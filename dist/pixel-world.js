@@ -1,9 +1,9 @@
-import {pierRings,landPolygons,coastLines,buildingFootprints,FISHING_SPOTS,onLand,onPier} from './geography.js?v=20260927-pixel-v5';
-import {HARBOR} from './harbor-layout.js?v=20260927-pixel-v5';
-import {depthInfoAt} from './bathymetry.js?v=20260927-pixel-v5';
-import {createWildlife,drawWildlife} from './pixel-wildlife.js?v=20260927-pixel-v5';
-import {cameraOffset,unprojectPixel,stepDeadzoneCamera,keepCameraPointsVisible,cameraDeadzone,rectilinearOutline} from './pixel-camera.js?v=20260927-pixel-v5';
-import {ladderPoint} from './swimming.js?v=20260927-pixel-v5';
+import {pierRings,landPolygons,coastLines,buildingFootprints,FISHING_SPOTS,onLand,onPier} from './geography.js?v=20260927-pixel-v6';
+import {HARBOR} from './harbor-layout.js?v=20260927-pixel-v6';
+import {depthInfoAt} from './bathymetry.js?v=20260927-pixel-v6';
+import {createWildlife,drawWildlife} from './pixel-wildlife.js?v=20260927-pixel-v6';
+import {cameraOffset,unprojectPixel,stepDeadzoneCamera,keepCameraPointsVisible,cameraDeadzone,rectilinearOutline} from './pixel-camera.js?v=20260927-pixel-v6';
+import {ladderPoint} from './swimming.js?v=20260927-pixel-v6';
 
 // The map keeps the same metre coordinates as the sailing simulation. The
 // people and boat are deliberately enlarged, like a handheld-era RPG, so that

@@ -16,15 +16,15 @@ No build step, API key, backend or account. The pixel edition uses Canvas 2D and
 
 ## The journey
 
-Start at 06:00, a few steps from the rental counter → pack free starter equipment → request the empty skiff's davit lowering → walk down the real left-side stair alignment → board → unmoor → start the engine and steer, or choose a waypoint after buying and carrying a chart → coast down, anchor and select a rig → hold/release to cast → watch the float and strike → reel and manage drag/tension → keep the fish or record/release → return, dock, walk to the counter and exchange retained catches → buy and pack equipment.
+Start at 06:00, a few steps from the rental counter → check the personal backpack (free starter gear is already enabled) → request the empty skiff's davit lowering → walk down the real left-side stair alignment → board → unmoor → start the engine and steer, or choose a waypoint after buying and carrying a chart → coast down, anchor and select a rig → hold/release to cast → watch the float and strike → reel and manage drag/tension → keep the fish or record/release → return, dock, walk to the counter and exchange retained catches → buy equipment and assemble each rod independently.
 
-- **WASD / left joystick:** walk or swim; aboard, forward/reverse throttle and steering. Releasing the momentary control returns to neutral while the boat retains momentum.
+- **WASD / left joystick:** walk; aboard, forward/reverse throttle and steering. Releasing the momentary control returns to neutral while the boat retains momentum.
 - **E:** contextual interaction. **G:** walk to the hut or boarding platform.
 - **R:** engine. **Q:** anchor. **I:** equipment. **M:** chart. **J:** catches.
 - **Hold Space / cast button, then release:** charge and cast. Tap at a bite to strike. Hold while fishing to lift the lure or raise the rod.
 - **Hold F / reel button:** reel. During a fight the on-screen − / + buttons change drag.
 - Tap accessible ground to walk there; after carrying a chart, tap navigable water to choose an assisted course.
-- The boat actions menu allows standing, moving on deck, entering the water, changing rigs and returning. Swimmers can approach the stern ladder and climb back. Settings includes free recovery.
+- The boat actions menu allows standing, moving within the deck rails, assembling rods and returning. Wharf edges and boat rails block the player; the pixel edition has no falling or swimming mechanic. Settings includes free recovery.
 - Opening a menu pauses simulation. Focus loss, orientation change and pointer cancellation clear held actions. Switching away pauses the trip.
 
 The touch interface remains visible on all devices, supports separate pointer ownership for the two thumbs and keeps a tall world view in portrait. It does not rely on mouse hover or pointer lock.
@@ -36,7 +36,7 @@ The touch interface remains visible on all devices, supports separate pointer ow
 - `pixel-sim.js`: DOM-free game model and validated player actions.
 - `pixel-game.js` / `pixel.css`: interface, keyboard/touch input, menus, saves, audio and page-scoped accessible tools.
 
-The edition reuses the real metre-coordinate OSM coastline, wharf and building footprints, NOAA depth grid, SI vessel dynamics, hull collisions, swimming model, gear catalogue and economic invariants. The 24-second davit sequence, walking and fishing use active real-time durations. The game calendar advances at 2× active real time to match the 1:2 offshore passage scale; physical dynamics do not receive a second time multiplier. New and resumed days start at 06:00. Menus pause the clock. Portrait and landscape share the same simulation.
+The edition reuses the real metre-coordinate OSM coastline, wharf and building footprints, NOAA depth grid, SI vessel dynamics, hull collisions, gear catalogue and economic invariants. Walking is 2.90 m/s before the carried-weight adjustment, twice the former speed. The 24-second davit sequence and fishing use active real-time durations. The game calendar advances at 2× active real time to match the 1:2 offshore passage scale; physical dynamics do not receive a second time multiplier. New and resumed days start at 06:00. Menus pause the clock. Portrait and landscape share the same simulation.
 
 The equipment catalogue has free starter gear plus rods, reel, line, leaders, several rigs/baits, sinkers, larger cooler, sounder and drift equipment. There are five representative fish species. Habitat, depth, bait and tackle affect probabilities; species are not locked behind specific purchases. The fish reward ledger prevents double settlement. Retained fish require a counter visit; released fish earn a recorded release reward.
 
@@ -50,12 +50,12 @@ Sources: `dist/SOURCES.html`, `dist/credits.html`, `dist/data/`, and `qa/wharf-c
 
 ## Validation
 
-`npm run check` syntax-checks every shipped JavaScript module. `npm test` covers the pixel full journey, economy, casting/bait, swim/reboarding, resume recovery, momentary mobile input, rigs and destinations, plus existing vessel/collision/geography/depth/pointer suites. See `qa/pixel/PLAYTEST.md` for actual browser evidence and responsive screenshots. Page-scoped WebMCP tools expose only normal player actions and a read-only state report; they cannot teleport, skip time, force bites or create fish.
+`npm run check` syntax-checks every shipped JavaScript module. `npm test` covers the pixel full journey, economy, casting/bait, edge blocking, personal inventory, independent rod assemblies, resume recovery, momentary mobile input, rigs and destinations, plus existing vessel/collision/geography/depth/pointer suites. See `qa/pixel/PLAYTEST.md` for actual browser evidence and responsive screenshots. Page-scoped WebMCP tools expose only normal player actions and a read-only state report; they cannot teleport, skip time, force bites or create fish.
 
 ## September 27 gameplay expansion
 
-- **Compressed passages:** offshore powered navigation uses a 1:2 game-distance scale, smoothly returning to full scale near the landing. GPS and shoreline coordinates are unchanged. Walking, swimming, the davit and fishing retain normal active-time pacing; the calendar beginning at 06:00 now runs at 2× active real time.
-- **Earn your instruments:** no starting chart, GPS, compass or depth sounder. A purchased instrument must also be packed. A paper chart enables route selection but has no own-position marker. GPS adds position/speed; the compass adds heading; the sounder adds depth and a historical bottom profile.
+- **Compressed passages:** offshore powered navigation uses a 1:2 game-distance scale, smoothly returning to full scale near the landing. GPS and shoreline coordinates are unchanged. The davit and fishing retain normal active-time pacing; the calendar beginning at 06:00 now runs at 2× active real time.
+- **Earn your instruments:** no starting chart, GPS, compass or depth sounder. A purchased instrument must also be enabled in the personal backpack. A paper chart enables route selection but has no own-position marker. GPS adds position/speed; the compass adds heading; the sounder adds depth and a historical bottom profile.
 - **Six fishing presentations:** single-hook bottom, two-hook dropper, sliding sinker, leadhead soft plastic, slip float and two-hook feather rig. Sinker mass, current, target layer, lifting/retrieval and structure affect sinking, attraction, snag risk and species weights. Every modelled species retains a nonzero encounter weight; there are no equipment species unlocks.
 - **Wildlife:** occasional bait schools with feeding seabirds, dolphin pods and seasonal whales. Region, bottom depth, daylight and sea conditions affect availability. Wildlife uses its own random source. Rates are deliberately illustrative game tuning, not observed population/catch rates.
 - **Unannounced inspections:** players decide whether to keep a fish with no advance legal warning or forced release. Random patrols and occasional dock inspections assess recorded capture evidence, then confiscate supported violations from current cargo. Legal and illegal cargo have the same inspection selection process. Checks do not invent violations when a legacy save lacks evidence.
@@ -75,10 +75,19 @@ Primary references:
 
 ## Pixel usability update
 
-- Persistent 30-slot backpack and shore locker, with original icons for all 30 catalogue items. Tap an item for details; move to an empty slot or swap occupied slots. Mouse dragging and keyboard grid navigation are also supported. Buying and packing still require the counter.
+- Persistent personal backpack with at least 30 slots and original icons for all 30 catalogue items. All owned items remain in its grid, whether enabled or put away; previous locker contents migrate into it. Tap an item for details; move to an empty slot or swap occupied slots. Mouse dragging and keyboard grid navigation are also supported. Organizing and enabling equipment works anywhere. Only purchases, supplies and fish exchange require the counter.
 - Walking keeps the camera still across a broad screen deadzone. Scene geometry uses cached horizontal/vertical art outlines with a shared integer camera offset, while real geographic collision polygons remain unchanged.
 - The calendar runs at 2× active real time, including capture timestamps. Menus pause simulation. Every new or resumed day starts at 06:00.
-- Worker, boarding, engine, anchor and ladder actions follow their scene targets. The joystick and held fishing controls stay in the thumb areas.
-- Original 16-bar, 100 BPM background music plus interaction, footsteps, casting, water entry, bites, reeling, catches, purchase and engine effects. Music and master sound are separately switchable; music volume is adjustable and saved. Audio starts only after a user gesture, pauses in the background and continues through inventory menus.
+- Worker, boarding, engine and anchor actions follow their scene targets. The joystick and held fishing controls stay in the thumb areas.
+- Original 16-bar, 100 BPM background music plus interaction, footsteps, casting, bites, reeling, catches, purchase and engine effects. Music and master sound are separately switchable; music volume is adjustable and saved. Audio starts only after a user gesture, pauses in the background and continues through inventory menus.
 
 See `qa/pixel-usability/PLAYTEST.md` for this update’s actual browser checks.
+
+## Personal equipment and rod assembly update
+
+- Each owned rod has its own seven assembly slots: reel, main line, leader, rig, bait, weight and fishing layer; drag is saved separately for each rod too. Editing another rod does not change the held rod. A separate action picks it up. Parts have ownership and stock requirements, and a unique paid component transfers between rods instead of being duplicated.
+- The active rod's parts drive the fishing model, including retrieval, line diameter, drag and presentation. Rig changes reset weight/layer to compatible defaults. Saves preserve each rod's assembly and hook-bait condition.
+- Walking is twice as fast. Swept collision checks block wharf edges and deck movement stays within the rails. Old swimming saves recover safely at the dock while preserving equipment and catches.
+- Mobile UI disables text selection and callouts. The map jump on pointer-down was a shared `.held` rule translating the entire canvas by 2 CSS pixels; that press effect now applies only to buttons. The canvas and joystick remain stationary under touch.
+
+See `qa/pixel-rods/PLAYTEST.md` for responsive browser verification.
