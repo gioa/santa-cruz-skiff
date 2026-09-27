@@ -1,7 +1,7 @@
-import {GEAR_CATALOG} from './equipment.js?v=20260927-pixel-v11';
-import {getRigProfile} from './fishing-rigs.js?v=20260927-pixel-v11';
-import {rodAssemblyOptions} from './pixel-rod-loadouts.js?v=20260927-pixel-v11';
-import {drawItemIcon} from './pixel-item-icons.js?v=20260927-pixel-v11';
+import {GEAR_CATALOG} from './equipment.js?v=20260927-pixel-v12';
+import {getRigProfile} from './fishing-rigs.js?v=20260927-pixel-v12';
+import {rodAssemblyOptions} from './pixel-rod-loadouts.js?v=20260927-pixel-v12';
+import {drawItemIcon} from './pixel-item-icons.js?v=20260927-pixel-v12';
 
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const slots=[['reel','绕线轮','reel_smooth'],['line','主线','line_braid'],['leader','前导','leader_heavy'],['rig','钓组','tackle'],['bait','鱼饵','bait'],['weightGrams','配重','sinker_heavy'],['fishingDepthMeters','饵层','rig_float']];

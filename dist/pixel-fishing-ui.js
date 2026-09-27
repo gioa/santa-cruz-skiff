@@ -1,5 +1,5 @@
-import {bindPointer} from './input.js?v=20260927-pixel-v11';
-import {rodPoseFromDrag,clockwiseTurns,createCrankInput} from './pixel-fishing-input.js?v=20260927-pixel-v11';
+import {bindPointer} from './input.js?v=20260927-pixel-v12';
+import {rodPoseFromDrag,clockwiseTurns,createCrankInput} from './pixel-fishing-input.js?v=20260927-pixel-v12';
 
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const rigNames={bottom:'沉底组',dropper:'双支线',slider:'滑铅组',jig:'软饵组',float:'浮漂组',sabiki:'羽毛组'};
@@ -57,12 +57,12 @@ export function mountFishingConsole(root,{sim,getActions,isRetrieving=()=>false,
   if(!compact){c.textAlign='right';c.fillText(`${Math.round(s.rodAzimuth??70)}°`,w-8,16);c.fillStyle='#75866a';c.fillRect(8,h-9,w-16,3);c.fillStyle=bend>.85?'#b76e4f':'#427568';c.fillRect(8,h-9,(w-16)*bend,3);}
  }
  function paintReel(s){
-  const c=wheel.getContext('2d'),w=wheel.width,h=wheel.height,cx=w*.46,cy=h*.49,r=Math.min(w,h)*.32;
-  c.clearRect(0,0,w,h);c.fillStyle='#d8ccaa';c.fillRect(0,0,w,h);c.fillStyle='#81907b';c.fillRect(cx-13,cy+r-1,26,h-cy-r);c.fillStyle='#304c45';c.beginPath();c.arc(cx,cy,r+6,0,TAU);c.fill();c.fillStyle='#a5ae8b';c.beginPath();c.arc(cx,cy,r+2,0,TAU);c.fill();c.fillStyle='#36594f';c.beginPath();c.arc(cx,cy,r-4,0,TAU);c.fill();
+  const focus=document.getElementById('app')?.classList.contains('is-fishing-focus'),c=wheel.getContext('2d'),w=wheel.width,h=wheel.height,cx=w*.46,cy=h*.49,r=Math.min(w,h)*.32;
+  c.clearRect(0,0,w,h);c.fillStyle=focus?'#284b4c':'#d8ccaa';c.fillRect(0,0,w,h);c.fillStyle='#81907b';c.fillRect(cx-13,cy+r-1,26,h-cy-r);c.fillStyle='#304c45';c.beginPath();c.arc(cx,cy,r+6,0,TAU);c.fill();c.fillStyle='#a5ae8b';c.beginPath();c.arc(cx,cy,r+2,0,TAU);c.fill();c.fillStyle='#36594f';c.beginPath();c.arc(cx,cy,r-4,0,TAU);c.fill();
   c.save();c.translate(cx,cy);c.rotate(rotation*.32);c.strokeStyle='#b6c6a3';c.lineWidth=2;for(let i=0;i<8;i++){const a=i/8*TAU;c.beginPath();c.moveTo(Math.cos(a)*8,Math.sin(a)*8);c.lineTo(Math.cos(a)*(r-8),Math.sin(a)*(r-8));c.stroke();}c.restore();
   for(let i=0;i<4;i++){c.strokeStyle='#d8d4a3';c.lineWidth=1.5;c.beginPath();c.arc(cx,cy,10+i*3,0,TAU);c.stroke();}
   const x=cx+Math.cos(rotation)*r*.84,y=cy+Math.sin(rotation)*r*.84;c.strokeStyle='#d5d3ab';c.lineWidth=6;c.beginPath();c.moveTo(cx,cy);c.lineTo(x,y);c.stroke();c.fillStyle='#254a43';c.fillRect(x-7,y-5,14,10);c.fillStyle='#728b71';c.fillRect(x-6,y-5,12,3);c.fillStyle='#deb46d';c.beginPath();c.arc(cx,cy,5,0,TAU);c.fill();
-  c.fillStyle='#355e50';c.font='11px monospace';c.textAlign='left';c.fillText(`${(s.paidLineMeters||0).toFixed(1)} m`,8,15);c.fillStyle=s.reelMode==='free'?'#aa654c':'#4c7261';c.fillRect(w-13,7,6,6);
+  c.fillStyle=focus?'#fff0c6':'#355e50';c.font='11px monospace';c.textAlign='left';c.fillText(`${(s.paidLineMeters||0).toFixed(1)} m`,8,15);c.fillStyle=s.reelMode==='free'?'#aa654c':'#4c7261';c.fillRect(w-13,7,6,6);
  }
  function update(){
   const s=sim.state,a=cancelUnavailable(actions()),show=(el,visible)=>{el.hidden=!visible;if(el.tagName==='BUTTON'||el.tagName==='SELECT')el.disabled=!visible;};
