@@ -373,3 +373,8 @@
 #drag-knob .drag-marks{font:10px/1.6 ui-monospace,monospace;opacity:.65}
 #rod-load{font-size:10px;color:#527263}
 #rod-monitor b{max-width:7em;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+
+/* Whole rigs and bait remain touch-sized independent inventory slots. */
+.premade-workbench .rod-assembly-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.premade-workbench .assembly-slot{min-height:132px}.supply-condition{font-size:9px;color:#536a54;line-height:1.35}.supply-condition.empty{color:#935334}.supply-action{font-size:9px;padding:3px 6px;background:#ded0ab;color:#344f48}.premade-workbench .rod-part{min-height:110px}.premade-workbench .rod-part-options{max-height:360px}.rod-part:disabled .supply-action{background:transparent}.premade-workbench .assembly-slot strong{font-size:11px}
+@media(max-width:600px){.premade-workbench .assembly-slot{min-height:106px}.premade-workbench .rod-part{min-height:104px}.premade-workbench .rod-part-options{max-height:232px}.premade-workbench .assembly-slot strong{font-size:10px}}
+@media(max-height:500px) and (orientation:landscape){.premade-workbench .rod-part-options{max-height:132px}.premade-workbench .assembly-slot{min-height:115px}.premade-workbench .rod-part{min-height:94px}}

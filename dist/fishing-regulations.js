@@ -99,10 +99,10 @@ function salmonGear(fish,context,result){
  const bait=evidence('bait'),trolling=evidence('trolling');
  if(bait===true&&trolling===false){
   checkRequired('circleHook','salmon_circle_hook_required');
-  if(Number(evidence('hookCount'))===2){checkRequired('hardTied','salmon_hard_tied_required');const spacing=evidence('hookSpacingInches');if(!finitePositive(spacing))result.unsupported.push(unsupported('hookSpacingInches_not_recorded'));else if(Number(spacing)>5)result.violations.push(issue('salmon_hook_spacing','rig','非拖钓饵钓鲑鱼的双钩间距超过五英寸。',SOURCE.salmon,{actual:Number(spacing),maximum:5}));}
+  if(Number(evidence('hookCount'))===2){checkRequired('hardTied','salmon_hard_tied_required');const spacing=evidence('hookSpacingInches');if(!finitePositive(spacing))result.unsupported.push(unsupported('hookSpacingInches_not_recorded'));else if(Number(spacing)>5)result.violations.push(issue('salmon_hook_spacing','rig','非拖钓饵钓鲑鱼的双钩间距超过 12.7 cm。',SOURCE.salmon,{actual:Number(spacing),maximum:5}));}
  }else if(bait!==false&&trolling!==true)result.unsupported.push(unsupported('salmon_bait_or_trolling_not_recorded'));
  const sinker=evidence('sinkerLb');
- if(sinker!=null&&Number.isFinite(Number(sinker))&&Number(sinker)>4){if(evidence('breakawayWeight')===false)result.violations.push(issue('salmon_sinker_limit','rig','鲑鱼钓线上的坠重超过四磅且无独立脱离装置。',SOURCE.salmon));else if(evidence('breakawayWeight')!==true)result.unsupported.push(unsupported('salmon_weight_release_not_recorded'));}
+ if(sinker!=null&&Number.isFinite(Number(sinker))&&Number(sinker)>4){if(evidence('breakawayWeight')===false)result.violations.push(issue('salmon_sinker_limit','rig','鲑鱼钓线上的坠重超过约 1.814 kg 且无独立脱离装置。',SOURCE.salmon));else if(evidence('breakawayWeight')!==true)result.unsupported.push(unsupported('salmon_weight_release_not_recorded'));}
 }
 
 /** Evaluate one capture using its historical capture location/date/tackle.
@@ -139,12 +139,12 @@ export function assessCatch(fish={},context={}){
   if(Number.isFinite(Number(rig.hookCount))&&Number(rig.hookCount)>2)result.violations.push(issue('groundfish_hook_limit','rig','捕捞或持有底栖鱼时最多使用两个钩。',SOURCE.general,{actual:Number(rig.hookCount),maximum:2}));
  }
  if(sp.groundfish){if(rig.hasDescendingDevice===false)result.violations.push(issue('descending_device_required','rig','船上需要可立即使用的降鱼器。',SOURCE.groundfish));else if(rig.hasDescendingDevice!==true)result.unsupported.push(unsupported('descending_device_not_recorded'));}
- if(rig.landingNetDiameterInches===false||Number.isFinite(rig.landingNetDiameterInches)&&rig.landingNetDiameterInches<18)result.violations.push(issue('landing_net_required','rig','船钓需要可立即使用且开口至少十八英寸的抄网。',SOURCE.general,{minimumInches:18}));else if(!Number.isFinite(rig.landingNetDiameterInches))result.unsupported.push(unsupported('landing_net_not_recorded'));
+ if(rig.landingNetDiameterInches===false||Number.isFinite(rig.landingNetDiameterInches)&&rig.landingNetDiameterInches<18)result.violations.push(issue('landing_net_required','rig','船钓需要可立即使用且开口至少 45.72 cm 的抄网。',SOURCE.general,{minimumInches:18}));else if(!Number.isFinite(rig.landingNetDiameterInches))result.unsupported.push(unsupported('landing_net_not_recorded'));
  // South of Pigeon Point and within 1,000 yards of mean high tide. This
  // emergency amendment took effect July 3, not its June adoption date.
  // A recorded shore distance is needed; guessed geography is not evidence.
  const emergency=RULESET_2026.nearshoreGearEmergency;
- if(date>=emergency.effectiveFrom&&date<=emergency.expires&&Number.isFinite(rig.shoreDistanceMeters)&&rig.shoreDistanceMeters>=0&&rig.shoreDistanceMeters<=emergency.maximumDistanceMeters){if(rig.wireLeader===true)result.violations.push(issue('nearshore_wire_leader','rig','近岸一千码范围不允许金属钓线或前导。',SOURCE.general,{effectiveFrom:emergency.effectiveFrom}));if(Number.isFinite(rig.hookGapInches)&&rig.hookGapInches>emergency.maximumHookGapInches)result.violations.push(issue('nearshore_hook_gap','rig','近岸一千码范围钩内最宽距离不可超过一点五英寸。',SOURCE.general,{maximumInches:emergency.maximumHookGapInches,actual:rig.hookGapInches,effectiveFrom:emergency.effectiveFrom}));}
+ if(date>=emergency.effectiveFrom&&date<=emergency.expires&&Number.isFinite(rig.shoreDistanceMeters)&&rig.shoreDistanceMeters>=0&&rig.shoreDistanceMeters<=emergency.maximumDistanceMeters){if(rig.wireLeader===true)result.violations.push(issue('nearshore_wire_leader','rig','距岸 914.4 m 范围内不允许金属钓线或前导。',SOURCE.general,{effectiveFrom:emergency.effectiveFrom}));if(Number.isFinite(rig.hookGapInches)&&rig.hookGapInches>emergency.maximumHookGapInches)result.violations.push(issue('nearshore_hook_gap','rig','距岸 914.4 m 范围内，钩内最宽距离不可超过 3.81 cm。',SOURCE.general,{maximumInches:emergency.maximumHookGapInches,actual:rig.hookGapInches,effectiveFrom:emergency.effectiveFrom}));}
  // The modeled Santa Cruz area is wholly north of Point Sur's magnetic
  // west boundary. The ledger applies its two-fish halibut bag only locally.
  return finish(result);

@@ -1,7 +1,7 @@
-import {getRigProfile} from './fishing-rigs.js?v=20260927-pixel-v17';
-import {bindPointer} from './input.js?v=20260927-pixel-v17';
-import {rodPoseFromDrag,clockwiseTurns,createCrankInput} from './pixel-fishing-input.js?v=20260927-pixel-v17';
-import {fishingFeedback,reelMotion} from './pixel-fishing-feedback.js?v=20260927-pixel-v17';
+import {getRigProfile} from './fishing-rigs.js?v=20260927-pixel-v18';
+import {bindPointer} from './input.js?v=20260927-pixel-v18';
+import {rodPoseFromDrag,clockwiseTurns,createCrankInput} from './pixel-fishing-input.js?v=20260927-pixel-v18';
+import {fishingFeedback,reelMotion} from './pixel-fishing-feedback.js?v=20260927-pixel-v18';
 
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const rigNames={bottom:'沉底组',dropper:'双支线',slider:'滑铅组',jig:'软饵组',float:'浮漂组',sabiki:'羽毛组'};
@@ -68,7 +68,8 @@ export function mountFishingConsole(root,{sim,getActions,isRetrieving=()=>false,
  }
  function update(){
   const s=sim.state,a=cancelUnavailable(actions()),feedback=fishingFeedback(s),show=(el,visible)=>{el.hidden=!visible;if(el.tagName==='BUTTON'||el.tagName==='SELECT')el.disabled=!visible;};
-  get('tackle-name').textContent=`${mountNames[s.rodMount]||'手持'} · ${rigNames[s.rig]||'钓组'}`;get('rod-load').textContent=feedback.cue;
+  const supplies=s.fishState==='idle'?sim.rodConsumableStatus?.():null,needsRig=supplies&&(!supplies.rig.present||supplies.rig.condition<=.08),needsBait=supplies&&!needsRig&&supplies.requiresBait!==false&&!(supplies.bait?.condition>.08);
+  get('tackle-name').textContent=needsRig?'未装钓组 · 打开鱼竿更换':needsBait?'需要换饵 · 打开鱼竿更换':`${mountNames[s.rodMount]||'手持'} · ${rigNames[s.rig]||'钓组'}`;get('rod-load').textContent=feedback.cue;
   show(pose,a.pose);pose.setAttribute('role',a.adjustPose?'slider':'img');pose.tabIndex=a.adjustPose?0:-1;pose.style.cursor=a.adjustPose?'move':'default';pose.setAttribute('aria-valuenow',String(Math.round(s.rodElevation??45)));pose.setAttribute('aria-valuetext',`抬竿 ${Math.round(s.rodElevation??45)} 度，朝向 ${Math.round(s.rodAzimuth??70)} 度，${feedback.bendLabel}`);pose.removeAttribute('aria-disabled');
   wheel.setAttribute('role',a.reel?'slider':'img');wheel.tabIndex=a.reel?0:-1;wheel.style.cursor=a.reel?'grab':'default';wheel.setAttribute('aria-valuenow',String(Math.round((s.paidLineMeters||0)*10)/10));wheel.setAttribute('aria-valuetext',`${feedback.cue}，已放线 ${(s.paidLineMeters||0).toFixed(1)} 米`);wheel.removeAttribute('aria-disabled');
   show(get('reel-instrument'),a.reelInstrument);show(hold,a.reel);show(spool,a.spool);spool.textContent=s.reelMode==='free'?'锁住线杯':'打开线杯';spool.setAttribute('aria-pressed',String(s.reelMode==='free'));

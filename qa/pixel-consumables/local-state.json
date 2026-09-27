@@ -1,0 +1,645 @@
+{
+  "activeRod": "rod",
+  "activeSeconds": 43,
+  "anchor": false,
+  "arrival": "counter",
+  "audio": {
+    "activeVoices": 5,
+    "contextState": "running",
+    "enabled": true,
+    "masterVolume": 0.55,
+    "musicBar": 8,
+    "musicDuck": 1,
+    "musicEnabled": true,
+    "musicVoices": 5,
+    "musicVolume": 0.34,
+    "paused": false,
+    "reel": {
+      "active": false,
+      "crank": 0,
+      "crankFrequency": 0,
+      "crankVolume": 0,
+      "feedFrequency": 0,
+      "feedVolume": 0,
+      "gearFrequency": 0,
+      "lineVolume": 0,
+      "mode": "brake",
+      "payout": 0,
+      "ratchetFrequency": 0,
+      "ratchetHz": 0,
+      "ratchetVolume": 0,
+      "retrieve": 0,
+      "totalTicks": 0,
+      "voices": 0
+    },
+    "scheduledNotes": 0,
+    "scoreBPM": 100,
+    "totalEffects": 23,
+    "totalMusicNotes": 1520
+  },
+  "autoWalking": false,
+  "availableActions": {
+    "adjustPose": false,
+    "anchor": false,
+    "assemble": false,
+    "cast": false,
+    "catch": false,
+    "console": false,
+    "dock": false,
+    "drag": false,
+    "engine": false,
+    "helm": false,
+    "hook": false,
+    "lower": false,
+    "monitor": false,
+    "mount": false,
+    "mounted": false,
+    "pose": false,
+    "reel": false,
+    "reelInstrument": false,
+    "retrieve": false,
+    "return": false,
+    "spool": false,
+    "switchLabel": "操船",
+    "switchPanel": false,
+    "tackle": false,
+    "take": false,
+    "unmoor": false
+  },
+  "boat": {
+    "heading": 0,
+    "x": -34.2,
+    "z": -55
+  },
+  "boats": {
+    "parked": [
+      {
+        "afloat": false,
+        "bounds": {
+          "bottom": 758.3161690140845,
+          "left": 151.57682926829267,
+          "right": 264.58170731707315,
+          "top": 696.6922816901409
+        },
+        "heading": 1.5707963267948966,
+        "height": 112.97712676056338,
+        "lift": 0,
+        "phase": "rack",
+        "scale": 1.08,
+        "screenX": 208.0792682926829,
+        "screenY": 727.5042253521127,
+        "stage": "stored",
+        "width": 61.639024390243904,
+        "x": -19,
+        "z": -33
+      },
+      {
+        "afloat": false,
+        "bounds": {
+          "bottom": 836.7725070422534,
+          "left": 151.57682926829267,
+          "right": 264.58170731707315,
+          "top": 775.1486197183099
+        },
+        "heading": 1.5707963267948966,
+        "height": 112.97712676056338,
+        "lift": 0,
+        "phase": "rack",
+        "scale": 1.08,
+        "screenX": 208.0792682926829,
+        "screenY": 805.9605633802817,
+        "stage": "stored",
+        "width": 61.639024390243904,
+        "x": -19,
+        "z": -22
+      }
+    ],
+    "player": {
+      "afloat": true,
+      "bounds": {
+        "bottom": 627.0801126760563,
+        "left": 69.05853658536584,
+        "right": 130.69756097560975,
+        "top": 514.1029859154929
+      },
+      "heading": 0,
+      "height": 112.97712676056338,
+      "lift": 0,
+      "phase": "water",
+      "scale": 1.08,
+      "screenX": 99.8780487804878,
+      "screenY": 570.5915492957746,
+      "stage": "afloat",
+      "width": 61.639024390243904,
+      "x": -34.2,
+      "z": -55
+    }
+  },
+  "breaks": 0,
+  "camera": {
+    "deadzone": {
+      "bottom": 540,
+      "left": 59,
+      "right": 269,
+      "top": 149
+    },
+    "framing": {
+      "all": null,
+      "playfield": {
+        "bottom": 562.2704225352113,
+        "left": 23.78048780487805,
+        "right": 366.219512195122,
+        "top": 120.06197183098593
+      },
+      "primary": null
+    },
+    "height": 710,
+    "mode": "deadzone",
+    "scale": 6,
+    "width": 328,
+    "x": -20.83,
+    "z": -79.38
+  },
+  "canOperateHelm": true,
+  "castPower": 0,
+  "casting": false,
+  "casts": 23,
+  "catches": [
+    {
+      "caughtAt": "2026-09-27T13:02:24.009Z",
+      "confiscated": false,
+      "hookCount": 1,
+      "kept": false,
+      "kg": 1.57,
+      "length": 45,
+      "name": "加州大比目鱼",
+      "rig": {
+        "fishingDepthMeters": null,
+        "hookCount": 1,
+        "id": "bottom",
+        "leader": null,
+        "line": null,
+        "lineCount": 1,
+        "reel": null,
+        "rod": "rod",
+        "weightGrams": 85,
+        "wireLeader": false
+      },
+      "settled": true
+    },
+    {
+      "caughtAt": "2026-09-27T13:09:10.206Z",
+      "confiscated": false,
+      "hookCount": 1,
+      "kept": true,
+      "kg": 4.02,
+      "length": 60,
+      "name": "长蛇齿单线鱼",
+      "rig": {
+        "fishingDepthMeters": null,
+        "hookCount": 1,
+        "id": "bottom",
+        "leader": null,
+        "line": null,
+        "lineCount": 1,
+        "reel": null,
+        "rod": "rod",
+        "weightGrams": 85,
+        "wireLeader": false
+      },
+      "settled": false
+    },
+    {
+      "caughtAt": "2026-09-27T13:14:44.806Z",
+      "confiscated": false,
+      "hookCount": 1,
+      "kept": false,
+      "kg": 2.26,
+      "length": 46,
+      "name": "铜岩鱼",
+      "rig": {
+        "fishingDepthMeters": null,
+        "hookCount": 1,
+        "id": "bottom",
+        "leader": null,
+        "line": null,
+        "lineCount": 1,
+        "reel": null,
+        "rod": "rod",
+        "weightGrams": 85,
+        "wireLeader": false
+      },
+      "settled": true
+    },
+    {
+      "caughtAt": "2026-09-27T13:08:17.742Z",
+      "confiscated": false,
+      "hookCount": 1,
+      "kept": false,
+      "kg": 1.45,
+      "length": 39,
+      "name": "铜岩鱼",
+      "rig": {
+        "fishingDepthMeters": null,
+        "hookCount": 1,
+        "id": "bottom",
+        "leader": null,
+        "line": null,
+        "lineCount": 1,
+        "reel": null,
+        "rod": "rod",
+        "weightGrams": 85,
+        "wireLeader": false
+      },
+      "settled": true
+    },
+    {
+      "caughtAt": "2026-09-27T13:02:40.245Z",
+      "confiscated": false,
+      "hookCount": 1,
+      "kept": false,
+      "kg": 0.56,
+      "length": 28,
+      "name": "蓝岩鱼",
+      "rig": {
+        "fishingDepthMeters": null,
+        "hookCount": 1,
+        "id": "bottom",
+        "leader": null,
+        "line": null,
+        "lineCount": 1,
+        "reel": null,
+        "rod": "rod",
+        "weightGrams": 85,
+        "wireLeader": false
+      },
+      "settled": true
+    },
+    {
+      "caughtAt": "2026-09-27T13:03:57.212Z",
+      "confiscated": false,
+      "hookCount": 1,
+      "kept": false,
+      "kg": 1.47,
+      "length": 44,
+      "name": "加州大比目鱼",
+      "rig": {
+        "fishingDepthMeters": null,
+        "hookCount": 1,
+        "id": "bottom",
+        "leader": null,
+        "line": null,
+        "lineCount": 1,
+        "reel": null,
+        "rod": "rod",
+        "weightGrams": 85,
+        "wireLeader": false
+      },
+      "settled": true
+    },
+    {
+      "caughtAt": "2026-09-27T13:07:21.239Z",
+      "confiscated": false,
+      "hookCount": 1,
+      "kept": false,
+      "kg": 1.34,
+      "length": 40,
+      "name": "长蛇齿单线鱼",
+      "rig": {
+        "bait": "squid",
+        "breakawayWeight": false,
+        "fishingDepthMeters": null,
+        "hookCount": 1,
+        "id": "bottom",
+        "leader": null,
+        "line": null,
+        "lineCount": 1,
+        "reel": null,
+        "rod": "rod",
+        "rodCount": 1,
+        "sinkerLb": 0.18739307571562108,
+        "trolling": false,
+        "weightGrams": 85,
+        "wireLeader": false
+      },
+      "settled": true
+    },
+    {
+      "caughtAt": "2026-09-27T13:04:55.107Z",
+      "confiscated": false,
+      "hookCount": 1,
+      "kept": false,
+      "kg": 2.2,
+      "length": 51,
+      "name": "加州大比目鱼",
+      "rig": {
+        "bait": true,
+        "breakawayWeight": false,
+        "circleHook": true,
+        "fishingDepthMeters": null,
+        "hookCount": 1,
+        "id": "bottom",
+        "leader": null,
+        "line": null,
+        "lineCount": 1,
+        "reel": null,
+        "rod": "rod",
+        "rodCount": 1,
+        "sinkerLb": 0.18739307571562108,
+        "trolling": false,
+        "weightGrams": 85,
+        "wireLeader": false
+      },
+      "settled": true
+    },
+    {
+      "caughtAt": "2026-09-27T13:04:55.583Z",
+      "confiscated": false,
+      "hookCount": 1,
+      "kept": false,
+      "kg": 0.43,
+      "length": 27,
+      "name": "朱红岩鱼",
+      "rig": {
+        "bait": true,
+        "breakawayWeight": false,
+        "circleHook": true,
+        "fishingDepthMeters": null,
+        "hookCount": 1,
+        "id": "bottom",
+        "leader": null,
+        "line": null,
+        "lineCount": 1,
+        "reel": null,
+        "rod": "rod",
+        "rodCount": 1,
+        "sinkerLb": 0.18739307571562108,
+        "trolling": false,
+        "weightGrams": 85,
+        "wireLeader": false
+      },
+      "settled": true
+    }
+  ],
+  "conditions": {
+    "clockMode": "morning",
+    "customHour": 8,
+    "daylight": 0.1,
+    "fresh": false,
+    "mode": "real",
+    "period": 9,
+    "tideMLLW": 0.17317951864908632,
+    "waterTemp": 15,
+    "waveDirection": 295,
+    "waveHeight": 1.3,
+    "windDirection": 320,
+    "windKnots": 11.66304
+  },
+  "consumables": {
+    "bait": {
+      "condition": 1,
+      "kind": "squid"
+    },
+    "baitStock": {
+      "anchovy": 0,
+      "jig": 3,
+      "sardine": 0,
+      "shrimp": 0,
+      "squid": 12
+    },
+    "requiresBait": true,
+    "rig": {
+      "condition": 0.975,
+      "id": "bottom",
+      "present": true
+    },
+    "rigStock": {
+      "bottom": 2,
+      "dropper": 0,
+      "float": 0,
+      "jig": 0,
+      "sabiki": 0,
+      "slider": 2
+    }
+  },
+  "crankRate": 0,
+  "dayStartAt": "2026-09-27T13:00:00.000Z",
+  "dragThresholdN": 17.72,
+  "ecology": {
+    "active": [],
+    "counts": {
+      "bait": 0,
+      "dolphins": 0,
+      "whale": 0
+    },
+    "encounters": [],
+    "illustrativeRates": true
+  },
+  "edition": "pixel",
+  "engine": false,
+  "fish": null,
+  "fishMotion": null,
+  "fishPullN": 0,
+  "fishState": "idle",
+  "fishingDepthMeters": null,
+  "focusView": {
+    "active": false,
+    "height": 844,
+    "phase": "idle",
+    "view": "first-person",
+    "width": 390
+  },
+  "fps": 60,
+  "fuel": 100,
+  "gameSeconds": 86,
+  "gps": {
+    "lat": 36.96061314941172,
+    "lon": -122.02068594067556
+  },
+  "hasAnchor": false,
+  "helm": {
+    "gear": "N",
+    "lever": 0,
+    "manual": false,
+    "steer": 0,
+    "throttle": 0
+  },
+  "hookCount": 1,
+  "inspection": null,
+  "interaction": "码头小屋",
+  "lastInspection": null,
+  "launchProgress": 0,
+  "launchStage": "afloat",
+  "lineDistance": 0,
+  "lineSlackMeters": 0,
+  "loaded": false,
+  "lureDepth": null,
+  "maxPaidLineMeters": 120,
+  "menu": "gear",
+  "misses": 3,
+  "mode": "walk",
+  "moored": true,
+  "navigation": {
+    "chart": false,
+    "compass": false,
+    "depth": null,
+    "gps": true,
+    "gpsPosition": {
+      "lat": 36.96061314941172,
+      "lon": -122.02068594067556
+    },
+    "heading": 147.73626830563796,
+    "sounder": false,
+    "speedKnots": 0
+  },
+  "navigationScale": 1,
+  "packed": [
+    "pfd",
+    "rod",
+    "tackle",
+    "bait",
+    "cooler",
+    "net",
+    "descending_device",
+    "water",
+    "safety",
+    "gps",
+    "rod_light",
+    "rig_slider"
+  ],
+  "paidLineMeters": 0,
+  "paused": true,
+  "payoutRate": 0,
+  "phase": "fish",
+  "position": {
+    "x": -7.8,
+    "z": -54
+  },
+  "profile": {
+    "credits": 119,
+    "loadout": {
+      "cooler": "cooler",
+      "leader": null,
+      "line": null,
+      "reel": null,
+      "rod": "rod"
+    },
+    "owned": [
+      "pfd",
+      "rod",
+      "tackle",
+      "bait",
+      "cooler",
+      "net",
+      "descending_device",
+      "water",
+      "safety",
+      "rod_light",
+      "rig_slider",
+      "gps"
+    ],
+    "stock": {
+      "anchovy": 0,
+      "jig": 3,
+      "sardine": 0,
+      "shrimp": 0,
+      "squid": 12
+    }
+  },
+  "reelMode": "brake",
+  "referenceDepth": null,
+  "renderer": "Canvas 2D",
+  "rentalPaid": true,
+  "rentalPrice": 15,
+  "retrieveRate": 0,
+  "rig": "bottom",
+  "rigPresentation": null,
+  "rigStock": {
+    "bottom": [
+      {
+        "bait": null,
+        "condition": 1
+      },
+      {
+        "bait": {
+          "condition": 1,
+          "kind": "squid"
+        },
+        "condition": 1
+      }
+    ],
+    "dropper": [],
+    "float": [],
+    "jig": [],
+    "sabiki": [],
+    "slider": [
+      {
+        "bait": null,
+        "condition": 1
+      },
+      {
+        "bait": null,
+        "condition": 1
+      }
+    ]
+  },
+  "rigWeightGrams": 85,
+  "rodAssemblies": {
+    "rod": {
+      "bait": "squid",
+      "drag": 0.6688888888888889,
+      "fishingDepthMeters": null,
+      "leader": null,
+      "line": null,
+      "reel": null,
+      "rig": "bottom",
+      "weightGrams": 85
+    },
+    "rod_light": {
+      "bait": "squid",
+      "drag": 0.48,
+      "fishingDepthMeters": null,
+      "leader": null,
+      "line": null,
+      "reel": null,
+      "rig": "slider",
+      "weightGrams": 57
+    }
+  },
+  "rodAzimuth": 70,
+  "rodBend": 0,
+  "rodElevation": 45,
+  "rodLoadN": 0,
+  "rodMount": "hand",
+  "rodSupplies": {
+    "rod": {
+      "bait": {
+        "condition": 1,
+        "kind": "squid"
+      },
+      "condition": 0.975,
+      "rig": "bottom"
+    },
+    "rod_light": {
+      "bait": null,
+      "condition": 1,
+      "rig": "slider"
+    }
+  },
+  "sailedMeters": 2010,
+  "speedKnots": 0,
+  "stamina": 3,
+  "standing": false,
+  "swim": null,
+  "tension": 0,
+  "throttle": 0,
+  "time": "06:01:26",
+  "timeScale": 2,
+  "tripComplete": false,
+  "version": 5,
+  "view": "overhead",
+  "walkDestination": null,
+  "walkPending": false,
+  "walkedMeters": 180,
+  "waypoint": null
+}

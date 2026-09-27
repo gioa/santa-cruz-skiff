@@ -17,9 +17,9 @@ function quietDrop(sim){assert.ok(sim.lowerRig().ok);sim.state.biteAt=1e6;sim.st
 function pure(rig='bottom',extra={}){const s={rig,rigWeightGrams:85,boatX:0,boatZ:0,heading:0,rodElevation:45,rodAzimuth:70,rodMount:'hand',reelMode:'free',crankRate:0,drag:.48,pumpHeight:0,rodBend:0,rodLoadN:0,lureDepth:0,paidLineMeters:2.55,...extra};const tip=rodTipPosition(s);s.bobber??={x:tip.x,z:tip.z,height:0};return s;}
 function pureRun(s,seconds,options={}){for(let t=0;t<seconds-1e-8;t+=.1)Object.assign(s,stepFishingLine(s,{dt:.1,environment:{bottomDepth:20},...options}));return s;}
 
-test('vertical lowering consumes one bait, starts beside the real tip, and has no casting flight',()=>{
- const sim=ready();assert.ok(sim.lowerRig().ok);assert.equal(sim.state.castFlight,null);assert.equal(sim.state.fishState,'sinking');assert.equal(sim.state.reelMode,'free');assert.equal(sim.state.profile.stock.squid,11);assert.equal(sim.state.bobber.x,sim.state.rodTip.x);assert.equal(sim.state.bobber.z,sim.state.rodTip.z);assert.equal(sim.state.bobber.height,0);assert.equal(sim.state.floatPosition,null);
- assert.equal(sim.lowerRig().ok,false);assert.equal(sim.state.profile.stock.squid,11);sim.retrieve();assert.ok(sim.lowerRig().ok);assert.equal(sim.state.profile.stock.squid,11,'usable bait remains on its actual rod');
+test('vertical lowering uses installed bait without consuming a second portion, starts beside the real tip, and has no casting flight',()=>{
+ const sim=ready();assert.ok(sim.lowerRig().ok);assert.equal(sim.state.castFlight,null);assert.equal(sim.state.fishState,'sinking');assert.equal(sim.state.reelMode,'free');assert.equal(sim.state.profile.stock.squid,12);assert.equal(sim.state.bobber.x,sim.state.rodTip.x);assert.equal(sim.state.bobber.z,sim.state.rodTip.z);assert.equal(sim.state.bobber.height,0);assert.equal(sim.state.floatPosition,null);
+ assert.equal(sim.lowerRig().ok,false);assert.equal(sim.state.profile.stock.squid,12);sim.retrieve();assert.ok(sim.lowerRig().ok);assert.equal(sim.state.profile.stock.squid,12,'usable bait remains on its actual rod');
  const unpaid=new PixelSimulation();unpaid.start();assert.equal(unpaid.lowerRig().ok,false);assert.equal(unpaid.state.profile.stock.squid,12);
 });
 
@@ -59,7 +59,7 @@ test('flow is relative to boat velocity, while stronger crossflow loads and bend
 });
 
 test('hooking preserves the actual rig point and paid line instead of inventing a distant fish',()=>{
- const sim=ready(['rig_dropper']);sim.setRig({rig:'dropper'});assert.ok(sim.lowerRig().ok);for(let t=0;t<100&&sim.state.fishState!=='bite';t+=.1)sim.step(.1);assert.equal(sim.state.fishState,'bite');const point={...sim.state.bobber},paid=sim.state.paidLineMeters;assert.ok(sim.hook().ok);assert.deepEqual(sim.state.bobber,point);assert.equal(sim.state.paidLineMeters,paid);seatHook(sim,{request:false,onStep:(before,dt)=>assert.ok(Math.abs(sim.state.paidLineMeters-before.paidLineMeters-(sim.state.payoutRate-sim.state.retrieveRate)*dt)<1e-8,'seating must conserve actual spool travel')});assert.equal(sim.state.fish.hookCount,2);assert.equal(sim.state.fish.rig.id,'dropper');assert.equal(sim.state.reelMode,'brake');
+ const sim=ready(['rig_dropper']);sim.setRig({rig:'dropper',bait:'squid'});assert.ok(sim.lowerRig().ok);for(let t=0;t<100&&sim.state.fishState!=='bite';t+=.1)sim.step(.1);assert.equal(sim.state.fishState,'bite');const point={...sim.state.bobber},paid=sim.state.paidLineMeters;assert.ok(sim.hook().ok);assert.deepEqual(sim.state.bobber,point);assert.equal(sim.state.paidLineMeters,paid);seatHook(sim,{request:false,onStep:(before,dt)=>assert.ok(Math.abs(sim.state.paidLineMeters-before.paidLineMeters-(sim.state.payoutRate-sim.state.retrieveRate)*dt)<1e-8,'seating must conserve actual spool travel')});assert.equal(sim.state.fish.hookCount,2);assert.equal(sim.state.fish.rig.id,'dropper');assert.equal(sim.state.reelMode,'brake');
 });
 
 test('an overloaded drag slips despite cranking; fish remain above seabed and line stays finite',()=>{
@@ -84,7 +84,7 @@ test('pause freezes line and posture; resume resets old live tackle without dupl
 test('an actively fitted smoother reel reduces drag breakaway shock without changing steady payout',()=>{
  const ordinary=pure('bottom',{reelMode:'brake',paidLineMeters:12,lureDepth:8}),smooth=pure('bottom',{reelMode:'brake',paidLineMeters:12,lureDepth:8});ordinary.bobber.height=smooth.bobber.height=-8;ordinary.paidLineMeters=smooth.paidLineMeters=rodTipPosition(ordinary).height+8;
  Object.assign(ordinary,stepFishingLine(ordinary,{dt:.1,fishPullN:30,smooth:1}));Object.assign(smooth,stepFishingLine(smooth,{dt:.1,fishPullN:30,smooth:.86}));assert.ok(smooth.rodLoadN<ordinary.rodLoadN);assert.equal(smooth.paidLineMeters,ordinary.paidLineMeters);assert.equal(smooth.dragThresholdN,ordinary.dragThresholdN);
- const sim=ready(['reel_smooth','rod_light']);assert.equal(sim.stats.smooth,1,'packing an unattached reel does not change the active rod');assert.ok(sim.setRig({rod:'rod_light',reel:'reel_smooth'}).ok);assert.equal(sim.stats.smooth,1);assert.ok(sim.selectRod('rod_light').ok);assert.equal(sim.stats.smooth,.86);
+ const sim=ready(['reel_smooth','rod_light']);assert.equal(sim.stats.smooth,1,'packing an unattached reel does not change the active rod');assert.equal(sim.setRig({rod:'rod_light',reel:'reel_smooth'}).ok,false);sim.state.profile.rodLoadouts.rod_light.reel='reel_smooth';assert.equal(sim.stats.smooth,1);assert.ok(sim.selectRod('rod_light').ok);assert.equal(sim.stats.smooth,.86);
 });
 
 
