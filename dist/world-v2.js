@@ -4,7 +4,7 @@ import {Sky} from './vendor/Sky.js';
 import {makeWoodTexture,createRod,createFish} from './world.js';
 import {geography,fromGPS,coastLines,pierRings,buildingFootprints,landPolygons,onLand,FISHING_SPOTS} from './geography.js';
 import {bathymetry,elevationAt,depthAt} from './bathymetry.js';
-import {sea,solarPosition,updateSea} from './marine.js';
+import {sea,solarPosition,updateSea} from './marine.js?v=20260927-0600';
 export {createRod,createFish,depthAt,FISHING_SPOTS};
 export const HARBOR={boatX:20.8,boatZ:-77,boardingX:18,boardingZ:-76,deckHeight:2.73};
 export function waveHeight(x,z,t,strength=1){const h=Math.min(3,sea.waveHeight||.25);const angle=(sea.waveDirection-134)*Math.PI/180;const q=x*Math.sin(angle)+z*Math.cos(angle);const period=Math.max(4,sea.period);const k=4*Math.PI*Math.PI/(9.81*period*period);return strength*(Math.sin(q*k+t*2*Math.PI/period)*h*.27+Math.sin(x*.11-z*.06+t*1.15)*h*.11+Math.sin(z*.28+t*1.7)*.025);}

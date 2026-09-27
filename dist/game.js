@@ -1,18 +1,18 @@
 import * as THREE from './vendor/three.module.js';
-import {buildWorld,waveHeight,depthAt,FISHING_SPOTS,createRod,createFish} from './world-v2.js';
+import {buildWorld,waveHeight,depthAt,FISHING_SPOTS,createRod,createFish} from './world-v2.js?v=20260927-0600';
 import {createSkiff} from './boat.js';
 import {OceanAudio} from './audio.js';
 import {bindPointer, ActionSources} from './input.js';
 import {createMobileControls} from './mobile.js';
 import {GEAR_CATALOG,BASE_GEAR,createProfile,equipmentStats,weightedFish,cargoWeight,settleFish} from './equipment.js';
 import {createCommerce} from './commerce.js';
-import {sea,marine,marineSummary,clockText,gameDate,resetTripClock,advanceTripClock,updateSea} from './marine.js';
+import {sea,marine,marineSummary,clockText,gameDate,resetTripClock,advanceTripClock,updateSea} from './marine.js?v=20260927-0600';
 import {toGPS,onPier,onLand,insidePolygon,buildingFootprints,bearingDegrees,MAP_BOUNDS} from './geography.js';
 import {depthInfoAt} from './bathymetry.js';
 import {waterRoute} from './navigation.js';
 import {newImmersion,stepImmersion,ladderPoint} from './swimming.js';
 import * as harborAssets from './harbor-assets.js';
-import {HARBOR} from './world-v2.js';
+import {HARBOR} from './world-v2.js?v=20260927-0600';
 import {createCharts} from './charts.js';
 
 const $=s=>document.querySelector(s), clamp=THREE.MathUtils.clamp, lerp=THREE.MathUtils.lerp;
