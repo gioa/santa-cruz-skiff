@@ -5,19 +5,51 @@ const finite=(n,f=0)=>Number.isFinite(n)?n:f;
 export function cameraOffset(camera){return{x:Math.round(camera.width*.5-camera.x*camera.scale),y:Math.round(camera.height*.47-camera.z*camera.scale)};}
 export function projectPixel(camera,x,z){const o=cameraOffset(camera);return{x:Math.round(x*camera.scale)+o.x,y:Math.round(z*camera.scale)+o.y};}
 export function unprojectPixel(camera,x,y){const o=cameraOffset(camera);return{x:(x-o.x)/camera.scale,z:(y-o.y)/camera.scale};}
+function viewportMetrics(camera){
+  const viewport=camera.viewport,ratio=camera.height/Math.max(1,finite(viewport?.height,camera.height));
+  return{bottom:Math.max(0,camera.height-Math.max(0,finite(viewport?.bottom,0))*ratio),gap:Math.max(0,finite(viewport?.gap,10))*ratio};
+}
 export function cameraDeadzone(camera,mode='walk'){
   const boat=mode==='boat',swim=mode==='swim',width=camera.width,height=camera.height;
   const horizontal=boat?.30:swim?.24:.18,top=boat?.31:swim?.25:.21,bottom=boat?.68:swim?.73:.76;
-  return{left:Math.round(width*horizontal),right:Math.round(width*(1-horizontal)),top:Math.round(height*top),bottom:Math.round(height*bottom)};
+  let bottomEdge=Math.round(height*bottom);
+  if(boat&&camera.viewport){
+    // The CSS console has a fixed height, so a percentage alone cannot keep a
+    // boat visible on both tall and short phones. Reserve its rotated sprite
+    // radius as well as the console; collapse a tiny playfield safely.
+    const view=viewportMetrics(camera),radius=54*clamp(camera.scale*.18,.78,1.18);
+    bottomEdge=Math.min(bottomEdge,Math.floor(Math.max(view.bottom/2,view.bottom-radius-view.gap)));
+  }
+  return{left:Math.round(width*horizontal),right:Math.round(width*(1-horizontal)),top:Math.min(Math.round(height*top),bottomEdge),bottom:bottomEdge};
 }
 /** Returns a new camera. Motion inside the deadzone changes no camera field. */
-export function stepDeadzoneCamera(camera,focus,{mode='walk',dt=1/60,force=false}={}){
+export function stepDeadzoneCamera(camera,focus,{mode='walk'}={}){
   const next={...camera},box=cameraDeadzone(camera,mode),p=projectPixel(camera,focus.x,focus.z),dx=p.x-clamp(p.x,box.left,box.right),dy=p.y-clamp(p.y,box.top,box.bottom);
   if(!dx&&!dy)return next;
-  const far=p.x<camera.width*.08||p.x>camera.width*.92||p.y<camera.height*.10||p.y>camera.height*.9;
-  const blend=force||far?1:1-Math.exp(-clamp(finite(dt),0,.1)*10);
-  next.x+=dx*blend/camera.scale;next.z+=dy*blend/camera.scale;
+  // The sprite and camera must cross a logical pixel together. Easing an
+  // already rounded overflow makes the sprite move first, then the camera
+  // catch up one pixel in the opposite direction on a later frame.
+  const offset=cameraOffset(camera);
+  if(dx)next.x=(camera.width*.5-(offset.x-dx))/camera.scale;
+  if(dy)next.z=(camera.height*.47-(offset.y-dy))/camera.scale;
   return next;
+}
+/** Stable normal framing; the engine switch never changes the map scale. */
+export function cameraZoomForState(camera,state){
+  const fishing=state.mode==='boat'&&!['idle','landed'].includes(state.fishState||'idle');
+  if(!fishing||!state.bobber)return 6;
+  if(camera.viewport){
+    // Fit the cast in the same unobscured region used by the sailing camera.
+    for(let scale=6;scale>=2;scale--){const bottom=cameraDeadzone({...camera,scale},'boat').bottom;if((Math.abs(state.bobber.x-state.boatX)+5)*scale<=camera.width-80&&(Math.abs(state.bobber.z-state.boatZ)+6)*scale<=bottom-32)return scale;}
+    return 2;
+  }
+  return clamp(Math.floor(Math.min(6,(camera.width-80)/(Math.abs(state.bobber.x-state.boatX)+5),(camera.height-100)/(Math.abs(state.bobber.z-state.boatZ)+6))),3,6);
+}
+/** A necessary cast-fit zoom preserves the boat's exact projected pixel. */
+export function zoomCameraAt(camera,scale,focus){
+  if(scale===camera.scale)return{...camera};
+  const p=projectPixel(camera,focus.x,focus.z);
+  return{...camera,scale,x:(camera.width*.5-(p.x-Math.round(focus.x*scale)))/scale,z:(camera.height*.47-(p.y-Math.round(focus.z*scale)))/scale};
 }
 /** Keep the rod and float visible during a long cast without recentring them. */
 export function keepCameraPointsVisible(camera,points,{paddingX=28,paddingTop=32,paddingBottom=62}={}){

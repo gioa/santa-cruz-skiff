@@ -46,3 +46,27 @@ test('per-rod configurations, bait and active rod survive save/resume; old globa
  const sim=equipped(['rod_light','rig_float','reel_smooth']);sim.setRig({rod:'rod_light',rig:'float',reel:'reel_smooth',bait:'jig',drag:.62,fishingDepthMeters:3});sim.selectRod('rod_light');sim.state.baitOnHook={kind:'jig',condition:.7};const saved=sim.snapshot(),restored=new PixelSimulation({saved,now});restored.start(true);assert.equal(restored.state.profile.loadout.rod,'rod_light');assert.equal(restored.state.rig,'float');assert.equal(restored.state.drag,.62);assert.equal(restored.state.fishingDepthMeters,3);assert.deepEqual(restored.state.baitOnHook,{kind:'jig',condition:.7});assert.equal(restored.rodAssembly('rod').rig,'bottom');assert.deepEqual(restored.state.packed,saved.packed);
  const old=structuredClone(saved);delete old.profile.rodLoadouts;delete old.profile.rodLoadoutsVersion;delete old.rodBaitOnHooks;old.rig='float';old.bait='jig';old.rigWeightGrams=7;old.fishingDepthMeters=5;old.drag=.71;const migrated=new PixelSimulation({saved:old,now});migrated.start(true);assert.equal(migrated.rodAssembly('rod_light').rig,'float');assert.equal(migrated.rodAssembly('rod_light').fishingDepthMeters,5);assert.equal(migrated.rodAssembly('rod_light').drag,.71);assert.equal(migrated.rodAssembly('rod').rig,'bottom');assert.equal(migrated.state.profile.loadout.rod,'rod_light');assert.deepEqual(migrated.state.packed,old.packed);
 });
+
+test('new players and drift-sock owners cannot lower an unpurchased physical anchor',()=>{
+ const fresh=equipped();assert.equal(BASE_GEAR.some(g=>g.id==='anchor'),false);assert.equal(fresh.state.profile.owned.includes('anchor'),false);assert.equal(fresh.stats.hasAnchor,false);assert.equal(fresh.publicState().hasAnchor,false);aboard(fresh);assert.equal(fresh.toggleAnchor().ok,false);assert.equal(fresh.state.anchor,false);fresh.packStarter();assert.equal(fresh.state.profile.owned.includes('anchor'),false);assert.equal(fresh.toggleAnchor().ok,false);
+ const drift=equipped(['sea_anchor']);drift.equip('sea_anchor');aboard(drift);assert.equal(drift.toggleAnchor().ok,false);assert.equal(drift.hasGear('sea_anchor'),true);assert.equal(drift.publicState().hasAnchor,false);
+});
+
+test('purchased anchors require activation and safe lowering; deployed anchors must be raised before stowing',()=>{
+ const sim=equipped(['anchor']);assert.equal(sim.state.profile.credits,4935);aboard(sim);assert.equal(sim.toggleAnchor().ok,false,'owned but stowed equipment is unavailable');assert.equal(sim.equip('anchor').ok,true);assert.equal(sim.stats.hasAnchor,true);assert.equal(sim.publicState().hasAnchor,true);
+ assert.equal(sim.toggleEngine().ok,true);assert.equal(sim.toggleAnchor().ok,false);assert.equal(sim.state.anchor,false);sim.toggleEngine();sim.state.speed=1;assert.equal(sim.toggleAnchor().ok,false);sim.state.speed=0;
+ assert.equal(sim.toggleAnchor().ok,true);assert.equal(sim.state.anchor,true);assert.equal(sim.equip('anchor').ok,false);assert.equal(sim.hasGear('anchor'),true);assert.equal(sim.state.anchor,true);assert.equal(sim.toggleEngine().ok,false);
+ assert.equal(sim.toggleAnchor().ok,true);assert.equal(sim.state.anchor,false);assert.equal(sim.equip('anchor').ok,true);assert.equal(sim.publicState().hasAnchor,false);assert.equal(sim.toggleAnchor().ok,false);
+});
+
+test('legacy deployed-anchor saves do not grant anchors; a purchased carried anchor survives resume',()=>{
+ for(const owned of[false,true]){
+  const sim=equipped(owned?['anchor']:[]);aboard(sim);const saved=sim.snapshot();saved.anchor=true;const restored=new PixelSimulation({saved,now});restored.start(true);
+  assert.equal(restored.state.anchor,false);assert.equal(restored.publicState().hasAnchor,false);assert.equal(restored.state.profile.owned.includes('anchor'),owned);assert.equal(restored.state.profile.credits,saved.profile.credits);assert.deepEqual(restored.state.packed,saved.packed);
+ }
+ const sim=equipped(['anchor']);sim.equip('anchor');aboard(sim);sim.toggleAnchor();const restored=new PixelSimulation({saved:sim.snapshot(),now});restored.start(true);assert.equal(restored.state.anchor,true);assert.equal(restored.publicState().hasAnchor,true);assert.equal(restored.toggleAnchor().ok,true);assert.equal(restored.state.anchor,false);
+});
+
+test('raising an already-deployed anchor remains possible when its old equipment flag is missing',()=>{
+ const sim=equipped();aboard(sim);sim.state.anchor=true;assert.equal(sim.hasGear('anchor'),false);assert.equal(sim.toggleAnchor().ok,true);assert.equal(sim.state.anchor,false);assert.equal(sim.state.profile.owned.includes('anchor'),false);assert.equal(sim.toggleAnchor().ok,false);
+});

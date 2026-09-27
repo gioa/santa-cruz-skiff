@@ -1,0 +1,102 @@
+[
+  {
+    "viewport": [
+      1280,
+      720
+    ],
+    "logical": [
+      640,
+      360
+    ],
+    "seconds": 40,
+    "sampledSteadySeconds": 15,
+    "reverseCameraSteps": 0,
+    "boatBasePixels": [
+      180
+    ],
+    "existingWaveOffsets": [
+      1,
+      0,
+      -1
+    ],
+    "engineSwitchScale": 6,
+    "consoleHeight": 232,
+    "boatBottomCss": 478.6,
+    "consoleTop": 488
+  },
+  {
+    "viewport": [
+      390,
+      844
+    ],
+    "logical": [
+      328,
+      710
+    ],
+    "seconds": 40,
+    "sampledSteadySeconds": 15,
+    "reverseCameraSteps": 0,
+    "boatBasePixels": [
+      448
+    ],
+    "existingWaveOffsets": [
+      1,
+      0,
+      -1
+    ],
+    "engineSwitchScale": 6,
+    "consoleHeight": 232,
+    "boatBottomCss": 603.1,
+    "consoleTop": 612
+  },
+  {
+    "viewport": [
+      320,
+      568
+    ],
+    "logical": [
+      300,
+      533
+    ],
+    "seconds": 40,
+    "sampledSteadySeconds": 15,
+    "reverseCameraSteps": 0,
+    "boatBasePixels": [
+      247
+    ],
+    "existingWaveOffsets": [
+      1,
+      0,
+      -1
+    ],
+    "engineSwitchScale": 6,
+    "consoleHeight": 232,
+    "boatBottomCss": 326.4,
+    "consoleTop": 336
+  },
+  {
+    "viewport": [
+      568,
+      320
+    ],
+    "logical": [
+      560,
+      315
+    ],
+    "seconds": 40,
+    "sampledSteadySeconds": 15,
+    "reverseCameraSteps": 0,
+    "boatBasePixels": [
+      122
+    ],
+    "existingWaveOffsets": [
+      1,
+      0,
+      -1
+    ],
+    "engineSwitchScale": 6,
+    "consoleHeight": 126,
+    "boatBottomCss": 184.2,
+    "consoleTop": 194
+  }
+]

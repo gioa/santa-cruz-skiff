@@ -1,9 +1,9 @@
-import {pierRings,landPolygons,coastLines,buildingFootprints,FISHING_SPOTS,onLand,onPier} from './geography.js?v=20260927-pixel-v6.1';
-import {HARBOR} from './harbor-layout.js?v=20260927-pixel-v6.1';
-import {depthInfoAt} from './bathymetry.js?v=20260927-pixel-v6.1';
-import {createWildlife,drawWildlife} from './pixel-wildlife.js?v=20260927-pixel-v6.1';
-import {cameraOffset,unprojectPixel,stepDeadzoneCamera,keepCameraPointsVisible,cameraDeadzone,rectilinearOutline} from './pixel-camera.js?v=20260927-pixel-v6.1';
-import {ladderPoint} from './swimming.js?v=20260927-pixel-v6.1';
+import {pierRings,landPolygons,coastLines,buildingFootprints,FISHING_SPOTS,onLand,onPier} from './geography.js?v=20260927-pixel-v7';
+import {HARBOR} from './harbor-layout.js?v=20260927-pixel-v7';
+import {depthInfoAt} from './bathymetry.js?v=20260927-pixel-v7';
+import {createWildlife,drawWildlife} from './pixel-wildlife.js?v=20260927-pixel-v7';
+import {cameraOffset,unprojectPixel,stepDeadzoneCamera,keepCameraPointsVisible,cameraDeadzone,cameraZoomForState,zoomCameraAt,rectilinearOutline} from './pixel-camera.js?v=20260927-pixel-v7';
+import {ladderPoint} from './swimming.js?v=20260927-pixel-v7';
 
 // The map keeps the same metre coordinates as the sailing simulation. The
 // people and boat are deliberately enlarged, like a handheld-era RPG, so that
@@ -40,7 +40,9 @@ export function createPixelWorld(canvas,{sprites={},conditions={}}={}){
     const logicalWidth=portrait?Math.min(360,Math.max(300,Math.round(width*.84))):Math.min(800,Math.max(560,Math.round(width/2)));
     const logicalHeight=Math.round(logicalWidth*height/width);cameraResized=canvas.width!==logicalWidth||canvas.height!==logicalHeight;
     if(cameraResized){canvas.width=logicalWidth;canvas.height=logicalHeight;}
-    camera.width=canvas.width;camera.height=canvas.height;pixelOffset=cameraOffset(camera);ctx.imageSmoothingEnabled=false;
+    camera.width=canvas.width;camera.height=canvas.height;
+    camera.viewport={height:cssHeight,bottom:cssHeight<=500&&cssWidth>cssHeight?126:232,gap:10};
+    pixelOffset=cameraOffset(camera);ctx.imageSmoothingEnabled=false;
   }
   function point(x,z){return{x:Math.round(x*camera.scale)+pixelOffset.x,y:Math.round(z*camera.scale)+pixelOffset.y};}
   function screenToWorld(x,y){return unprojectPixel(camera,x*canvas.width/cssWidth,y*canvas.height/cssHeight);}
@@ -235,17 +237,19 @@ export function createPixelWorld(canvas,{sprites={},conditions={}}={}){
     const mode=state.mode||'intro',swim=state.swim||{},focus=mode==='boat'?{x:state.boatX,z:state.boatZ}:mode==='swim'?{x:swim.x??state.playerX,z:swim.z??state.playerZ}:{x:state.playerX??HARBOR.spawnX,z:state.playerZ??HARBOR.spawnZ};
     const fishing=mode==='boat'&&!['idle','landed'].includes(state.fishState||'idle'),nearDock=Math.hypot(focus.x-HARBOR.spawnX,focus.z-HARBOR.spawnZ)<70;
     const castFocus=fishing&&state.bobber?{x:(focus.x+state.bobber.x)/2,z:(focus.z+state.bobber.z)/2}:focus;
-    const castScale=fishing&&state.bobber?clamp(Math.floor(Math.min(7,(camera.width-80)/(Math.abs(state.bobber.x-focus.x)+5),(camera.height-100)/(Math.abs(state.bobber.z-focus.z)+6))),3,7):7;
-    const wantedZoom=zoomOverride??(mode==='walk'||mode==='intro'||mode==='swim'?6:fishing?castScale:state.moored?6:state.engine?4:6);
+    const wantedZoom=zoomOverride??cameraZoomForState(camera,state);
     // Start with the rental hut and left landing together in view. Thereafter
     // movement within the broad deadzone never drags the scenery along.
     let targetX=focus.x,targetZ=focus.z-4;
     if(mode==='intro'||mode==='walk'&&nearDock){targetX=focus.x-7;targetZ=focus.z-6;}
     if(!initialized){camera.x=targetX;camera.z=targetZ;camera.scale=wantedZoom;initialized=true;}else{
-      const scaleChanged=camera.scale!==wantedZoom;camera.scale=wantedZoom;
-      Object.assign(camera,stepDeadzoneCamera(camera,castFocus,{mode,dt,force:cameraResized||scaleChanged||lastMode!==mode}));
+      const scaleChanged=camera.scale!==wantedZoom;
+      if(scaleChanged)Object.assign(camera,zoomCameraAt(camera,wantedZoom,focus));
     }
-    if(fishing&&state.bobber)Object.assign(camera,keepCameraPointsVisible(camera,[focus,state.bobber]));
+    // Apply the visible playfield on the very first frame too, particularly
+    // when resuming a boat trip on a short phone above the fixed console.
+    Object.assign(camera,stepDeadzoneCamera(camera,castFocus,{mode}));
+    if(fishing&&state.bobber)Object.assign(camera,keepCameraPointsVisible(camera,[focus,state.bobber],{paddingBottom:camera.height-cameraDeadzone(camera,'boat').bottom}));
     cameraResized=false;lastMode=mode;pixelOffset=cameraOffset(camera);
     const nature=ecology.update(state,dt,seaConditions);
     ctx.imageSmoothingEnabled=false;ocean();drawWildlife(ctx,nature,{project:point,scale:camera.scale,sprites,layer:'water'});terrain();drawWake(state,dt);routeMarker(state);buildings();dockLife();boat(state);patrol(state);

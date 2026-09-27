@@ -16,9 +16,9 @@ No build step, API key, backend or account. The pixel edition uses Canvas 2D and
 
 ## The journey
 
-Start at 06:00, a few steps from the rental counter → check the personal backpack (free starter gear is already enabled) → request the empty skiff's davit lowering → walk down the real left-side stair alignment → board → unmoor → start the engine and steer, or choose a waypoint after buying and carrying a chart → coast down, anchor and select a rig → hold/release to cast → watch the float and strike → reel and manage drag/tension → keep the fish or record/release → return, dock, walk to the counter and exchange retained catches → buy equipment and assemble each rod independently.
+Start at 06:00, a few steps from the rental counter → check the personal backpack (free starter gear is already enabled) → request the empty skiff's davit lowering → walk down the real left-side stair alignment → board → unmoor → start the engine and steer, or choose a waypoint after buying and carrying a chart → coast down, deploy a purchased anchor or drift, and select a rig → hold/release to cast → watch the float and strike → reel and manage drag/tension → keep the fish or record/release → return, dock, walk to the counter and exchange retained catches → buy equipment and assemble each rod independently.
 
-- **WASD / left joystick:** walk; aboard, forward/reverse throttle and steering. Releasing the momentary control returns to neutral while the boat retains momentum.
+- **Left joystick / WASD:** walk. Aboard, the bottom console has a retained outboard tiller, twist-throttle touch surface and F/N/R gear selector. Move the tiller opposite the forward turn; slide the ribbed grip up/down to rotate the throttle. Release holds the friction settings. N idles the motor; interruption clears manual power while preserving momentum. WASD is also available for momentary keyboard steering/throttle.
 - **E:** contextual interaction. **G:** walk to the hut or boarding platform.
 - **R:** engine. **Q:** anchor. **I:** equipment. **M:** chart. **J:** catches.
 - **Hold Space / cast button, then release:** charge and cast. Tap at a bite to strike. Hold while fishing to lift the lure or raise the rod.
@@ -75,10 +75,10 @@ Primary references:
 
 ## Pixel usability update
 
-- Persistent personal backpack with at least 30 slots and original icons for all 30 catalogue items. All owned items remain in its grid, whether enabled or put away; previous locker contents migrate into it. Tap an item for details; move to an empty slot or swap occupied slots. Mouse dragging and keyboard grid navigation are also supported. Organizing and enabling equipment works anywhere. Only purchases, supplies and fish exchange require the counter.
+- Persistent personal backpack with at least 30 slots and original icons for catalogue items. All owned items remain in its grid, whether enabled or put away; previous locker contents migrate into it. Tap an item for details; move to an empty slot or swap occupied slots. Mouse dragging and keyboard grid navigation are also supported. Organizing and enabling equipment works anywhere. Only purchases, supplies and fish exchange require the counter.
 - Walking keeps the camera still across a broad screen deadzone. Scene geometry uses cached horizontal/vertical art outlines with a shared integer camera offset, while real geographic collision polygons remain unchanged.
 - The calendar runs at 2× active real time, including capture timestamps. Menus pause simulation. Every new or resumed day starts at 06:00.
-- Worker, boarding, engine and anchor actions follow their scene targets. The joystick and held fishing controls stay in the thumb areas.
+- Worker and boarding actions follow their scene targets. Once aboard, engine, purchased anchor, gear, tiller and fishing actions sit in the bottom thumb area.
 - Original 16-bar, 100 BPM background music plus interaction, footsteps, casting, bites, reeling, catches, purchase and engine effects. Music and master sound are separately switchable; music volume is adjustable and saved. Audio starts only after a user gesture, pauses in the background and continues through inventory menus.
 
 See `qa/pixel-usability/PLAYTEST.md` for this update’s actual browser checks.
@@ -97,3 +97,13 @@ See `qa/pixel-rods/PLAYTEST.md` for responsive browser verification.
 The opening dock keeps only its functional counter attendant; three decorative bystanders are removed. The attendant has an independent sprite with a navy work cap, yellow oilskin, teal apron, silver moustache and clipboard, visibly distinct from the angler's cream sunhat and coral lifejacket. Pointer targets follow the actual enlarged artwork with a minimum 44 CSS-pixel hit area. Touch-down captures the destination, so camera movement during a tap cannot move the intended target. Building detours are planned in small batches across frames; slower phones receive more planning frames instead of a false “unreachable” result. Direct walks and the precise left-side stair corridor remain the first choices.
 
 See `qa/pixel-walking/PLAYTEST.md` for the browser checks.
+
+## Purchased anchor and outboard console
+
+A physical anchor and rode costs 65 game credits and must be enabled in the personal backpack. It is separate from the drift sock and never part of free starter gear. Old saves with an active anchor but no owned/enabled anchor safely release it; no item is silently granted.
+
+Boat actions are in a bottom console. The touch tiller and throttle retain their positions on normal release; N idles immediately, while switching F/R requires idle power, neutral and low speed. Pointer cancellation, menus, focus loss and resizing idle manual controls. Assisted chart routes retain their route through a pause; touching manual controls takes over. The interaction is based on the [Honda BF5A manual, printed pages 15 and 33–34](https://cdn.powerequipment.honda.com/marine/pdf/manuals/00X31ZV16630.pdf); touch travel and low-speed interlocks are game tuning, not manufacturer limits.
+
+The edge-camera previously eased after integer pixel overflow, producing alternating one-pixel motion. Camera and hull now consume the same pixel overflow synchronously. Starting/stopping the engine no longer changes map scale. The camera reserves the lower console area while preserving the walking deadzone.
+
+See `qa/pixel-helm/PLAYTEST.md` for validation and responsive screenshots.

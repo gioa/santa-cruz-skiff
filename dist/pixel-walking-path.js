@@ -1,5 +1,5 @@
-import {buildingFootprints,insidePolygon} from './geography.js?v=20260927-pixel-v6.1';
-import {walkAllowed,walkHeight} from './harbor-layout.js?v=20260927-pixel-v6.1';
+import {buildingFootprints,insidePolygon} from './geography.js?v=20260927-pixel-v7';
+import {walkAllowed,walkHeight} from './harbor-layout.js?v=20260927-pixel-v7';
 
 // Only nearby footprints matter to a walking point. The rental porch remains
 // traversable, matching the shared harbor layout used by the other edition.
