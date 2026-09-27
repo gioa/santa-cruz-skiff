@@ -1,7 +1,7 @@
 /** Pixel gameplay. Offshore travel uses a 1:2 map scale and the calendar clock runs at 2x. Input, fishing and animations use active real seconds. */
 import {GEAR_CATALOG,BASE_GEAR,createProfile,equipmentStats,cargoWeight,settleFish,buyGear as purchaseGear,restock} from './equipment.js?v=20260927-pixel-v6.1';
 import {HARBOR,BOARDING_WALK_PATH,walkHeight,walkAllowed,canBoardFrom,harborWaterBlocked} from './harbor-layout.js?v=20260927-pixel-v6.1';
-import {walkingBlocked as walkBlocked,walkingPointOpen,walkingSegmentOpen as safeWalkSegment,planGroundWalk} from './pixel-walking-path.js?v=20260927-pixel-v6.1';
+import {walkingBlocked as walkBlocked,walkingPointOpen,walkingSegmentOpen as safeWalkSegment,createGroundWalkSearch,advanceGroundWalk} from './pixel-walking-path.js?v=20260927-pixel-v6.1';
 import {FISHING_SPOTS,toGPS,bearingDegrees,onLand,onPier,MAP_BOUNDS} from './geography.js?v=20260927-pixel-v6.1';
 import {depthAt,depthInfoAt} from './bathymetry.js?v=20260927-pixel-v6.1';
 import {waterRoute,resolveVesselContact,contactAwareControl} from './navigation.js?v=20260927-pixel-v6.1';
@@ -35,7 +35,7 @@ function pacificDayStart(now){
 }
 function initialState(profile){return{
  version:4,edition:'pixel',mode:'intro',phase:'walk',time:0,elapsed:0,gameElapsed:0,timeScale:GAME_TIME_SCALE,clock:'06:00:00',paused:false,
- playerX:HARBOR.spawnX,playerZ:HARBOR.spawnZ,yaw:0,walking:false,walkRoute:[],autoWalk:false,walkArrival:null,
+ playerX:HARBOR.spawnX,playerZ:HARBOR.spawnZ,yaw:0,walking:false,walkRoute:[],autoWalk:false,walkArrival:null,walkTarget:null,walkPending:false,
  boatX:HARBOR.boatX,boatZ:HARBOR.boatZ,heading:0,speed:0,tiller:0,roll:0,pitch:0,
  launchStage:'stored',launchProgress:0,loaded:false,moored:true,engine:false,throttle:0,fuel:100,anchor:false,
  standing:false,deckX:0,deckZ:.8,pfd:true,lanyard:true,swim:null,docking:null,
@@ -48,7 +48,7 @@ function initialState(profile){return{
 
 export class PixelSimulation {
  constructor({profile=null,saved=null,rng=Math.random,patrolRng,now=()=>new Date(),navigationScale,conditions={}}={}){
-  this.rng=rng;this.now=now;this.navigationScaleOverride=navigationScale;this.saved=saved;this.conditions={windKnots:0,windDirection:315,waveHeight:0,period:9,waterTemp:14,...conditions};
+  this.rng=rng;this.now=now;this.navigationScaleOverride=navigationScale;this.saved=saved;this.walkSearch=null;this.conditions={windKnots:0,windDirection:315,waveHeight:0,period:9,waterTemp:14,...conditions};
   this.state=initialState(profile||saved?.profile);this.patrol=new FishingPatrol({rng:patrolRng,isWater:(x,z)=>!onLand(x,z)&&!onPier(x,z)&&!harborWaterBlocked(x,z)});this.transientThrottle=false;this.vessel=createVesselState({x:HARBOR.boatX,z:HARBOR.boatZ});
   ensureRodLoadouts(this.state.profile,saved||{});this.activeRodId=this.state.profile.loadout.rod;this.applyActiveRod();
  }
@@ -92,7 +92,7 @@ export class PixelSimulation {
    if(['lowering','raising'].includes(s.launchStage))s.launchStage='afloat';
    if(s.mode==='boat')s.launchStage='afloat';
   }else{s.mode='walk';this.journal('06:00，到达 Santa Cruz Wharf。');}
-  syncVessel(this.vessel,{x:s.boatX,z:s.boatZ,heading:s.heading,clearMotion:true});
+  this.clearWalking();syncVessel(this.vessel,{x:s.boatX,z:s.boatZ,heading:s.heading,clearMotion:true});
   ensureRodLoadouts(s.profile,{rig:s.rig,bait:s.bait,weightGrams:s.rigWeightGrams,drag:s.drag,fishingDepthMeters:s.fishingDepthMeters});s.rodBaitOnHooks??={};this.activeRodId=s.profile.loadout.rod;this.applyActiveRod();
   this.transientThrottle=false;s.dayStartAt=pacificDayStart(this.now());s.rigWeightGrams=finite(s.rigWeightGrams,getRigProfile(s.rig).defaultWeightGrams);s.rigPresentation=null;s.pumpHeight=0;s.paidLineMeters=0;
   return this.notify(resume&&this.saved?.mode==='swim'?'落水航程已安全恢复到码头，装备与鱼获已保留。':resume?'新的一天，装备与鱼获已保留。':'早上好，码头小屋就在前面。');
@@ -106,6 +106,7 @@ export class PixelSimulation {
  launchBoat(){const s=this.state;if(!this.atCounter)return this.notify('请在小屋柜台请求吊艇。',null,false);if(s.launchStage==='stored'){s.launchStage='lowering';s.launchProgress=0;s.phase='board';this.journal('工作人员操作吊臂下放木艇。');return this.notify('吊臂正在下放空艇，沿左侧台阶去登船。');}if(s.launchStage==='afloat'&&s.moored){return this.notify('木艇已在登船平台等你。');}return this.notify('吊艇正在进行。',null,false);}
  walkTo(destination){
   const s=this.state;if(s.mode!=='walk')return this.notify('先回到岸上。',null,false);
+  this.clearWalking();
   let target=destination==='counter'?{x:HARBOR.counterX,z:HARBOR.counterZ}:destination==='boarding'?{x:HARBOR.boardingX,z:HARBOR.boardingZ}:destination;
   if(!target||!Number.isFinite(target.x)||!Number.isFinite(target.z))return this.notify('',null,false);
   const here={x:s.playerX,z:s.playerZ};let route=null;
@@ -121,11 +122,12 @@ export class PixelSimulation {
     let cost=distance(here,candidate[0]);for(let k=1;k<candidate.length;k++)cost+=distance(candidate[k-1],candidate[k]);if(cost<best){best=cost;route=candidate;}
    }
   }
-  if(!route)route=planGroundWalk(here,target).route;
-  if(!route)return this.notify('这边暂时走不过去。',null,false);
-  s.walkRoute=route;s.autoWalk=true;s.arrival=null;s.walkArrival=destination==='counter'?'counter':destination==='boarding'?'boarding':'ground';return this.notify('',`walking-${s.walkArrival}`);
+  if(!route)this.walkSearch=createGroundWalkSearch(here,target);
+  s.walkRoute=route||[];s.walkPending=!route;s.walkTarget={x:target.x,z:target.z};s.autoWalk=true;s.arrival=null;s.walkArrival=destination==='counter'?'counter':destination==='boarding'?'boarding':'ground';return this.notify('',`walking-${s.walkArrival}`);
  }
- board(){const s=this.state;if(this.inspectionPending())return this.notify('等例行检查结束再出发。',null,false);if(s.mode!=='walk'||!canBoardFrom(s.playerX,s.playerZ))return this.notify('沿左侧台阶走到登船平台。',null,false);if(s.launchStage!=='afloat')return this.notify('等吊臂放稳木艇，再登船。',null,false);s.mode='boat';s.loaded=true;s.moored=true;s.standing=false;s.walkRoute=[];s.autoWalk=false;s.phase='launch';s.tripComplete=false;s.yaw=0;s.inspection=null;this.patrol.resetTrip();this.journal('带上装备，登上木艇。');return this.notify('坐稳了，解开缆绳出发。');}
+ clearWalking(){const s=this.state;this.walkSearch=null;s.walkRoute=[];s.autoWalk=false;s.walkPending=false;s.walkTarget=null;s.walkArrival=null;s.arrival=null;}
+ walkSearchNow(){return performance.now();}
+ board(){const s=this.state;if(this.inspectionPending())return this.notify('等例行检查结束再出发。',null,false);if(s.mode!=='walk'||!canBoardFrom(s.playerX,s.playerZ))return this.notify('沿左侧台阶走到登船平台。',null,false);if(s.launchStage!=='afloat')return this.notify('等吊臂放稳木艇，再登船。',null,false);s.mode='boat';s.loaded=true;s.moored=true;s.standing=false;this.clearWalking();s.phase='launch';s.tripComplete=false;s.yaw=0;s.inspection=null;this.patrol.resetTrip();this.journal('带上装备，登上木艇。');return this.notify('坐稳了，解开缆绳出发。');}
  unmoor(){const s=this.state;if(s.mode!=='boat'||!s.moored||s.launchStage!=='afloat')return this.notify('',null,false);s.moored=false;return this.notify('缆绳已解开。');}
  interact(){const s=this.state;if(s.paused)return this.notify('',null,false);if(s.mode==='walk'){if(this.atCounter)return{ok:true,action:'staff',message:''};if(canBoardFrom(s.playerX,s.playerZ))return this.board();return this.notify('靠近小屋柜台或左侧登船平台。',null,false);}if(s.mode==='boat'){if(s.moored)return this.unmoor();if(s.fishState==='bite')return this.hook();if(s.fishState==='idle'&&Math.hypot(s.boatX-HARBOR.boatX,s.boatZ-HARBOR.boatZ)<16&&Math.abs(s.speed)<.85)return this.dock();}return this.notify('',null,false);}
  toggleEngine(){const s=this.state;if(this.inspectionChecking())return this.notify('正在进行例行检查。',null,false);if(s.mode!=='boat'||s.standing||s.docking)return this.notify('坐回驾驶座。',null,false);if(s.moored)return this.notify('先解开缆绳。',null,false);if(s.anchor)return this.notify('先起锚。',null,false);if(s.fishState!=='idle')return this.notify('先收回钓组。',null,false);if(s.fuel<=0)return this.notify('燃油用尽，可呼叫免费救援。',null,false);s.engine=!s.engine;s.throttle=0;if(!s.engine){s.waypoint=null;s.waterRoute=[];}return this.notify(s.engine?'发动机已启动。':'发动机已关闭。');}
@@ -169,7 +171,7 @@ export class PixelSimulation {
  jump(){return{ok:false,message:''};}
  reboard(){return{ok:false,message:''};}
 
- rescue(){const s=this.state;this.retrieve();Object.assign(s,{mode:'walk',playerX:HARBOR.spawnX,playerZ:HARBOR.spawnZ,boatX:HARBOR.boatX,boatZ:HARBOR.boatZ,heading:0,speed:0,engine:false,throttle:0,moored:true,anchor:false,swim:null,standing:false,docking:null,waypoint:null,waterRoute:[],walkRoute:[],autoWalk:false,launchStage:'afloat',launchProgress:0,loaded:false});syncVessel(this.vessel,{x:s.boatX,z:s.boatZ,heading:0,clearMotion:true});this.journal('使用免费游戏救援返回码头。');return this.notify('你和木艇已返回码头。');}
+ rescue(){const s=this.state;this.retrieve();this.clearWalking();Object.assign(s,{mode:'walk',playerX:HARBOR.spawnX,playerZ:HARBOR.spawnZ,boatX:HARBOR.boatX,boatZ:HARBOR.boatZ,heading:0,speed:0,engine:false,throttle:0,moored:true,anchor:false,swim:null,standing:false,docking:null,waypoint:null,waterRoute:[],walkRoute:[],autoWalk:false,launchStage:'afloat',launchProgress:0,loaded:false});syncVessel(this.vessel,{x:s.boatX,z:s.boatZ,heading:0,clearMotion:true});this.journal('使用免费游戏救援返回码头。');return this.notify('你和木艇已返回码头。');}
  pause(value=true){this.state.paused=Boolean(value);this.cancelCast();this.state.reeling=false;this.state.pumping=false;}
  snapshot(){this.rememberHookBait();const copy=clone(this.state);copy.events=[];copy.toast='';copy.toastId=0;return copy;}
 
@@ -184,19 +186,25 @@ export class PixelSimulation {
   this.stepFishing(dt,input);this.stepPatrol(dt);return s;
  }
  clock(){if(!this.state.dayStartAt)return'06:00:00';return pacificClock.format(new Date(this.captureTimestamp()));}
- stepWalking(dt,input){const s=this.state;let dx=finite(input.moveX),dz=finite(input.moveZ),magnitude=Math.hypot(dx,dz);if(magnitude>.05){s.walkRoute=[];s.autoWalk=false;s.walkArrival=null;s.arrival=null;if(magnitude>1){dx/=magnitude;dz/=magnitude;}}else if(s.walkRoute.length){let target=s.walkRoute[0],d=Math.hypot(target.x-s.playerX,target.z-s.playerZ);
+ stepWalking(dt,input){const s=this.state;let dx=finite(input.moveX),dz=finite(input.moveZ),magnitude=Math.hypot(dx,dz);if(magnitude>.05){this.clearWalking();if(magnitude>1){dx/=magnitude;dz/=magnitude;}}else{
+   if(s.walkPending){
+    if(!this.walkSearch){this.clearWalking();return;}
+    const result=advanceGroundWalk(this.walkSearch,{now:()=>this.walkSearchNow()});if(!result.done)return;
+    this.walkSearch=null;s.walkPending=false;if(!result.value.route){this.clearWalking();this.notify('这边暂时走不过去。',null,false);return;}s.walkRoute=result.value.route;
+   }
+   if(!s.walkRoute.length)return;let target=s.walkRoute[0],d=Math.hypot(target.x-s.playerX,target.z-s.playerZ);
    // The stair is only 1.4 m wide. Reach its actual vertices: accepting a point
    // 12 cm early cuts a diagonal over the connector/landing edge. Movement is
    // still capped to the physical walking speed; this does not teleport.
-   while(d<1e-6){s.walkRoute.shift();if(!s.walkRoute.length){s.autoWalk=false;s.arrival=s.walkArrival||'ground';s.walkArrival=null;return;}target=s.walkRoute[0];d=Math.hypot(target.x-s.playerX,target.z-s.playerZ);}
-   dx=(target.x-s.playerX)/d;dz=(target.z-s.playerZ)/d;const maxMove=WALK_SPEED*(1-this.stats.weight*.002)*dt;if(d<maxMove){dx*=d/maxMove;dz*=d/maxMove;}}else return;
+   while(d<1e-6){s.walkRoute.shift();if(!s.walkRoute.length){const arrival=s.walkArrival||'ground';this.clearWalking();s.arrival=arrival;return;}target=s.walkRoute[0];d=Math.hypot(target.x-s.playerX,target.z-s.playerZ);}
+   dx=(target.x-s.playerX)/d;dz=(target.z-s.playerZ)/d;const maxMove=WALK_SPEED*(1-this.stats.weight*.002)*dt;if(d<maxMove){dx*=d/maxMove;dz*=d/maxMove;}}
   const speed=WALK_SPEED*(1-this.stats.weight*.002),startX=s.playerX,startZ=s.playerZ,targetX=startX+dx*speed*dt,targetZ=startZ+dz*speed*dt,steps=Math.max(1,Math.ceil(Math.hypot(targetX-startX,targetZ-startZ)/.025));
   // Sweep the whole movement, so a fast diagonal cannot skip a narrow water
   // gap. Stop at the last safe point rather than entering a swimming mode.
   let x=startX,z=startZ,previousHeight=walkHeight(x,z),blocked=false;
   for(let i=1;i<=steps;i++){const nextX=startX+(targetX-startX)*i/steps,nextZ=startZ+(targetZ-startZ)*i/steps,nextHeight=walkHeight(nextX,nextZ);if(!walkAllowed(nextX,nextZ)||walkBlocked(nextX,nextZ)||Math.abs(nextHeight-previousHeight)>.3){blocked=true;break;}x=nextX;z=nextZ;previousHeight=nextHeight;}
   const moved=Math.hypot(x-startX,z-startZ);if(moved>1e-8){s.walked+=moved;s.playerX=x;s.playerZ=z;s.yaw=Math.atan2(-dx,-dz);s.walking=true;}
-  if(blocked&&s.autoWalk){s.walkRoute=[];s.autoWalk=false;s.arrival=null;}
+  if(blocked&&s.autoWalk)this.clearWalking();
  }
  stepDeck(dt,input){const s=this.state,beforeX=s.deckX,beforeZ=s.deckZ;s.deckX=clamp(s.deckX+finite(input.moveX)*dt*.8,-.72,.72);s.deckZ=clamp(s.deckZ+finite(input.moveZ)*dt*.8,-1.85,1.70);s.walking=Math.hypot(s.deckX-beforeX,s.deckZ-beforeZ)>1e-8;}
 
@@ -242,7 +250,7 @@ export class PixelSimulation {
  publicState(){
   const s=this.state,p=s.mode==='walk'?{x:s.playerX,z:s.playerZ}:s.mode==='swim'?s.swim:{x:s.boatX,z:s.boatZ},nav=this.navigationInstruments(),fish=s.fish?clone(s.fish):null;if(fish&&!nav.gps)delete fish.caughtGPS;
   const presentation=s.rigPresentation?{...s.rigPresentation,depth:nav.sounder?s.rigPresentation.depth:null,targetDepth:nav.sounder?s.rigPresentation.targetDepth:null}:null;
-  return{edition:'pixel',renderer:'Canvas 2D',version:4,mode:s.mode,phase:s.phase,time:s.clock,dayStartAt:s.dayStartAt,activeSeconds:Math.round(s.elapsed),gameSeconds:Math.round(s.gameElapsed),timeScale:GAME_TIME_SCALE,position:{x:round(p.x),z:round(p.z)},boat:{x:round(s.boatX),z:round(s.boatZ),heading:nav.compass||nav.gps?round(s.heading,3):null},navigation:nav,navigationScale:s.navigationScale,gps:nav.gpsPosition,referenceDepth:nav.depth,launchStage:s.launchStage,launchProgress:round(s.launchProgress,2),packed:[...s.packed],profile:{credits:s.profile.credits,owned:[...s.profile.owned],stock:{...s.profile.stock},loadout:{...s.profile.loadout}},activeRod:s.profile.loadout.rod,rodAssemblies:clone(s.profile.rodLoadouts||{}),loaded:s.loaded,moored:s.moored,engine:s.engine,throttle:round(s.throttle,2),anchor:s.anchor,speedKnots:nav.speedKnots==null?null:round(nav.speedKnots),fuel:Math.round(s.fuel),standing:s.standing,swim:s.swim?clone(s.swim):null,waypoint:s.waypoint?.name||null,autoWalking:s.autoWalk,walkDestination:s.autoWalk&&s.walkRoute.length?{...s.walkRoute.at(-1)}:null,arrival:s.arrival,fishState:s.fishState,casting:s.casting,castPower:round(s.castPower,2),rig:s.rig,rigWeightGrams:s.rigWeightGrams,fishingDepthMeters:s.fishingDepthMeters,rigPresentation:presentation,hookCount:getRigProfile(s.rig).hooks,paidLineMeters:round(s.paidLineMeters),tension:Math.round(s.tension),stamina:Math.round(s.stamina),lineDistance:round(s.lineDistance),lureDepth:nav.sounder?round(s.lureDepth):null,fish,casts:s.casts,catches:s.catches.map(f=>({name:f.name,length:f.length,kg:f.kg,kept:f.kept,settled:Boolean(f.settled),confiscated:Boolean(f.confiscated),caughtAt:f.caughtAt,rig:f.rig,hookCount:f.hookCount})),inspection:s.inspection?clone(s.inspection):null,lastInspection:s.lastInspection?clone(s.lastInspection):null,misses:s.misses,breaks:s.breaks,sailedMeters:Math.round(s.sailed),walkedMeters:Math.round(s.walked),paused:s.paused,interaction:this.interaction(),tripComplete:s.tripComplete,conditions:{...this.conditions}};
+  return{edition:'pixel',renderer:'Canvas 2D',version:4,mode:s.mode,phase:s.phase,time:s.clock,dayStartAt:s.dayStartAt,activeSeconds:Math.round(s.elapsed),gameSeconds:Math.round(s.gameElapsed),timeScale:GAME_TIME_SCALE,position:{x:round(p.x),z:round(p.z)},boat:{x:round(s.boatX),z:round(s.boatZ),heading:nav.compass||nav.gps?round(s.heading,3):null},navigation:nav,navigationScale:s.navigationScale,gps:nav.gpsPosition,referenceDepth:nav.depth,launchStage:s.launchStage,launchProgress:round(s.launchProgress,2),packed:[...s.packed],profile:{credits:s.profile.credits,owned:[...s.profile.owned],stock:{...s.profile.stock},loadout:{...s.profile.loadout}},activeRod:s.profile.loadout.rod,rodAssemblies:clone(s.profile.rodLoadouts||{}),loaded:s.loaded,moored:s.moored,engine:s.engine,throttle:round(s.throttle,2),anchor:s.anchor,speedKnots:nav.speedKnots==null?null:round(nav.speedKnots),fuel:Math.round(s.fuel),standing:s.standing,swim:s.swim?clone(s.swim):null,waypoint:s.waypoint?.name||null,autoWalking:s.autoWalk,walkPending:s.walkPending,walkDestination:s.autoWalk?{...(s.walkTarget||s.walkRoute.at(-1))}:null,arrival:s.arrival,fishState:s.fishState,casting:s.casting,castPower:round(s.castPower,2),rig:s.rig,rigWeightGrams:s.rigWeightGrams,fishingDepthMeters:s.fishingDepthMeters,rigPresentation:presentation,hookCount:getRigProfile(s.rig).hooks,paidLineMeters:round(s.paidLineMeters),tension:Math.round(s.tension),stamina:Math.round(s.stamina),lineDistance:round(s.lineDistance),lureDepth:nav.sounder?round(s.lureDepth):null,fish,casts:s.casts,catches:s.catches.map(f=>({name:f.name,length:f.length,kg:f.kg,kept:f.kept,settled:Boolean(f.settled),confiscated:Boolean(f.confiscated),caughtAt:f.caughtAt,rig:f.rig,hookCount:f.hookCount})),inspection:s.inspection?clone(s.inspection):null,lastInspection:s.lastInspection?clone(s.lastInspection):null,misses:s.misses,breaks:s.breaks,sailedMeters:Math.round(s.sailed),walkedMeters:Math.round(s.walked),paused:s.paused,interaction:this.interaction(),tripComplete:s.tripComplete,conditions:{...this.conditions}};
  }
 
 }

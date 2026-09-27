@@ -11,6 +11,10 @@ Date: 2026-09-27. Browser verification used the independent `127.0.0.1:4173` tes
 
 Screenshots: `01-quiet-dock.png`, `02-tap-destination.png`, `03-tap-boat.png`, `04-player-and-staff.png`.
 
-Final model verification: the local planner uses indexed building footprints and a bounded detour search; direct paths and the authored stair corridor remain preferred. Full `npm run check` and `npm test` passed: 186 tests, zero failures. Four new route tests cover real mapped building detours, destination replacement/manual takeover, water/building/oversized-target rejection and both directions on the narrow stair.
+Final model verification: the local planner uses indexed building footprints and a bounded detour search; direct paths and the authored stair corridor remain preferred. Full `npm run check` and `npm test` passed: 188 tests, zero failures. Six new route tests cover real mapped building detours, destination replacement/manual takeover, water/building/oversized-target rejection and both directions on the narrow stair.
 
 Final browser check at 1280×900: clicked visible ground beyond the rental building, automatically walked 35 metres to (12, -69.8), reported `arrival: ground`, cleared the destination and stopped. Console had no warnings or errors. Screenshot: `05-building-detour.png`.
+
+The initial synchronous 45ms route deadline failed on a cold GitHub runner. It was replaced with incremental search: about 3ms and at most 64 batches per frame, with the same 1,600-node total cap. Both search and precise smoothing yield, preserving input/render responsiveness. A slow-clock test forces one batch per frame and verifies eventual success after far more than 45ms, with no movement while pending and no catch-up walking. Pause, replacement, manual cancellation, exhausted searches and save recovery clear or preserve the pending target as appropriate.
+
+Final incremental browser run: clicked beyond the building again, received the target (12, -72.17), and walked normally; no rejection toast or console errors.

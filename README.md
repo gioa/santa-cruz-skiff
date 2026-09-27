@@ -94,6 +94,6 @@ See `qa/pixel-rods/PLAYTEST.md` for responsive browser verification.
 
 ## Clearer dock and one-tap walking
 
-The opening dock keeps only its functional counter attendant; three decorative bystanders are removed. The attendant has an independent sprite with a navy work cap, yellow oilskin, teal apron, silver moustache and clipboard, visibly distinct from the angler's cream sunhat and coral lifejacket. Pointer targets follow the actual enlarged artwork with a minimum 44 CSS-pixel hit area. Touch-down captures the destination, so camera movement during a tap cannot move the intended target.
+The opening dock keeps only its functional counter attendant; three decorative bystanders are removed. The attendant has an independent sprite with a navy work cap, yellow oilskin, teal apron, silver moustache and clipboard, visibly distinct from the angler's cream sunhat and coral lifejacket. Pointer targets follow the actual enlarged artwork with a minimum 44 CSS-pixel hit area. Touch-down captures the destination, so camera movement during a tap cannot move the intended target. Building detours are planned in small batches across frames; slower phones receive more planning frames instead of a false “unreachable” result. Direct walks and the precise left-side stair corridor remain the first choices.
 
 See `qa/pixel-walking/PLAYTEST.md` for the browser checks.

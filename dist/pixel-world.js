@@ -221,8 +221,9 @@ export function createPixelWorld(canvas,{sprites={},conditions={}}={}){
   }
   function routeMarker(state){
     // One small ground marker gives immediate feedback for tap-to-walk.
-    if(state.mode==='walk'&&state.autoWalk&&state.walkRoute?.length){
-      const target=state.walkRoute.at(-1),p=point(target.x,target.z),r=6+Math.round(Math.sin(clock*5));
+    const walkTarget=state.walkTarget||state.walkRoute?.at(-1);
+    if(state.mode==='walk'&&state.autoWalk&&walkTarget){
+      const p=point(walkTarget.x,walkTarget.z),r=6+Math.round(Math.sin(clock*5));
       ctx.fillStyle='#244d50';ctx.fillRect(p.x-r-1,p.y-4,5,2);ctx.fillRect(p.x+r-3,p.y-4,5,2);ctx.fillRect(p.x-r-1,p.y+3,5,2);ctx.fillRect(p.x+r-3,p.y+3,5,2);
       ctx.fillStyle='#ffe3a0';for(const side of[-1,1]){ctx.fillRect(p.x+side*r-(side>0?3:0),p.y-4,4,1);ctx.fillRect(p.x+side*r,p.y-4,1,3);ctx.fillRect(p.x+side*r-(side>0?3:0),p.y+3,4,1);ctx.fillRect(p.x+side*r,p.y+1,1,3);}return;
     }
