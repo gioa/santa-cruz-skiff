@@ -3,7 +3,7 @@ import * as THREE from './vendor/three.module.js';
 // Ordinary portable instruments stay in the boat rather than hovering over the view.
 export function createDeckInstruments(){
  const group=new THREE.Group(),rubber=new THREE.MeshStandardMaterial({color:0x172021,roughness:.82}),steel=new THREE.MeshStandardMaterial({color:0x7e8984,roughness:.36,metalness:.78});
- const compass=new THREE.Group();compass.position.set(-.48,.79,-.32);group.add(compass);
+ const compass=new THREE.Group();compass.position.set(.50,.523,.60);group.add(compass);
  const base=new THREE.Mesh(new THREE.CylinderGeometry(.13,.145,.075,40),rubber);compass.add(base);
  const rim=new THREE.Mesh(new THREE.TorusGeometry(.124,.009,8,48),steel);rim.rotation.x=Math.PI/2;rim.position.y=.048;compass.add(rim);
  const dial=document.createElement('canvas');dial.width=dial.height=512;const c=dial.getContext('2d');c.fillStyle='#111c20';c.fillRect(0,0,512,512);c.translate(256,256);c.strokeStyle='#d9d8b9';
@@ -12,7 +12,7 @@ export function createDeckInstruments(){
  const card=new THREE.Group(),face=new THREE.Mesh(new THREE.CircleGeometry(.119,48),new THREE.MeshStandardMaterial({map:dialTexture,roughness:.6,emissive:0x61725d,emissiveIntensity:.16}));face.rotation.x=-Math.PI/2;card.add(face);card.position.y=.045;compass.add(card);
  const lubber=new THREE.Mesh(new THREE.BoxGeometry(.006,.004,.06),new THREE.MeshStandardMaterial({color:0xb96342,roughness:.8}));lubber.position.set(0,.056,-.085);compass.add(lubber);
  const cover=new THREE.Mesh(new THREE.SphereGeometry(.123,32,16,0,Math.PI*2,0,Math.PI/2),new THREE.MeshPhysicalMaterial({color:0xaac4c6,transparent:true,opacity:.16,roughness:.08,metalness:.1,depthWrite:false}));cover.scale.y=.32;cover.position.y=.049;compass.add(cover);
- const watch=new THREE.Group();watch.position.set(.49,.83,-.31);watch.rotation.set(-.2,0,.15);group.add(watch);
+ const watch=new THREE.Group();watch.position.set(.16,.498,.60);watch.rotation.set(0,0,0);group.add(watch);
  const strap=new THREE.Mesh(new THREE.BoxGeometry(.083,.026,.25),rubber);watch.add(strap);
  const casing=new THREE.Mesh(new THREE.BoxGeometry(.115,.035,.105),steel);casing.position.y=.02;watch.add(casing);
  const screen=document.createElement('canvas');screen.width=512;screen.height=384;const ink=screen.getContext('2d');const screenTexture=new THREE.CanvasTexture(screen);screenTexture.colorSpace=THREE.SRGBColorSpace;

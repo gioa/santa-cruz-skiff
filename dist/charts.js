@@ -1,6 +1,6 @@
-import {toGPS,fromGPS,geography,coastLines,pierRings,landPolygons,FISHING_SPOTS} from './geography.js?v=20260927-wharf-dawn';
-import {depthInfoAt} from './bathymetry.js?v=20260927-wharf-dawn';
-import {HARBOR,harborObstacleRings} from './harbor-layout.js?v=20260927-wharf-dawn';
+import {toGPS,fromGPS,geography,coastLines,pierRings,landPolygons,FISHING_SPOTS} from './geography.js?v=20260927-articulated-v4';
+import {depthInfoAt} from './bathymetry.js?v=20260927-articulated-v4';
+import {HARBOR,harborObstacleRings} from './harbor-layout.js?v=20260927-articulated-v4';
 // North-up chart uses the same geographic projection as the world.
 export function createCharts(state){
  const origin=toGPS(HARBOR.boatX,HARBOR.boatZ),e=111320*Math.cos(origin.lat*Math.PI/180),n=111132;

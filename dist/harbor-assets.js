@@ -1,6 +1,6 @@
 import * as THREE from './vendor/three.module.js';
-import { HARBOR_SHAPES } from './harbor-shapes.js?v=20260927-wharf-dawn';
-import {clothMap} from './angler-model.js?v=20260927-wharf-dawn';
+import { HARBOR_SHAPES } from './harbor-shapes.js?v=20260927-articulated-v4';
+import {clothMap} from './angler-model.js?v=20260927-articulated-v4';
 // Authored metric geometry. Blender export crashed locally; runtime mesh construction is Three.js.
 // These assets are generic dock equipment and a fictional worker, not replicas of real staff.
 const COLORS={galvanized:0x81928e,paint:0x36745e,edges:0x454f51,ochre:0xc49a50,bolt:0xb9c1bf,black:0x252e30,cable:0x495659,concrete:0x8f9387,rust:0x815038,orange:0xbc784e,orangeShade:0x84513a,navy:0x465c6e,navyLight:0x596e7e,skin:0xc1977d,skinShade:0xa77d67,lip:0x9b7768,eye:0xd2cec3,pupil:0x463d2b,cap:0xa39f82,boot:0x626f5f,reflect:0xd5d5ad};

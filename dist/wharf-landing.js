@@ -1,7 +1,7 @@
 import * as THREE from './vendor/three.module.js';
-import {DetailBatch} from './env-detail.js?v=20260927-wharf-dawn';
-import {HARBOR} from './harbor-layout.js?v=20260927-wharf-dawn';
-import {onPier} from './geography.js?v=20260927-wharf-dawn';
+import {DetailBatch} from './env-detail.js?v=20260927-articulated-v4';
+import {HARBOR} from './harbor-layout.js?v=20260927-articulated-v4';
+import {onPier} from './geography.js?v=20260927-articulated-v4';
 
 // Photo-referenced rental landing, distinct from the larger public float.
 // City 2014 engineering report Photo 8-2 + Bay Area Waters video at 00:45–00:55.

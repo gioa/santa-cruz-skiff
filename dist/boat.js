@@ -74,8 +74,8 @@ export function createSkiff(){
  const shape=new THREE.Shape();for(let j=0;j<=24;j++){const a=(j/24-.5)*2,p=pt(2.2,Math.abs(a),Math.sign(a)||1);if(!j)shape.moveTo(p.x,p.y);else shape.lineTo(p.x,p.y);}shape.closePath();
  const tg=new THREE.ExtrudeGeometry(shape,{depth:.045,bevelEnabled:false});tg.translate(0,0,2.155);mesh(tg,red,'solid timber transom');box(1.59,.09,.09,[0,.78,2.18],green,'transom top rail');box(.58,.37,.06,[0,.56,2.215],wood,'outboard reinforcement pad');
  const floor=[];for(let i=-4;i<=4;i++){let x=i*.133,a=-1.94+Math.pow(Math.abs(x)/.6,2)*.45,b=1.9;floor.push(timberUV(boxg(.123,.045,b-a,x,.075,(a+b)/2),'z',b-a,.123));}mesh(merged(floor),green,'nine spaced wooden floorboards');
- const seats=[],frames=[];for(const [z,w]of [[-1.07,1.46],[.60,1.64]]){for(const dz of [-.133,0,.133])seats.push(timberUV(bevelBox(w,.05,.124,.009),'x',w,.124).translate(0,.46,z+dz));for(const s of [-1,1]){frames.push(boxg(.07,.38,.32,s*(w/2-.08),.27,z));frames.push(boxg(.10,.07,.43,s*(w/2-.09),.405,z));for(const dz of [-.13,.13])bolts.push(new THREE.CylinderGeometry(.009,.005,.004,10).translate(s*(w/2-.085),.488,z+dz));}}
- mesh(merged(seats),wood,'two worn timber rowing benches');mesh(merged(frames),green,'bench brackets');
+ const seats=[],frames=[];for(const [z,w]of [[-1.07,1.46],[.60,1.64],[1.45,1.56]]){for(const dz of [-.133,0,.133])seats.push(timberUV(bevelBox(w,.05,.124,.009),'x',w,.124).translate(0,.46,z+dz));for(const s of [-1,1]){frames.push(boxg(.07,.38,.32,s*(w/2-.08),.27,z));frames.push(boxg(.10,.07,.43,s*(w/2-.09),.405,z));for(const dz of [-.13,.13])bolts.push(new THREE.CylinderGeometry(.009,.005,.004,10).translate(s*(w/2-.085),.488,z+dz));}}
+ mesh(merged(seats),wood,'three worn timber thwarts including aft helm seat');mesh(merged(frames),green,'bench brackets');
  const hook=new THREE.Shape();hook.moveTo(0,-2.57);hook.lineTo(.36,-2.18);hook.quadraticCurveTo(0,-2.31,-.36,-2.18);hook.closePath();const hg=new THREE.ExtrudeGeometry(hook,{depth:.045,bevelEnabled:false});hg.rotateX(Math.PI/2);hg.translate(0,.875,0);mesh(hg,green,'small bow breasthook');
  for(const [x,y,z]of [[0,.915,-2.36],[-.67,.815,1.84],[.67,.815,1.84]]){bolts.push(boxg(.1,.013,.055,x,y,z));bolts.push(new THREE.CylinderGeometry(.015,.022,.055,8).translate(x,y+.029,z));bolts.push(new THREE.CylinderGeometry(.012,.017,.18,8).rotateZ(Math.PI/2).translate(x,y+.062,z));}
  for(const s of [-1,1]){const p=pt(-.18,1,s);bolts.push(new THREE.CylinderGeometry(.021,.028,.095,8).translate(p.x,p.y+.017,p.z));bolts.push(new THREE.TorusGeometry(.052,.009,6,15,Math.PI*1.45).rotateY(Math.PI/2).translate(p.x,p.y+.115,p.z));const ps=[],zs=[-1.95,-1.48,-.90,-.32,.28,.89,1.47,1.98];zs.forEach((z,i)=>{let q=pt(z,.94,s,-.05);ps.push(q);bolts.push(new THREE.TorusGeometry(.025,.006,5,10).rotateY(Math.PI/2).translate(q.x,q.y,q.z));if(i<zs.length-1){q=pt((z+zs[i+1])/2,.91,s,-.07);q.y-=.075;ps.push(q);}});mesh(tube(ps,.013,90,6),rope,'looped safety grab line');}
@@ -85,23 +85,72 @@ export function createSkiff(){
  mesh(cowlingGeometry(),gray,'sculpted rounded Yamaha cowling',motor);
  rounded(.366,.065,.424,[0,.144,.18],black,'rubber cowling separation gasket',motor,.016);
  rounded(.17,.14,.30,[0,.066,.16],gray,'outboard swivel head',motor,.026);
- rounded(.107,.68,.143,[0,-.294,.175],gray,'tapered shaft housing',motor,.021);
- rounded(.38,.022,.275,[0,-.5,.195],gray,'bevelled anti ventilation plate',motor,.005);
- mesh(new THREE.SphereGeometry(1,16,10).scale(.091,.078,.22).translate(0,-.62,.23),gray,'streamlined lower gearcase',motor);
- const fin=new THREE.Shape();fin.moveTo(-.58,.07);fin.lineTo(-.84,.22);fin.quadraticCurveTo(-.85,.29,-.78,.30);fin.lineTo(-.59,.33);fin.closePath();const fg=new THREE.ExtrudeGeometry(fin,{depth:.015,bevelEnabled:true,bevelThickness:.004,bevelSize:.004,bevelSegments:1});fg.rotateY(Math.PI/2);fg.rotateX(Math.PI/2);fg.translate(-.0075,0,0);mesh(fg,gray,'swept protective skeg',motor);
+ rounded(.107,1.04,.143,[0,-.474,.175],gray,'tapered shaft housing',motor,.021);
+ rounded(.30,.022,.235,[0,-.86,.195],gray,'bevelled anti ventilation plate',motor,.005);
+ mesh(new THREE.SphereGeometry(1,16,10).scale(.064,.061,.17).translate(0,-.98,.23),gray,'streamlined lower gearcase',motor);
+ const fin=new THREE.Shape();fin.moveTo(-.58,.07);fin.lineTo(-.84,.22);fin.quadraticCurveTo(-.85,.29,-.78,.30);fin.lineTo(-.59,.33);fin.closePath();const fg=new THREE.ExtrudeGeometry(fin,{depth:.015,bevelEnabled:true,bevelThickness:.004,bevelSize:.004,bevelSegments:1});fg.rotateY(Math.PI/2);fg.rotateX(Math.PI/2);fg.translate(-.0075,-.36,0);mesh(fg,gray,'swept protective skeg',motor);
  // Cowling vents, latch and recessed starter socket have independent dark cavities.
  const ventParts=[];for(const x of [-1,1])for(let i=0;i<4;i++)ventParts.push(bevelBox(.006,.018,.068,.002).translate(x*.201,.253+i*.027,.198));mesh(merged(ventParts),black,'engine cooling intake louvers',motor);
  rounded(.048,.046,.015,[0,.15,.408],black,'rear cowling release latch',motor,.006);
  rounded(.080,.05,.018,[0,.258,-.049],black,'recoil starter recess',motor,.006);
  rounded(.053,.022,.028,[0,.258,-.066],black,'starter pull handle',motor,.005);
- const propeller=new THREE.Group();propeller.name='propeller';propeller.position.set(0,-.62,.45);motor.add(propeller);mesh(new THREE.CylinderGeometry(.035,.045,.1,10).rotateX(Math.PI/2),metal,'propeller hub',propeller);const blades=[];for(let i=0;i<3;i++){const b=new THREE.SphereGeometry(1,8,6).scale(.055,.13,.012).translate(0,.11,0);b.rotateY(.35);b.rotateZ(i*Math.PI*2/3);blades.push(b);}mesh(merged(blades),metal,'three swept propeller blades',propeller);
- rounded(.075,.069,.54,[-.12,.20,-.22],black,'rounded folding tiller arm',motor,.016);mesh(new THREE.CylinderGeometry(.034,.034,.19,10).rotateX(Math.PI/2).translate(-.12,.20,-.48),black,'rubber tiller grip',motor);for(const x of [-.15,.15]){box(.055,.26,.13,[x,-.025,-.05],metal,'transom motor clamp',motor);box(.07,.025,.11,[x,-.13,-.13],black,'clamp screw handle',motor);}
+ // At the design waterline the ventilation plate is 24 cm submerged, level
+ // with the transom keel. A 23 cm diameter small-outboard propeller remains fully
+ // immersed, including its upper blade, instead of rotating above the surface.
+ const propeller=new THREE.Group();propeller.name='propeller';propeller.position.set(0,-.98,.425);motor.add(propeller);mesh(new THREE.CylinderGeometry(.026,.035,.085,12).rotateX(Math.PI/2),metal,'propeller hub',propeller);const blades=[];for(let i=0;i<3;i++){const b=new THREE.SphereGeometry(1,12,8).scale(.038,.059,.008).translate(0,.055,0);b.rotateY(.42);b.rotateZ(i*Math.PI*2/3);blades.push(b);}mesh(merged(blades),metal,'three swept propeller blades',propeller);
+ // The clamp bracket belongs to the hull: turning the engine must never rotate it
+ // through the timber transom. Only the swivel head, shaft and tiller steer together.
+ const motorMount=new THREE.Group();motorMount.name='fixed transom clamp and tilt bracket';motorMount.position.copy(motor.position);boat.add(motorMount);
+ const clampCastings=[],clampSteel=[],clampRubber=[];
+ for(const x of[-.145,.145]){
+  clampCastings.push(bevelBox(.052,.213,.055,.008).translate(x,.082,-.015));
+  clampCastings.push(bevelBox(.058,.041,.212,.008).translate(x,.192,-.092));
+  clampCastings.push(bevelBox(.050,.182,.034,.006).translate(x,.111,-.185));
+  // Threaded clamp screw, circular pressure pad and folding cross handle.
+  clampSteel.push(new THREE.CylinderGeometry(.007,.007,.097,10).rotateX(Math.PI/2).translate(x,.047,-.189));
+  clampSteel.push(new THREE.CylinderGeometry(.025,.025,.012,12).rotateX(Math.PI/2).translate(x,.047,-.137));
+  clampSteel.push(new THREE.CylinderGeometry(.006,.006,.083,8).rotateZ(Math.PI/2).translate(x,.047,-.239));
+  for(let i=0;i<10;i++)clampSteel.push(new THREE.TorusGeometry(.008,.0014,3,8).translate(x,.047,-.17-i*.005));
+  clampRubber.push(new THREE.CylinderGeometry(.024,.024,.004,12).rotateX(Math.PI/2).translate(x,.047,-.130));
+  clampSteel.push(new THREE.CylinderGeometry(.018,.018,.068,10).rotateZ(Math.PI/2).translate(x,.125,.030));
+ }
+ clampCastings.push(bevelBox(.24,.041,.07,.010).translate(0,-.01,.023));
+ clampSteel.push(new THREE.CylinderGeometry(.017,.017,.35,12).rotateZ(Math.PI/2).translate(0,.122,.034));
+ mesh(merged(clampCastings),gray,'cast alloy transom clamp brackets and tilt cradle',motorMount);
+ mesh(merged(clampSteel),metal,'threaded clamp screws pressure pads handles and tilt pin',motorMount);
+ mesh(merged(clampRubber),black,'rubber transom protection pads',motorMount);
+ // Compact F8-style folding tiller, with a separate twist throttle and contact socket.
+ // Socket +Y follows the grip toward the bow; +Z points toward the palm above it.
+ const tillerPivot=new THREE.Group();tillerPivot.name='folding tiller pivot';tillerPivot.position.set(-.12,.20,.025);motor.add(tillerPivot);
+ mesh(new THREE.CylinderGeometry(.047,.047,.115,14).rotateZ(Math.PI/2),gray,'tiller hinge boss',tillerPivot);
+ mesh(new THREE.CylinderGeometry(.018,.018,.126,6).rotateZ(Math.PI/2),metal,'hex tiller hinge pivot bolt',tillerPivot);
+ rounded(.062,.053,.411,[0,0,-.225],black,'tapered folding tiller arm',tillerPivot,.012);
+ rounded(.034,.009,.257,[0,.029,-.193],gray,'tiller upper inset',tillerPivot,.003);
+ mesh(new THREE.CylinderGeometry(.033,.033,.034,14).rotateX(Math.PI/2).translate(0,0,-.405),black,'throttle friction collar',tillerPivot);
+ const tillerThrottle=new THREE.Group();tillerThrottle.name='working twist throttle grip';tillerThrottle.position.set(0,0,-.505);tillerThrottle.rotation.x=-Math.PI/2;tillerPivot.add(tillerThrottle);
+ mesh(new THREE.CylinderGeometry(.027,.028,.184,20),black,'molded rubber throttle grip',tillerThrottle);
+ const gripRibs=[];for(let i=0;i<15;i++)gripRibs.push(new THREE.TorusGeometry(.028,.0019,4,20).rotateX(Math.PI/2).translate(0,-.081+i*.0115,0));
+ gripRibs.push(new THREE.CylinderGeometry(.030,.030,.013,20).translate(0,.098,0));
+ mesh(merged(gripRibs),material('#242b2d',.91),'rubber grip ribs and palm stop',tillerThrottle);
+ rounded(.008,.047,.0028,[0,-.038,.028],material('#bdc1ba',.7),'raised throttle index stripe',tillerThrottle,.0006);
+ const tillerGripSocket=new THREE.Object3D();tillerGripSocket.name='right hand throttle contact';tillerGripSocket.userData.gripRadius=.028;tillerThrottle.add(tillerGripSocket);
+ const safetyRed=material('#ab4437',.7),stopButton=material('#d76c54',.58);
+ mesh(new THREE.CylinderGeometry(.015,.018,.014,12).rotateZ(Math.PI/2).translate(-.043,.001,-.335),stopButton,'engine stop button',tillerPivot);
+ mesh(new THREE.TorusGeometry(.016,.004,5,12).rotateY(Math.PI/2).translate(-.052,.001,-.335),safetyRed,'emergency stop clip',tillerPivot);
+ // A coiled lanyard is stowed beside the stop switch. The rig can extend it to the PFD.
+ const tether=[];for(let i=0;i<=80;i++){const t=i/80,a=t*Math.PI*16;tether.push(new THREE.Vector3(-.059-Math.sin(a)*.010,-.015-t*.14,-.335+Math.cos(a)*.010));}
+ mesh(tube(tether,.0025,80,4),safetyRed,'coiled safety cutout lanyard',tillerPivot);
+ mesh(new THREE.TorusGeometry(.018,.003,5,12).translate(-.059,-.163,-.325),metal,'lanyard attachment ring',tillerPivot);
+ // Side shift linkage has a visible pivot, stem and hand knob rather than a floating block.
+ mesh(new THREE.CylinderGeometry(.028,.028,.027,12).rotateZ(Math.PI/2).translate(.121,.084,-.042),black,'gear selector pivot',motor);
+ mesh(tube([new THREE.Vector3(.138,.084,-.042),new THREE.Vector3(.183,.138,-.046),new THREE.Vector3(.183,.17,-.042)],.008,12,6),metal,'gear selector stem',motor);
+ rounded(.042,.035,.051,[.183,.177,-.042],black,'gear selector rubber knob',motor,.009);
  const c=document.createElement('canvas');c.width=512;c.height=256;const cx=c.getContext('2d');cx.clearRect(0,0,512,256);cx.fillStyle='#213440';cx.fillRect(16,27,480,159);cx.fillStyle='#c7d3d7';cx.fillRect(16,27,480,6);cx.fillStyle='#f6f6f1';cx.textAlign='center';cx.font='bold 61px Arial';cx.fillText('YAMAHA',256,104);cx.font='bold 65px Arial';cx.fillText('8',256,175);let tex=new THREE.CanvasTexture(c);tex.colorSpace=THREE.SRGBColorSpace;
  const label=new THREE.MeshStandardMaterial({map:tex,transparent:true,roughness:.4,metalness:.2,depthWrite:false});
  mesh(new THREE.PlaneGeometry(.278,.139).translate(0,.359,.4205),label,'Yamaha aft cowling badge',motor);
  for(const side of [-1,1]){const badge=mesh(new THREE.PlaneGeometry(.255,.13),label,'Yamaha side cowling badge',motor);badge.rotation.y=side*Math.PI/2;badge.position.set(side*.199,.383,.162);}
  const nc=document.createElement('canvas');nc.width=256;nc.height=256;const nq=nc.getContext('2d');nq.clearRect(0,0,256,256);nq.fillStyle='#171d18';nq.font='bold 174px Georgia';nq.textAlign='center';nq.fillText('17',128,191);tex=new THREE.CanvasTexture(nc);tex.colorSpace=THREE.SRGBColorSpace;mesh(new THREE.PlaneGeometry(.29,.29).translate(-.44,.47,2.203),new THREE.MeshStandardMaterial({map:tex,roughness:.9,transparent:true,depthWrite:false}),'black hull number');
- const rodHolder=new THREE.Group();rodHolder.position.set(.71,.61,1.54);rodHolder.rotation.z=-.22;boat.add(rodHolder);mesh(new THREE.CylinderGeometry(.042,.034,.25,12,1,true),black,'open tubular rod holder',rodHolder);mesh(new THREE.TorusGeometry(.042,.006,6,14).rotateX(Math.PI/2).translate(0,.125,0),metal,'rod holder rim',rodHolder);box(.075,.1,.035,[0,-.04,-.025],metal,'rod holder bracket',rodHolder);
+ const rodHolder=new THREE.Group();rodHolder.position.set(.71,.61,1.54);rodHolder.rotation.z=-.22;boat.add(rodHolder);mesh(new THREE.CylinderGeometry(.042,.034,.25,12,1,true),black,'open tubular rod holder',rodHolder);mesh(new THREE.TorusGeometry(.042,.006,6,14).rotateX(Math.PI/2).translate(0,.125,0),metal,'rod holder rim',rodHolder);box(.075,.1,.035,[0,-.04,-.025],metal,'rod holder bracket',rodHolder);rounded(.123,.028,.078,[.063,-.04,-.025],metal,'rod holder cross brace to hull',rodHolder,.005);rounded(.018,.12,.10,[.127,0,-.025],metal,'rod holder hull backing plate',rodHolder,.004);for(const y of[-.041,.041])mesh(new THREE.CylinderGeometry(.008,.008,.025,6).rotateZ(Math.PI/2).translate(.13,y,-.025),metal,'rod holder mounting bolt',rodHolder);const rodStowSocket=new THREE.Object3D();rodStowSocket.name='rod butt inside the fixed holder';rodHolder.add(rodStowSocket);
  const gear=new THREE.Group();gear.name='optional fishing gear';boat.add(gear);const cooler=new THREE.Group();cooler.position.set(0,.11,-1.65);gear.add(cooler);const cream=material('#dddccd'),mint=material('#aec5bd');rounded(.54,.30,.34,[0,.15,0],mint,'rounded molded cooler body',cooler,.022);rounded(.548,.012,.344,[0,.299,0],black,'cooler lid dark seal',cooler,.003);rounded(.566,.054,.36,[0,.328,0],cream,'bevelled cooler lid',cooler,.012);rounded(.49,.006,.283,[0,.357,0],cream,'raised cooler lid inset',cooler,.001);for(const x of [-.272,.272]){rounded(.018,.086,.141,[x,.20,0],black,'cooler handle recess',cooler,.004);mesh(tube([new THREE.Vector3(x,.223,-.065),new THREE.Vector3(x*1.1,.174,-.055),new THREE.Vector3(x*1.1,.174,.055),new THREE.Vector3(x,.223,.065)],.012,14,6),cream,'folding cooler carry handle',cooler);}for(const x of [-.17,.17]){rounded(.035,.07,.014,[x,.265,.178],black,'cooler flexible latch',cooler,.003);rounded(.046,.02,.02,[x,.294,.18],cream,'cooler latch catch',cooler,.004);}for(const x of [-.255,.255])for(const z of [-.13,.13])rounded(.028,.22,.018,[x,.142,z],mint,'cooler molded corner rib',cooler,.004);
  const bucket=new THREE.Group();bucket.position.set(-.36,.105,1.49);gear.add(bucket);const bm=material('#c4b79d');bm.side=THREE.DoubleSide;mesh(new THREE.CylinderGeometry(.16,.12,.31,20,1,true).translate(0,.155,0),bm,'open bait bucket',bucket);mesh(new THREE.CylinderGeometry(.12,.12,.018,20).translate(0,.01,0),bm,'bucket bottom',bucket);mesh(new THREE.TorusGeometry(.16,.012,6,22).rotateX(Math.PI/2).translate(0,.31,0),bm,'bucket rolled rim',bucket);mesh(tube(Array.from({length:24},(_,i)=>new THREE.Vector3(Math.cos(Math.PI*i/23)*.168,.25+Math.sin(Math.PI*i/23)*.17,0)),.006,24,5),metal,'wire bucket bail',bucket);
  rounded(.24,.15,.31,[.36,.17,1.49],red,'rounded portable fuel tank',gear,.025);mesh(tube([new THREE.Vector3(.30,.247,1.49),new THREE.Vector3(.31,.275,1.49),new THREE.Vector3(.41,.275,1.49),new THREE.Vector3(.42,.247,1.49)],.012,16,6),black,'fuel tank carry handle',gear);mesh(new THREE.CylinderGeometry(.031,.033,.017,12).translate(.36,.252,1.39),black,'fuel filler cap',gear);mesh(tube([new THREE.Vector3(.14,.66,2.43),new THREE.Vector3(.37,.44,2.1),new THREE.Vector3(.40,.15,1.82),new THREE.Vector3(.36,.15,1.49)],.013,28,6),black,'fuel hose');
@@ -141,10 +190,18 @@ export function createSkiff(){
  mesh(new THREE.TorusGeometry(.025,.004,5,12).translate(0,-.09,2.205),metal,'transom drain plug ferrule');mesh(new THREE.CylinderGeometry(.019,.019,.025,10).rotateX(Math.PI/2).translate(0,-.09,2.217),black,'tethered drain plug');
  rounded(.29,.019,.19,[-.43,.501,.60],pale,'scored removable bait cutting board',gear,.004);
  const scoring=[];for(let i=0;i<9;i++)scoring.push(boxg(.11+(i%3)*.03,.0008,.0009,-.44+(i%3)*.02,.512,.537+i*.014));mesh(merged(scoring),rubber,'knife cuts on bait board',gear);
+ // A very soft baked contact layer keeps the floor/seat junctions readable in
+ // skylight at 06:00, including mobile devices without expensive shadow maps.
+ // It only darkens the small areas physically occluded by thwarts and equipment.
+ const aoCanvas=document.createElement('canvas');aoCanvas.width=128;aoCanvas.height=128;const aq=aoCanvas.getContext('2d');
+ const aoGradient=aq.createRadialGradient(64,64,3,64,64,62);aoGradient.addColorStop(0,'rgba(255,255,255,.24)');aoGradient.addColorStop(.48,'rgba(255,255,255,.18)');aoGradient.addColorStop(1,'rgba(255,255,255,0)');aq.fillStyle=aoGradient;aq.fillRect(0,0,128,128);
+ const aoTexture=new THREE.CanvasTexture(aoCanvas),aoParts=[];
+ for(const [x,y,z,w,d]of[[0,.100,-1.07,1.40,.84],[0,.100,.60,1.47,.84],[0,.100,1.45,1.40,.84],[0,.101,-1.65,.73,.51],[-.36,.102,1.49,.44,.43],[.36,.103,1.49,.39,.44],[-.35,.487,1.45,.53,.35]])aoParts.push(new THREE.PlaneGeometry(w,d).rotateX(-Math.PI/2).translate(x,y,z));
+ const contactShade=new THREE.Mesh(merged(aoParts),new THREE.MeshBasicMaterial({color:'#15231c',map:aoTexture,transparent:true,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-1}));contactShade.name='soft baked bench equipment and seated body contact shade';contactShade.renderOrder=1;boat.add(contactShade);
  // Merge static components sharing a material, preserving articulated / equipment groups.
  // This keeps the many modeled fixtures inexpensive on mobile GPUs.
- function batchStatic(parent){const batches=new Map();for(const o of [...parent.children])if(o.isMesh&&!Array.isArray(o.material)){const key=o.material.uuid;if(!batches.has(key))batches.set(key,[]);batches.get(key).push(o);}for(const list of batches.values()){if(list.length<2)continue;const names=[],gs=[];for(const o of list){o.updateMatrix();gs.push(o.geometry.clone().applyMatrix4(o.matrix));names.push(o.name);parent.remove(o);o.geometry.dispose();}const combined=mesh(merged(gs),list[0].material,names.join(' / '),parent);combined.userData.components=names;}}
- for(const parent of[boat,motor,gear,cooler,bucket,rodHolder,boardingLadder,net])batchStatic(parent);
- boat.userData={boardingLadder,motor,propeller,gear,cooler,bucket,net,rodHolder,dimensions:{length:4.8,beam:1.9,waterline:0,floor:.0975},bowDirection:new THREE.Vector3(0,0,-1),helmPosition:new THREE.Vector3(0,1.57,1.42),cockpitPosition:new THREE.Vector3(0,1.57,-.1)};
+ function batchStatic(parent){const batches=new Map();for(const o of [...parent.children])if(o.isMesh&&o!==contactShade&&!Array.isArray(o.material)){const key=o.material.uuid;if(!batches.has(key))batches.set(key,[]);batches.get(key).push(o);}for(const list of batches.values()){if(list.length<2)continue;const names=[],gs=[];for(const o of list){o.updateMatrix();gs.push(o.geometry.clone().applyMatrix4(o.matrix));names.push(o.name);parent.remove(o);o.geometry.dispose();}const combined=mesh(merged(gs),list[0].material,names.join(' / '),parent);combined.userData.components=names;}}
+ for(const parent of[boat,motor,motorMount,tillerPivot,tillerThrottle,gear,cooler,bucket,rodHolder,boardingLadder,net])batchStatic(parent);
+ boat.userData={boardingLadder,motor,motorMount,tillerPivot,tillerThrottle,tillerGripSocket,setThrottle:value=>{tillerThrottle.rotation.y=-THREE.MathUtils.clamp(value,0,1)*.78;},helmSeatPosition:new THREE.Vector3(-.35,.055,1.72),propeller,gear,cooler,bucket,net,rodHolder,rodStowSocket,dimensions:{length:4.8,beam:1.9,waterline:0,floor:.0975},bowDirection:new THREE.Vector3(0,0,-1),helmPosition:new THREE.Vector3(0,1.57,1.42),cockpitPosition:new THREE.Vector3(0,1.57,-.1)};
  return boat;
 }

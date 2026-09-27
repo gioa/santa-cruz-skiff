@@ -43,7 +43,17 @@ Feet are at y=0, approximate height is 1.82 m, front is -Z. Poses: `idle`, `wave
 
 - JavaScript syntax checks passed.
 - Crane: 9,926 triangles, 19 meshes.
-- Worker: 12,286 triangles, 23 meshes. Boat: 53,352 triangles, 41 meshes (was 83 before batching). First-person hands and seated angler use separate clothing/skin geometry.
+- Worker: 12,286 triangles, 23 meshes. Boat: 53,352 triangles, 41 meshes (was 83 before batching). The character now uses the same articulated arms and hands in both cameras (see the September interaction update below).
 - Crane/worker vertex scan found no nonfinite geometry values.
 - Browser rendering checked the whole crane and a close worker view. Corrected bib/waist/sleeve intersections found during that inspection.
 - `proof.html` is a temporary visual proof, not a production dependency.
+
+## Articulated interaction update — 2026-09-27
+
+`angler-interaction.js` coordinates one world-space fisherman, rod and motor. The camera no longer moves a second copy of the rod/hands. `angler-model.js` exposes two-bone shoulder/elbow/wrist IK, relaxed and closed fingers, a head eye socket and articulated standing legs. Anatomical limb lengths remain fixed; impossible target poses report contact error instead of stretching the arms. Third-person orbit is independent of the held fishing direction.
+
+The aft helm seat supports the pelvis at boat coordinates (-0.35, 0.485, 1.47). The tiller grip socket follows both motor steering and twist throttle; clamps remain fixed to the transom. The lower unit places the 0.228 m propeller below the reference waterline (center -0.36 m) while preserving the grip height. A supported rod holder carries the unused tackle. Compass and watch rest on the existing middle thwart.
+
+The new conventional reel has a real crank contact socket, geared spool and level-wind traverse. The supporting palm closes around the cork, while the reeling hand follows the knob circle without tumbling. One continuous tapered blank bends through every guide; the line passes the guides and leaves the live tip. All reel animation uses dt, independent of frame rate.
+
+Primary outboard reference: [Yamaha F8](https://www.yamaha-motor.com.au/products/marine/outboard/portable-four-stroke-2.5---25hp/f8), particularly folding tiller, twist throttle and side-mounted gear selector. Shape/dimensions remain authored approximations, not a manufacturer CAD export. This is an interactive procedural character, not a GTA asset, photoreal human scan or AAA art claim.
