@@ -19,7 +19,7 @@ test('complete walking, hoist, sailing, fishing, return, fish trade and equipmen
 });
 
 test('missed bite expires, bait persists and disconnected pointer cancellation costs no bait',()=>{
- const sim=new PixelSimulation({rng:()=>0});departure(sim);assert.equal(sim.startCast().ok,true);sim.cancelCast();assert.equal(sim.state.fishState,'idle');assert.equal(sim.state.profile.stock.squid,12);sim.startCast();sim.step(.1);sim.releaseCast();runUntil(sim,s=>s.fishState==='bite',100);for(let i=0;i<100;i++)sim.step(.1);assert.equal(sim.state.fishState,'idle');assert.equal(sim.state.misses,1);assert.equal(sim.state.profile.stock.squid,11);sim.startCast();sim.releaseCast();assert.equal(sim.state.profile.stock.squid,11,'usable hook bait is retained for recast');
+ const sim=new PixelSimulation({rng:()=>0});departure(sim);assert.equal(sim.startCast().ok,true);sim.cancelCast();assert.equal(sim.state.fishState,'idle');assert.equal(sim.state.profile.stock.squid,12);sim.startCast();sim.step(.1);sim.releaseCast();runUntil(sim,s=>s.fishState==='bite',100);sim.state.biteHold.threshold=.02;for(let i=0;i<100;i++)sim.step(.1);assert.equal(sim.state.fishState,'idle');assert.equal(sim.state.misses,1);assert.equal(sim.state.profile.stock.squid,11);sim.startCast();sim.releaseCast();assert.equal(sim.state.profile.stock.squid,11,'usable hook bait is retained for recast');
 });
 
 test('onboard walking and old water-entry controls cannot move the seated angler or interrupt propulsion',()=>{

@@ -1,11 +1,11 @@
-import {pierRings,landPolygons,coastLines,buildingFootprints,FISHING_SPOTS,onLand,onPier} from './pixel-geography.js?v=20260927-pixel-v15';
-import {HARBOR} from './harbor-layout.js?v=20260927-pixel-v15';
-import {depthInfoAt} from './bathymetry.js?v=20260927-pixel-v15';
-import {createWildlife,drawWildlife} from './pixel-wildlife.js?v=20260927-pixel-v15';
-import {cameraOffset,projectPixel,unprojectPixel,stepDeadzoneCamera,cameraDeadzone,cameraPlayfield,fitCameraBounds,zoomCameraAt,rectilinearOutline} from './pixel-camera.js?v=20260927-pixel-v15';
-import {ladderPoint} from './swimming.js?v=20260927-pixel-v15';
-import {SKIFF_RACKS,boatRenderPose,parkedSkiffPoses,skiffScreenPose,hitSkiff} from './pixel-boat-geometry.js?v=20260927-pixel-v15';
-import {getRodCurve,getReelPose,getFishingLine,getFishingPresentation} from './pixel-rod-geometry.js?v=20260927-pixel-v15';
+import {pierRings,landPolygons,coastLines,buildingFootprints,FISHING_SPOTS,onLand,onPier} from './pixel-geography.js?v=20260927-pixel-v17';
+import {HARBOR} from './harbor-layout.js?v=20260927-pixel-v17';
+import {depthInfoAt} from './bathymetry.js?v=20260927-pixel-v17';
+import {createWildlife,drawWildlife} from './pixel-wildlife.js?v=20260927-pixel-v17';
+import {cameraOffset,projectPixel,unprojectPixel,stepDeadzoneCamera,cameraDeadzone,cameraPlayfield,fitCameraBounds,zoomCameraAt,rectilinearOutline} from './pixel-camera.js?v=20260927-pixel-v17';
+import {ladderPoint} from './swimming.js?v=20260927-pixel-v17';
+import {SKIFF_RACKS,boatRenderPose,parkedSkiffPoses,skiffScreenPose,hitSkiff} from './pixel-boat-geometry.js?v=20260927-pixel-v17';
+import {getRodCurve,getReelPose,getFishingLine,getFishingPresentation} from './pixel-rod-geometry.js?v=20260927-pixel-v17';
 
 // The map keeps the same metre coordinates as the sailing simulation. The
 // people and boat are deliberately enlarged, like a handheld-era RPG, so that

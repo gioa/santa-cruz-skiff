@@ -42,13 +42,32 @@ test('casting into flight cancels an already held rod and a fresh touch is neede
  pose.emit('pointerdown',{pointerId:2});pose.emit('pointermove',{pointerId:2,clientY:86});assert.equal(state.rodElevation,62);
 });
 
-test('retrieving the rig hides and cancels a held drag control without changing saved drag',t=>{
- const {state,ui,elements}=fixture(t,'waiting'),drag=elements['drag-knob'];
+test('the drag control stays hidden and ignores pointer and keyboard input before hookup',t=>{
+ const {state,ui,elements}=fixture(t),drag=elements['drag-knob'];
+ for(const phase of['idle','casting','flight','sinking','waiting','bite']){
+  state.fishState=phase;ui.update();assert.equal(drag.hidden,true,phase);assert.equal(drag.disabled,true,phase);
+  drag.emit('pointerdown');drag.emit('pointermove',{clientY:46});drag.emit('keydown',{key:'ArrowUp'});
+  assert.equal(drag.hasPointerCapture(1),false,phase);assert.equal(state.drag,.5,phase);
+ }
+ state.fishState='fight';ui.update();assert.equal(drag.hidden,false);assert.equal(drag.disabled,false);
+ drag.emit('keydown',{key:'ArrowUp'});assert.equal(state.drag,.55);
+});
+
+test('ending a fight hides and cancels a held drag control without changing saved drag',t=>{
+ const {state,ui,elements}=fixture(t,'fight'),drag=elements['drag-knob'];
  drag.emit('pointerdown');drag.emit('pointermove',{clientY:82});assert.equal(state.drag,.6);
- state.fishState='idle';ui.update();assert.equal(drag.hidden,true);assert.equal(drag.disabled,true);assert.equal(drag.hasPointerCapture(1),false);
- drag.emit('pointermove',{clientY:46});assert.equal(state.drag,.6);
- state.fishState='sinking';ui.update();drag.emit('pointermove',{clientY:46});assert.equal(state.drag,.6);
+ state.fishState='landed';ui.update();assert.equal(drag.hidden,true);assert.equal(drag.disabled,true);assert.equal(drag.hasPointerCapture(1),false);
+ drag.emit('pointermove',{clientY:46});drag.emit('keydown',{key:'ArrowUp'});assert.equal(state.drag,.6);
+ state.fishState='waiting';ui.update();drag.emit('pointerdown',{pointerId:2});drag.emit('pointermove',{pointerId:2,clientY:46});assert.equal(state.drag,.6);
+ state.fishState='fight';ui.update();drag.emit('pointermove',{clientY:46});assert.equal(state.drag,.6,'the previous fight gesture cannot resume');
  drag.emit('pointerdown',{pointerId:2});drag.emit('pointermove',{pointerId:2,clientY:82});assert.equal(state.drag,.7);
+});
+
+test('a lost fish cancels a held drag gesture even before the next UI refresh',t=>{
+ const {state,ui,elements}=fixture(t,'fight'),drag=elements['drag-knob'];
+ drag.emit('pointerdown');drag.emit('pointermove',{clientY:82});assert.equal(state.drag,.6);
+ state.fishState='idle';drag.emit('pointermove',{clientY:46});assert.equal(state.drag,.6);assert.equal(drag.hasPointerCapture(1),false);
+ state.fishState='fight';drag.emit('pointermove',{clientY:28});assert.equal(state.drag,.6);
 });
 
 test('losing reel availability clears captured crank travel and keyboard winding, not just output',t=>{
@@ -62,7 +81,7 @@ test('losing reel availability clears captured crank travel and keyboard winding
 });
 
 test('phase changes cancel gestures before the next UI refresh or pointer release',t=>{
- const {state,ui,elements}=fixture(t,'waiting'),pose=elements['rod-pose'],drag=elements['drag-knob'],wheel=elements['reel-wheel'];
+ const {state,ui,elements}=fixture(t,'fight'),pose=elements['rod-pose'],drag=elements['drag-knob'],wheel=elements['reel-wheel'];
  pose.emit('pointerdown');drag.emit('pointerdown',{pointerId:2});wheel.emit('pointerdown',{pointerId:3,clientX:150,clientY:68.6});
  state.paused=true;pose.emit('pointermove',{clientY:20});
  assert.equal(state.rodElevation,45);assert.equal(state.drag,.5);assert.equal(pose.hasPointerCapture(1),false);assert.equal(drag.hasPointerCapture(2),false);assert.equal(wheel.hasPointerCapture(3),false);

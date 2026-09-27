@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import {seatHook} from './helpers/pixel-hook.js';
 import {readFile} from 'node:fs/promises';
 globalThis.fetch=async url=>new Response(await readFile(url));
 const {PixelSimulation,HARBOR,FISHING_SPOTS}=await import('../dist/pixel-sim.js');
@@ -58,7 +59,7 @@ test('flow is relative to boat velocity, while stronger crossflow loads and bend
 });
 
 test('hooking preserves the actual rig point and paid line instead of inventing a distant fish',()=>{
- const sim=ready(['rig_dropper']);sim.setRig({rig:'dropper'});assert.ok(sim.lowerRig().ok);for(let t=0;t<100&&sim.state.fishState!=='bite';t+=.1)sim.step(.1);assert.equal(sim.state.fishState,'bite');const point={...sim.state.bobber},paid=sim.state.paidLineMeters;assert.ok(sim.hook().ok);assert.deepEqual(sim.state.bobber,point);assert.equal(sim.state.paidLineMeters,paid);assert.equal(sim.state.fish.hookCount,2);assert.equal(sim.state.fish.rig.id,'dropper');assert.equal(sim.state.reelMode,'brake');
+ const sim=ready(['rig_dropper']);sim.setRig({rig:'dropper'});assert.ok(sim.lowerRig().ok);for(let t=0;t<100&&sim.state.fishState!=='bite';t+=.1)sim.step(.1);assert.equal(sim.state.fishState,'bite');const point={...sim.state.bobber},paid=sim.state.paidLineMeters;assert.ok(sim.hook().ok);assert.deepEqual(sim.state.bobber,point);assert.equal(sim.state.paidLineMeters,paid);seatHook(sim,{request:false,onStep:(before,dt)=>assert.ok(Math.abs(sim.state.paidLineMeters-before.paidLineMeters-(sim.state.payoutRate-sim.state.retrieveRate)*dt)<1e-8,'seating must conserve actual spool travel')});assert.equal(sim.state.fish.hookCount,2);assert.equal(sim.state.fish.rig.id,'dropper');assert.equal(sim.state.reelMode,'brake');
 });
 
 test('an overloaded drag slips despite cranking; fish remain above seabed and line stays finite',()=>{
@@ -71,8 +72,8 @@ test('side holder permits bounded slow trolling, neutral pickup, and actual line
  sim.setThrottle(0);for(let t=0;t<30&&Math.abs(sim.state.speed)>1.2;t+=.1)sim.step(.1);sim.step(.1,{reel:.7});assert.equal(sim.state.rodMount,'hand');assert.equal(sim.state.engine,false);assert.equal(sim.canOperateHelm,false);assert.equal(sim.state.crankRate,.7);
 });
 
-test('a mounted bite neutralizes propulsion and requires the player to pick up the rod before striking',()=>{
- const sim=ready();assert.ok(sim.setRodMount('port').ok);assert.ok(sim.lowerRig().ok);sim.state.biteAt=.4;assert.ok(sim.toggleEngine().ok);assert.ok(sim.setThrottle(.15));run(sim,2);assert.equal(sim.state.fishState,'bite');assert.equal(sim.state.throttle,0);assert.equal(sim.canOperateHelm,false);assert.equal(sim.hook().ok,false);assert.ok(sim.setRodMount('hand').ok);assert.equal(sim.state.engine,false);assert.ok(sim.hook().ok);assert.equal(sim.state.fishState,'fight');
+test('a mounted bite neutralizes propulsion and requires pickup before a hand-operated wind/lift',()=>{
+ const sim=ready();assert.ok(sim.setRodMount('port').ok);assert.ok(sim.lowerRig().ok);sim.state.biteAt=.4;assert.ok(sim.toggleEngine().ok);assert.ok(sim.setThrottle(.15));run(sim,2);assert.equal(sim.state.fishState,'bite');assert.equal(sim.state.throttle,0);assert.equal(sim.canOperateHelm,false);assert.equal(sim.hook().ok,false);assert.ok(sim.setRodMount('hand').ok);assert.equal(sim.state.engine,false);seatHook(sim);assert.equal(sim.state.fishState,'fight');
 });
 
 test('pause freezes line and posture; resume resets old live tackle without duplicating bait or cargo',()=>{

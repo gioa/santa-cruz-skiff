@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import {seatHook} from './helpers/pixel-hook.js';
 import {readFile} from 'node:fs/promises';
 globalThis.fetch=async url=>new Response(await readFile(url));
 const {PixelSimulation,HARBOR,FISHING_SPOTS}=await import('../dist/pixel-sim.js');
@@ -32,26 +33,26 @@ test('a natural hand-held bite enters focus and stays through hooking, real reel
  assert.ok(sim.keepCatch().ok);assert.equal(isFishingFocus(sim.state),false);assert.equal(sim.state.catches.length,1);assert.equal(sim.state.catches[0].kept,true);assert.equal(sim.state.profile.stock.squid,bait);
 });
 
-test('a trolling bite enters focus while mounted, then requires pickup and strike before the fight',()=>{
+test('a trolling bite stays focused through pickup, winding into the fish and landing',()=>{
  const sim=ready();assert.ok(sim.setRodMount('starboard').ok);assert.ok(sim.lowerRig().ok);sim.state.biteAt=.5;assert.ok(sim.toggleEngine().ok);assert.ok(sim.setThrottle(.15));until(sim,s=>s.fishState==='bite');assert.equal(isFishingFocus(sim.state),true);assert.equal(sim.state.rodMount,'starboard');assert.equal(sim.state.throttle,0);assert.equal(sim.hook().ok,false);assert.equal(isFishingFocus(sim.state),true);
  assert.ok(sim.setRodMount('hand').ok);assert.equal(sim.state.engine,false);assert.equal(isFishingFocus(sim.state),true);assert.ok(sim.hook().ok);assert.equal(isFishingFocus(sim.state),true);until(sim,s=>s.fishState==='landed',240,{reel:1.2});assert.equal(isFishingFocus(sim.state),true);assert.ok(sim.releaseCatch().ok);assert.equal(isFishingFocus(sim.state),false);assert.equal(sim.state.catches[0].kept,false);
 });
 
 test('missed bites, broken lines and cleared tackle leave focus through their actual model transitions',()=>{
- const missed=ready();bite(missed);until(missed,s=>s.fishState==='idle',15);assert.equal(missed.state.misses,1);assert.equal(isFishingFocus(missed.state),false);
- const broken=ready();bite(broken);assert.ok(broken.hook().ok);broken.escape('break');assert.equal(broken.state.breaks,1);assert.equal(isFishingFocus(broken.state),false);
+ const missed=ready();bite(missed);missed.state.biteHold.threshold=.02;until(missed,s=>s.fishState==='idle',15);assert.equal(missed.state.misses,1);assert.equal(isFishingFocus(missed.state),false);
+ const broken=ready();bite(broken);seatHook(broken);broken.escape('break');assert.equal(broken.state.breaks,1);assert.equal(isFishingFocus(broken.state),false);
  const retrieved=ready();bite(retrieved);assert.ok(retrieved.retrieve().ok);assert.equal(isFishingFocus(retrieved.state),false);assert.equal(retrieved.state.paidLineMeters,0);
 });
 
 test('menus keep the focused camera while pausing all fishing progress',()=>{
  const sim=ready();bite(sim);for(const stage of['bite','fight','landed']){
-  if(stage==='fight')assert.ok(sim.hook().ok);if(stage==='landed')until(sim,s=>s.fishState==='landed',240,{reel:1.2});sim.pause(true);const before=structuredClone(sim.state);assert.equal(isFishingFocus(sim.state),true);run(sim,10,{reel:2,pump:true});assert.deepEqual(sim.state,before);assert.equal(isFishingFocus(sim.state),true);sim.pause(false);
+  if(stage==='fight')seatHook(sim);if(stage==='landed')until(sim,s=>s.fishState==='landed',240,{reel:1.2});sim.pause(true);const before=structuredClone(sim.state);assert.equal(isFishingFocus(sim.state),true);run(sim,10,{reel:2,pump:true});assert.deepEqual(sim.state,before);assert.equal(isFishingFocus(sim.state),true);sim.pause(false);
  }
  assert.ok(sim.releaseCatch().ok);assert.equal(isFishingFocus(sim.state),false);
 });
 
 test('rescue returns to the normal harbour view and a newly resumed day cannot retain a stale focus',()=>{
- const sim=ready();bite(sim);assert.ok(sim.hook().ok);const saved=sim.snapshot();assert.ok(sim.rescue().ok);assert.equal(sim.state.mode,'walk');assert.equal(isFishingFocus(sim.state),false);
+ const sim=ready();bite(sim);seatHook(sim);const saved=sim.snapshot();assert.ok(sim.rescue().ok);assert.equal(sim.state.mode,'walk');assert.equal(isFishingFocus(sim.state),false);
  const resumed=new PixelSimulation({saved,patrolRng:()=>.9});assert.ok(resumed.start(true).ok);assert.equal(resumed.state.fishState,'idle');assert.equal(isFishingFocus(resumed.state),false);
 });
 

@@ -1,6 +1,7 @@
-import {bindPointer} from './input.js?v=20260927-pixel-v15';
-import {rodPoseFromDrag,clockwiseTurns,createCrankInput} from './pixel-fishing-input.js?v=20260927-pixel-v15';
-import {fishingFeedback,reelMotion} from './pixel-fishing-feedback.js?v=20260927-pixel-v15';
+import {getRigProfile} from './fishing-rigs.js?v=20260927-pixel-v17';
+import {bindPointer} from './input.js?v=20260927-pixel-v17';
+import {rodPoseFromDrag,clockwiseTurns,createCrankInput} from './pixel-fishing-input.js?v=20260927-pixel-v17';
+import {fishingFeedback,reelMotion} from './pixel-fishing-feedback.js?v=20260927-pixel-v17';
 
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const rigNames={bottom:'沉底组',dropper:'双支线',slider:'滑铅组',jig:'软饵组',float:'浮漂组',sabiki:'羽毛组'};
@@ -71,7 +72,7 @@ export function mountFishingConsole(root,{sim,getActions,isRetrieving=()=>false,
   show(pose,a.pose);pose.setAttribute('role',a.adjustPose?'slider':'img');pose.tabIndex=a.adjustPose?0:-1;pose.style.cursor=a.adjustPose?'move':'default';pose.setAttribute('aria-valuenow',String(Math.round(s.rodElevation??45)));pose.setAttribute('aria-valuetext',`抬竿 ${Math.round(s.rodElevation??45)} 度，朝向 ${Math.round(s.rodAzimuth??70)} 度，${feedback.bendLabel}`);pose.removeAttribute('aria-disabled');
   wheel.setAttribute('role',a.reel?'slider':'img');wheel.tabIndex=a.reel?0:-1;wheel.style.cursor=a.reel?'grab':'default';wheel.setAttribute('aria-valuenow',String(Math.round((s.paidLineMeters||0)*10)/10));wheel.setAttribute('aria-valuetext',`${feedback.cue}，已放线 ${(s.paidLineMeters||0).toFixed(1)} 米`);wheel.removeAttribute('aria-disabled');
   show(get('reel-instrument'),a.reelInstrument);show(hold,a.reel);show(spool,a.spool);spool.textContent=s.reelMode==='free'?'锁住线杯':'打开线杯';spool.setAttribute('aria-pressed',String(s.reelMode==='free'));
-  show(lower,a.lower||a.hook||a.catch);lower.textContent=a.hook?'提竿！':a.catch?'鱼获':'船边下放';show(cast,a.cast);
+  show(lower,a.lower||a.hook||a.catch);lower.textContent=a.hook?(getRigProfile(s.rig).hookStyle==='circle'?'收紧鱼线':'轻提鱼竿'):a.catch?'鱼获':'船边下放';show(cast,a.cast);
   show(mount,a.mount);mount.value='hand';show(take,a.take);show(retrieve,a.retrieve);retrieve.textContent=isRetrieving()?'停止收竿':'收回钓组';retrieve.setAttribute('aria-pressed',String(isRetrieving()));
   show(drag,a.drag);drag.style.setProperty?.('--drag-angle',`${-100+clamp((s.drag-.2)/.65,0,1)*200}deg`);drag.setAttribute('aria-valuenow',String(Math.round(s.drag*100)));drag.setAttribute('aria-valuetext',`泄力${feedback.dragLabel}，向上拧紧，向下放松`);drag.removeAttribute('aria-disabled');
   const tools=a.lower||a.hook||a.catch||a.cast||a.mount||a.take||a.retrieve||a.drag;root.querySelector('.fishing-toolbar').hidden=!tools;root.querySelector('.fishing-instruments').hidden=!a.pose&&!a.reelInstrument;

@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import {seatHook} from './helpers/pixel-hook.js';
 import {readFile} from 'node:fs/promises';
 globalThis.fetch=async url=>new Response(await readFile(url));
 const {PixelSimulation,HARBOR}=await import('../dist/pixel-sim.js');
@@ -19,17 +20,18 @@ test('each reachable fishing phase offers only its permitted actions, distinguis
   ['idle','hand',['engine','anchor','adjustPose','lower','cast','mount','assemble','return']],
   ['casting','hand',['adjustPose','cast']],
   ['flight','hand',[]],
-  ['sinking','hand',['adjustPose','reel','spool','drag','retrieve','mount']],
-  ['waiting','hand',['adjustPose','reel','spool','drag','retrieve','mount']],
-  ['bite','hand',['adjustPose','reel','spool','drag','hook']],
+  ['sinking','hand',['adjustPose','reel','spool','retrieve','mount']],
+  ['waiting','hand',['adjustPose','reel','spool','retrieve','mount']],
+  ['bite','hand',['adjustPose','reel','spool','hook']],
   ['fight','hand',['adjustPose','reel','spool','drag']],
   ['landed','hand',['catch']],
  ];
  for(const mount of['port','starboard'])cases.push(
   ['idle',mount,['engine','anchor','adjustPose','lower','take','assemble','return']],
-  ['sinking',mount,['engine','anchor','adjustPose','spool','drag','take','return']],
-  ['waiting',mount,['engine','anchor','adjustPose','spool','drag','take','return']],
-  ['bite',mount,['adjustPose','spool','drag','take']],
+  ['sinking',mount,['engine','anchor','adjustPose','spool','take','return']],
+  ['waiting',mount,['engine','anchor','adjustPose','spool','take','return']],
+  ['bite',mount,['adjustPose','spool','take']],
+  ['fight',mount,['adjustPose','spool','drag','take']],
  );
  for(const[fishState,rodMount,expected]of cases){
   const state={...base,fishState,rodMount},a=boatActions(state,{hasRod:true,hasAnchor:true,hasChart:true,canLower:fishState==='idle',canCast:fishState==='idle'&&rodMount==='hand',nearDock:false});
@@ -47,7 +49,7 @@ test('a hand-held deployed rig hides boat operation until a real reel retrieve o
 
 test('a mounted bite offers pickup rather than strike, and pickup exposes the real hook action',()=>{
  const sim=ready();assert.ok(sim.setRodMount('starboard').ok);assert.ok(sim.lowerRig().ok);sim.state.biteAt=.5;run(sim,2);assert.equal(sim.state.fishState,'bite');let a=actions(sim);assert.equal(a.take,true);assert.equal(a.hook,false);assert.equal(a.engine,false);assert.equal(a.anchor,false);assert.equal(a.reel,false);assert.equal(sim.hook().ok,false);
- assert.ok(sim.setRodMount('hand').ok);a=actions(sim);assert.equal(a.take,false);assert.equal(a.hook,true);assert.equal(a.reel,true);assert.ok(sim.hook().ok);assert.equal(sim.state.fishState,'fight');a=actions(sim);assert.equal(a.hook,false);assert.equal(a.mount,false);assert.equal(a.engine,false);assert.equal(a.drag,true);
+ assert.ok(sim.setRodMount('hand').ok);a=actions(sim);assert.equal(a.take,false);assert.equal(a.hook,true);assert.equal(a.reel,true);seatHook(sim);assert.equal(sim.state.fishState,'fight');a=actions(sim);assert.equal(a.hook,false);assert.equal(a.mount,false);assert.equal(a.engine,false);assert.equal(a.drag,true);
 });
 
 test('the charging cast keeps its release control while incompatible controls stay absent',()=>{

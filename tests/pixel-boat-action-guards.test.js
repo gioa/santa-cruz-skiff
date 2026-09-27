@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import {seatHook} from './helpers/pixel-hook.js';
 import {readFile} from 'node:fs/promises';
 globalThis.fetch=async url=>new Response(await readFile(url));
 const {PixelSimulation,HARBOR}=await import('../dist/pixel-sim.js');
@@ -11,7 +12,7 @@ function ready(){
 test('a deployed hand-held rod blocks both anchor directions until the rod is secured in a side holder',()=>{
  const sim=ready();assert.ok(sim.lowerRig().ok);assert.equal(sim.toggleAnchor().ok,false);assert.equal(sim.state.anchor,false);assert.ok(sim.setRodMount('port').ok);assert.ok(sim.toggleAnchor().ok);assert.equal(sim.state.anchor,true);
  assert.ok(sim.setRodMount('hand').ok);assert.equal(sim.toggleAnchor().ok,false);assert.equal(sim.state.anchor,true);assert.ok(sim.setRodMount('starboard').ok);assert.ok(sim.toggleAnchor().ok);assert.equal(sim.state.anchor,false);
- sim.state.fishState='bite';assert.equal(sim.toggleAnchor().ok,false,'a bite needs rod attention even in the holder');assert.ok(sim.setRodMount('hand').ok);assert.ok(sim.hook().ok);assert.equal(sim.toggleAnchor().ok,false,'fighting fish cannot be interrupted by hauling anchor');
+ sim.state.fishState='bite';assert.equal(sim.toggleAnchor().ok,false,'a bite needs rod attention even in the holder');assert.ok(sim.setRodMount('hand').ok);seatHook(sim);assert.equal(sim.toggleAnchor().ok,false,'fighting fish cannot be interrupted by hauling anchor');
 });
 
 test('anchor obeys pause, inspection, mooring and docking state, preserving engine/speed rules',()=>{
