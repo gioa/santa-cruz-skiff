@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {cameraOffset,projectPixel,unprojectPixel,cameraDeadzone,stepDeadzoneCamera,keepCameraPointsVisible,cameraZoomForState,zoomCameraAt,rectilinearOutline} from '../dist/pixel-camera.js';
+import {cameraOffset,projectPixel,unprojectPixel,cameraDeadzone,cameraPlayfield,fitCameraBounds,stepDeadzoneCamera,keepCameraPointsVisible,cameraZoomForState,zoomCameraAt,rectilinearOutline} from '../dist/pixel-camera.js';
 import {skiffScale} from '../dist/pixel-boat-geometry.js';
 const initial=()=>({x:-17,z:-51,scale:6,width:640,height:360});
 
@@ -94,4 +94,9 @@ test('long casts fit the unobscured playfield above the console in both directio
     const scale=cameraZoomForState(base,state);let camera=zoomCameraAt(base,scale,boat);const box=cameraDeadzone(camera,'boat');camera=keepCameraPointsVisible(camera,[boat,float],{paddingBottom:height-box.bottom});
     for(const point of[boat,float]){const p=projectPixel(camera,point.x,point.z);assert.ok(p.y>=31&&p.y<=box.bottom,JSON.stringify({width,height,scale,dz,p,box}));}
   }
+});
+test('framing uses actual sprite bounds and cannot sacrifice the boat to a distant line endpoint',()=>{
+  const camera={x:0,z:0,scale:6,width:300,height:533,viewport:{height:568,top:110,bottom:288,gap:10}},primary={left:100,right:155,top:52,bottom:151},all={left:100,right:180,top:52,bottom:510},before=cameraOffset(camera),next=fitCameraBounds(camera,all,{primaryBounds:primary}),after=cameraOffset(next),field=cameraPlayfield(camera),dy=after.y-before.y;
+  assert.ok(primary.top+dy>=field.top);assert.ok(primary.bottom+dy<=field.bottom);assert.ok(Number.isInteger(dy));
+  const moved=r=>({left:r.left+after.x-before.x,right:r.right+after.x-before.x,top:r.top+dy,bottom:r.bottom+dy});assert.deepEqual(fitCameraBounds(next,moved(all),{primaryBounds:moved(primary)}),next,'a stopped composition does not drift');
 });

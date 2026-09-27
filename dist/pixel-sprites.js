@@ -75,7 +75,7 @@ function boatSprite(){return raster(48,88,({rect:r,px,line:l,poly:p})=>{
   [[12,68],[35,68],[9,52],[38,52],[13,22],[34,22]].forEach(([x,y])=>px(x,y,'cream'));
 });}
 
-function personSprite({worker=false,back=false,step=0,fish=false,drive=false,side=0}={}){
+function personSprite({worker=false,back=false,step=0,fish=false,hold=false,drive=false,side=0}={}){
   return raster(16,26,({rect:r,px,poly:p,line:l})=>{
     const jacket=worker?'green':'coral',jacketShade=worker?'greenDark':'rust';
     // Shadow and two separate boot silhouettes; the stride moves opposite feet.
@@ -88,7 +88,11 @@ function personSprite({worker=false,back=false,step=0,fish=false,drive=false,sid
     if(back){r(6,12,4,3,worker?'jade':'gold');r(5,16,6,1,jacketShade);}
     else {r(7,10,1,8,'cream');r(5,15,2,2,jacketShade);r(9,15,2,2,jacketShade);px(8,12,'gold');}
     // Sleeves and free hands have readable cuffs, instead of floating skin dots.
-    if(fish){
+    if(hold){
+      // World-space articulated forearms connect these sleeves to the shared
+      // rod grip. No baked-in handle can detach when elevation changes.
+      r(2,12,3,2,'navy');r(2,12,1,2,'denim');r(11,11,3,3,'navy');r(12,12,2,1,'denim');
+    }else if(fish){
       r(2,12,3,4,'navy');r(3,14,4,2,'denim');r(6,14,4,2,'skin');r(9,13,2,3,'skinLight');
       r(11,11,3,4,'navy');r(12,13,3,2,'denim');r(12,15,3,2,'skin');
       r(11,12,2,7,'woodDark');r(12,12,1,6,'gold');r(13,14,2,2,'slate');px(14,14,'steel');
@@ -288,7 +292,7 @@ export function createPixelSprites(){
   const hut=hutSprite();
   return {
     boat:boatSprite(),angler,anglerBack,anglerWalk1:personSprite({step:1}),anglerWalk2:personSprite({step:2}),
-    anglerFish:personSprite({fish:true}),anglerDrive:personSprite({back:true,drive:true}),
+    anglerFish:personSprite({fish:true}),anglerHold:personSprite({hold:true}),anglerDrive:personSprite({back:true,drive:true}),
     anglerLeft:personSprite({side:-1}),anglerRight:personSprite({side:1}),
     dockWorker:dockWorkerSprite(),hut,tackleShop:hut,
     crate:crateSprite(),cooler:coolerSprite(),buoy:buoySprite(),kelp:kelpSprite(),rock:rockSprite(),

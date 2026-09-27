@@ -1,5 +1,5 @@
-import {GEAR_CATALOG} from './equipment.js?v=20260927-pixel-v9';
-import {RIG_PROFILES} from './fishing-rigs.js?v=20260927-pixel-v9';
+import {GEAR_CATALOG} from './equipment.js?v=20260927-pixel-v10';
+import {RIG_PROFILES} from './fishing-rigs.js?v=20260927-pixel-v10';
 
 /** Deterministic inventory model: no browser state, I/O, or random values.
  * Each rod includes its basic reel, mono and leader (null IDs). Purchased
@@ -183,7 +183,7 @@ export function rodAssemblyOptions(profile,rodId,slot,packed){
   for(const weight of weights){const basic=weight===rig.defaultWeightGrams;add(weight,`${weight} 克${basic?' · 配套':''}`,'sinker_heavy',{owned:basic||owns(profile,'sinker_heavy'),required:basic?null:'sinker_heavy'});}
  }else if(slot==='fishingDepthMeters'){
   const rig=RIG_PROFILES[assembly.rig],depths=[null,...new Set([1,2.5,4,6,10,15,20,30,40,...(rig.id==='float'?[]:[60,80]),assembly.fishingDepthMeters].filter(v=>v!==null))];
-  for(const depth of depths)add(depth,depth===null?rig.layer==='bottom'?'随钓组沉底':'钓组默认饵层':`${depth} 米`,'rig_float');
+  for(const depth of depths)add(depth,depth===null?rig.id==='float'?'默认漂下长度':'不设参考':`${depth} 米`,'rig_float');
  }
  return options;
 }

@@ -16,13 +16,15 @@ No build step, API key, backend or account. The pixel edition uses Canvas 2D and
 
 ## The journey
 
-Start at 06:00, a few steps from the rental counter → check the personal backpack (free starter gear is already enabled) → pay the 15-credit boat rental, then watch the empty skiff move from its deck cradle to the davit and water → walk down the real left-side stair alignment → board → unmoor → start the engine and steer, or choose a waypoint after buying and carrying a chart → coast down, deploy a purchased anchor or drift, and select a rig → hold/release to cast → watch the float and strike → reel and manage drag/tension → keep the fish or record/release → return, dock, walk to the counter and exchange retained catches → buy equipment and assemble each rod independently.
+Start at 06:00, a few steps from the rental counter → check the personal backpack (free starter gear is already enabled) → pay the 15-credit boat rental, then watch the empty skiff move from its deck cradle to the davit and water → walk down the real left-side stair alignment → board → unmoor → start the engine and steer, or choose a waypoint after buying and carrying a chart → coast down, deploy a purchased anchor or drift, and select a rig → lower beside the boat or choose a cast → watch the rod and line, then strike → turn the reel and manage drag/tension → keep the fish or record/release → return, dock, walk to the counter and exchange retained catches → buy equipment and assemble each rod independently.
 
 - **Left joystick / WASD:** walk. Aboard, the bottom console has a retained outboard tiller, twist-throttle touch surface and F/N/R gear selector. Move the tiller opposite the forward turn; slide the ribbed grip up/down to rotate the throttle. Release holds the friction settings. N idles the motor; interruption clears manual power while preserving momentum. WASD is also available for momentary keyboard steering/throttle.
 - **E:** contextual interaction. **G:** walk to the hut or boarding platform.
 - **R:** engine. **Q:** anchor. **I:** equipment. **M:** chart. **J:** catches.
-- **Hold Space / cast button, then release:** charge and cast. Tap at a bite to strike. Hold while fishing to lift the lure or raise the rod.
-- **Hold F / reel button:** reel. During a fight the on-screen − / + buttons change drag.
+- **Space / 船边下放:** lower the rig directly beside the boat. The separate 抛投 button charges on hold and casts on release. Tap at a bite to strike; Space while fishing provides a finite lift stroke.
+- **Rod posture:** drag the bottom rod vertically to raise/lower it and horizontally to swing it. Rod load changes the bend in both the world and control panel. Arrow keys work when the rod control has focus.
+- **Reel:** turn its handle clockwise or hold the handle / F to retrieve. 打开线杯 releases line; 锁住线杯 stops free spool. Drag the ✳ control up/down to adjust fighting drag. Line is finite and reeling cannot silently feed more line.
+- **Rod holders:** choose 左舷 or 右舷 to place the rod in a side holder and use the outboard for slow trolling. 鱼竿 / 操船 switches controls while a small rod monitor remains on the helm. Idle and take the rod back into your hands to fight or retrieve. Only float rigs display a float; the other rigs show a line entering the water.
 - Tap accessible ground once to walk there automatically. Tap the counter attendant or rental hut to approach the counter; tap the skiff or landing to take the left-side stair route. A small ground marker shows the destination. A new tap replaces the route, and the joystick/WASD takes over immediately. After enabling a chart, tap navigable water to choose an assisted course.
 - The boat actions menu allows standing, moving within the deck rails, assembling rods and returning. Wharf edges and boat rails block the player; the pixel edition has no falling or swimming mechanic. Settings includes free recovery.
 - Opening a menu pauses simulation. Focus loss, orientation change and pointer cancellation clear held actions. Switching away pauses the trip.
@@ -119,3 +121,11 @@ Version-5 saves retain payment and launch progress. Existing earlier saves alrea
 ## Straight pixel wharf
 
 The pixel wharf is now a single 54-metre-wide rectangle with parallel edges and a square seaward end. `pixel-geography.js` supplies the same outline to the renderer, paper chart, wildlife, walking and boat navigation. It spans the original wharf's shore-to-tip extent, connects to the beach, and retains the rental buildings, three equal-size boat cradles, left stairs and launch berth. The preserved 3D edition retains its original wharf geography. See `qa/pixel-straight-wharf/PLAYTEST.md` for validation.
+
+## Rod, reel and vertical fishing
+
+The bottom tackle console connects rod posture, load-dependent bending, actual paid line, a conventional reel, free spool and fighting drag. Rod movement takes up slack before lifting the rig; it never creates line. Excess fish load can slip the drag even while the handle is turning. Rod/reel/line upgrades apply only through the active rod's assembly. Normal retrieval winds the rig back to the boat; the compatibility reset remains reserved for rescue, a lost rig and patrol interruption.
+
+Port/starboard holders support slow trolling with the bait's position responding to relative water flow and vessel movement. The current build has one actively deployed rig. Numerical rod forces, payout rates and the slow-trolling envelope are bounded game approximations, not measured performance of a particular rod or reel. The pixel-sized rod/hull artwork is enlarged for readability. Only the slip-float rig has a physical float and float-stop depth; other depth selections are reference marks and cannot automatically suspend a feather rig.
+
+References and browser evidence are in `qa/pixel-tackle/PLAYTEST.md`.

@@ -1,10 +1,11 @@
-import {pierRings,landPolygons,coastLines,buildingFootprints,FISHING_SPOTS,onLand,onPier} from './pixel-geography.js?v=20260927-pixel-v9';
-import {HARBOR} from './harbor-layout.js?v=20260927-pixel-v9';
-import {depthInfoAt} from './bathymetry.js?v=20260927-pixel-v9';
-import {createWildlife,drawWildlife} from './pixel-wildlife.js?v=20260927-pixel-v9';
-import {cameraOffset,unprojectPixel,stepDeadzoneCamera,keepCameraPointsVisible,cameraDeadzone,cameraZoomForState,zoomCameraAt,rectilinearOutline} from './pixel-camera.js?v=20260927-pixel-v9';
-import {ladderPoint} from './swimming.js?v=20260927-pixel-v9';
-import {SKIFF_RACKS,boatRenderPose,parkedSkiffPoses,skiffScreenPose,hitSkiff} from './pixel-boat-geometry.js?v=20260927-pixel-v9';
+import {pierRings,landPolygons,coastLines,buildingFootprints,FISHING_SPOTS,onLand,onPier} from './pixel-geography.js?v=20260927-pixel-v10';
+import {HARBOR} from './harbor-layout.js?v=20260927-pixel-v10';
+import {depthInfoAt} from './bathymetry.js?v=20260927-pixel-v10';
+import {createWildlife,drawWildlife} from './pixel-wildlife.js?v=20260927-pixel-v10';
+import {cameraOffset,projectPixel,unprojectPixel,stepDeadzoneCamera,cameraDeadzone,cameraPlayfield,fitCameraBounds,zoomCameraAt,rectilinearOutline} from './pixel-camera.js?v=20260927-pixel-v10';
+import {ladderPoint} from './swimming.js?v=20260927-pixel-v10';
+import {SKIFF_RACKS,boatRenderPose,parkedSkiffPoses,skiffScreenPose,hitSkiff} from './pixel-boat-geometry.js?v=20260927-pixel-v10';
+import {getRodCurve,getReelPose,getFishingLine,getFishingPresentation} from './pixel-rod-geometry.js?v=20260927-pixel-v10';
 
 // The map keeps the same metre coordinates as the sailing simulation. The
 // people and boat are deliberately enlarged, like a handheld-era RPG, so that
@@ -24,7 +25,7 @@ export function createPixelWorld(canvas,{sprites={},conditions={}}={}){
   const ctx=canvas.getContext('2d',{alpha:false});
   const camera={x:HARBOR.spawnX-7,z:HARBOR.spawnZ-7,scale:6,width:640,height:360};
   let pixelOffset=cameraOffset(camera);
-  let cssWidth=640,cssHeight=360,clock=0,zoomOverride=null,initialized=false,lastBoat=null,cameraResized=false,lastMode=null,lastDrawState=null;
+  let cssWidth=640,cssHeight=360,clock=0,reelTurns=0,zoomOverride=null,initialized=false,lastBoat=null,cameraResized=false,lastMode=null,lastDrawState=null,bottomInset=null,topInset=null,lastFrameBounds=null;
   const wakes=[];
   let seaConditions=conditions;
   const ecology=createWildlife({habitat:(x,z)=>({water:!onLand(x,z)&&!onPier(x,z),depth:depthInfoAt(x,z).value??0}),origin:{x:HARBOR.boatX,z:HARBOR.boatZ}});
@@ -42,7 +43,7 @@ export function createPixelWorld(canvas,{sprites={},conditions={}}={}){
     const logicalHeight=Math.round(logicalWidth*height/width);cameraResized=canvas.width!==logicalWidth||canvas.height!==logicalHeight;
     if(cameraResized){canvas.width=logicalWidth;canvas.height=logicalHeight;}
     camera.width=canvas.width;camera.height=canvas.height;
-    camera.viewport={height:cssHeight,bottom:cssHeight<=500&&cssWidth>cssHeight?126:232,gap:10};
+    camera.viewport={height:cssHeight,top:topInset??(cssHeight<=500&&cssWidth>cssHeight?50:110),bottom:bottomInset??(cssHeight<=500&&cssWidth>cssHeight?126:232),gap:10};
     pixelOffset=cameraOffset(camera);ctx.imageSmoothingEnabled=false;
   }
   function point(x,z){return{x:Math.round(x*camera.scale)+pixelOffset.x,y:Math.round(z*camera.scale)+pixelOffset.y};}
@@ -158,7 +159,9 @@ export function createPixelWorld(canvas,{sprites={},conditions={}}={}){
     const g=skiffGeometry(pose),x=pose.x,z=pose.z,p=point(x,z),heading=pose.heading,scale=g.scale,bob=g.screenY-p.y;
     const occupied=state.mode==='boat'&&pose.afloat,fishActive=!['idle','landed'].includes(state.fishState||'idle');
     const bodyX=state.standing?(state.deckX||0)*15:0,bodyY=state.standing?(state.deckZ??.8)*14-10:0;
-    const occupantPose=fishActive?'fishing':state.engine?'driving':'seated';
+    const mounted=['port','starboard'].includes(state.rodMount),equippedRod=state.profile?.loadout?.rod,readied=occupied&&!state.moored&&!state.engine&&!state.standing&&state.fishState!=='landed'&&equippedRod&&(!Array.isArray(state.packed)||state.packed.includes(equippedRod)),holding=(fishActive||readied)&&!mounted;
+    const occupantPose=state.engine?'driving':holding?'fishing':'seated';
+    const rod=occupied&&(fishActive||mounted||readied)?getRodCurve(state,{origin:{x:g.screenX,y:g.screenY},scale,heading,bodyX,bodyY}):null;
     // A stored boat has only its dry deck shadow. A raised hull's shadow stays
     // on the surface below, while the hull follows the crane's actual pose.
     ctx.save();ctx.translate(p.x,p.y+(pose.afloat?bob:0));ctx.rotate(-heading);smallShadow(4,6,42*scale,73*scale,pose.afloat?.25:.16);ctx.restore();
@@ -172,7 +175,7 @@ export function createPixelWorld(canvas,{sprites={},conditions={}}={}){
       }
       if(occupied&&(sprites.anglerFish||sprites.anglerDrive||sprites.angler)){
         ctx.save();ctx.scale(scale,scale);
-        const driver=occupantPose==='driving',active=occupantPose==='fishing',personAsset=active?sprites.anglerFish:driver?sprites.anglerDrive:sprites.anglerBack||sprites.angler;
+        const driver=occupantPose==='driving',active=occupantPose==='fishing',personAsset=active?(sprites.anglerHold||sprites.anglerBack||sprites.angler):driver?sprites.anglerDrive:sprites.anglerBack||sprites.angler;
         ctx.translate(bodyX,bodyY);
         const px=-8,py=driver?8:-8;
         ctx.drawImage(personAsset,px,py);
@@ -180,16 +183,13 @@ export function createPixelWorld(canvas,{sprites={},conditions={}}={}){
           // One connected hand-to-tiller segment, ending at the outboard grip.
           const hand={x:-3,y:py+18},grip={x:-5+Math.sin((state.tiller||0)*.45)*4,y:24};
           pixelLine(-2,34,grip.x,grip.y,'#304956',2);pixelLine(hand.x,hand.y,grip.x,grip.y,'#e8ac79',2);ctx.fillStyle='#ffd5a0';ctx.fillRect(grip.x-1,grip.y-1,3,2);
-        }else if(active){
-          const hand={x:px+12,y:py+15},lift=(state.castPower||0)*11,bend=state.fishState==='fight'?(state.tension||0)*.07:0;
-          pixelLine(hand.x,hand.y,25,-26-lift,'#304956',2);pixelLine(25,-26-lift,40,-40+bend-lift,'#d8c28a',1);ctx.fillStyle='#4c6872';ctx.fillRect(hand.x+1,hand.y-1,4,4);ctx.fillStyle='#e8ac79';ctx.fillRect(hand.x-1,hand.y+1,3,2);const crank=Math.round(Math.sin(clock*12)*2)*(state.reeling?1:0);ctx.fillStyle='#ffd5a0';ctx.fillRect(hand.x+4,hand.y+crank,2,2);
         }
         ctx.restore();
       }else if(occupied){
         // These arms and tackle are authored together, so the hands cannot
         // detach from the reel or tiller as the boat rotates.
         ctx.save();ctx.scale(scale,scale);ctx.translate(0,12);ctx.fillStyle='#243f4c';ctx.fillRect(-6,4,5,10);ctx.fillRect(3,4,5,10);ctx.fillStyle='#de8b4d';ctx.fillRect(-8,-10,16,17);ctx.fillStyle='#ffd17c';ctx.fillRect(-6,-8,4,12);ctx.fillRect(3,-8,3,12);ctx.fillStyle='#dfb48b';ctx.fillRect(-5,-20,11,10);ctx.fillStyle='#31535a';ctx.fillRect(-6,-23,12,5);ctx.fillStyle='#ebc777';ctx.fillRect(-8,-19,16,3);
-        if(occupantPose==='driving'){pixelLine(6,-3,9,9,'#e1b58e',4);pixelLine(9,9,3,23,'#343f43',3);ctx.fillStyle='#d6aa86';ctx.fillRect(7,7,4,4);}else if(occupantPose==='fishing'){pixelLine(7,-5,16,-6,'#dfb38b',4);pixelLine(-6,-6,14,-8,'#d4a17b',3);pixelLine(14,-8,35,-41-(state.castPower||0)*10,'#443c3b',2);pixelLine(35,-41,40,-52,'#f1d893',1);ctx.fillStyle='#446574';ctx.fillRect(13,-10,5,6);ctx.fillStyle='#e6bf78';ctx.fillRect(16,-8,3,3);if(state.reeling)ctx.fillRect(18+Math.round(Math.sin(clock*13)*2),-6,2,2);}else{ctx.fillStyle='#d9ae83';ctx.fillRect(-10,-3,3,8);ctx.fillRect(8,-3,3,8);}ctx.restore();
+        if(occupantPose==='driving'){pixelLine(6,-3,9,9,'#e1b58e',4);pixelLine(9,9,3,23,'#343f43',3);ctx.fillStyle='#d6aa86';ctx.fillRect(7,7,4,4);}else if(occupantPose!=='fishing'){ctx.fillStyle='#d9ae83';ctx.fillRect(-10,-3,3,8);ctx.fillRect(8,-3,3,8);}ctx.restore();
       }
     }
     // Three bright rungs at the port stern make the reboarding target visible.
@@ -197,12 +197,35 @@ export function createPixelWorld(canvas,{sprites={},conditions={}}={}){
     ctx.restore();
     if(state.moored&&pose.afloat){const cleat=point(HARBOR.mooringX,HARBOR.mooringZ),bow={x:p.x-32*scale*Math.sin(heading),y:p.y-32*scale*Math.cos(heading)+bob};ctx.strokeStyle='#e3d49b';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(cleat.x,cleat.y);ctx.quadraticCurveTo((cleat.x+bow.x)/2,(cleat.y+bow.y)/2+4,bow.x,bow.y);ctx.stroke();}
     if(state.anchor&&pose.afloat){const a=point(x-2.4,z+4);pixelLine(p.x-4,p.y+12,a.x,a.y,'#c6d7b6',1);ctx.fillStyle='#377b82';ctx.fillRect(a.x-3,a.y,6,2);}
-    if(occupied&&fishActive&&state.bobber){
-      const bx=state.bobber.x??x-5,bz=state.bobber.z??z-9,q=point(bx,bz),sh=(state.bobber.height||0)*camera.scale;
-      const lx=(40+bodyX)*scale,lz=(-40+bodyY-(state.castPower||0)*11+(state.fishState==='fight'?(state.tension||0)*.07:0))*scale,tip={x:p.x+lx*Math.cos(heading)+lz*Math.sin(heading),y:p.y-lx*Math.sin(heading)+lz*Math.cos(heading)+bob};
-      ctx.strokeStyle='#e8f0cf';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(Math.round(tip.x),Math.round(tip.y));ctx.quadraticCurveTo(Math.round((tip.x+q.x)*.5),Math.round((tip.y+q.y)*.5+Math.min(16,state.lineDistance||8)),q.x,q.y-sh);ctx.stroke();
-      const ripple=state.fishState==='bite'||state.fishState==='fight';ctx.strokeStyle=ripple?'#e5edbc':'#79c5be';ctx.lineWidth=1;const rr=(clock*(ripple?10:3))%12;ctx.strokeRect(q.x-rr,q.y-rr*.3,rr*2,rr*.6);ctx.fillStyle='#e8e4ba';ctx.fillRect(q.x-2,q.y-5-sh,4,7);ctx.fillStyle='#d76b53';ctx.fillRect(q.x-2,q.y-5-sh,4,3);ctx.fillStyle='#f6edd1';ctx.fillRect(q.x,q.y-7-sh,1,3);
-      if(ripple){ctx.fillStyle='#ddf0cf';for(let i=0;i<5;i++){const a=i*1.25+clock*2;ctx.fillRect(q.x+Math.cos(a)*9,q.y+Math.sin(a)*4,2,1);}}
+    if(rod)drawFishingRig(state,rod);
+  }
+  function drawFishingRig(state,rod){
+    const s=rod.scale,line=getFishingLine(state,rod,{project:point,cameraScale:camera.scale});
+    const {knob,hands}=getReelPose(state,rod,{turns:reelTurns});
+    if(rod.mounted){
+      // The socket is fastened to the rail; it is independent of the angler,
+      // who remains seated at the tiller while slow trolling.
+      ctx.save();ctx.translate(rod.socket.x,rod.socket.y);ctx.rotate(-(state.heading||0));ctx.fillStyle='#243d49';ctx.fillRect(-3*s,-6*s,6*s,9*s);ctx.fillStyle='#8daaa8';ctx.fillRect(-2*s,-5*s,4*s,2*s);ctx.fillStyle='#ebd9a7';ctx.fillRect(-s,s,2*s,s);ctx.restore();pixelLine(rod.socket.x,rod.socket.y,rod.butt.x,rod.butt.y,'#728f93',3*s);
+    }else{
+      for(let i=0;i<2;i++){const shoulder=rod.shoulders[i],hand=hands[i],elbow={x:shoulder.x+(hand.x-shoulder.x)*.52,y:shoulder.y+(hand.y-shoulder.y)*.52+3*s};pixelLine(shoulder.x,shoulder.y,elbow.x,elbow.y,'#38566a',3*s);pixelLine(elbow.x,elbow.y,hand.x,hand.y,'#e8ac79',2*s);}
+    }
+    pixelLine(rod.butt.x,rod.butt.y,rod.base.x,rod.base.y,'#584b42',4*s);pixelLine(rod.butt.x,rod.butt.y,rod.base.x,rod.base.y,'#cfa777',2*s);
+    for(let i=1;i<rod.points.length;i++){const a=rod.points[i-1],b=rod.points[i];pixelLine(a.x,a.y,b.x,b.y,i<7?'#2f4149':'#d7c08b',i<7?2*s:1);}
+    ctx.fillStyle='#314d59';ctx.fillRect(Math.round(rod.reel.x-3*s),Math.round(rod.reel.y-2*s),Math.max(3,Math.round(6*s)),Math.max(3,Math.round(5*s)));ctx.fillStyle=state.reelMode==='free'?'#7facab':'#b6c8b4';ctx.fillRect(Math.round(rod.reel.x-s),Math.round(rod.reel.y-s),Math.max(1,Math.round(2*s)),Math.max(2,Math.round(3*s)));
+    pixelLine(rod.reel.x,rod.reel.y,knob.x,knob.y,'#405b65',1);ctx.fillStyle='#d9be84';ctx.fillRect(Math.round(knob.x),Math.round(knob.y),2,2);
+    if(!rod.mounted){ctx.fillStyle='#ffd5a0';for(const hand of hands)ctx.fillRect(Math.round(hand.x-s),Math.round(hand.y-s),Math.max(2,Math.round(3*s)),Math.max(2,Math.round(2*s)));}
+    if(!line.deployed)return;
+    ctx.globalAlpha=.76;for(let i=1;i<line.points.length;i++){const a=line.points[i-1],b=line.points[i];pixelLine(a.x,a.y,b.x,b.y,'#e2e9ca',1);}ctx.globalAlpha=1;
+    const q=line.end;
+    if(line.showFloat){
+      const bite=state.fishState==='bite',dip=bite?Math.round((Math.sin(clock*9)+1)*1.5):0;ctx.fillStyle='#f1ebc8';ctx.fillRect(Math.round(q.x)-1,Math.round(q.y)-5+dip,3,6-dip);ctx.fillStyle='#d6684f';ctx.fillRect(Math.round(q.x)-1,Math.round(q.y)-5+dip,3,2);ctx.fillStyle='#faf5d6';ctx.fillRect(Math.round(q.x),Math.round(q.y)-7+dip,1,2);
+      if(line.kind!=='flight'){ctx.globalAlpha=.5;pixelLine(q.x-5,q.y+1,q.x-2,q.y+2,'#c4dfc8',1);pixelLine(q.x+3,q.y+1,q.x+6,q.y,'#a4d8cb',1);ctx.globalAlpha=1;}
+    }else if(line.kind==='flight'){
+      // A sinker/jig is a small grey or metallic lure, never a red-white float.
+      ctx.fillStyle=state.rig==='jig'?'#b8d1cd':'#738b92';ctx.fillRect(Math.round(q.x)-1,Math.round(q.y)-2,3,4);ctx.fillStyle='#dfdbb6';ctx.fillRect(Math.round(q.x),Math.round(q.y)-2,1,2);
+    }else{
+      ctx.globalAlpha=.35;pixelLine(q.x-3,q.y,q.x-1,q.y+1,'#a9d6c8',1);pixelLine(q.x+1,q.y+1,q.x+3,q.y,'#a9d6c8',1);
+      const tail=line.underwater[1];if(tail){for(let i=0;i<3;i++){const a={x:q.x+(tail.x-q.x)*i/3,y:q.y+(tail.y-q.y)*i/3},b={x:q.x+(tail.x-q.x)*(i+1)/3,y:q.y+(tail.y-q.y)*(i+1)/3};ctx.globalAlpha=.23-i*.075;pixelLine(a.x,a.y,b.x,b.y,'#aec8ba',1);}}ctx.globalAlpha=1;
     }
   }
   function davit(state){
@@ -247,12 +270,44 @@ export function createPixelWorld(canvas,{sprites={},conditions={}}={}){
     // Offshore courses keep their small destination pennant.
     const w=state.waypoint;if(!w||!visible(w.x,w.z,10))return;const p=point(w.x,w.z);ctx.globalAlpha=.55;ctx.strokeStyle='#e9dc9a';ctx.lineWidth=1;ctx.strokeRect(p.x-5,p.y-2,10,4);ctx.globalAlpha=1;pixelLine(p.x,p.y,p.x,p.y-14,'#efdfaa',1);ctx.fillStyle='#e4b762';ctx.fillRect(p.x+1,p.y-14,7,4);
   }
+  function boatFrame(state,view=camera){
+    // Frame the still-water pose with one pixel reserved for wave motion. The
+    // camera must never chase the boat's alternating one-pixel water bob.
+    const project=(x,z)=>projectPixel(view,x,z),g=skiffScreenPose(boatRenderPose(state,HARBOR),{cameraScale:view.scale,project,time:0}),primary={left:g.bounds.left-1,right:g.bounds.right+1,top:g.bounds.top-1,bottom:g.bounds.bottom+1};
+    const extend=(bounds,p,pad=0)=>{bounds.left=Math.min(bounds.left,p.x-pad);bounds.right=Math.max(bounds.right,p.x+pad);bounds.top=Math.min(bounds.top,p.y-pad);bounds.bottom=Math.max(bounds.bottom,p.y+pad);};
+    const presentation=getFishingPresentation(state),mounted=['port','starboard'].includes(state.rodMount),equippedRod=state.profile?.loadout?.rod,readied=!state.moored&&!state.engine&&!state.standing&&state.fishState!=='landed'&&equippedRod&&(!Array.isArray(state.packed)||state.packed.includes(equippedRod));
+    let rod=null;
+    if(g.afloat&&(presentation.active||mounted||readied)){
+      rod=getRodCurve(state,{origin:{x:g.screenX,y:g.screenY},scale:g.scale,heading:g.heading,bodyX:state.standing?(state.deckX||0)*15:0,bodyY:state.standing?(state.deckZ??.8)*14-10:0});
+      for(const p of[...rod.points,rod.butt,rod.reel])extend(primary,p,4*g.scale+1);
+    }
+    const all={...primary};
+    if(rod){const line=getFishingLine(state,rod,{project,cameraScale:view.scale});for(const p of line.points)extend(all,p,1);if(line.end)extend(all,line.end,line.showFloat?7:3);for(const p of line.underwater)extend(all,p,1);}
+    return{primary,all};
+  }
+  function boatZoom(state){
+    const field=cameraPlayfield(camera),width=field.right-field.left,height=field.bottom-field.top;
+    const fits=(bounds,extra=0)=>bounds.right-bounds.left+extra<=width&&bounds.bottom-bounds.top+extra<=height;
+    // Underwater tackle must not miniaturise the angler just to include a far
+    // entry point. Prioritise the complete boat/rod; visible floats or flying
+    // lures may use wider framing because those targets need to stay visible.
+    const includeLine=getFishingPresentation(state).cameraTracksLure,composition=scale=>{const frame=boatFrame(state,{...camera,scale});return includeLine?frame.all:frame.primary;};
+    let wanted=2;
+    for(let scale=6;scale>=2;scale--){if(fits(composition(scale))){wanted=scale;break;}}
+    // A wave or one pixel of rod flex must not repeatedly toggle scale. Allow
+    // magnification again only when the larger composition has spare room.
+    if(initialized&&lastMode==='boat'&&wanted>camera.scale&&camera.scale>=2&&camera.scale<6){
+      for(let scale=wanted;scale>camera.scale;scale--)if(fits(composition(scale),12))return scale;
+      return camera.scale;
+    }
+    return wanted;
+  }
   function draw(state,dt=1/60){
     dt=clamp(Number.isFinite(dt)?dt:1/60,0,.1);clock+=dt;lastDrawState=state;
+    if(state.reeling&&!state.paused)reelTurns=(reelTurns+Math.max(0,state.crankRate||0)*dt)%1;
     const mode=state.mode||'intro',swim=state.swim||{},focus=mode==='boat'?{x:state.boatX,z:state.boatZ}:mode==='swim'?{x:swim.x??state.playerX,z:swim.z??state.playerZ}:{x:state.playerX??HARBOR.spawnX,z:state.playerZ??HARBOR.spawnZ};
     const fishing=mode==='boat'&&!['idle','landed'].includes(state.fishState||'idle'),nearDock=Math.hypot(focus.x-HARBOR.spawnX,focus.z-HARBOR.spawnZ)<70;
-    const castFocus=fishing&&state.bobber?{x:(focus.x+state.bobber.x)/2,z:(focus.z+state.bobber.z)/2}:focus;
-    const wantedZoom=zoomOverride??cameraZoomForState(camera,state);
+    const wantedZoom=zoomOverride??(mode==='boat'?boatZoom(state):6);
     // Start with the rental hut and left landing together in view. Thereafter
     // movement within the broad deadzone never drags the scenery along.
     let targetX=focus.x,targetZ=focus.z-4;
@@ -263,8 +318,8 @@ export function createPixelWorld(canvas,{sprites={},conditions={}}={}){
     }
     // Apply the visible playfield on the very first frame too, particularly
     // when resuming a boat trip on a short phone above the fixed console.
-    Object.assign(camera,stepDeadzoneCamera(camera,castFocus,{mode}));
-    if(fishing&&state.bobber)Object.assign(camera,keepCameraPointsVisible(camera,[focus,state.bobber],{paddingBottom:camera.height-cameraDeadzone(camera,'boat').bottom}));
+    Object.assign(camera,stepDeadzoneCamera(camera,focus,{mode}));
+    if(mode==='boat'){const frame=boatFrame(state);Object.assign(camera,fitCameraBounds(camera,frame.all,{primaryBounds:frame.primary}));lastFrameBounds=boatFrame(state);}else lastFrameBounds=null;
     cameraResized=false;lastMode=mode;pixelOffset=cameraOffset(camera);
     const nature=ecology.update(state,dt,seaConditions);
     ctx.imageSmoothingEnabled=false;ocean();drawWildlife(ctx,nature,{project:point,scale:camera.scale,sprites,layer:'water'});terrain();drawWake(state,dt);routeMarker(state);buildings();dockLife();boat(state);davit(state);patrol(state);
@@ -305,6 +360,8 @@ export function createPixelWorld(canvas,{sprites={},conditions={}}={}){
     return null;
   }
   function boatSummary(pose){const g=skiffGeometry(pose),rx=cssWidth/canvas.width,ry=cssHeight/canvas.height;return{x:g.x,z:g.z,heading:g.heading,scale:g.scale,width:g.width*rx,height:g.height*ry,screenX:g.screenX*rx,screenY:g.screenY*ry,bounds:{left:g.bounds.left*rx,top:g.bounds.top*ry,right:g.bounds.right*rx,bottom:g.bounds.bottom*ry},stage:g.stage,phase:g.phase,afloat:g.afloat,lift:g.lift};}
-  function publicState(){const active=ecology.snapshot(),history=ecology.history;return{renderer:'Canvas 2D',camera:{x:+camera.x.toFixed(2),z:+camera.z.toFixed(2),scale:+camera.scale.toFixed(2),width:camera.width,height:camera.height,mode:'deadzone',deadzone:cameraDeadzone(camera,lastMode||'walk')},boats:{player:boatSummary(boatRenderPose(lastDrawState||{launchStage:'stored'},HARBOR)),parked:parkedSkiffPoses().map(boatSummary)},wildlife:{active,counts:active.reduce((counts,e)=>(counts[e.type]=(counts[e.type]||0)+1,counts),{bait:0,dolphins:0,whale:0}),encounters:history.map(e=>({...e})),illustrativeRates:true}};}
-  return {resize,draw,screenToWorld,worldToScreen:point,cssWorldToScreen,interactionAnchors,walkingTargetAt,camera,wildlife:ecology,publicState,setConditions:value=>{seaConditions=value||{};},setZoom:value=>{zoomOverride=value==null?null:Math.round(clamp(value,2,9));}};
+  function publicState(){const active=ecology.snapshot(),history=ecology.history,toCss=r=>r?{left:r.left*cssWidth/canvas.width,right:r.right*cssWidth/canvas.width,top:r.top*cssHeight/canvas.height,bottom:r.bottom*cssHeight/canvas.height}:null;return{renderer:'Canvas 2D',camera:{x:+camera.x.toFixed(2),z:+camera.z.toFixed(2),scale:+camera.scale.toFixed(2),width:camera.width,height:camera.height,mode:'deadzone',deadzone:cameraDeadzone(camera,lastMode||'walk'),framing:{playfield:toCss(cameraPlayfield(camera)),primary:toCss(lastFrameBounds?.primary),all:toCss(lastFrameBounds?.all)}},boats:{player:boatSummary(boatRenderPose(lastDrawState||{launchStage:'stored'},HARBOR)),parked:parkedSkiffPoses().map(boatSummary)},wildlife:{active,counts:active.reduce((counts,e)=>(counts[e.type]=(counts[e.type]||0)+1,counts),{bait:0,dolphins:0,whale:0}),encounters:history.map(e=>({...e})),illustrativeRates:true}};}
+  function setBottomInset(value){bottomInset=Number.isFinite(value)?clamp(value,0,Math.max(0,cssHeight-40)):null;camera.viewport.bottom=bottomInset??(cssHeight<=500&&cssWidth>cssHeight?126:232);}
+  function setTopInset(value){topInset=Number.isFinite(value)?clamp(value,0,Math.max(0,cssHeight-40)):null;camera.viewport.top=topInset??(cssHeight<=500&&cssWidth>cssHeight?50:110);}
+  return {resize,draw,screenToWorld,worldToScreen:point,cssWorldToScreen,interactionAnchors,walkingTargetAt,camera,wildlife:ecology,publicState,setConditions:value=>{seaConditions=value||{};},setBottomInset,setTopInset,setZoom:value=>{zoomOverride=value==null?null:Math.round(clamp(value,2,9));}};
 }

@@ -60,8 +60,8 @@ test('guided stair arrival never clips open water and remains still for a minute
  }
 });
 
-test('the visible retrieve action also cancels an airborne cast without consuming another bait',()=>{
- const sim=new PixelSimulation();departure(sim);sim.startCast();sim.step(.1);sim.releaseCast();assert.equal(sim.state.fishState,'flight');assert.equal(sim.startCast().ok,true);assert.equal(sim.state.fishState,'idle');assert.equal(sim.state.castFlight,null);assert.equal(sim.state.bobber,null);assert.equal(sim.state.profile.stock.squid,11);
+test('casting again cannot instantly retrieve a live airborne rig; emergency retrieval consumes no extra bait',()=>{
+ const sim=new PixelSimulation();departure(sim);sim.startCast();sim.step(.1);sim.releaseCast();assert.equal(sim.state.fishState,'flight');assert.equal(sim.startCast().ok,false);assert.equal(sim.state.fishState,'flight');assert.equal(sim.retrieve().ok,true);assert.equal(sim.state.fishState,'idle');assert.equal(sim.state.castFlight,null);assert.equal(sim.state.bobber,null);assert.equal(sim.state.profile.stock.squid,11);
 });
 
 test('packing a larger cooler activates its purchased capacity without requiring the free cooler to be removed',()=>{

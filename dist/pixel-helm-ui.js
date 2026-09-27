@@ -1,13 +1,13 @@
-import {bindPointer} from './input.js?v=20260927-pixel-v9';
-import {tillerFromPointer,throttleFromDrag} from './pixel-tiller-input.js?v=20260927-pixel-v9';
-import {createTillerControl} from './pixel-helm-state.js?v=20260927-pixel-v9';
+import {bindPointer} from './input.js?v=20260927-pixel-v10';
+import {tillerFromPointer,throttleFromDrag} from './pixel-tiller-input.js?v=20260927-pixel-v10';
+import {createTillerControl} from './pixel-helm-state.js?v=20260927-pixel-v10';
 
 // A retained tiller and a separate twist grip, as on a portable outboard.
 // Normal release keeps friction settings; interruptions deliberately idle it.
 export function mountHelm(root,{getState,onIdle,onFeedback}){
  const control=createTillerControl(),handle=root.querySelector('#tiller-touch'),arm=root.querySelector('.tiller-arm'),grip=root.querySelector('#throttle-touch'),meter=root.querySelector('#throttle-value'),gears=[...root.querySelectorAll('[data-gear]')];
  let gesture=null;
- const usable=()=>{const s=getState();return s.mode==='boat'&&s.engine&&!s.standing&&!s.moored&&!s.docking&&s.fishState==='idle'&&!s.paused;};
+ const usable=()=>{const s=getState();return s.mode==='boat'&&s.engine&&!s.standing&&!s.moored&&!s.docking&&(s.canOperateHelm??s.fishState==='idle')&&!s.paused;};
  const render=()=>{const c=control.state;arm.style.setProperty('--handle-angle',`${c.steer*35}deg`);grip.style.setProperty('--grip-turn',`${c.throttle*32}px`);meter.textContent=`${Math.round(c.throttle*100)}%`;handle.setAttribute('aria-valuenow',String(Math.round(c.steer*35)));grip.setAttribute('aria-valuenow',String(Math.round(c.throttle*100)));for(const el of gears)el.setAttribute('aria-pressed',String(el.dataset.gear===c.gear));};
  const reset=()=>{control.reset();gesture=null;onIdle();render();};
  const apply=result=>{if(result?.ok===false)onFeedback(result);render();};

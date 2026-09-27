@@ -45,8 +45,8 @@ test('rig profiles, carried sinkers and suspended depth selection stay distinct 
 
 test('lure descent uses water depth and real time, not short horizontal cast length; lift has finite stroke',()=>{
  const sim=prepared(['rig_float','rig_jig']);offshore(sim);cast(sim);sim.state.biteAt=1e6;sim.state.snagThreshold=Infinity;sim.state.lineDistance=.4;const bottom=depthAt(sim.state.bobber.x,sim.state.bobber.z);run(sim,55);assert.ok(sim.state.lureDepth>Math.min(8,bottom-1));assert.ok(sim.state.paidLineMeters>sim.state.lureDepth);assert.ok(sim.state.rigPresentation.bottomContact);
- const rest=sim.state.lureDepth;run(sim,2,{pump:true});const lifted=sim.state.lureDepth;run(sim,6,{pump:true});assert.ok(rest-lifted>.4);assert.ok(Math.abs(sim.state.lureDepth-lifted)<.3,'held pump cannot lift forever');run(sim,3);assert.ok(sim.state.lureDepth>lifted+.3);
- sim.retrieve();sim.setRig({rig:'float',fishingDepthMeters:2});cast(sim);sim.state.biteAt=1e6;sim.state.snagThreshold=Infinity;run(sim,20);assert.ok(Math.abs(sim.state.lureDepth-2)<.25);const before=sim.state.lineDistance;run(sim,1,{reel:true});assert.ok(sim.state.lineDistance<before);assert.equal(sim.state.reeling,true);
+ sim.retrieve();assert.ok(sim.lowerRig().ok);sim.state.biteAt=1e6;sim.state.snagThreshold=Infinity;run(sim,30);sim.setReelMode('brake');run(sim,2,{reel:.5});const rest=sim.state.lureDepth;run(sim,2,{pump:true});const lifted=sim.state.lureDepth;run(sim,6,{pump:true});assert.ok(rest-lifted>.4,'a taut vertical rig follows the finite tip stroke');assert.ok(Math.abs(sim.state.lureDepth-lifted)<.3,'held pump cannot lift forever');run(sim,3);assert.ok(sim.state.lureDepth>lifted+.2);
+ sim.retrieve();sim.setRig({rig:'float',fishingDepthMeters:2});cast(sim);sim.state.biteAt=1e6;sim.state.snagThreshold=Infinity;run(sim,20);assert.ok(Math.abs(sim.state.lureDepth-2)<.25);const before=sim.state.paidLineMeters;run(sim,1,{reel:true});assert.ok(sim.state.paidLineMeters<before);assert.equal(sim.state.reeling,true);
 });
 
 test('hook stamps Pacific six-am date, capture position and actual carried tackle; keeping undersized fish is allowed',()=>{

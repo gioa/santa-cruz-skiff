@@ -1,6 +1,6 @@
 // Camera and presentation geometry only. Gameplay coordinates and collision
 // polygons are never rewritten by this module.
-import {skiffScale} from './pixel-boat-geometry.js?v=20260927-pixel-v9';
+import {skiffScale} from './pixel-boat-geometry.js?v=20260927-pixel-v10';
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 const finite=(n,f=0)=>Number.isFinite(n)?n:f;
 export function cameraOffset(camera){return{x:Math.round(camera.width*.5-camera.x*camera.scale),y:Math.round(camera.height*.47-camera.z*camera.scale)};}
@@ -8,7 +8,23 @@ export function projectPixel(camera,x,z){const o=cameraOffset(camera);return{x:M
 export function unprojectPixel(camera,x,y){const o=cameraOffset(camera);return{x:(x-o.x)/camera.scale,z:(y-o.y)/camera.scale};}
 function viewportMetrics(camera){
   const viewport=camera.viewport,ratio=camera.height/Math.max(1,finite(viewport?.height,camera.height));
-  return{bottom:Math.max(0,camera.height-Math.max(0,finite(viewport?.bottom,0))*ratio),gap:Math.max(0,finite(viewport?.gap,10))*ratio};
+  return{top:Math.max(0,finite(viewport?.top,0))*ratio,bottom:Math.max(0,camera.height-Math.max(0,finite(viewport?.bottom,0))*ratio),gap:Math.max(0,finite(viewport?.gap,10))*ratio};
+}
+export function cameraPlayfield(camera,{paddingX=20}={}){
+  const view=viewportMetrics(camera),top=Math.ceil(view.top+view.gap),bottom=Math.max(top,Math.floor(view.bottom-view.gap));
+  return{left:paddingX,right:Math.max(paddingX,camera.width-paddingX),top,bottom};
+}
+/** Fit rendered bounds once, after normal edge tracking. Bounds include the
+ * actual hull/rod extent, so a secondary float cannot push the boat under HUD.
+ * All camera motion is in whole logical pixels, as in the sailing deadzone. */
+export function fitCameraBounds(camera,bounds,{primaryBounds=bounds}={}){
+  const field=cameraPlayfield(camera),fits=b=>b.right-b.left<=field.right-field.left&&b.bottom-b.top<=field.bottom-field.top;
+  const target=fits(bounds)?bounds:primaryBounds;
+  const shift=(low,high,min,max)=>{const a=Math.ceil(low-min),b=Math.floor(high-max);return a<=b?clamp(0,a,b):Math.round((low+high-min-max)/2);};
+  const dx=shift(field.left,field.right,target.left,target.right),dy=shift(field.top,field.bottom,target.top,target.bottom),next={...camera};
+  if(!dx&&!dy)return next;
+  const offset=cameraOffset(camera);next.x=(camera.width*.5-(offset.x+dx))/camera.scale;next.z=(camera.height*.47-(offset.y+dy))/camera.scale;
+  return next;
 }
 export function cameraDeadzone(camera,mode='walk'){
   const boat=mode==='boat',swim=mode==='swim',width=camera.width,height=camera.height;
