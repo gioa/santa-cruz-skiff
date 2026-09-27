@@ -1,6 +1,6 @@
-import {bindPointer} from './input.js?v=20260927-pixel-v8';
-import {tillerFromPointer,throttleFromDrag} from './pixel-tiller-input.js?v=20260927-pixel-v8';
-import {createTillerControl} from './pixel-helm-state.js?v=20260927-pixel-v8';
+import {bindPointer} from './input.js?v=20260927-pixel-v9';
+import {tillerFromPointer,throttleFromDrag} from './pixel-tiller-input.js?v=20260927-pixel-v9';
+import {createTillerControl} from './pixel-helm-state.js?v=20260927-pixel-v9';
 
 // A retained tiller and a separate twist grip, as on a portable outboard.
 // Normal release keeps friction settings; interruptions deliberately idle it.

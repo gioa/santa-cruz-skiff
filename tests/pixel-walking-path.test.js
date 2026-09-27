@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 globalThis.fetch=async url=>new Response(await readFile(url));
 const {PixelSimulation,HARBOR}=await import('../dist/pixel-sim.js');
-const {walkAllowed,walkBlocked,walkHeight}=await import('../dist/harbor-layout.js');
+const {walkAllowed,walkBlocked,walkHeight}=await import('../dist/pixel-harbor-layout.js');
 const {planGroundWalk,walkingSegmentOpen,createGroundWalkSearch}=await import('../dist/pixel-walking-path.js');
 const from={x:HARBOR.spawnX,z:HARBOR.spawnZ},behindBuilding={x:12,z:-72};
 function arrive(sim,dt=.1){

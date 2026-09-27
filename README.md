@@ -36,7 +36,7 @@ The touch interface remains visible on all devices, supports separate pointer ow
 - `pixel-sim.js`: DOM-free game model and validated player actions.
 - `pixel-game.js` / `pixel.css`: interface, keyboard/touch input, menus, saves, audio and page-scoped accessible tools.
 
-The edition reuses the real metre-coordinate OSM coastline, wharf and building footprints, NOAA depth grid, SI vessel dynamics, hull collisions, gear catalogue and economic invariants. Walking is 2.90 m/s before the carried-weight adjustment, twice the former speed. The 24-second davit sequence and fishing use active real-time durations. The game calendar advances at 2× active real time to match the 1:2 offshore passage scale; physical dynamics do not receive a second time multiplier. New and resumed days start at 06:00. Menus pause the clock. Portrait and landscape share the same simulation.
+The edition reuses the real metre-coordinate OSM coastline and building footprints, NOAA depth grid, SI vessel dynamics, hull collisions, gear catalogue and economic invariants. Its wharf is simplified to one straight, constant-width deck; artwork, walking and boat collision share that outline. Walking is 2.90 m/s before the carried-weight adjustment, twice the former speed. The 24-second davit sequence and fishing use active real-time durations. The game calendar advances at 2× active real time to match the 1:2 offshore passage scale; physical dynamics do not receive a second time multiplier. New and resumed days start at 06:00. Menus pause the clock. Portrait and landscape share the same simulation.
 
 The equipment catalogue has free starter gear plus rods, reel, line, leaders, several rigs/baits, sinkers, larger cooler, sounder and drift equipment. There are five representative fish species. Habitat, depth, bait and tackle affect probabilities; species are not locked behind specific purchases. The fish reward ledger prevents double settlement. Retained fish require a counter visit; released fish earn a recorded release reward.
 
@@ -76,7 +76,7 @@ Primary references:
 ## Pixel usability update
 
 - Persistent personal backpack with at least 30 slots and original icons for catalogue items. All owned items remain in its grid, whether enabled or put away; previous locker contents migrate into it. Tap an item for details; move to an empty slot or swap occupied slots. Mouse dragging and keyboard grid navigation are also supported. Organizing and enabling equipment works anywhere. Only purchases, supplies and fish exchange require the counter.
-- Walking keeps the camera still across a broad screen deadzone. Scene geometry uses cached horizontal/vertical art outlines with a shared integer camera offset, while real geographic collision polygons remain unchanged.
+- Walking keeps the camera still across a broad screen deadzone. Coastal and building artwork uses cached horizontal/vertical outlines with a shared integer camera offset. The straight wharf shares its exact outline with walking and vessel collision.
 - The calendar runs at 2× active real time, including capture timestamps. Menus pause simulation. Every new or resumed day starts at 06:00.
 - Worker and boarding actions follow their scene targets. Once aboard, engine, purchased anchor, gear, tiller and fishing actions sit in the bottom thumb area.
 - Original 16-bar, 100 BPM background music plus interaction, footsteps, casting, bites, reeling, catches, purchase and engine effects. Music and master sound are separately switchable; music volume is adjustable and saved. Audio starts only after a user gesture, pauses in the background and continues through inventory menus.
@@ -115,3 +115,7 @@ New trips start with the skiff on its wharf cradle. The counter's explicit **付
 All three rental skiffs use the same hull art and scale. The selected boat moves from its actual shore cradle to the davit, then descends to the left landing; stored boats have no water wake, wave bob or mooring line. Occupancy does not resize the hull.
 
 Version-5 saves retain payment and launch progress. Existing earlier saves already afloat or in a launch continue without a retroactive fee; unpaid shore sessions remain on shore. Recovery cannot launch an unpaid boat. If an existing paid voyage has insufficient balance for a new rental, the main entry continues that voyage and the model refuses to overwrite it with an unaffordable new trip. See `qa/pixel-rental/PLAYTEST.md`.
+
+## Straight pixel wharf
+
+The pixel wharf is now a single 54-metre-wide rectangle with parallel edges and a square seaward end. `pixel-geography.js` supplies the same outline to the renderer, paper chart, wildlife, walking and boat navigation. It spans the original wharf's shore-to-tip extent, connects to the beach, and retains the rental buildings, three equal-size boat cradles, left stairs and launch berth. The preserved 3D edition retains its original wharf geography. See `qa/pixel-straight-wharf/PLAYTEST.md` for validation.

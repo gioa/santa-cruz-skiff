@@ -4,7 +4,7 @@ import {readFile} from 'node:fs/promises';
 globalThis.fetch=async url=>new Response(await readFile(url));
 const {PixelSimulation,HARBOR,FISHING_SPOTS}=await import('../dist/pixel-sim.js');
 const {syncVessel}=await import('../dist/vessel-physics.js');
-const {bearingDegrees,toGPS}=await import('../dist/geography.js');
+const {bearingDegrees,toGPS}=await import('../dist/pixel-geography.js');
 const {depthAt}=await import('../dist/bathymetry.js');
 const {assessCatchLedger}=await import('../dist/fishing-regulations.js');
 const now=()=>new Date('2026-09-27T23:15:00Z');

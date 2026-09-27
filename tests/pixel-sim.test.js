@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 globalThis.fetch=async url=>new Response(await readFile(url));
 const {PixelSimulation,HARBOR,BASE_GEAR}=await import('../dist/pixel-sim.js');
-const {hullPenetration}=await import('../dist/navigation.js');
+const {hullPenetration}=await import('../dist/pixel-navigation.js');
 const runUntil=(sim,predicate,seconds=600,input={})=>{let elapsed=0;while(!predicate(sim.state)&&elapsed<seconds){sim.step(.1,typeof input==='function'?input(sim.state):input);elapsed+=.1;}assert.ok(predicate(sim.state),`timed out after ${elapsed.toFixed(1)}s: ${JSON.stringify(sim.publicState())}`);return elapsed;};
 function departure(sim,chart=false,anchor=false){assert.equal(sim.start().ok,true);assert.equal(sim.walkTo('counter').ok,true);runUntil(sim,()=>sim.atCounter&&sim.state.walkRoute.length===0,20);assert.equal(sim.interact().action,'staff');assert.equal(sim.packStarter().ok,true);if(chart){assert.equal(sim.buyGear('nautical_chart').ok,true);assert.equal(sim.equip('nautical_chart').ok,true);}if(anchor){assert.equal(sim.buyGear('anchor').ok,true);assert.equal(sim.equip('anchor').ok,true);}assert.equal(sim.launchBoat().ok,true);assert.equal(sim.walkTo('boarding').ok,true);runUntil(sim,s=>s.walkRoute.length===0&&s.launchStage==='afloat',70);assert.equal(sim.board().ok,true);assert.equal(sim.unmoor().ok,true);}
 

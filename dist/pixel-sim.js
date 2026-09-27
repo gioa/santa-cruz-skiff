@@ -1,16 +1,16 @@
 /** Pixel gameplay. Offshore travel uses a 1:2 map scale and the calendar clock runs at 2x. Input, fishing and animations use active real seconds. */
-import {GEAR_CATALOG,BASE_GEAR,createProfile,equipmentStats,cargoWeight,settleFish,buyGear as purchaseGear,restock} from './equipment.js?v=20260927-pixel-v8';
-import {HARBOR,BOARDING_WALK_PATH,walkHeight,walkAllowed,canBoardFrom,harborWaterBlocked} from './harbor-layout.js?v=20260927-pixel-v8';
-import {walkingBlocked as walkBlocked,walkingPointOpen,walkingSegmentOpen as safeWalkSegment,createGroundWalkSearch,advanceGroundWalk} from './pixel-walking-path.js?v=20260927-pixel-v8';
-import {FISHING_SPOTS,toGPS,bearingDegrees,onLand,onPier,MAP_BOUNDS} from './geography.js?v=20260927-pixel-v8';
-import {depthAt,depthInfoAt} from './bathymetry.js?v=20260927-pixel-v8';
-import {waterRoute,resolveVesselContact,contactAwareControl} from './navigation.js?v=20260927-pixel-v8';
-import {createVesselState,stepVessel,syncVessel,vesselWind,vesselAutopilot} from './vessel-physics.js?v=20260927-pixel-v8';
-import {RIG_PROFILES,getRigProfile,stepRigLure,weightedRigFish} from './fishing-rigs.js?v=20260927-pixel-v8';
-import {ensureRodLoadouts,getRodAssembly,setRodAssembly,syncActiveRodLoadout} from './pixel-rod-loadouts.js?v=20260927-pixel-v8';
-import {assessCatchLedger,identifyRegulatedSpecies} from './fishing-regulations.js?v=20260927-pixel-v8';
-import {FishingPatrol} from './fish-patrol.js?v=20260927-pixel-v8';
-import {NAVIGATION_COMPRESSION,navigationStepScale} from './pixel-navigation-scale.js?v=20260927-pixel-v8';
+import {GEAR_CATALOG,BASE_GEAR,createProfile,equipmentStats,cargoWeight,settleFish,buyGear as purchaseGear,restock} from './equipment.js?v=20260927-pixel-v9';
+import {HARBOR,BOARDING_WALK_PATH,walkHeight,walkAllowed,canBoardFrom,harborWaterBlocked} from './pixel-harbor-layout.js?v=20260927-pixel-v9';
+import {walkingBlocked as walkBlocked,walkingPointOpen,walkingSegmentOpen as safeWalkSegment,createGroundWalkSearch,advanceGroundWalk} from './pixel-walking-path.js?v=20260927-pixel-v9';
+import {FISHING_SPOTS,toGPS,bearingDegrees,onLand,onPier,MAP_BOUNDS} from './pixel-geography.js?v=20260927-pixel-v9';
+import {depthAt,depthInfoAt} from './bathymetry.js?v=20260927-pixel-v9';
+import {waterRoute,resolveVesselContact,contactAwareControl,clearResumeVesselPose} from './pixel-navigation.js?v=20260927-pixel-v9';
+import {createVesselState,stepVessel,syncVessel,vesselWind,vesselAutopilot} from './vessel-physics.js?v=20260927-pixel-v9';
+import {RIG_PROFILES,getRigProfile,stepRigLure,weightedRigFish} from './fishing-rigs.js?v=20260927-pixel-v9';
+import {ensureRodLoadouts,getRodAssembly,setRodAssembly,syncActiveRodLoadout} from './pixel-rod-loadouts.js?v=20260927-pixel-v9';
+import {assessCatchLedger,identifyRegulatedSpecies} from './fishing-regulations.js?v=20260927-pixel-v9';
+import {FishingPatrol} from './fish-patrol.js?v=20260927-pixel-v9';
+import {NAVIGATION_COMPRESSION,navigationStepScale} from './pixel-navigation-scale.js?v=20260927-pixel-v9';
 export const GAME_TIME_SCALE=1/NAVIGATION_COMPRESSION;
 export const WALK_SPEED=2.90;
 export const BOAT_RENTAL_PRICE=15; // Virtual game credits, not a real rental quote.
@@ -101,6 +101,7 @@ export class PixelSimulation {
    else if(s.launchStage==='lowering'){s.launchProgress=clamp(finite(s.launchProgress),0,1);s.mode='walk';s.loaded=false;s.moored=true;}
    else if(s.mode==='boat'||s.launchStage==='raising')s.launchStage='afloat';
   }else{s.mode='walk';this.journal('06:00，到达 Santa Cruz Wharf。');}
+  if(resume&&s.mode==='boat'){const pose={x:s.boatX,z:s.boatZ,heading:s.heading},clear=clearResumeVesselPose(pose);if(clear!==pose){s.boatX=clear.x;s.boatZ=clear.z;s.heading=clear.heading;s.anchor=false;this.journal('码头布局更新，木艇已移到邻近安全水面。');}}
   if(!this.hasGear('anchor'))s.anchor=false;this.clearWalking();syncVessel(this.vessel,{x:s.boatX,z:s.boatZ,heading:s.heading,clearMotion:true});
   ensureRodLoadouts(s.profile,{rig:s.rig,bait:s.bait,weightGrams:s.rigWeightGrams,drag:s.drag,fishingDepthMeters:s.fishingDepthMeters});s.rodBaitOnHooks??={};this.activeRodId=s.profile.loadout.rod;this.applyActiveRod();
   this.transientThrottle=false;s.dayStartAt=pacificDayStart(this.now());s.rigWeightGrams=finite(s.rigWeightGrams,getRigProfile(s.rig).defaultWeightGrams);s.rigPresentation=null;s.pumpHeight=0;s.paidLineMeters=0;

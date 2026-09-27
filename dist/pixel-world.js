@@ -1,10 +1,10 @@
-import {pierRings,landPolygons,coastLines,buildingFootprints,FISHING_SPOTS,onLand,onPier} from './geography.js?v=20260927-pixel-v8';
-import {HARBOR} from './harbor-layout.js?v=20260927-pixel-v8';
-import {depthInfoAt} from './bathymetry.js?v=20260927-pixel-v8';
-import {createWildlife,drawWildlife} from './pixel-wildlife.js?v=20260927-pixel-v8';
-import {cameraOffset,unprojectPixel,stepDeadzoneCamera,keepCameraPointsVisible,cameraDeadzone,cameraZoomForState,zoomCameraAt,rectilinearOutline} from './pixel-camera.js?v=20260927-pixel-v8';
-import {ladderPoint} from './swimming.js?v=20260927-pixel-v8';
-import {SKIFF_RACKS,boatRenderPose,parkedSkiffPoses,skiffScreenPose,hitSkiff} from './pixel-boat-geometry.js?v=20260927-pixel-v8';
+import {pierRings,landPolygons,coastLines,buildingFootprints,FISHING_SPOTS,onLand,onPier} from './pixel-geography.js?v=20260927-pixel-v9';
+import {HARBOR} from './harbor-layout.js?v=20260927-pixel-v9';
+import {depthInfoAt} from './bathymetry.js?v=20260927-pixel-v9';
+import {createWildlife,drawWildlife} from './pixel-wildlife.js?v=20260927-pixel-v9';
+import {cameraOffset,unprojectPixel,stepDeadzoneCamera,keepCameraPointsVisible,cameraDeadzone,cameraZoomForState,zoomCameraAt,rectilinearOutline} from './pixel-camera.js?v=20260927-pixel-v9';
+import {ladderPoint} from './swimming.js?v=20260927-pixel-v9';
+import {SKIFF_RACKS,boatRenderPose,parkedSkiffPoses,skiffScreenPose,hitSkiff} from './pixel-boat-geometry.js?v=20260927-pixel-v9';
 
 // The map keeps the same metre coordinates as the sailing simulation. The
 // people and boat are deliberately enlarged, like a handheld-era RPG, so that
@@ -12,9 +12,9 @@ import {SKIFF_RACKS,boatRenderPose,parkedSkiffPoses,skiffScreenPose,hitSkiff} fr
 const TAU=Math.PI*2, clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const hash=(x,y=0)=>{let n=Math.imul(x|0,374761393)+Math.imul(y|0,668265263);n=(n^(n>>>13))*1274126177;return((n^(n>>>16))>>>0)/4294967295;};
 const rectRing=r=>[{x:r.minX,z:r.minZ},{x:r.maxX,z:r.minZ},{x:r.maxX,z:r.maxZ},{x:r.minX,z:r.maxZ}];
-// These are presentation-only outlines. Navigation and collision keep the
-// untouched geographic rings imported above.
-const artPierRings=pierRings.map(r=>rectilinearOutline(r,{grid:1,span:14}));
+// The deck uses the exact same straight edges as walking and boat collision.
+// Coastal/building artwork alone uses stepped pixel outlines.
+const artPierRings=pierRings;
 const artLandPolygons=landPolygons.map(r=>rectilinearOutline(r,{grid:3,span:12}));
 const artCoastLines=coastLines.map(r=>rectilinearOutline(r,{grid:3,span:12,closed:false}));
 const artBuildings=new Map(buildingFootprints.map(b=>[b.id,rectilinearOutline(b.points,{grid:1,span:6})]));

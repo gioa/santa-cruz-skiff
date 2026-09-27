@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 globalThis.fetch=async url=>new Response(await readFile(url));
 const {PixelSimulation,HARBOR,BASE_GEAR,WALK_SPEED}=await import('../dist/pixel-sim.js');
-const {walkAllowed,walkBlocked}=await import('../dist/harbor-layout.js');
+const {walkAllowed,walkBlocked}=await import('../dist/pixel-harbor-layout.js');
 const now=()=>new Date('2026-09-27T20:00:00Z');
 const run=(sim,seconds,input={})=>{for(let t=0;t<seconds-1e-8;t+=.1)sim.step(Math.min(.1,seconds-t),input);};
 function equipped(items=[]){const sim=new PixelSimulation({now,rng:()=>.05,patrolRng:()=>.9,profile:{version:2,credits:5000}});sim.start();Object.assign(sim.state,{playerX:HARBOR.counterX,playerZ:HARBOR.counterZ});for(const id of items)assert.equal(sim.buyGear(id).ok,true,id);Object.assign(sim.state,{playerX:HARBOR.spawnX,playerZ:HARBOR.spawnZ});return sim;}

@@ -1,5 +1,6 @@
-import {onLand,onPier,landPolygons,pierRings} from './geography.js?v=20260927-articulated-v5';
-import {harborWaterBlocked,harborObstacleRings} from './harbor-layout.js?v=20260927-articulated-v5';
+import {onLand as defaultOnLand,onPier as defaultOnPier,landPolygons as defaultLandPolygons,pierRings as defaultPierRings} from './geography.js?v=20260927-articulated-v5';
+import {harborWaterBlocked as defaultHarborWaterBlocked,harborObstacleRings as defaultHarborObstacleRings} from './harbor-layout.js?v=20260927-articulated-v5';
+export function createNavigation({onLand=defaultOnLand,onPier=defaultOnPier,landPolygons=defaultLandPolygons,pierRings=defaultPierRings,harborWaterBlocked=defaultHarborWaterBlocked,harborObstacleRings=defaultHarborObstacleRings}={}){
 const geographicBlocked=(x,z)=>onLand(x,z)||onPier(x,z);
 const blocked=(x,z)=>geographicBlocked(x,z)||harborWaterBlocked(x,z);
 const polygonEdges=rings=>rings.flatMap(r=>r.map((a,i)=>[a,r[(i+1)%r.length]]));
@@ -9,14 +10,14 @@ function intersects(a,b,c,d){if(Math.max(a.x,b.x)<Math.min(c.x,d.x)||Math.min(a.
 function clearsObstacle(a,b,radius,isBlocked,obstacleEdges){const len=Math.hypot(b.x-a.x,b.z-a.z)||1,px=-(b.z-a.z)/len*radius,pz=(b.x-a.x)/len*radius;for(const side of [-1,0,1]){const p={x:a.x+px*side,z:a.z+pz*side},q={x:b.x+px*side,z:b.z+pz*side};if(isBlocked(p.x,p.z)||isBlocked(q.x,q.z))return false;if(obstacleEdges.some(([c,d])=>intersects(p,q,c,d)))return false;}return true;}
 // Preserve coastal clearance; close alongside the fixed landing, use the
 // vessel's 0.9 m half-beam plus 0.25 m to permit a real-sized berth departure.
-export function clearWaterSegment(a,b){return clearsObstacle(a,b,2.4,geographicBlocked,edges)&&clearsObstacle(a,b,1.15,harborWaterBlocked,harborEdges);}
+function clearWaterSegment(a,b){return clearsObstacle(a,b,2.4,geographicBlocked,edges)&&clearsObstacle(a,b,1.15,harborWaterBlocked,harborEdges);}
 const hullSamples=[[0,0],[-.9,0],[.9,0],[0,-2],[0,2]];
 const contactManeuvers=new WeakMap();
 const contactStalls=new WeakMap();
 function edgeDistance(x,z,obstacles){let best=Infinity;for(const[a,b]of obstacles){const dx=b.x-a.x,dz=b.z-a.z,t=Math.max(0,Math.min(1,((x-a.x)*dx+(z-a.z)*dz)/(dx*dx+dz*dz||1)));best=Math.min(best,Math.hypot(x-a.x-t*dx,z-a.z-t*dz));}return best;}
 // A nonzero value measures actual intrusion, so an already touching vessel can
 // move OUT of contact. A boolean-only test otherwise traps every escape step.
-export function hullPenetration(pose,{extraPenetration=null}={}){
+function hullPenetration(pose,{extraPenetration=null}={}){
  const c=Math.cos(pose.heading),s=Math.sin(pose.heading);let depth=0;
  for(const[x,z]of hullSamples){const px=pose.x+x*c+z*s,pz=pose.z-x*s+z*c;let d=0;
   if(geographicBlocked(px,pz))d=Math.max(d,edgeDistance(px,pz,edges));
@@ -30,7 +31,7 @@ export function hullPenetration(pose,{extraPenetration=null}={}){
 // the boat to an invented safe point. Sliding and turning out of contact remain
 // possible; blocked velocity components stop, while the real engine and tiller
 // keep responding. In particular, reject a newly colliding heading as well as XY.
-export function resolveVesselContact(v,before,options={}){
+function resolveVesselContact(v,before,options={}){
  const requested={x:v.x,z:v.z,heading:v.heading},penetration=hullPenetration(requested,options);
  if(penetration===0){contactStalls.delete(v);return{collided:false,recovering:false,penetration:0};}
  const oldDepth=hullPenetration(before,options),angle=Math.atan2(Math.sin(requested.heading-before.heading),Math.cos(requested.heading-before.heading));
@@ -58,15 +59,19 @@ export function resolveVesselContact(v,before,options={}){
 // A propeller cannot turn a 4.8 m hull in place while it is touching the wharf.
 // The assisted helmsman first backs two metres under real reverse thrust, then
 // resumes its heading controller. Manual helm inputs do not use this function.
-export function contactAwareControl(v,control,options={}){
+function contactAwareControl(v,control,options={}){
  if(!contactManeuvers.has(v)&&hullPenetration(v,options)>0)contactManeuvers.set(v,{x:v.x,z:v.z});
  const maneuver=contactManeuvers.get(v);if(!maneuver)return control;
  if(Math.hypot(v.x-maneuver.x,v.z-maneuver.z)>2&&hullPenetration(v,options)===0){contactManeuvers.delete(v);return control;}
  return{...control,steer:0,throttle:-.25,arrived:false,recovering:true};
 }
-export function waterRoute(start,target){if(blocked(target.x,target.z))return null;if(clearWaterSegment(start,target))return[{...target}];
+function waterRoute(start,target){if(blocked(target.x,target.z))return null;if(clearWaterSegment(start,target))return[{...target}];
  const step=30,margin=450,minX=Math.min(start.x,target.x)-margin,minZ=Math.min(start.z,target.z)-margin,w=Math.ceil((Math.abs(start.x-target.x)+2*margin)/step)+1,h=Math.ceil((Math.abs(start.z-target.z)+2*margin)/step)+1;
  if(w*h>25000)return null;const pos=i=>({x:minX+(i%w)*step,z:minZ+Math.floor(i/w)*step});const cell=p=>Math.round((p.z-minZ)/step)*w+Math.round((p.x-minX)/step),first=cell(start),last=cell(target);const costs=new Float64Array(w*h).fill(Infinity),parent=new Int32Array(w*h).fill(-1),closed=new Uint8Array(w*h),blockedCache=new Int8Array(w*h).fill(-1);const bad=i=>{if(blockedCache[i]<0){const p=pos(i);blockedCache[i]=blocked(p.x,p.z)?1:0;}return blockedCache[i];};
  if(first===last)return null;costs[first]=0;const open=[first],heuristic=i=>{const p=pos(i);return Math.hypot(p.x-target.x,p.z-target.z);};let found=false,iterations=0;
  while(open.length&&iterations++<25000){let best=0;for(let k=1;k<open.length;k++)if(costs[open[k]]+heuristic(open[k])<costs[open[best]]+heuristic(open[best]))best=k;const current=open.splice(best,1)[0];if(closed[current])continue;closed[current]=1;if(current===last){found=true;break;}const cx=current%w,cy=Math.floor(current/w);for(const [dx,dy]of[[1,0],[-1,0],[0,1],[0,-1],[1,1],[-1,-1],[1,-1],[-1,1]]){const nx=cx+dx,ny=cy+dy;if(nx<0||ny<0||nx>=w||ny>=h)continue;const next=ny*w+nx;if(closed[next]||(next!==last&&bad(next)))continue;if(!clearWaterSegment(current===first?start:pos(current),next===last?target:pos(next)))continue;const cost=costs[current]+Math.hypot(dx,dy)*step;if(cost<costs[next]){costs[next]=cost;parent[next]=current;open.push(next);}}}
  if(!found)return null;const route=[{...target}];let cursor=parent[last];while(cursor!==-1&&cursor!==first){route.unshift(pos(cursor));cursor=parent[cursor];}route.unshift(start);const smooth=[];let i=0;while(i<route.length-1){let next=route.length-1;while(next>i+1&&!clearWaterSegment(route[i],route[next]))next--;if(!clearWaterSegment(route[i],route[next]))return null;smooth.push(route[next]);i=next;}return smooth;}
+
+ return{clearWaterSegment,hullPenetration,resolveVesselContact,contactAwareControl,waterRoute};
+}
+export const {clearWaterSegment,hullPenetration,resolveVesselContact,contactAwareControl,waterRoute}=createNavigation();

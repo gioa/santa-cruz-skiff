@@ -2,19 +2,18 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import {SKIFF_RACKS,boatRenderPose,parkedSkiffPoses,skiffScreenPose,hitSkiff,skiffScale} from '../dist/pixel-boat-geometry.js';
-import {rectilinearOutline} from '../dist/pixel-camera.js';
 globalThis.fetch=async url=>new Response(await readFile(url));
 const {HARBOR}=await import('../dist/harbor-layout.js');
-const {onPier,insidePolygon,pierRings,buildingFootprints}=await import('../dist/geography.js');
+const {onPier,insidePolygon,pierRings,buildingFootprints}=await import('../dist/pixel-geography.js');
 const base={mode:'walk',playerX:HARBOR.spawnX,playerZ:HARBOR.spawnZ,boatX:HARBOR.boatX,boatZ:HARBOR.boatZ,heading:0,launchStage:'stored',fishState:'idle',moored:true};
 const poseAt=p=>boatRenderPose({...base,launchStage:'lowering',launchProgress:p},HARBOR);
 const project=(x,z)=>({x:x*6,y:z*6});
 const geometry=(pose,time=0)=>skiffScreenPose(pose,{cameraScale:6,project,time});
 const hullCorners=pose=>[-24,24].flatMap(x=>[-44,44].map(z=>({x:pose.x+.18*(x*Math.cos(pose.heading)+z*Math.sin(pose.heading)),z:pose.z+.18*(-x*Math.sin(pose.heading)+z*Math.cos(pose.heading))})));
-const artPier=pierRings.map(r=>rectilinearOutline(r,{grid:1,span:14}));
+const artPier=pierRings;
 const safeDryFootprint=pose=>{for(const p of hullCorners(pose)){assert.ok(onPier(p.x,p.z),`hull over water at ${JSON.stringify(p)}`);assert.ok(artPier.some(r=>insidePolygon(p.x,p.z,r)),'hull must also stay inside rendered deck');assert.ok(!buildingFootprints.some(b=>insidePolygon(p.x,p.z,b.points)),'hull cannot occupy a building');}};
 
-test('three full-size stored rentals fit on the real and rendered pier with clear separation',()=>{
+test('three full-size stored rentals fit on the straight playable pier with clear separation',()=>{
   const poses=[boatRenderPose(base,HARBOR),...parkedSkiffPoses()];assert.equal(poses.length,3);
   for(const pose of poses)safeDryFootprint(pose);
   for(let i=1;i<poses.length;i++)assert.ok(poses[i].z-poses[i-1].z>48*.18+2,'rack hulls leave more than two metres of gap');

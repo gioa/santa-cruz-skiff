@@ -4,7 +4,7 @@ import {readFile} from 'node:fs/promises';
 globalThis.fetch=async url=>new Response(await readFile(url));
 const {NAVIGATION_COMPRESSION,NAVIGATION_HARBOR_RADIUS,NAVIGATION_OFFSHORE_RADIUS,navigationStepScale,navigationSubsteps,compressedDistance}=await import('../dist/pixel-navigation-scale.js');
 const {PixelSimulation,HARBOR,FISHING_SPOTS,GEAR_CATALOG}=await import('../dist/pixel-sim.js');
-const {hullPenetration}=await import('../dist/navigation.js');
+const {hullPenetration}=await import('../dist/pixel-navigation.js');
 
 const home={x:HARBOR.boatX,z:HARBOR.boatZ};
 const offshore={mode:'boat',engine:true,fishState:'idle',speed:2,boatX:home.x-600,boatZ:home.z};
