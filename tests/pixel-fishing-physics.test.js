@@ -81,7 +81,7 @@ test('pause freezes line and posture; resume resets old live tackle without dupl
 
 
 test('an actively fitted smoother reel reduces drag breakaway shock without changing steady payout',()=>{
- const ordinary=pure('bottom',{reelMode:'brake',paidLineMeters:12,lureDepth:8}),smooth=pure('bottom',{reelMode:'brake',paidLineMeters:12,lureDepth:8});ordinary.bobber.height=smooth.bobber.height=-8;
+ const ordinary=pure('bottom',{reelMode:'brake',paidLineMeters:12,lureDepth:8}),smooth=pure('bottom',{reelMode:'brake',paidLineMeters:12,lureDepth:8});ordinary.bobber.height=smooth.bobber.height=-8;ordinary.paidLineMeters=smooth.paidLineMeters=rodTipPosition(ordinary).height+8;
  Object.assign(ordinary,stepFishingLine(ordinary,{dt:.1,fishPullN:30,smooth:1}));Object.assign(smooth,stepFishingLine(smooth,{dt:.1,fishPullN:30,smooth:.86}));assert.ok(smooth.rodLoadN<ordinary.rodLoadN);assert.equal(smooth.paidLineMeters,ordinary.paidLineMeters);assert.equal(smooth.dragThresholdN,ordinary.dragThresholdN);
  const sim=ready(['reel_smooth','rod_light']);assert.equal(sim.stats.smooth,1,'packing an unattached reel does not change the active rod');assert.ok(sim.setRig({rod:'rod_light',reel:'reel_smooth'}).ok);assert.equal(sim.stats.smooth,1);assert.ok(sim.selectRod('rod_light').ok);assert.equal(sim.stats.smooth,.86);
 });

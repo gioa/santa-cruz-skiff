@@ -216,11 +216,7 @@
 }
 #boat-fishing .fish-status-head{font-size:10px;gap:5px;white-space:nowrap}
 #boat-fishing #fish-distance,#boat-fishing #fish-detail{display:none}
-#boat-fishing #tension-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);flex:1;gap:3px 8px;min-width:0}
-#boat-fishing .meter-caption{font-size:8px;margin:0;grid-row:1}
 #boat-fishing .meter{height:4px;grid-row:2}
-#boat-fishing .meter-caption:nth-of-type(1),#boat-fishing .meter.tension{grid-column:1}
-#boat-fishing .meter-caption:nth-of-type(3),#boat-fishing .meter.stamina{grid-column:2}
 #boat-fishing #cast-row{flex:1;min-width:0}#boat-fishing #cast-row .meter{margin:0;height:6px}#boat-fishing #cast-row small{display:none}
 @media(max-width:380px){
  #boat-console,#boat-console.fishing-open{width:calc(100% - 12px);padding:6px;bottom:calc(6px + env(safe-area-inset-bottom));gap:5px}
@@ -298,20 +294,15 @@
 .is-fishing-focus #boat-fishing .fish-status{
  position:absolute;top:calc(12px + var(--safe-top));bottom:auto;
  left:max(12px,calc(env(safe-area-inset-left,0px) + 8px));right:auto;transform:none;
- display:grid;grid-template-columns:minmax(0,1fr);gap:7px;width:min(360px,calc(100% - 80px));
- max-width:none;min-height:0;padding:9px 11px;border:1px solid #d8e7d746;
+ display:grid;grid-template-columns:minmax(0,1fr);gap:7px;width:max-content;
+ max-width:calc(100% - 80px);min-height:0;padding:9px 11px;border:1px solid #d8e7d746;
  background:#163e46c7;box-shadow:0 2px 0 #102e392b;color:#fff1d5;pointer-events:none
 }
 .is-fishing-focus #boat-fishing .fish-status-head{font-size:11px;gap:7px;line-height:16px}
 .is-fishing-focus #boat-fishing .fish-status-head i{background:#edc78a;box-shadow:0 0 0 2px #edc78a20}
-.is-fishing-focus #boat-fishing #fish-distance{display:block;font:10px ui-monospace,monospace;color:#e3edda}
-.is-fishing-focus #boat-fishing #tension-row{display:grid;width:100%;gap:4px 12px}
-.is-fishing-focus #boat-fishing .meter-caption{font-size:10px;line-height:14px;color:#e3edda}
-.is-fishing-focus #boat-fishing .meter-caption b{font:10px/14px ui-monospace,monospace;color:#fff1d5}
+.is-fishing-focus #boat-fishing #fish-distance{display:none}
 .is-fishing-focus #boat-fishing .meter{height:5px;background:#f6f5ce20}
 .is-fishing-focus #boat-fishing .meter i{background:#85c4a7}
-.is-fishing-focus #boat-fishing .meter.stamina i{background:#edc78a}
-.is-fishing-focus #boat-fishing .tension span{height:5px;background:#ef9478}
 .is-fishing-focus #boat-fishing .fishing-instruments{
  position:absolute;right:max(12px,calc(env(safe-area-inset-right,0px) + 8px));
  bottom:calc(12px + var(--safe-bottom));display:block;width:168px;height:172px;
@@ -361,13 +352,11 @@
 }
 @media(max-width:350px){
  .is-fishing-focus #boat-fishing .fish-status{padding:8px;gap:6px}
- .is-fishing-focus #boat-fishing #tension-row{gap:4px 8px}
- .is-fishing-focus #boat-fishing .meter-caption,.is-fishing-focus #boat-fishing .meter-caption b{font-size:9px}
  .is-fishing-focus #boat-fishing .fishing-toolbar{gap:6px}
 }
 @media(max-height:500px) and (orientation:landscape){
  .is-fishing-focus .hud,.is-fishing-focus #boat-fishing .fish-status{top:calc(8px + var(--safe-top))}
- .is-fishing-focus #boat-fishing .fish-status{width:min(290px,calc(100% - 80px));padding:7px 9px;gap:5px}
+ .is-fishing-focus #boat-fishing .fish-status{width:max-content;max-width:calc(100% - 80px);padding:7px 9px;gap:5px}
  .is-fishing-focus #boat-fishing .fishing-instruments{width:132px;height:132px;bottom:calc(8px + var(--safe-bottom))}
  .is-fishing-focus #boat-fishing .fishing-toolbar{width:108px;bottom:calc(8px + var(--safe-bottom));gap:6px}
  .is-fishing-focus #boat-fishing .fishing-toolbar button,
@@ -376,3 +365,11 @@
  .is-fishing-focus #boat-fishing .fishing-toolbar #drag-knob{height:44px;min-height:44px}
  .is-fishing-focus #toast{bottom:calc(150px + var(--safe-bottom));max-width:min(300px,calc(100% - 260px));font-size:10px}
 }
+
+/* The drag adjuster is a physical star dial, with no simulated force gauge. */
+#boat-fishing .fishing-toolbar #drag-knob{display:flex;align-items:center;justify-content:center;gap:4px;position:relative}
+#drag-knob .drag-star{display:block;font:25px/1 ui-monospace,monospace;transform:rotate(var(--drag-angle,0deg));transform-origin:center;color:inherit}
+#drag-knob .drag-caption{font:9px/1.2 ui-monospace,monospace}
+#drag-knob .drag-marks{font:10px/1.6 ui-monospace,monospace;opacity:.65}
+#rod-load{font-size:10px;color:#527263}
+#rod-monitor b{max-width:7em;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}

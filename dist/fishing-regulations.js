@@ -11,6 +11,7 @@ const SOURCE={
  halibut:'https://wildlife.ca.gov/Fishing/Ocean/Regulations/Fishing-Map/San-Francisco',
  booklet:'https://nrm.dfg.ca.gov/FileHandler.ashx?DocumentID=239985',
  central:'https://wildlife.ca.gov/Fishing/Ocean/Regulations/Fishing-Map/Central',
+ salmon:'https://nrm.dfg.ca.gov/FileHandler.ashx?DocumentID=242581&inline=',
  naturalBridges:'https://wildlife.ca.gov/Conservation/Marine/MPAs/Natural-Bridges',
  soquel:'https://wildlife.ca.gov/Conservation/Marine/MPAs/Soquel-Canyon',
  countyMPAs:'https://wildlife.ca.gov/Conservation/Marine/MPAs/Outreach-Materials',
@@ -21,11 +22,12 @@ export const RULESET_2026=Object.freeze({
  id:'cdfw-santa-cruz-2026-09-27',jurisdiction:'California ocean sport fishery',region:'Central Groundfish Management Area',
  verifiedAt:'2026-09-27',validFrom:'2026-01-01',validThrough:'2026-12-31',timeZone:'America/Los_Angeles',
  publishedSnapshot:true,live:false,latitudeNorth:37+11/60,latitudeSouth:34+27/60,
- sourceUpdates:{groundfish:'2026-06-23',general:'2026-07-24',halibut:'2026-09-01',central:'2026-09-11',booklet:'2026-01-13'},
+ sourceUpdates:{groundfish:'2026-06-23',general:'2026-07-24',halibut:'2026-09-01',central:'2026-09-11',booklet:'2026-07-17',salmon:'2026-08-19'},
  // Publication dates are not represented as the legal effective dates of each
  // amendment. This module applies the 2026 schedule in the verified snapshot;
  // it is not a history of every in-season version and expires after 2026.
  groundfishSeason:{open:'04-01',close:'12-31',depthRestriction:null},
+ salmonSeason:{open:'04-11',close:'09-30',earlyMinimumThrough:'05-15',earlyMinimumCm:24*2.54,minimumCm:20*2.54},
  nearshoreGearEmergency:{effectiveFrom:'2026-07-03',expires:'2026-12-31',maximumDistanceMeters:914.4,maximumHookGapInches:1.5,source:SOURCE.rulemaking2026},
  rcgDailyBag:10,rcgPossession:10,generalFinfishDailyBag:20,generalFinfishPossession:20,
  sources:SOURCE,
@@ -33,6 +35,11 @@ export const RULESET_2026=Object.freeze({
 const species=[
  {id:'blue_rockfish',names:['蓝岩鱼','blue rockfish'],latin:'Sebastes mystinus',groundfish:true,rcg:true,minimumCm:0,bag:10,source:SOURCE.groundfish},
  {id:'copper_rockfish',names:['铜岩鱼','copper rockfish'],latin:'Sebastes caurinus',groundfish:true,rcg:true,minimumCm:0,bag:1,source:SOURCE.groundfish},
+ {id:'vermilion_rockfish',names:['朱红岩鱼','红岩鱼','vermilion rockfish'],latin:'Sebastes miniatus',groundfish:true,rcg:true,minimumCm:0,bag:2,bagGroup:'vermilion_sunset',source:SOURCE.groundfish},
+ {id:'sunset_rockfish',names:['夕阳岩鱼','sunset rockfish'],latin:'Sebastes crocotulus',groundfish:true,rcg:true,minimumCm:0,bag:2,bagGroup:'vermilion_sunset',source:SOURCE.groundfish},
+ {id:'chinook_salmon',names:['帝王鲑','奇努克鲑','chinook salmon','king salmon'],latin:'Oncorhynchus tshawytscha',salmon:true,pelagic:true,minimumCm:20*2.54,bag:2,source:SOURCE.salmon},
+ {id:'white_seabass',names:['白鲈','白海鲈','白海鲈鱼','white seabass','wsb'],latin:'Atractoscion nobilis',minimumCm:28*2.54,bag:3,source:SOURCE.central},
+ {id:'pacific_bonito',names:['太平洋鲣','太平洋狐鲣','pacific bonito','sarda chiliensis','sarda lineolata'],latin:'Sarda chiliensis lineolata',pelagic:true,minimumCm:0,bag:10,smallBag:5,minimumForkCm:24*2.54,minimumKg:5*.45359237,source:SOURCE.booklet},
  {id:'california_halibut',names:['加州大比目鱼','加州比目鱼','california halibut'],latin:'Paralichthys californicus',minimumCm:22*2.54,bag:2,source:SOURCE.halibut},
  {id:'pacific_mackerel',names:['太平洋鲭鱼','pacific mackerel','pacific chub mackerel'],latin:'Scomber japonicus',minimumCm:0,bag:null,excludedGeneralBag:true,pelagic:true,source:SOURCE.general},
  {id:'lingcod',names:['长蛇齿单线鱼','灵鳕','lingcod'],latin:'Ophiodon elongatus',groundfish:true,minimumCm:22*2.54,bag:2,source:SOURCE.groundfish},
@@ -71,6 +78,33 @@ function unsupported(code,details={}){return{code,...details};}
 function rigEvidence(fish,context){const rig=typeof fish.rig==='object'&&fish.rig?fish.rig:typeof context.rig==='object'&&context.rig?context.rig:{};return{hookCount:fish.hookCount??fish.caughtHookCount??rig.hookCount??rig.hooks??context.hookCount,lineCount:fish.lineCount??rig.lineCount??rig.lines??context.lineCount,wireLeader:rig.wireLeader??fish.wireLeader??context.wireLeader,hookGapInches:rig.hookGapInches??fish.hookGapInches??context.hookGapInches,shoreDistanceMeters:fish.shoreDistanceMeters??context.shoreDistanceMeters,hasDescendingDevice:fish.hasDescendingDevice??rig.hasDescendingDevice??context.hasDescendingDevice,landingNetDiameterInches:fish.landingNetDiameterInches??rig.landingNetDiameterInches??context.landingNetDiameterInches};}
 function finish(result){result.status=result.violations.length?'violation':result.unsupported.length?'unsupported':'supported';return result;}
 
+function finitePositive(value){return value!=null&&Number.isFinite(Number(value))&&Number(value)>0;}
+// Bonito's measurement is fork length, not the total length used by most fish.
+// Meeting either published threshold is sufficient; missing evidence cannot
+// be counted against the five-fish small-bonito allowance.
+function bonitoSize(fish){
+ const fork=fish.forkLengthCm??(fish.lengthType==='fork'?(fish.lengthCm??fish.length):undefined),kg=fish.weightKg??fish.kg??fish.weight;
+ const forkKnown=finitePositive(fork),weightKnown=finitePositive(kg);
+ if(forkKnown&&Number(fork)>=24*2.54||weightKnown&&Number(kg)>=5*.45359237)return 'regular';
+ return forkKnown&&weightKnown?'small':'unknown';
+}
+function salmonGear(fish,context,result){
+ const rig=typeof fish.rig==='object'&&fish.rig?fish.rig:typeof context.rig==='object'&&context.rig?context.rig:{};
+ const evidence=key=>fish[key]??rig[key]??context[key];
+ const checkRequired=(key,code)=>{const value=evidence(key);if(value===false)result.violations.push(issue(code,'rig','捕捞或船上持有鲑鱼时的钓钩不符合规定。',SOURCE.salmon));else if(value!==true)result.unsupported.push(unsupported(`${key}_not_recorded`));};
+ for(const [key,code]of [['barbless','salmon_barbless_required'],['singlePoint','salmon_single_point_required'],['singleShank','salmon_single_shank_required']])checkRequired(key,code);
+ for(const [key,max,code]of [['rodCount',1,'salmon_rod_limit'],['hookCount',2,'salmon_hook_limit']]){
+  const value=evidence(key);if(!Number.isInteger(Number(value))||Number(value)<1)result.unsupported.push(unsupported(`${key}_not_recorded`));else if(Number(value)>max)result.violations.push(issue(code,'rig','捕捞或船上持有鲑鱼时超过竿钩数量限制。',SOURCE.salmon,{actual:Number(value),maximum:max}));
+ }
+ const bait=evidence('bait'),trolling=evidence('trolling');
+ if(bait===true&&trolling===false){
+  checkRequired('circleHook','salmon_circle_hook_required');
+  if(Number(evidence('hookCount'))===2){checkRequired('hardTied','salmon_hard_tied_required');const spacing=evidence('hookSpacingInches');if(!finitePositive(spacing))result.unsupported.push(unsupported('hookSpacingInches_not_recorded'));else if(Number(spacing)>5)result.violations.push(issue('salmon_hook_spacing','rig','非拖钓饵钓鲑鱼的双钩间距超过五英寸。',SOURCE.salmon,{actual:Number(spacing),maximum:5}));}
+ }else if(bait!==false&&trolling!==true)result.unsupported.push(unsupported('salmon_bait_or_trolling_not_recorded'));
+ const sinker=evidence('sinkerLb');
+ if(sinker!=null&&Number.isFinite(Number(sinker))&&Number(sinker)>4){if(evidence('breakawayWeight')===false)result.violations.push(issue('salmon_sinker_limit','rig','鲑鱼钓线上的坠重超过四磅且无独立脱离装置。',SOURCE.salmon));else if(evidence('breakawayWeight')!==true)result.unsupported.push(unsupported('salmon_weight_release_not_recorded'));}
+}
+
 /** Evaluate one capture using its historical capture location/date/tackle.
  * `kept:false` suppresses retention-size/prohibited-possession findings only.
  * Season/location/method can concern take, including attempts and releases.
@@ -86,7 +120,16 @@ export function assessCatch(fish={},context={}){
  if(!sp||!date||date<RULESET_2026.validFrom||date>RULESET_2026.validThrough||!gps||gps.lat<RULESET_2026.latitudeSouth||gps.lat>RULESET_2026.latitudeNorth)return finish(result);
  const kept=retained(fish),lengthCm=Number(fish.lengthCm??fish.length),rig=rigEvidence(fish,context);
  if(sp.prohibited&&kept)result.violations.push(issue('prohibited_species','species','该鱼种全年不得保留。',sp.source,{speciesId:sp.id}));
- if(sp.minimumCm>0&&kept){if(!Number.isFinite(lengthCm)||lengthCm<=0)result.unsupported.push(unsupported('missing_fish_length'));else if(lengthCm<sp.minimumCm)result.violations.push(issue('undersize','size','鱼体全长不足规定尺寸。',sp.source,{actualCm:lengthCm,minimumCm:sp.minimumCm,minimumInches:22}));}
+ const salmonSeason=RULESET_2026.salmonSeason,minimumCm=sp.salmon&&date.slice(5)<=salmonSeason.earlyMinimumThrough?salmonSeason.earlyMinimumCm:sp.minimumCm;
+ const meetsAlternate=sp.id==='white_seabass'&&finitePositive(fish.alternateLengthCm)&&Number(fish.alternateLengthCm)>=20*2.54;
+ if(minimumCm>0&&kept&&!meetsAlternate){if(!Number.isFinite(lengthCm)||lengthCm<=0)result.unsupported.push(unsupported('missing_fish_length'));else if(lengthCm<minimumCm)result.violations.push(issue('undersize','size','鱼体全长不足规定尺寸。',sp.source,{actualCm:lengthCm,minimumCm,minimumInches:minimumCm/2.54}));}
+ if(sp.id==='pacific_bonito'&&kept&&bonitoSize(fish)==='unknown')result.unsupported.push(unsupported('bonito_fork_length_or_weight_not_recorded'));
+ const salmonAboard=fish.salmonAboardAtCapture===true||context.salmonAboard===true;
+ if(sp.salmon||salmonAboard){
+  if(date.slice(5)<salmonSeason.open||date.slice(5)>salmonSeason.close)result.violations.push(issue(sp.salmon?'closed_salmon_season':'salmon_closed_area_gear','season','当前日期不在已核实的 Monterey 鲑鱼开放期。',SOURCE.salmon,{seasonOpens:'2026-04-11',seasonCloses:'2026-09-30'}));
+  salmonGear(fish,context,result);
+ }
+ if(sp.salmon&&kept&&fish.filleted===true)result.violations.push(issue('salmon_fillet_on_vessel','retention','鲑鱼上岸前不得在船上切成鱼片。',SOURCE.salmon));
  if(sp.groundfish&&!sp.prohibited&&date.slice(5)<RULESET_2026.groundfishSeason.open)result.violations.push(issue('closed_groundfish_season','season','当前日期在船钓岩鱼与灵鳕关闭期。',SOURCE.groundfish,{seasonOpens:`${date.slice(0,4)}-04-01`,seasonCloses:`${date.slice(0,4)}-12-31`}));
  const protection=marineProtectionAt(gps);if(!protection.supported)result.unsupported.push(unsupported(protection.reason));for(const p of protection.uncertain)result.unsupported.push(unsupported('mpa_boundary_uncertain',p));for(const p of protection.areas)if(p.type==='no_take'||p.type==='pelagic_only'&&!sp.pelagic)result.violations.push(issue('protected_area_take','location','该保护区不允许捕捞这类鱼。',p.source,{areaId:p.id,areaName:p.name}));
  const groundfishAboard=Boolean(fish.groundfishAboardAtCapture??context.groundfishAboard)||Boolean(sp.groundfish);
@@ -114,21 +157,26 @@ export function assessCatch(fish={},context={}){
  */
 export function assessCatchLedger(catches=[],context={}){
  const ledgerContext={...context,date:undefined,caughtAt:undefined};
- const entries=catches.map((fish,index)=>({fish,index,date:capturedDate(fish,ledgerContext)})).sort((a,b)=>(String(a.fish.caughtAt??a.date)).localeCompare(String(b.fish.caughtAt??b.date))||a.index-b.index),daily=new Map(),possession=new Map(),seen=new Set(),results=[],ledgerUnsupported=[];let currentGeneral=0,currentRCG=0;
+ const entries=catches.map((fish,index)=>({fish,index,date:capturedDate(fish,ledgerContext)})).sort((a,b)=>(String(a.fish.caughtAt??a.date)).localeCompare(String(b.fish.caughtAt??b.date))||a.index-b.index),daily=new Map(),possession=new Map(),groupPossession=new Map(),seen=new Set(),results=[],ledgerUnsupported=[];let currentGeneral=0,currentRCG=0,currentSmallBonito=0;
  for(const {fish,index,date}of entries){
   if(fish.catchId&&seen.has(fish.catchId)){ledgerUnsupported.push(unsupported('duplicate_catch_id',{catchId:fish.catchId}));continue;}if(fish.catchId)seen.add(fish.catchId);
   const sp=identifyRegulatedSpecies(fish),result=assessCatch(fish,ledgerContext);result.index=index;results.push(result);
   if(!sp||!date||date<RULESET_2026.validFrom||date>RULESET_2026.validThrough||!retained(fish))continue;
   const gps=gpsValue(fish.caughtGPS??context.gps);if(!gps||gps.lat<RULESET_2026.latitudeSouth||gps.lat>RULESET_2026.latitudeNorth)continue;
-  let counts=daily.get(date);if(!counts){counts={species:{},rcg:0,general:0};daily.set(date,counts);}const n=counts.species[sp.id]=(counts.species[sp.id]||0)+1;
+  let counts=daily.get(date);if(!counts){counts={species:{},groups:{},rcg:0,general:0,smallBonito:0};daily.set(date,counts);}const n=counts.species[sp.id]=(counts.species[sp.id]||0)+1;
   let bag=sp.bag;
   if(sp.id==='california_halibut'&&(gps.lat<LOCAL_MPA_COVERAGE.south||gps.lat>LOCAL_MPA_COVERAGE.north||gps.lon<LOCAL_MPA_COVERAGE.west||gps.lon>LOCAL_MPA_COVERAGE.east)){bag=null;result.unsupported.push(unsupported('halibut_regional_bag_outside_local_coverage'));}
-  if(!sp.prohibited&&bag!=null&&n>bag)result.violations.push(issue('daily_species_bag','bag','当天该鱼种保留数量超过限额。',sp.source,{date,speciesId:sp.id,actual:n,maximum:bag}));
+  const bagCount=sp.bagGroup?(counts.groups[sp.bagGroup]=(counts.groups[sp.bagGroup]||0)+1):n;
+  if(!sp.prohibited&&bag!=null&&bagCount>bag)result.violations.push(issue('daily_species_bag','bag','当天该鱼种或合并鱼种保留数量超过限额。',sp.source,{date,speciesId:sp.id,...(sp.bagGroup?{group:sp.bagGroup}:{}),actual:bagCount,maximum:bag}));
+  const smallBonito=sp.id==='pacific_bonito'&&bonitoSize(fish)==='small';
+  if(smallBonito&&++counts.smallBonito>sp.smallBag)result.violations.push(issue('daily_small_bonito_bag','bag','当天小尺寸太平洋狐鲣超过五尾例外额度。',sp.source,{date,actual:counts.smallBonito,maximum:sp.smallBag}));
   if(sp.rcg&&++counts.rcg>RULESET_2026.rcgDailyBag)result.violations.push(issue('daily_rcg_bag','bag','当天岩鱼、cabezon 与 greenling 合计超过限额。',SOURCE.groundfish,{date,actual:counts.rcg,maximum:RULESET_2026.rcgDailyBag}));
   if(!sp.excludedGeneralBag&&++counts.general>RULESET_2026.generalFinfishDailyBag)result.violations.push(issue('daily_general_bag','bag','当天计入总限额的鳍鱼超过限额。',SOURCE.general,{date,actual:counts.general,maximum:RULESET_2026.generalFinfishDailyBag}));
   if(possessed(fish)){
    const p=(possession.get(sp.id)||0)+1;possession.set(sp.id,p);
-   if(!sp.prohibited&&bag!=null&&p>bag)result.violations.push(issue('species_possession','bag','当前持有该鱼种数量超过限额。',sp.source,{speciesId:sp.id,actual:p,maximum:bag}));
+   const groupCount=sp.bagGroup?(groupPossession.get(sp.bagGroup)||0)+1:p;if(sp.bagGroup)groupPossession.set(sp.bagGroup,groupCount);
+   if(!sp.prohibited&&bag!=null&&groupCount>bag)result.violations.push(issue('species_possession','bag','当前持有该鱼种或合并鱼种数量超过限额。',sp.source,{speciesId:sp.id,...(sp.bagGroup?{group:sp.bagGroup}:{}),actual:groupCount,maximum:bag}));
+   if(smallBonito&&++currentSmallBonito>sp.smallBag)result.violations.push(issue('small_bonito_possession','bag','当前持有的小尺寸太平洋狐鲣超过五尾例外额度。',sp.source,{actual:currentSmallBonito,maximum:sp.smallBag}));
    if(sp.rcg&&++currentRCG>RULESET_2026.rcgPossession)result.violations.push(issue('rcg_possession','bag','当前持有 RCG 鱼种合计超过限额。',SOURCE.groundfish,{actual:currentRCG,maximum:RULESET_2026.rcgPossession}));
    if(!sp.excludedGeneralBag&&++currentGeneral>RULESET_2026.generalFinfishPossession)result.violations.push(issue('general_possession','bag','当前持有的限额鳍鱼总量超过限额。',SOURCE.general,{actual:currentGeneral,maximum:RULESET_2026.generalFinfishPossession}));
   }

@@ -1,0 +1,65 @@
+{
+  "note": "Simulation calibration, not empirical hooked-force measurements. Same starter tackle, 12 m depth, 1.2 handle rev/s, steady winding, no hand-tuned per-fish landing time.",
+  "results": [
+    {
+      "name": "small rockfish",
+      "kg": 0.45,
+      "landed": true,
+      "seconds": 14.5,
+      "peakSimulatedThrustN": 2.9,
+      "linePaidOutMeters": 0,
+      "maximumLineMeters": 14.5,
+      "remainingEnergy": 0.16
+    },
+    {
+      "name": "ordinary rockfish",
+      "kg": 1.2,
+      "landed": true,
+      "seconds": 14.9,
+      "peakSimulatedThrustN": 6.3,
+      "linePaidOutMeters": 0,
+      "maximumLineMeters": 14.5,
+      "remainingEnergy": 0.55
+    },
+    {
+      "name": "large rockfish",
+      "kg": 5.5,
+      "landed": true,
+      "seconds": 31.6,
+      "peakSimulatedThrustN": 25.2,
+      "linePaidOutMeters": 5.3,
+      "maximumLineMeters": 17.1,
+      "remainingEnergy": 0.54
+    },
+    {
+      "name": "Chinook salmon",
+      "kg": 6,
+      "landed": true,
+      "seconds": 188.5,
+      "peakSimulatedThrustN": 37.2,
+      "linePaidOutMeters": 74.9,
+      "maximumLineMeters": 53.4,
+      "remainingEnergy": 0.03
+    },
+    {
+      "name": "white seabass",
+      "kg": 12,
+      "landed": true,
+      "seconds": 293.8,
+      "peakSimulatedThrustN": 59,
+      "linePaidOutMeters": 128.6,
+      "maximumLineMeters": 83.9,
+      "remainingEnergy": 0.03
+    },
+    {
+      "name": "Pacific bonito",
+      "kg": 3.5,
+      "landed": true,
+      "seconds": 110.3,
+      "peakSimulatedThrustN": 26.9,
+      "linePaidOutMeters": 32.7,
+      "maximumLineMeters": 24.4,
+      "remainingEnergy": 0.21
+    }
+  ]
+}

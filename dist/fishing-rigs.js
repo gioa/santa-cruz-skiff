@@ -117,6 +117,10 @@ export function stepRigLure(options={}){
 }
 
 const SPECIES=Object.freeze({
+  vermilion:{habitat:{kelp:1.2,reef:3.2,sand:.35},baits:{squid:1.4,anchovy:1.25,shrimp:1.1,sardine:1.15,jig:1.3},layer:'structure'},
+  salmon:{habitat:{kelp:.65,reef:.6,sand:1.6},baits:{squid:.45,anchovy:1.8,shrimp:.3,sardine:1.6,jig:1.1},layer:'pelagic'},
+  seabass:{habitat:{kelp:2.6,reef:.65,sand:1.4},baits:{squid:1.9,anchovy:1.3,shrimp:.25,sardine:1.6,jig:.8},layer:'school'},
+  bonito:{habitat:{kelp:.8,reef:.7,sand:1.7},baits:{squid:.6,anchovy:1.6,shrimp:.25,sardine:1.7,jig:1.5},layer:'pelagic'},
   blue:{habitat:{kelp:2.5,reef:1.8,sand:.8},baits:{squid:1.3,anchovy:1.08,shrimp:1.16,sardine:1.08,jig:1.13},layer:'school'},
   copper:{habitat:{kelp:1.85,reef:2.9,sand:.6},baits:{squid:1.35,anchovy:1.06,shrimp:1.21,sardine:1.05,jig:1.18},layer:'structure'},
   halibut:{habitat:{kelp:.78,reef:.52,sand:3.1},baits:{squid:.95,anchovy:1.5,shrimp:.9,sardine:1.35,jig:1.19},layer:'sand'},
@@ -127,6 +131,10 @@ const SPECIES=Object.freeze({
 /** Accept existing PIXEL_FISH objects, latin names or future stable IDs. */
 export function rigSpeciesKey(fish){
   const s=typeof fish==='string'?fish:`${fish?.id||''} ${fish?.latin||''} ${fish?.name||''}`;
+  if(/miniatus|vermilion|朱红/i.test(s))return'vermilion';
+  if(/tshawytscha|chinook|帝王鲑/i.test(s))return'salmon';
+  if(/nobilis|seabass|白海鲈/i.test(s))return'seabass';
+  if(/Sarda|bonito|太平洋鲣/i.test(s))return'bonito';
   if(/mystinus|blue|蓝岩鱼/i.test(s))return'blue';
   if(/caurinus|copper|铜岩鱼/i.test(s))return'copper';
   if(/californicus|halibut|大比目鱼/i.test(s))return'halibut';
@@ -149,9 +157,12 @@ export function rigFishWeights(fishes,options={}){
     else if(s.layer==='structure')layer=.07+.93*bell(above,1.1,3.4);
     else if(s.layer==='school')layer=.23+.77*bell(depth/bottom,.62,.32);
     else if(s.layer==='pelagic')layer=.17+.83*bell(depth,Math.min(5,bottom*.33),Math.max(2,bottom*.23));
-    const presentation=rig.speciesBias[key]||1;
+    const newBias={vermilion:{bottom:1.3,dropper:1.7,jig:1.5,float:.35,sabiki:.55},salmon:{bottom:.35,dropper:.3,jig:1.2,float:1.05,sabiki:.35,slider:.8},seabass:{bottom:.9,dropper:.65,slider:1.5,jig:1,float:1.2,sabiki:.2},bonito:{bottom:.3,dropper:.25,jig:1.65,float:1.25,sabiki:.8}};
+    const presentation=newBias[key]?.[rig.id]||rig.speciesBias[key]||1;
     const actionBias=key==='lingcod'||key==='copper'?activity:key==='mackerel'?.65+activity*.35:.8+activity*.2;
-    return Math.max(.008,habitat*bait*layer*presentation*actionBias*(.55+.45*freshness));
+    const warmth=key==='bonito'?clamp((number(options.waterTemp,15)-11)/7,.15,1.3):1;
+    const seasonal=key==='salmon'&&[11,12,1,2].includes(options.month)?.3:1;
+    return Math.max(.001,habitat*bait*layer*presentation*actionBias*(.55+.45*freshness)*number(fish.rarity,1)*warmth*seasonal);
   });
 }
 

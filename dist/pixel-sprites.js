@@ -238,6 +238,42 @@ function fishSprite(kind){return raster(48,24,({rect:r,px,poly:p,line:l})=>{
     p([[18,8],[22,3],[27,7]],'denim');p([[25,16],[29,20],[32,16]],'steel');
     for(let x=14;x<34;x+=4){px(x,8,'greenDark');l(x,9,x+2,11,'greenDark');}
     l(13,13,35,13,'white');r(38,9,4,4,'cream');r(40,10,2,2,'ink');px(43,13,'woodDark');l(35,10,34,14,'slate');
+  }else if(kind==='salmon'){
+    // Ocean-phase Chinook: silver flanks, dark back, adipose fin and spots on
+    // both tail lobes. Its soft fins differ from a rockfish's dorsal spines.
+    p([[8,11],[17,7],[29,6],[39,8],[46,11],[45,14],[39,17],[27,19],[15,17],[8,14],[1,20],[3,12],[1,4]],'ink');
+    p([[8,12],[17,8],[29,7],[38,9],[45,11],[44,13],[38,16],[27,18],[16,16],[8,13],[3,17],[5,12],[3,7]],'steel');
+    p([[12,12],[22,9],[34,9],[41,11],[44,13],[36,16],[27,17],[16,15]],'light');
+    p([[13,13],[26,13],[39,12],[42,13],[35,16],[26,17],[17,15]],'white');
+    p([[21,8],[24,2],[29,6],[30,8]],'slate');p([[11,9],[12,6],[15,8]],'slate');
+    p([[17,16],[17,20],[23,18]],'steel');p([[29,17],[31,21],[34,17]],'steel');p([[36,12],[28,13],[32,16]],'steel');
+    l(14,10,31,8,'denim');l(14,13,34,12,'ivory');l(36,10,35,15,'slate');
+    [[14,9],[18,8],[20,10],[24,8],[28,9],[30,7],[33,9],[5,9],[4,8],[4,15],[5,16]].forEach(([x,y])=>px(x,y,'ink'));
+    r(39,9,3,3,'ivory');px(40,10,'ink');l(41,14,45,12,'ink');
+  }else if(kind==='seabass'){
+    // White seabass has an elongated silver body, a large oblique mouth and
+    // one long notched dorsal fin, with a shallow fork to the broad tail.
+    p([[8,11],[18,7],[31,6],[41,8],[46,11],[46,14],[41,17],[27,18],[16,16],[8,14],[2,18],[3,12],[2,6]],'ink');
+    p([[8,12],[18,8],[31,7],[40,9],[45,11],[45,13],[40,16],[27,17],[16,15],[8,13],[4,16],[5,12],[4,8]],'steel');
+    p([[13,12],[23,9],[35,9],[44,11],[44,13],[38,15],[27,16],[16,14]],'light');
+    p([[15,13],[29,12],[40,12],[42,14],[36,16],[25,16]],'white');
+    p([[13,9],[15,5],[26,5],[29,7],[31,3],[33,6],[35,4],[36,7]],'slate');
+    l(15,6,25,6,'steel');l(17,7,17,8,'denim');l(20,6,20,8,'denim');l(23,6,23,8,'denim');
+    p([[19,16],[19,20],[26,18]],'steel');p([[33,16],[34,20],[38,16]],'steel');p([[37,11],[29,13],[34,15]],'blue');
+    l(13,12,35,11,'ivory');l(37,9,36,15,'slate');l(23,17,36,17,'ivory');
+    r(40,8,3,3,'gold');px(41,9,'ink');l(41,14,45,11,'ink');l(42,15,45,14,'sand');
+  }else if(kind==='bonito'){
+    // Streamlined Pacific bonito: crescent fork, narrow tail stalk, finlets,
+    // and dark stripes slanting up toward the tail across the blue back.
+    p([[8,11],[17,7],[30,5],[39,8],[47,11],[43,14],[31,19],[18,17],[8,14],[1,22],[3,13],[1,2]],'ink');
+    p([[8,12],[18,8],[30,6],[39,9],[46,11],[42,13],[31,18],[18,16],[8,13],[3,18],[5,12],[3,6]],'denim');
+    p([[12,12],[23,10],[37,10],[44,11],[40,14],[30,17],[20,15]],'light');
+    p([[15,13],[28,12],[41,12],[36,15],[29,17],[20,15]],'white');
+    p([[18,8],[21,4],[26,2],[29,6]],'navy');p([[17,16],[20,21],[26,18]],'steel');
+    p([[36,11],[27,13],[30,16]],'slate');
+    for(let x=14;x<32;x+=4)l(x,8-(x>22?1:0),x+4,11-(x>26?1:0),'ink');
+    [[9,10],[12,9],[9,14],[12,15]].forEach(([x,y])=>p([[x,y],[x+2,y-1],[x+2,y+1]],'gold'));
+    l(13,13,30,13,'ivory');l(37,9,36,14,'slate');r(40,8,3,3,'ivory');px(41,9,'ink');l(42,13,46,11,'ink');
   }else if(kind==='lingcod'){
     p([[7,11],[15,7],[34,6],[43,9],[46,12],[44,16],[35,18],[14,17],[7,14],[1,19],[2,12],[1,6]],'ink');
     p([[7,12],[16,8],[34,7],[42,10],[45,12],[43,15],[34,17],[15,16],[8,13],[3,16],[4,12],[3,9]],'greenDark');
@@ -247,12 +283,13 @@ function fishSprite(kind){return raster(48,24,({rect:r,px,poly:p,line:l})=>{
     l(17,13,29,14,'mint');r(38,8,4,4,'gold');r(40,9,2,2,'ink');l(39,14,45,13,'ink');px(43,14,'cream');l(35,10,34,15,'greenDark');
   }else{
     p([[9,11],[16,6],[31,5],[41,8],[46,12],[42,17],[30,20],[15,18],[8,15],[1,19],[3,12],[1,5]],'ink');
-    p([[8,12],[16,7],[31,6],[41,9],[45,12],[41,16],[30,19],[16,17],[8,14],[3,17],[5,12],[3,8]],'rust');
-    p([[12,11],[21,8],[33,8],[41,11],[43,13],[36,17],[22,17],[12,14]],'coral');
+    p([[8,12],[16,7],[31,6],[41,9],[45,12],[41,16],[30,19],[16,17],[8,14],[3,17],[5,12],[3,8]],kind==='vermilion'?'#a94239':'rust');
+    p([[12,11],[21,8],[33,8],[41,11],[43,13],[36,17],[22,17],[12,14]],kind==='vermilion'?'#ed7056':'coral');
     p([[14,7],[17,2],[20,5],[24,1],[27,5],[31,2],[34,6]],'rust');l(17,3,18,6,'peach');l(24,2,25,5,'peach');l(31,3,32,6,'peach');
     p([[23,17],[25,23],[31,19]],'rust');p([[31,12],[25,10],[27,15],[31,16]],'gold');
     [[16,10],[21,9],[25,8],[18,14],[23,15],[33,16]].forEach(([x,y])=>r(x,y,2,1,'peach'));
     r(37,8,5,5,'gold');r(39,9,3,3,'ink');px(39,9,'cream');l(35,10,34,15,'rust');l(41,15,45,13,'ink');
+    if(kind==='vermilion'){l(14,14,22,16,'#ffb58c');r(23,9,3,2,'#f8b69c');r(30,14,3,1,'#f8b69c');l(17,5,18,7,'#ed7056');l(24,3,25,6,'#ed7056');l(31,4,32,7,'#ed7056');}
   }
 });}
 
@@ -286,7 +323,7 @@ function iconSprite(kind){return raster(16,16,({rect:r,line:l,poly:p,px,oval:o})
 
 /** All canvases are original art at native pixel resolution. */
 export function createPixelSprites(){
-  const fish=Object.fromEntries(['rockfish','halibut','mackerel','lingcod'].map(name=>[name,fishSprite(name)]));
+  const fish=Object.fromEntries(['rockfish','vermilion','halibut','mackerel','lingcod','salmon','seabass','bonito'].map(name=>[name,fishSprite(name)]));
   const icons=Object.fromEntries(['rod','anchor','engine','backpack','fish','coin','tackle','oar','map','sun','bait','reel'].map(name=>[name,iconSprite(name)]));
   const angler=personSprite(),anglerBack=personSprite({back:true});
   const hut=hutSprite();

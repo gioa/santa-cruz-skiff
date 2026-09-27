@@ -1,5 +1,6 @@
 // First-person artwork uses the same rod pose, load, surface intersection and
 // crank speed as the simulation. It is a camera change, never another fight.
+import {reelMotion} from './pixel-fishing-feedback.js?v=20260927-pixel-v14';
 const TAU=Math.PI*2;
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 const finite=(n,f=0)=>Number.isFinite(n)?n:f;
@@ -49,7 +50,7 @@ export function fightViewGeometry(width,height,state={},options={}){
 }
 
 export function createFightView(canvas){
- const c=canvas.getContext('2d',{alpha:false});let cssWidth=390,cssHeight=844,clock=0,crankAngle=0,lastGeometry=null,lastPhase='idle',active=false;
+ const c=canvas.getContext('2d',{alpha:false});let cssWidth=390,cssHeight=844,clock=0,crankAngle=0,spoolAngle=0,lastGeometry=null,lastPhase='idle',active=false;
  const rect=(x,y,w,h,color)=>{c.fillStyle=color;c.fillRect(Math.round(x),Math.round(y),Math.max(1,Math.round(w)),Math.max(1,Math.round(h)));};
  const polygon=(points,color)=>{c.fillStyle=color;c.beginPath();points.forEach((p,i)=>c[i?'lineTo':'moveTo'](Math.round(p.x),Math.round(p.y)));c.closePath();c.fill();};
  const line=(a,b,color,width=1)=>{
@@ -99,11 +100,11 @@ export function createFightView(canvas){
  }
  function waterContact(g,s,reducedMotion){
   if(!g.lineVisible)return;const {x,y}=g.waterEntry,t=reducedMotion?0:clock;
-  const pull=s.fishState==='fight'?clamp(finite(s.rodLoadN)/24,0,1):clamp(g.bend*.7,0,.5),radius=3+(Math.sin(t*1.5)+1)*1.5+pull*2;
+  const pull=s.fishState==='fight'?clamp(g.bend,0,1):clamp(g.bend*.7,0,.5),radius=3+(Math.sin(t*1.5)+1)*1.5+pull*2;
   // Tiny rings mark line entry. Large splashes only happen when the actual fish
   // has reached the surface; a fish thirty metres down never splashes above it.
   for(let side of[-1,1]){rect(x+side*radius-(side<0?2:0),y,3,1,'#a3cbbc');rect(x+side*(radius+3)-(side<0?2:0),y+2,3,1,'#68aca3');}
-  if(g.surfaceFish&&pull>.2){const burst=Math.max(0,Math.sin(t*2.6))*(1-finite(s.stamina,100)/130);for(let i=0;i<9;i++){const a=i/9*TAU,dist=(4+burst*15)*g.scale;rect(x+Math.cos(a)*dist,y+Math.sin(a)*dist*.30-burst*(2+hash(i+99)*5),2,1,'#d6e9cf');}rect(x-3,y-1,6,2,'#c5dfc7');}
+  if(g.surfaceFish&&pull>.2){const burst=clamp(finite(s.fishMotion?.headShake)+Math.abs(finite(s.fishMotion?.lateralMps))*.3,0,1)*pull;for(let i=0;i<9;i++){const a=i/9*TAU,dist=(4+burst*15)*g.scale;rect(x+Math.cos(a)*dist,y+Math.sin(a)*dist*.30-burst*(2+hash(i+99)*5),2,1,'#d6e9cf');}rect(x-3,y-1,6,2,'#c5dfc7');}
   if(g.showFloat){rect(x-1,y-5,3,4,'#e4bb79');rect(x-1,y-7,3,3,'#c7624a');rect(x,y-9,1,2,'#273e41');}
  }
  function skiff(g){
@@ -146,7 +147,7 @@ export function createFightView(canvas){
   // steel handle. Both the painted knob and right palm use one crank endpoint.
   const r=11*k;ellipse(reel.x,reel.y,r+2*k,r+1*k,'#203e42');ellipse(reel.x,reel.y,r,r,'#a3b7a3');ellipse(reel.x,reel.y,r-2*k,r-2*k,'#365951');ellipse(reel.x,reel.y,r-4*k,r-4*k,'#c4ac71');
   for(let i=0;i<5;i++){const yy=reel.y-5*k+i*2*k;line({x:reel.x-5*k,y:yy},{x:reel.x+5*k,y:yy},i%2?'#e0ce99':'#8c815d',1);}
-  for(let i=0;i<4;i++){const a=crankAngle*.21+i*TAU/4;rect(reel.x+Math.cos(a)*(r-1)-.5,reel.y+Math.sin(a)*(r-1)-.5,1,1,'#eef0d1');}
+  for(let i=0;i<4;i++){const a=spoolAngle+i*TAU/4;rect(reel.x+Math.cos(a)*(r-1)-.5,reel.y+Math.sin(a)*(r-1)-.5,1,1,'#eef0d1');}
   line(reel,knob,'#294b48',4*k);line(reel,knob,'#c7cdb2',2*k);ellipse(reel.x,reel.y,3*k,3*k,'#d8b670');ellipse(knob.x,knob.y,5*k,3*k,'#233e3d');rect(knob.x-3*k,knob.y-2*k,6*k,1,'#6d8c78');
   if(!mounted){
    // Fingers overlap the cork and crank instead of hovering beside the tackle.
@@ -163,14 +164,14 @@ export function createFightView(canvas){
  function draw(state,dt,{active:visible=true,paused=false,reducedMotion=false,bottomInset=0}={}){
   active=Boolean(visible);if(!active)return;
   const advance=!paused&&!state.paused?clamp(finite(dt),0,.1):0;
-  clock+=advance;if(advance)crankAngle=(crankAngle+Math.max(0,finite(state.crankRate))*TAU*advance)%TAU;
+  clock+=advance;if(advance){crankAngle=(crankAngle+Math.max(0,finite(state.crankRate))*TAU*advance)%TAU;spoolAngle=(spoolAngle+reelMotion(state).spoolRadiansPerSecond*advance)%TAU;}
   const g=fightViewGeometry(canvas.width,canvas.height,state,{bottomInset:bottomInset*canvas.height/cssHeight,clock,crankAngle,reducedMotion});lastGeometry=g;lastPhase=state.fishState;
   sky(g);ocean(g,reducedMotion);waterContact(g,state,reducedMotion);skiff(g);tackle(g,state);
  }
  function snapshot(){
   if(!lastGeometry)return{active,view:'first-person',phase:lastPhase,width:cssWidth,height:cssHeight};
   const g=lastGeometry,cssPoint=p=>({x:Math.round(p.x*cssWidth/g.width),y:Math.round(p.y*cssHeight/g.height)});
-  return{active,view:'first-person',phase:lastPhase,width:cssWidth,height:cssHeight,mount:g.mount,rodElevation:g.elevation,rodAzimuth:g.azimuth,bend:g.bend,crankAngle,rodTip:cssPoint(g.tip),lineEntry:cssPoint(g.waterEntry),lineVisible:g.lineVisible,floatVisible:g.showFloat,surfaceFish:g.surfaceFish};
+  return{active,view:'first-person',phase:lastPhase,width:cssWidth,height:cssHeight,mount:g.mount,rodElevation:g.elevation,rodAzimuth:g.azimuth,bend:g.bend,crankAngle,spoolAngle,rodTip:cssPoint(g.tip),lineEntry:cssPoint(g.waterEntry),lineVisible:g.lineVisible,floatVisible:g.showFloat,surfaceFish:g.surfaceFish};
  }
  resize(cssWidth,cssHeight);return{resize,draw,snapshot};
 }

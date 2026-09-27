@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {PixelAudio,PIXEL_MUSIC_SCORE,musicEventsForStep,MUSIC_STEP_SECONDS} from '../dist/pixel-audio.js';
+import {PixelAudio,PIXEL_MUSIC_SCORE,musicEventsForStep,MUSIC_STEP_SECONDS,reelFeedbackForState} from '../dist/pixel-audio.js';
 
 class Param{
   constructor(value=0){this.value=value;this.events=[];}
@@ -94,4 +94,79 @@ test('effects have distinct recipes and rate limits, with no unlimited reel note
   assert.equal(audio.event('unknown'),false);assert.equal(audio.publicState().totalEffects,11);
   for(let i=0;i<120;i++){audio.ctx.advance(1/60);audio.update(i/60,false,0,false,{reeling:true});}
   assert.ok(audio.publicState().activeVoices<25);audio.dispose();assert.equal(audio.publicState().musicVoices,0);
+});
+
+
+const runState={fishState:'fight',reelMode:'brake',payoutRate:1.5,retrieveRate:0,crankRate:0,rodLoadN:12,dragThresholdN:12,lineSlackMeters:0};
+const advanceAudio=(audio,seconds,options)=>{for(let i=0;i<Math.ceil(seconds*60);i++){audio.ctx.advance(1/60);audio.update(audio.ctx.currentTime,false,0,false,options);}};
+
+test('drag teeth follow actual payout, with distinct open-spool and crank sounds',()=>{
+  const small=reelFeedbackForState({...runState,payoutRate:.25,rodLoadN:5}),run=reelFeedbackForState({...runState,payoutRate:2.8});
+  assert.ok(run.ratchetHz>small.ratchetHz);assert.ok(run.ratchetFrequency>small.ratchetFrequency);assert.ok(run.ratchetVolume>small.ratchetVolume);
+  const feed=reelFeedbackForState({...runState,reelMode:'free'});
+  assert.equal(feed.ratchetHz,0);assert.ok(feed.feedVolume>0);assert.equal(feed.crankVolume,0);
+  assert.equal(run.feedVolume,0);assert.equal(run.crankVolume,0);
+  const stalled=reelFeedbackForState({...runState,crankRate:1.2,retrieveRate:0});
+  assert.ok(stalled.crankVolume>0,'a handle still turns audibly while the drag slips');assert.ok(stalled.ratchetHz>0);
+  const fast=reelFeedbackForState({...runState,payoutRate:0,crankRate:2,retrieveRate:1.2});
+  const slow=reelFeedbackForState({...runState,payoutRate:0,crankRate:.5,retrieveRate:.3});
+  assert.ok(fast.gearFrequency>slow.gearFrequency);assert.ok(fast.crankVolume>slow.crankVolume);
+  assert.equal(fast.ratchetHz,0);assert.equal(reelFeedbackForState({...runState,payoutRate:0,reeling:true,slipping:true}).ratchetHz,0);
+});
+
+test('stale rates, pause, slack and nonfinite physics cannot produce phantom reel motion',()=>{
+  for(const fishState of['idle','landed','charging','flight',undefined]){
+    const f=reelFeedbackForState({...runState,fishState,crankRate:2,retrieveRate:1});
+    assert.equal(f.active,false);assert.equal(f.ratchetHz+f.feedVolume+f.crankVolume+f.lineVolume,0);
+  }
+  assert.equal(reelFeedbackForState({...runState,paused:true}).ratchetHz,0);
+  const loose=reelFeedbackForState({...runState,lineSlackMeters:3}),tight=reelFeedbackForState(runState);
+  assert.ok(loose.lineVolume<tight.lineVolume*.2);
+  const bad=reelFeedbackForState({...runState,payoutRate:Infinity,crankRate:NaN,rodLoadN:NaN,dragThresholdN:0});
+  assert.equal(bad.ratchetHz+bad.crankVolume,0);assert.ok(Object.values(bad).filter(v=>typeof v==='number').every(Number.isFinite));
+});
+
+test('ratchet has a bounded audio-clock cadence and loops stay bounded on a mobile frame budget',()=>{
+  const audio=create();audio.init();audio.toggleMusic();
+  let maxVoices=0;const options={...runState,payoutRate:8,crankRate:2,retrieveRate:.2};
+  for(let frame=0;frame<60*20;frame++){
+    audio.ctx.advance(1/60);audio.update(frame/60,false,0,false,options);maxVoices=Math.max(maxVoices,audio.publicState().reel.voices);
+  }
+  const running=audio.publicState();assert.ok(running.reel.totalTicks>500);assert.ok(running.reel.totalTicks<20*43);assert.ok(maxVoices<=10);
+  assert.equal(audio._reelLoops.size,3,'crank, gears and guide hiss are reused instead of recreated every frame');
+  const before=running.reel.totalTicks;audio.ctx.advance(90);audio.update(110,false,0,false,options);
+  assert.ok(audio.publicState().reel.totalTicks-before<=3,'a delayed frame cannot replay a backlog of ratchet teeth');
+  audio.update(110,false,0,false,{...options,fishState:'idle'});assert.equal(audio.publicState().reel.voices,0);assert.equal(audio._reelLoops.size,0);
+  audio.dispose();
+});
+
+test('music ducks for a bite and fight while the bite cue itself has no beep oscillator',()=>{
+  const audio=create();audio.init();audio.update(0,false,0,false,{fishState:'bite'});
+  assert.equal(audio.publicState().musicDuck,.23);assert.equal(audio.musicGain.gain.value,audio.musicVolume*.23);
+  const before=audio.ctx.starts.length;audio.event('bite');const cue=audio.ctx.starts.slice(before);
+  assert.equal(cue.length,2);assert.ok(cue.every(node=>node.kind==='buffer'),'the cue is a physical knock and guide noise');
+  advanceAudio(audio,.1,{...runState,fishState:'fight'});assert.equal(audio.publicState().musicDuck,.23);
+  advanceAudio(audio,.1,{fishState:'landed'});assert.equal(audio.publicState().musicDuck,1);audio.dispose();
+});
+
+test('pause, mute and idle cancel reel loops and future teeth without waiting for the next 20 Hz automation tick',()=>{
+  const audio=create();audio.init();audio.toggleMusic();
+  audio.update(0,false,0,false,runState);assert.ok(audio.publicState().reel.voices>0);
+  audio.ctx.advance(.001);audio.update(.001,false,0,false,{...runState,paused:true});assert.equal(audio.publicState().reel.voices,0);
+  advanceAudio(audio,.1,runState);assert.ok(audio.publicState().reel.voices>0);
+  audio.setPaused(true);assert.equal(audio.publicState().reel.voices,0);audio.ctx.advance(20);audio.setPaused(false);audio.update(21,false,0,false,runState);
+  assert.ok(audio.publicState().reel.voices>0);assert.ok(audio.publicState().reel.voices<=5);
+  audio.toggle();assert.equal(audio.publicState().reel.voices,0);audio.toggle();advanceAudio(audio,.1,runState);assert.ok(audio.publicState().reel.voices>0);
+  audio.setVolume(0);assert.equal(audio.publicState().reel.voices,0);advanceAudio(audio,.2,runState);assert.equal(audio.publicState().reel.voices,0);
+  audio.setVolume(.55);advanceAudio(audio,.1,runState);assert.ok(audio.publicState().reel.voices>0);audio.dispose();assert.equal(audio.publicState().reel.voices,0);
+});
+
+test('spool latch plays once on mode change and an open spool never emits drag ratchet teeth',()=>{
+  const audio=create();audio.init();audio.toggleMusic();
+  audio.update(0,false,0,false,{...runState,reelMode:'free'});const first=audio.ctx.starts.length;
+  advanceAudio(audio,.4,{...runState,reelMode:'free'});assert.equal(audio.ctx.starts.length,first);assert.equal(audio.publicState().reel.totalTicks,0);
+  const before=audio.ctx.starts.length;advanceAudio(audio,.1,{...runState,reelMode:'brake',payoutRate:0});
+  assert.equal(audio.ctx.starts.length-before,2,'only the two dry latch layers start');
+  advanceAudio(audio,.2,{...runState,reelMode:'brake',payoutRate:0});assert.equal(audio.ctx.starts.length-before,2);
+  audio.dispose();
 });

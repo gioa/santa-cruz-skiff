@@ -69,3 +69,14 @@ test('phase changes cancel gestures before the next UI refresh or pointer releas
  state.paused=false;ui.update();wheel.emit('keydown',{key:'ArrowUp'});assert.equal(ui.input(.01).reel,1.2);
  state.paused=true;assert.equal(ui.input(.01).reel,0);state.paused=false;assert.equal(ui.input(.01).reel,0,'the frame gate also cancels a held key before update() runs');
 });
+
+test('console replaces force percentages with line cues and a physical drag adjuster',t=>{
+ const {state,ui,elements}=fixture(t,'fight');
+ Object.assign(state,{rodBend:.9,rodLoadN:40,tension:99,stamina:8,payoutRate:1.2,retrieveRate:.1,paidLineMeters:26});ui.update();
+ assert.equal(elements['rod-load'].textContent,'鱼在出线');
+ assert.ok(elements['rod-pose'].attributes['aria-valuetext'].includes('竿身深弯'));
+ assert.ok(!elements['rod-pose'].attributes['aria-valuetext'].includes('%'));
+ assert.ok(elements['drag-knob'].innerHTML.includes('drag-star'));assert.ok(!elements['drag-knob'].innerHTML.includes('%'));
+ assert.equal(elements['drag-knob'].attributes['aria-valuetext'],'泄力适中，向上拧紧，向下放松');
+ Object.assign(state,{lineSlackMeters:1,payoutRate:0});ui.update();assert.equal(elements['rod-load'].textContent,'鱼线松了');
+});

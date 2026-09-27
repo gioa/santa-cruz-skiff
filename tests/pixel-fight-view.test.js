@@ -71,3 +71,22 @@ test('pause freezes artwork and reduced motion stops all procedural movement',()
  canvas.reset();view.draw(still,.1,{active:true,reducedMotion:true,bottomInset:180});assert.equal(canvas.digest(),reduced);
  canvas.reset();view.draw(s,.1,{active:false});assert.equal(canvas.count,0);assert.equal(view.snapshot().active,false);
 });
+
+test('actual payout spins the visible spool independently from the crank and pause freezes both',()=>{
+ const canvas=recordingCanvas(),view=createFightView(canvas),running=state({crankRate:1,payoutRate:1.4,retrieveRate:.2});
+ view.draw(running,.02,{active:true,reducedMotion:true});
+ const moving=view.snapshot();assert.ok(moving.crankAngle>0);assert.ok(moving.spoolAngle<0,'a fish taking line back-drives the spool, not the handle');
+ view.draw(running,.1,{active:true,paused:true,reducedMotion:true});
+ assert.equal(view.snapshot().spoolAngle,moving.spoolAngle);assert.equal(view.snapshot().crankAngle,moving.crankAngle);
+ view.draw(state({crankRate:0,payoutRate:0,retrieveRate:0}),.1,{active:true,reducedMotion:true});
+ assert.equal(view.snapshot().spoolAngle,moving.spoolAngle,'no line travel means no spool movement');
+});
+
+test('surface disturbance follows actual fish motion and never reads a stamina score',()=>{
+ const render=s=>{const canvas=recordingCanvas(),view=createFightView(canvas);view.draw(s,0,{active:true,reducedMotion:true});return canvas.digest();};
+ const surface=state({lureDepth:.5,paidLineMeters:3,fishMotion:{headShake:.9,lateralMps:.6}});
+ assert.equal(render({...surface,stamina:0}),render({...surface,stamina:100}));
+ assert.notEqual(render(surface),render({...surface,fishMotion:{headShake:0,lateralMps:0}}));
+ const deep={...surface,lureDepth:20,paidLineMeters:25};
+ assert.equal(render(deep),render({...deep,fishMotion:{headShake:0,lateralMps:0}}),'a submerged fish cannot splash above itself');
+});

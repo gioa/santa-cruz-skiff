@@ -75,7 +75,7 @@ export function getFishingLine(state,rod,{project=(x,z)=>({x,y:z}),cameraScale=6
     const dx=underwaterTarget.x-end.x,dy=underwaterTarget.y-end.y,len=Math.hypot(dx,dy)||1,tail=Math.min(7*rod.scale,len);
     underwater=[end,{x:end.x+dx/len*tail,y:end.y+dy/len*tail+2*rod.scale}];
   }
-  const free=state.reelMode==='free',slack=free?Math.min(10,3+Math.max(0,finite(state.paidLineMeters,0)-finite(state.lureDepth,0))*.25):Math.max(0,2-rod.bend*2),control=lerp(rod.tip,end,.5);control.y+=slack*rod.scale;
+  const free=state.reelMode==='free',slack=Number.isFinite(state.lineSlackMeters)?clamp(state.lineSlackMeters*1.5,0,18):free?Math.min(10,3+Math.max(0,finite(state.paidLineMeters,0)-finite(state.lureDepth,0))*.25):Math.max(0,2-rod.bend*2),control=lerp(rod.tip,end,.5);control.y+=slack*rod.scale;
   const points=[];for(let i=0;i<=16;i++){const t=i/16,u=1-t;points.push({x:u*u*rod.tip.x+2*u*t*control.x+t*t*end.x,y:u*u*rod.tip.y+2*u*t*control.y+t*t*end.y});}
   // Preserve reference identity as well as values: the line begins at the exact
   // same point used for the rod's final raster segment.

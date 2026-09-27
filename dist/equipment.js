@@ -13,7 +13,7 @@ export const GEAR_CATALOG=[
  {id:'rod_boat',slot:'rod',name:'强韧船竿',price:160,kg:.81,desc:'持续负荷更稳；竿身较重、竿尖较迟钝',strength:1.16,retrieve:1.08,sensitivity:.88},
  {id:'reel_smooth',slot:'reel',name:'顺滑泄力轮',price:145,kg:.34,desc:'减小泄力启动冲击；不增加鱼种解锁',smooth:.86},
  {id:'line_braid',slot:'line',name:'30 lb 编织主线',price:70,kg:.1,desc:'传递鱼讯更直接；低延展需要温和提竿',strength:1.14},
- {id:'leader_heavy',slot:'leader',name:'耐磨前导',price:40,kg:.12,desc:'礁石附近更耐磨；更粗的前导较显眼',strength:1.1},
+ {id:'leader_heavy',slot:'leader',name:'30 lb 耐磨前导',price:40,kg:.12,desc:'礁石附近更耐磨；更粗的前导较显眼',strength:1.1},
  {id:'rig_slider',slot:'rig',name:'滑铅钓组',price:25,kg:.12,desc:'长子线自然呈饵，适合沙底缓慢漂流',rig:'slider',hooks:1},
  {id:'rig_jig',slot:'rig',name:'铅头软饵钓组',price:35,kg:.16,desc:'轻提后放落，或缓收搜索礁区底层',rig:'jig',hooks:1},
  {id:'rig_float',slot:'rig',name:'定层浮游钓组',price:25,kg:.09,desc:'调整浮漂饵层，搜索中上层鱼群',rig:'float',hooks:1},

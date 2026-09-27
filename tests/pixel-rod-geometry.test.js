@@ -40,6 +40,11 @@ test('free-spool line has visible slack and airborne non-float rigs remain sinke
   const rod=getRodCurve(base),brake=getFishingLine(base,rod,{project}),free=getFishingLine({...base,reelMode:'free',paidLineMeters:35},rod,{project});assert.ok(free.slack>brake.slack);
   const flight=getFishingLine({...base,fishState:'flight',bobber:{x:2,z:3,height:4}},rod,{project,cameraScale:6});assert.equal(flight.showFloat,false);assert.deepEqual(flight.end,{x:12,y:-6});
 });
+test('visible line sag follows physical slack, not merely whether the bail is open',()=>{
+ const rod=getRodCurve(base),taut=getFishingLine({...base,reelMode:'free',lineSlackMeters:0},rod,{project}),slack=getFishingLine({...base,reelMode:'brake',lineSlackMeters:3},rod,{project});
+ assert.equal(taut.slack,0);assert.ok(slack.slack>taut.slack);
+ assert.strictEqual(slack.points[0],rod.tip);assert.deepEqual(slack.points.at(-1),taut.points.at(-1));
+});
 test('model surface-intersection displacement is preserved on the enlarged pixel-art rod',()=>{
   const state={...base,rodTip:{x:-128,z:-60,height:2},lineEntry:{x:-127.5,z:-59.8,height:0}},rod=getRodCurve(state,{origin:{x:100,y:150},scale:1.08}),line=getFishingLine(state,rod,{project});assert.equal(line.entrySource,'model');
   assert.ok(Math.abs(line.end.x-rod.waterBase.x-.5*6)<1e-9);assert.ok(Math.abs(line.end.y-rod.waterBase.y-.2*6)<1e-9);assert.strictEqual(line.start,rod.tip);

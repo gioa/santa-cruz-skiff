@@ -1,5 +1,5 @@
-import {GEAR_CATALOG} from './equipment.js?v=20260927-pixel-v13';
-import {RIG_PROFILES} from './fishing-rigs.js?v=20260927-pixel-v13';
+import {GEAR_CATALOG} from './equipment.js?v=20260927-pixel-v14';
+import {RIG_PROFILES} from './fishing-rigs.js?v=20260927-pixel-v14';
 
 /** Deterministic inventory model: no browser state, I/O, or random values.
  * Each rod includes its basic reel, mono and leader (null IDs). Purchased
@@ -23,7 +23,7 @@ const ITEMS=new Map(GEAR_CATALOG.map(g=>[g.id,g]));
 const HARDWARE=['reel','line','leader'];
 const FIELDS=new Set(Object.keys(BASE_ROD_ASSEMBLY));
 const BAITS=Object.freeze({squid:{name:'鱿鱼条',iconId:'bait'},anchovy:{name:'鳀鱼饵',iconId:'bait_anchovy'},shrimp:{name:'虾饵',iconId:'bait_shrimp'},sardine:{name:'沙丁鱼饵',iconId:'bait_sardine'},jig:{name:'软饵',iconId:'bait_soft'}});
-const BASIC_NAMES={reel:'基础绕线轮',line:'基础尼龙主线',leader:'基础前导线'};
+const BASIC_NAMES={reel:'基础绕线轮',line:'20 lb 尼龙主线',leader:'15 lb 前导线'};
 const clamp=(n,min,max)=>Math.max(min,Math.min(max,n));
 const finite=(n,fallback)=>typeof n==='number'&&Number.isFinite(n)?n:fallback;
 const record=v=>Boolean(v&&typeof v==='object'&&!Array.isArray(v));
