@@ -1,15 +1,17 @@
-/** Pixel gameplay. Geographic coordinates are metres; offshore navigation is compressed 1:2, while clock/fishing/swimming remain 1:1. */
-import {GEAR_CATALOG,BASE_GEAR,createProfile,equipmentStats,cargoWeight,settleFish,buyGear as purchaseGear,restock} from './equipment.js?v=20260927-pixel-v4';
-import {HARBOR,BOARDING_WALK_PATH,walkHeight,walkAllowed,walkBlocked,clearWalkSegment,canBoardFrom,harborWaterBlocked} from './harbor-layout.js?v=20260927-pixel-v4';
-import {FISHING_SPOTS,toGPS,bearingDegrees,onLand,onPier,MAP_BOUNDS} from './geography.js?v=20260927-pixel-v4';
-import {depthAt,depthInfoAt} from './bathymetry.js?v=20260927-pixel-v4';
-import {waterRoute,resolveVesselContact,contactAwareControl} from './navigation.js?v=20260927-pixel-v4';
-import {createVesselState,stepVessel,syncVessel,vesselWind,vesselAutopilot} from './vessel-physics.js?v=20260927-pixel-v4';
-import {newImmersion,stepImmersion,ladderPoint} from './swimming.js?v=20260927-pixel-v4';
-import {RIG_PROFILES,getRigProfile,stepRigLure,weightedRigFish} from './fishing-rigs.js?v=20260927-pixel-v4';
-import {assessCatchLedger,identifyRegulatedSpecies} from './fishing-regulations.js?v=20260927-pixel-v4';
-import {FishingPatrol} from './fish-patrol.js?v=20260927-pixel-v4';
-import {navigationStepScale} from './pixel-navigation-scale.js?v=20260927-pixel-v4';
+/** Pixel gameplay. Offshore travel uses a 1:2 map scale and the calendar clock runs at 2x. Input, fishing, swimming and animations use active real seconds. */
+import {GEAR_CATALOG,BASE_GEAR,createProfile,equipmentStats,cargoWeight,settleFish,buyGear as purchaseGear,restock} from './equipment.js?v=20260927-pixel-v5';
+import {HARBOR,BOARDING_WALK_PATH,walkHeight,walkAllowed,walkBlocked,clearWalkSegment,canBoardFrom,harborWaterBlocked} from './harbor-layout.js?v=20260927-pixel-v5';
+import {FISHING_SPOTS,toGPS,bearingDegrees,onLand,onPier,MAP_BOUNDS} from './geography.js?v=20260927-pixel-v5';
+import {depthAt,depthInfoAt} from './bathymetry.js?v=20260927-pixel-v5';
+import {waterRoute,resolveVesselContact,contactAwareControl} from './navigation.js?v=20260927-pixel-v5';
+import {createVesselState,stepVessel,syncVessel,vesselWind,vesselAutopilot} from './vessel-physics.js?v=20260927-pixel-v5';
+import {newImmersion,stepImmersion,ladderPoint} from './swimming.js?v=20260927-pixel-v5';
+import {RIG_PROFILES,getRigProfile,stepRigLure,weightedRigFish} from './fishing-rigs.js?v=20260927-pixel-v5';
+import {assessCatchLedger,identifyRegulatedSpecies} from './fishing-regulations.js?v=20260927-pixel-v5';
+import {FishingPatrol} from './fish-patrol.js?v=20260927-pixel-v5';
+import {NAVIGATION_COMPRESSION,navigationStepScale} from './pixel-navigation-scale.js?v=20260927-pixel-v5';
+export const GAME_TIME_SCALE=1/NAVIGATION_COMPRESSION;
+const pacificClock=new Intl.DateTimeFormat('en-GB',{timeZone:'America/Los_Angeles',hour:'2-digit',minute:'2-digit',second:'2-digit',hourCycle:'h23'});
 export {GEAR_CATALOG,BASE_GEAR,HARBOR,BOARDING_WALK_PATH,FISHING_SPOTS};
 export const PIXEL_FISH=[
  {name:'蓝岩鱼',latin:'Sebastes mystinus',color:'#718ba8',min:22,max:39,weight:.7,power:.86,spot:'kelp',bait:'squid'},
@@ -39,7 +41,7 @@ function pacificDayStart(now){
  return new Date(base+(6-hour)*3600000).toISOString();
 }
 function initialState(profile){return{
- version:4,edition:'pixel',mode:'intro',phase:'walk',time:0,elapsed:0,clock:'06:00:00',paused:false,
+ version:4,edition:'pixel',mode:'intro',phase:'walk',time:0,elapsed:0,gameElapsed:0,timeScale:GAME_TIME_SCALE,clock:'06:00:00',paused:false,
  playerX:HARBOR.spawnX,playerZ:HARBOR.spawnZ,yaw:0,walking:false,walkRoute:[],autoWalk:false,
  boatX:HARBOR.boatX,boatZ:HARBOR.boatZ,heading:0,speed:0,tiller:0,roll:0,pitch:0,
  launchStage:'stored',launchProgress:0,loaded:false,moored:true,engine:false,throttle:0,fuel:100,anchor:false,
@@ -60,7 +62,7 @@ export class PixelSimulation {
  navigationScale(state=this.state){return this.navigationScaleOverride?this.navigationScaleOverride(state):navigationStepScale(state);}
  hasGear(id){const s=this.state;return s.profile.owned.includes(id)&&s.packed.includes(id);}
  navigationInstruments(){const s=this.state,p=s.mode==='walk'?{x:s.playerX,z:s.playerZ}:s.mode==='swim'&&s.swim?s.swim:{x:s.boatX,z:s.boatZ},chart=this.hasGear('nautical_chart'),compass=this.hasGear('compass'),gps=this.hasGear('gps'),sounder=this.hasGear('sounder');return{chart,compass,gps,sounder,heading:compass||gps?bearingDegrees(s.mode==='boat'?s.heading:s.yaw):null,gpsPosition:gps?toGPS(p.x,p.z):null,depth:sounder?depthInfoAt(s.boatX,s.boatZ):null,speedKnots:gps?Math.abs(s.speed)*1.94384:null};}
- captureTimestamp(){return new Date(Date.parse(this.state.dayStartAt)+this.state.elapsed*1000).toISOString();}
+ captureTimestamp(){return new Date(Date.parse(this.state.dayStartAt)+Math.round(this.state.gameElapsed*1000)).toISOString();}
  inspectionPending(){return ['approaching','checking'].includes(this.state.inspection?.phase);}
  inspectionChecking(){return this.state.inspection?.phase==='checking';}
  stopPropulsion(){const s=this.state;s.engine=false;s.throttle=0;s.waypoint=null;s.waterRoute=[];this.transientThrottle=false;}
@@ -72,7 +74,7 @@ export class PixelSimulation {
  start(resume=false){
   const s=this.state;if(s.mode!=='intro')return this.notify('',null,false);
   if(resume&&this.saved?.edition==='pixel'){
-   const p=this.saved;Object.assign(s,clone(p),{profile:createProfile(p.profile),mode:p.mode==='boat'?'boat':'walk',engine:false,throttle:0,speed:0,waypoint:null,waterRoute:[],walkRoute:[],autoWalk:false,casting:false,castFlight:null,bobber:null,fishState:'idle',fish:null,standing:false,swim:null,docking:null,paused:false,time:0,elapsed:0,clock:'06:00:00',events:[],tension:0,lureDepth:0,lineDistance:0,castPower:0,reeling:false,pumping:false,arrival:null});
+   const p=this.saved;Object.assign(s,clone(p),{profile:createProfile(p.profile),mode:p.mode==='boat'?'boat':'walk',engine:false,throttle:0,speed:0,waypoint:null,waterRoute:[],walkRoute:[],autoWalk:false,casting:false,castFlight:null,bobber:null,fishState:'idle',fish:null,standing:false,swim:null,docking:null,paused:false,time:0,elapsed:0,gameElapsed:0,timeScale:GAME_TIME_SCALE,clock:'06:00:00',events:[],tension:0,lureDepth:0,lineDistance:0,castPower:0,reeling:false,pumping:false,arrival:null});
    s.packed=(p.packed||[]).filter(id=>s.profile.owned.includes(id));s.catches=p.catches||[];
    if(s.mode==='walk'){s.playerX=HARBOR.spawnX;s.playerZ=HARBOR.spawnZ;s.loaded=false;}
    // Restoring an interrupted immersion is the same explicit free recovery as
@@ -157,7 +159,7 @@ export class PixelSimulation {
  snapshot(){const copy=clone(this.state);copy.events=[];copy.toast='';copy.toastId=0;return copy;}
 
  step(dt,input={}){
-  const s=this.state;if(s.mode==='intro'||s.paused||!Number.isFinite(dt)||dt<=0)return s;dt=Math.min(.25,dt);s.time+=dt;s.elapsed+=dt;s.clock=this.clock();s.walking=false;
+  const s=this.state;if(s.mode==='intro'||s.paused||!Number.isFinite(dt)||dt<=0)return s;dt=Math.min(.25,dt);s.time+=dt;s.elapsed+=dt;s.gameElapsed+=dt*GAME_TIME_SCALE;s.clock=this.clock();s.walking=false;
   if(s.launchStage==='lowering'){s.launchProgress=Math.min(1,s.launchProgress+dt/24);if(s.launchProgress===1){s.launchStage='afloat';s.launchProgress=0;this.notify('木艇已下水，可以登船。');}}
   if(s.docking){this.stepDocking(dt);this.stepPatrol(dt);return s;}
   this.stepBoat(dt,input);
@@ -166,7 +168,7 @@ export class PixelSimulation {
   else if(s.standing)this.stepDeck(dt,input);
   this.stepFishing(dt,input);this.stepPatrol(dt);return s;
  }
- clock(){const seconds=Math.floor(6*3600+this.state.elapsed)%86400;return`${String(Math.floor(seconds/3600)).padStart(2,'0')}:${String(Math.floor(seconds/60)%60).padStart(2,'0')}:${String(seconds%60).padStart(2,'0')}`;}
+ clock(){if(!this.state.dayStartAt)return'06:00:00';return pacificClock.format(new Date(this.captureTimestamp()));}
  stepWalking(dt,input){const s=this.state;let dx=finite(input.moveX),dz=finite(input.moveZ),magnitude=Math.hypot(dx,dz);if(magnitude>.05){s.walkRoute=[];s.autoWalk=false;if(magnitude>1){dx/=magnitude;dz/=magnitude;}}else if(s.walkRoute.length){let target=s.walkRoute[0],d=Math.hypot(target.x-s.playerX,target.z-s.playerZ);
    // The stair is only 1.4 m wide. Reach its actual vertices: accepting a point
    // 12 cm early cuts a diagonal over the connector/landing edge. Movement is
@@ -219,7 +221,7 @@ export class PixelSimulation {
  publicState(){
   const s=this.state,p=s.mode==='walk'?{x:s.playerX,z:s.playerZ}:s.mode==='swim'?s.swim:{x:s.boatX,z:s.boatZ},nav=this.navigationInstruments(),fish=s.fish?clone(s.fish):null;if(fish&&!nav.gps)delete fish.caughtGPS;
   const presentation=s.rigPresentation?{...s.rigPresentation,depth:nav.sounder?s.rigPresentation.depth:null,targetDepth:nav.sounder?s.rigPresentation.targetDepth:null}:null;
-  return{edition:'pixel',renderer:'Canvas 2D',version:4,mode:s.mode,phase:s.phase,time:s.clock,dayStartAt:s.dayStartAt,activeSeconds:Math.round(s.elapsed),position:{x:round(p.x),z:round(p.z)},boat:{x:round(s.boatX),z:round(s.boatZ),heading:nav.compass||nav.gps?round(s.heading,3):null},navigation:nav,navigationScale:s.navigationScale,gps:nav.gpsPosition,referenceDepth:nav.depth,launchStage:s.launchStage,launchProgress:round(s.launchProgress,2),packed:[...s.packed],profile:{credits:s.profile.credits,owned:[...s.profile.owned],stock:{...s.profile.stock}},loaded:s.loaded,moored:s.moored,engine:s.engine,throttle:round(s.throttle,2),anchor:s.anchor,speedKnots:nav.speedKnots==null?null:round(nav.speedKnots),fuel:Math.round(s.fuel),standing:s.standing,swim:s.swim?clone(s.swim):null,waypoint:s.waypoint?.name||null,arrival:s.arrival,fishState:s.fishState,casting:s.casting,castPower:round(s.castPower,2),rig:s.rig,rigWeightGrams:s.rigWeightGrams,fishingDepthMeters:s.fishingDepthMeters,rigPresentation:presentation,hookCount:getRigProfile(s.rig).hooks,paidLineMeters:round(s.paidLineMeters),tension:Math.round(s.tension),stamina:Math.round(s.stamina),lineDistance:round(s.lineDistance),lureDepth:nav.sounder?round(s.lureDepth):null,fish,casts:s.casts,catches:s.catches.map(f=>({name:f.name,length:f.length,kg:f.kg,kept:f.kept,settled:Boolean(f.settled),confiscated:Boolean(f.confiscated),caughtAt:f.caughtAt,rig:f.rig,hookCount:f.hookCount})),inspection:s.inspection?clone(s.inspection):null,lastInspection:s.lastInspection?clone(s.lastInspection):null,misses:s.misses,breaks:s.breaks,sailedMeters:Math.round(s.sailed),walkedMeters:Math.round(s.walked),paused:s.paused,interaction:this.interaction(),tripComplete:s.tripComplete,conditions:{...this.conditions}};
+  return{edition:'pixel',renderer:'Canvas 2D',version:4,mode:s.mode,phase:s.phase,time:s.clock,dayStartAt:s.dayStartAt,activeSeconds:Math.round(s.elapsed),gameSeconds:Math.round(s.gameElapsed),timeScale:GAME_TIME_SCALE,position:{x:round(p.x),z:round(p.z)},boat:{x:round(s.boatX),z:round(s.boatZ),heading:nav.compass||nav.gps?round(s.heading,3):null},navigation:nav,navigationScale:s.navigationScale,gps:nav.gpsPosition,referenceDepth:nav.depth,launchStage:s.launchStage,launchProgress:round(s.launchProgress,2),packed:[...s.packed],profile:{credits:s.profile.credits,owned:[...s.profile.owned],stock:{...s.profile.stock}},loaded:s.loaded,moored:s.moored,engine:s.engine,throttle:round(s.throttle,2),anchor:s.anchor,speedKnots:nav.speedKnots==null?null:round(nav.speedKnots),fuel:Math.round(s.fuel),standing:s.standing,swim:s.swim?clone(s.swim):null,waypoint:s.waypoint?.name||null,arrival:s.arrival,fishState:s.fishState,casting:s.casting,castPower:round(s.castPower,2),rig:s.rig,rigWeightGrams:s.rigWeightGrams,fishingDepthMeters:s.fishingDepthMeters,rigPresentation:presentation,hookCount:getRigProfile(s.rig).hooks,paidLineMeters:round(s.paidLineMeters),tension:Math.round(s.tension),stamina:Math.round(s.stamina),lineDistance:round(s.lineDistance),lureDepth:nav.sounder?round(s.lureDepth):null,fish,casts:s.casts,catches:s.catches.map(f=>({name:f.name,length:f.length,kg:f.kg,kept:f.kept,settled:Boolean(f.settled),confiscated:Boolean(f.confiscated),caughtAt:f.caughtAt,rig:f.rig,hookCount:f.hookCount})),inspection:s.inspection?clone(s.inspection):null,lastInspection:s.lastInspection?clone(s.lastInspection):null,misses:s.misses,breaks:s.breaks,sailedMeters:Math.round(s.sailed),walkedMeters:Math.round(s.walked),paused:s.paused,interaction:this.interaction(),tripComplete:s.tripComplete,conditions:{...this.conditions}};
  }
 
 }

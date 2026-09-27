@@ -31,7 +31,7 @@ test('handheld GPS follows walking and swimming positions rather than the moored
  const sim=prepared(['gps']);Object.assign(sim.state,{mode:'walk',playerX:HARBOR.spawnX,playerZ:HARBOR.spawnZ});assert.deepEqual(sim.navigationInstruments().gpsPosition,toGPS(HARBOR.spawnX,HARBOR.spawnZ));sim.enterWater(HARBOR.boatX+3,HARBOR.boatZ+2,1);assert.deepEqual(sim.navigationInstruments().gpsPosition,toGPS(sim.state.swim.x,sim.state.swim.z));
 });
 
-test('offshore navigation covers about twice the geography while clock, fuel and displayed vessel speed keep real time',()=>{
+test('offshore navigation covers about twice the geography while fuel and vessel speed stay unscaled and both modes share the 2x clock',()=>{
  const fast=prepared(),real=prepared([],{navigationScale:()=>1});for(const sim of[fast,real]){offshore(sim);sim.toggleEngine();sim.setThrottle(.7);run(sim,60);}
  assert.ok(fast.state.sailed/real.state.sailed>1.8&&fast.state.sailed/real.state.sailed<2.2);assert.equal(fast.state.clock,real.state.clock);assert.ok(Math.abs(fast.state.elapsed-60)<1e-7);assert.ok(Math.abs(fast.state.speed-real.state.speed)<.05);assert.ok(Math.abs(fast.state.fuel-real.state.fuel)<1e-8);assert.equal(fast.state.navigationScale,2);
  fast.toggleEngine();run(fast,.1);assert.equal(fast.state.navigationScale,1);fast.jump();const before=fast.state.swim.seconds;run(fast,2);assert.ok(Math.abs(fast.state.swim.seconds-before-2)<1e-6);

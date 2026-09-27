@@ -32,11 +32,11 @@ The touch interface remains visible on all devices, supports separate pointer ow
 ## Implementation
 
 - `pixel-sprites.js`: original authored low-resolution sprites; no downloaded sprite pack.
-- `pixel-world.js`: nearest-neighbour rendering, smooth camera, animated water/birds/wakes, left landing and davit, fishing line attached to rod tip and driver's hand attached to tiller.
+- `pixel-world.js`: nearest-neighbour rendering, edge-triggered deadzone camera, animated water/birds/wakes, left landing and davit, fishing line attached to rod tip and driver's hand attached to tiller.
 - `pixel-sim.js`: DOM-free game model and validated player actions.
 - `pixel-game.js` / `pixel.css`: interface, keyboard/touch input, menus, saves, audio and page-scoped accessible tools.
 
-The edition reuses the real metre-coordinate OSM coastline, wharf and building footprints, NOAA depth grid, SI vessel dynamics, hull collisions, swimming model, gear catalogue and economic invariants. The 24-second davit sequence, walking, fishing and game clock advance at 1:1 active time; offshore boat passages use the compressed scale described below. New and resumed days start at 06:00. Menus pause the clock. Portrait and landscape share the same simulation.
+The edition reuses the real metre-coordinate OSM coastline, wharf and building footprints, NOAA depth grid, SI vessel dynamics, hull collisions, swimming model, gear catalogue and economic invariants. The 24-second davit sequence, walking and fishing use active real-time durations. The game calendar advances at 2× active real time to match the 1:2 offshore passage scale; physical dynamics do not receive a second time multiplier. New and resumed days start at 06:00. Menus pause the clock. Portrait and landscape share the same simulation.
 
 The equipment catalogue has free starter gear plus rods, reel, line, leaders, several rigs/baits, sinkers, larger cooler, sounder and drift equipment. There are five representative fish species. Habitat, depth, bait and tackle affect probabilities; species are not locked behind specific purchases. The fish reward ledger prevents double settlement. Retained fish require a counter visit; released fish earn a recorded release reward.
 
@@ -54,7 +54,7 @@ Sources: `dist/SOURCES.html`, `dist/credits.html`, `dist/data/`, and `qa/wharf-c
 
 ## September 27 gameplay expansion
 
-- **Compressed passages:** offshore powered navigation uses a 1:2 game-distance scale, smoothly returning to full scale near the landing. GPS and shoreline coordinates are unchanged. Walking, swimming, the davit, fishing and the 06:00 clock retain normal active-time pacing.
+- **Compressed passages:** offshore powered navigation uses a 1:2 game-distance scale, smoothly returning to full scale near the landing. GPS and shoreline coordinates are unchanged. Walking, swimming, the davit and fishing retain normal active-time pacing; the calendar beginning at 06:00 now runs at 2× active real time.
 - **Earn your instruments:** no starting chart, GPS, compass or depth sounder. A purchased instrument must also be packed. A paper chart enables route selection but has no own-position marker. GPS adds position/speed; the compass adds heading; the sounder adds depth and a historical bottom profile.
 - **Six fishing presentations:** single-hook bottom, two-hook dropper, sliding sinker, leadhead soft plastic, slip float and two-hook feather rig. Sinker mass, current, target layer, lifting/retrieval and structure affect sinking, attraction, snag risk and species weights. Every modelled species retains a nonzero encounter weight; there are no equipment species unlocks.
 - **Wildlife:** occasional bait schools with feeding seabirds, dolphin pods and seasonal whales. Region, bottom depth, daylight and sea conditions affect availability. Wildlife uses its own random source. Rates are deliberately illustrative game tuning, not observed population/catch rates.
@@ -72,3 +72,13 @@ Primary references:
 - [Natural Bridges](https://wildlife.ca.gov/Conservation/Marine/MPAs/Natural-Bridges) and [Soquel Canyon](https://wildlife.ca.gov/Conservation/Marine/MPAs/Soquel-Canyon)
 - [NOAA Monterey Bay seasonal wildlife](https://montereybay.noaa.gov/visitor/seasons.html)
 - Technique/ecology citations and game-tuning boundaries are embedded in `fishing-rigs.js` and `pixel-wildlife.js`.
+
+## Pixel usability update
+
+- Persistent 30-slot backpack and shore locker, with original icons for all 30 catalogue items. Tap an item for details; move to an empty slot or swap occupied slots. Mouse dragging and keyboard grid navigation are also supported. Buying and packing still require the counter.
+- Walking keeps the camera still across a broad screen deadzone. Scene geometry uses cached horizontal/vertical art outlines with a shared integer camera offset, while real geographic collision polygons remain unchanged.
+- The calendar runs at 2× active real time, including capture timestamps. Menus pause simulation. Every new or resumed day starts at 06:00.
+- Worker, boarding, engine, anchor and ladder actions follow their scene targets. The joystick and held fishing controls stay in the thumb areas.
+- Original 16-bar, 100 BPM background music plus interaction, footsteps, casting, water entry, bites, reeling, catches, purchase and engine effects. Music and master sound are separately switchable; music volume is adjustable and saved. Audio starts only after a user gesture, pauses in the background and continues through inventory menus.
+
+See `qa/pixel-usability/PLAYTEST.md` for this update’s actual browser checks.

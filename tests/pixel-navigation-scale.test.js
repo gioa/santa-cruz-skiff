@@ -95,7 +95,7 @@ function voyage(compressed,dt){
   assert.equal(sim.selectWaypoint('dock').ok,true);
   const back=until(sim,()=>sim.state.arrival==='dock',dt,800,observe);
   assert.ok(Math.abs(sim.state.speed)<1.1);
-  assert.ok(Math.abs(sim.state.elapsed-departureElapsed-out-back)<1e-6,'clock must use unscaled wall time');
+  assert.ok(Math.abs(sim.state.elapsed-departureElapsed-out-back)<1e-6,'QA active time must use unscaled wall time');
   assert.equal(sim.state.walked,departureWalked);
   assert.ok(maxSpeed>2&&maxSpeed<4);
   assert.ok(maxStep<=maxSpeed*dt*(compressed?2:1)+.01,'no route teleport or inflated position jump');
