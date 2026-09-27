@@ -1,5 +1,5 @@
-import {GEAR_CATALOG} from './equipment.js?v=20260927-pixel-v7';
-import {RIG_PROFILES} from './fishing-rigs.js?v=20260927-pixel-v7';
+import {GEAR_CATALOG} from './equipment.js?v=20260927-pixel-v8';
+import {RIG_PROFILES} from './fishing-rigs.js?v=20260927-pixel-v8';
 
 /** Deterministic inventory model: no browser state, I/O, or random values.
  * Each rod includes its basic reel, mono and leader (null IDs). Purchased

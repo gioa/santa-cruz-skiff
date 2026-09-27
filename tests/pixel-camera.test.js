@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {cameraOffset,projectPixel,unprojectPixel,cameraDeadzone,stepDeadzoneCamera,keepCameraPointsVisible,cameraZoomForState,zoomCameraAt,rectilinearOutline} from '../dist/pixel-camera.js';
+import {skiffScale} from '../dist/pixel-boat-geometry.js';
 const initial=()=>({x:-17,z:-51,scale:6,width:640,height:360});
 
 test('walking around the shop and most of the boarding route leaves the scenery still',()=>{
@@ -79,6 +80,13 @@ test('southbound boats stop above the fixed CSS console on tall, short and lands
 });
 test('tiny viewports cannot invert the boat deadzone',()=>{
   for(const height of[160,220,260,320]){const camera={x:0,z:0,scale:6,width:560,height,viewport:{height,bottom:126,gap:10}},box=cameraDeadzone(camera,'boat');assert.ok(box.top>=0);assert.ok(box.bottom>=box.top);assert.ok(box.bottom<=height-126);const next=stepDeadzoneCamera(camera,{x:0,z:500},{mode:'boat'});assert.equal(projectPixel(next,0,500).y,box.bottom);}
+});
+test('console clearance reserves the same hull scale as dry and occupied boats at every zoom',()=>{
+  for(const [width,height,cssHeight,bottom]of[[640,360,720,232],[328,710,844,232],[300,533,568,232],[560,315,320,126]])for(const scale of[2,3,6,9]){
+    const camera={x:0,z:0,scale,width,height,viewport:{height:cssHeight,bottom,gap:10}},box=cameraDeadzone(camera,'boat'),visibleBottom=(cssHeight-bottom-10)*height/cssHeight;
+    assert.ok(box.bottom+54*skiffScale(scale)<=visibleBottom+1,`scale ${scale} hull enters console`);
+    assert.ok(box.top<=box.bottom,'camera deadzone remains ordered');
+  }
 });
 test('long casts fit the unobscured playfield above the console in both directions',()=>{
   for(const [width,height,cssHeight,bottom]of[[640,360,720,232],[328,710,844,232],[300,533,568,232],[560,315,320,126]])for(const dz of[-33,33]){

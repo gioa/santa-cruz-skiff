@@ -7,7 +7,7 @@ const {walkAllowed,walkBlocked}=await import('../dist/harbor-layout.js');
 const now=()=>new Date('2026-09-27T20:00:00Z');
 const run=(sim,seconds,input={})=>{for(let t=0;t<seconds-1e-8;t+=.1)sim.step(Math.min(.1,seconds-t),input);};
 function equipped(items=[]){const sim=new PixelSimulation({now,rng:()=>.05,patrolRng:()=>.9,profile:{version:2,credits:5000}});sim.start();Object.assign(sim.state,{playerX:HARBOR.counterX,playerZ:HARBOR.counterZ});for(const id of items)assert.equal(sim.buyGear(id).ok,true,id);Object.assign(sim.state,{playerX:HARBOR.spawnX,playerZ:HARBOR.spawnZ});return sim;}
-function aboard(sim){Object.assign(sim.state,{playerX:HARBOR.boardingX,playerZ:HARBOR.boardingZ,launchStage:'afloat'});assert.equal(sim.board().ok,true);sim.unmoor();}
+function aboard(sim){Object.assign(sim.state,{playerX:HARBOR.counterX,playerZ:HARBOR.counterZ});assert.equal(sim.launchBoat().ok,true);run(sim,24.1);Object.assign(sim.state,{playerX:HARBOR.boardingX,playerZ:HARBOR.boardingZ});assert.equal(sim.board().ok,true);sim.unmoor();}
 
 test('fresh base gear is enabled and backpack changes are portable without granting supplies or shop access',()=>{
  const sim=equipped(['gps']);assert.deepEqual(sim.state.packed,BASE_GEAR.map(g=>g.id));assert.equal(sim.state.pfd,true);assert.equal(sim.atCounter,false);assert.equal(sim.equip('gps').ok,true);assert.equal(sim.hasGear('gps'),true);sim.state.fuel=37;sim.state.profile.stock.squid=2;sim.equip('rod');assert.equal(sim.packStarter().ok,true);assert.equal(sim.hasGear('rod'),true);assert.equal(sim.state.fuel,37);assert.equal(sim.state.profile.stock.squid,2);assert.equal(sim.buyGear('rig_float').ok,false);assert.equal(sim.restock().ok,false);assert.equal(sim.trade().ok,false);

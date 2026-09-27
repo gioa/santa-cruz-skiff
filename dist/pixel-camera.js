@@ -1,5 +1,6 @@
 // Camera and presentation geometry only. Gameplay coordinates and collision
 // polygons are never rewritten by this module.
+import {skiffScale} from './pixel-boat-geometry.js?v=20260927-pixel-v8';
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 const finite=(n,f=0)=>Number.isFinite(n)?n:f;
 export function cameraOffset(camera){return{x:Math.round(camera.width*.5-camera.x*camera.scale),y:Math.round(camera.height*.47-camera.z*camera.scale)};}
@@ -17,8 +18,8 @@ export function cameraDeadzone(camera,mode='walk'){
     // The CSS console has a fixed height, so a percentage alone cannot keep a
     // boat visible on both tall and short phones. Reserve its rotated sprite
     // radius as well as the console; collapse a tiny playfield safely.
-    const view=viewportMetrics(camera),radius=54*clamp(camera.scale*.18,.78,1.18);
-    bottomEdge=Math.min(bottomEdge,Math.floor(Math.max(view.bottom/2,view.bottom-radius-view.gap)));
+    const view=viewportMetrics(camera),radius=54*skiffScale(camera.scale);
+    bottomEdge=Math.min(bottomEdge,Math.floor(Math.max(0,view.bottom-radius-view.gap)));
   }
   return{left:Math.round(width*horizontal),right:Math.round(width*(1-horizontal)),top:Math.min(Math.round(height*top),bottomEdge),bottom:bottomEdge};
 }

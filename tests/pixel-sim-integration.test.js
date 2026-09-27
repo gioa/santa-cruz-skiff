@@ -13,7 +13,7 @@ function until(sim,predicate,seconds=100,input={}){for(let elapsed=0;elapsed<sec
 function prepared(gear=[],options={}){
  const sim=new PixelSimulation({now,rng:()=>.05,patrolRng:()=>.9,profile:{version:2,credits:2000},...options});sim.start();Object.assign(sim.state,{playerX:HARBOR.counterX,playerZ:HARBOR.counterZ});sim.packStarter();
  for(const id of gear){assert.equal(sim.buyGear(id).ok,true,id);assert.equal(sim.equip(id).ok,true,id);}
- Object.assign(sim.state,{playerX:HARBOR.boardingX,playerZ:HARBOR.boardingZ,launchStage:'afloat'});assert.equal(sim.board().ok,true);sim.unmoor();return sim;
+ assert.equal(sim.launchBoat().ok,true);run(sim,24.1);Object.assign(sim.state,{playerX:HARBOR.boardingX,playerZ:HARBOR.boardingZ});assert.equal(sim.board().ok,true);sim.unmoor();return sim;
 }
 function offshore(sim,index=1){const p=FISHING_SPOTS[index];Object.assign(sim.state,{boatX:p.x,boatZ:p.z,heading:0,speed:0,engine:false,anchor:false,moored:false});syncVessel(sim.vessel,{x:p.x,z:p.z,heading:0,clearMotion:true});}
 function cast(sim){assert.equal(sim.startCast().ok,true);run(sim,.3);assert.equal(sim.releaseCast().ok,true);until(sim,s=>s.fishState==='sinking'||s.fishState==='waiting',5);}
@@ -32,8 +32,8 @@ test('handheld GPS follows walking position rather than the moored boat and jump
 });
 
 test('offshore navigation covers about twice the geography while fuel and vessel speed stay unscaled and both modes share the 2x clock',()=>{
- const fast=prepared(),real=prepared([],{navigationScale:()=>1});for(const sim of[fast,real]){offshore(sim);sim.toggleEngine();sim.setThrottle(.7);run(sim,60);}
- assert.ok(fast.state.sailed/real.state.sailed>1.8&&fast.state.sailed/real.state.sailed<2.2);assert.equal(fast.state.clock,real.state.clock);assert.ok(Math.abs(fast.state.elapsed-60)<1e-7);assert.ok(Math.abs(fast.state.speed-real.state.speed)<.05);assert.ok(Math.abs(fast.state.fuel-real.state.fuel)<1e-8);assert.equal(fast.state.navigationScale,2);
+ const fast=prepared(),real=prepared([],{navigationScale:()=>1}),departureTime=fast.state.elapsed;for(const sim of[fast,real]){offshore(sim);sim.toggleEngine();sim.setThrottle(.7);run(sim,60);}
+ assert.ok(fast.state.sailed/real.state.sailed>1.8&&fast.state.sailed/real.state.sailed<2.2);assert.equal(fast.state.clock,real.state.clock);assert.ok(Math.abs(fast.state.elapsed-departureTime-60)<1e-7);assert.ok(Math.abs(fast.state.speed-real.state.speed)<.05);assert.ok(Math.abs(fast.state.fuel-real.state.fuel)<1e-8);assert.equal(fast.state.navigationScale,2);
  fast.toggleEngine();run(fast,.1);assert.equal(fast.state.navigationScale,1);assert.equal(fast.jump().ok,false);const before=fast.state.elapsed;run(fast,2);assert.ok(Math.abs(fast.state.elapsed-before-2)<1e-6);assert.equal(fast.state.mode,'boat');
 });
 

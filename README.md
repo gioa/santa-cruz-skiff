@@ -16,7 +16,7 @@ No build step, API key, backend or account. The pixel edition uses Canvas 2D and
 
 ## The journey
 
-Start at 06:00, a few steps from the rental counter → check the personal backpack (free starter gear is already enabled) → request the empty skiff's davit lowering → walk down the real left-side stair alignment → board → unmoor → start the engine and steer, or choose a waypoint after buying and carrying a chart → coast down, deploy a purchased anchor or drift, and select a rig → hold/release to cast → watch the float and strike → reel and manage drag/tension → keep the fish or record/release → return, dock, walk to the counter and exchange retained catches → buy equipment and assemble each rod independently.
+Start at 06:00, a few steps from the rental counter → check the personal backpack (free starter gear is already enabled) → pay the 15-credit boat rental, then watch the empty skiff move from its deck cradle to the davit and water → walk down the real left-side stair alignment → board → unmoor → start the engine and steer, or choose a waypoint after buying and carrying a chart → coast down, deploy a purchased anchor or drift, and select a rig → hold/release to cast → watch the float and strike → reel and manage drag/tension → keep the fish or record/release → return, dock, walk to the counter and exchange retained catches → buy equipment and assemble each rod independently.
 
 - **Left joystick / WASD:** walk. Aboard, the bottom console has a retained outboard tiller, twist-throttle touch surface and F/N/R gear selector. Move the tiller opposite the forward turn; slide the ribbed grip up/down to rotate the throttle. Release holds the friction settings. N idles the motor; interruption clears manual power while preserving momentum. WASD is also available for momentary keyboard steering/throttle.
 - **E:** contextual interaction. **G:** walk to the hut or boarding platform.
@@ -107,3 +107,11 @@ Boat actions are in a bottom console. The touch tiller and throttle retain their
 The edge-camera previously eased after integer pixel overflow, producing alternating one-pixel motion. Camera and hull now consume the same pixel overflow synchronously. Starting/stopping the engine no longer changes map scale. The camera reserves the lower console area while preserving the walking deadzone.
 
 See `qa/pixel-helm/PLAYTEST.md` for validation and responsive screenshots.
+
+## Rent before launching
+
+New trips start with the skiff on its wharf cradle. The counter's explicit **付款租船 · ✦ 15** action debits 15 game credits once and begins the 24-second launch. Boarding, propulsion and fishing require both payment and the completed launch. Shopping before payment preserves the 15-credit rental balance. The price is game tuning, not a quote from the real Santa Cruz operator.
+
+All three rental skiffs use the same hull art and scale. The selected boat moves from its actual shore cradle to the davit, then descends to the left landing; stored boats have no water wake, wave bob or mooring line. Occupancy does not resize the hull.
+
+Version-5 saves retain payment and launch progress. Existing earlier saves already afloat or in a launch continue without a retroactive fee; unpaid shore sessions remain on shore. Recovery cannot launch an unpaid boat. If an existing paid voyage has insufficient balance for a new rental, the main entry continues that voyage and the model refuses to overwrite it with an unaffordable new trip. See `qa/pixel-rental/PLAYTEST.md`.
