@@ -1,0 +1,2925 @@
+{
+  "startedAt": "2026-09-27T16:47:32.704Z",
+  "completedAt": "2026-09-27T17:11:21.355Z",
+  "build": "20260927-pixel-v2",
+  "samples": [
+    {
+      "wall": "2026-09-27T16:48:25.183Z",
+      "activeSeconds": 46,
+      "anchor": false,
+      "arrival": "boarding",
+      "boat": {
+        "heading": 0,
+        "x": -34.2,
+        "z": -55
+      },
+      "breaks": 0,
+      "castPower": 0,
+      "casting": false,
+      "casts": 0,
+      "catches": [],
+      "conditions": {
+        "clockMode": "morning",
+        "customHour": 8,
+        "daylight": 0.1,
+        "fresh": false,
+        "mode": "real",
+        "period": 9,
+        "tideMLLW": 1.4867124877639173,
+        "waterTemp": 14.8,
+        "waveDirection": 294,
+        "waveHeight": 1.4,
+        "windDirection": 330,
+        "windKnots": 15.55072
+      },
+      "edition": "pixel",
+      "engine": false,
+      "fish": null,
+      "fishState": "idle",
+      "fps": 60,
+      "fuel": 100,
+      "gps": {
+        "lat": 36.96077778167208,
+        "lon": -122.02047168233857
+      },
+      "interaction": "登船",
+      "launchProgress": 0,
+      "launchStage": "afloat",
+      "lineDistance": 0,
+      "loaded": false,
+      "lureDepth": 0,
+      "menu": null,
+      "misses": 0,
+      "mode": "walk",
+      "moored": true,
+      "packed": [
+        "pfd",
+        "rod",
+        "tackle",
+        "bait",
+        "cooler",
+        "net",
+        "water",
+        "safety"
+      ],
+      "paused": false,
+      "phase": "board",
+      "position": {
+        "x": -31.8,
+        "z": -55.2
+      },
+      "profile": {
+        "credits": 100,
+        "owned": [
+          "pfd",
+          "rod",
+          "tackle",
+          "bait",
+          "cooler",
+          "net",
+          "water",
+          "safety"
+        ],
+        "stock": {
+          "anchovy": 0,
+          "jig": 3,
+          "sardine": 0,
+          "shrimp": 0,
+          "squid": 12
+        }
+      },
+      "referenceDepth": {
+        "datum": "MHW",
+        "measured": true,
+        "resolutionMeters": 20.655,
+        "source": "NOAA NCEI Monterey 2012 Coastal DEM, 1/3 arc-second MHW (DEM 3545), ArcGIS raster 93",
+        "value": 7.220447383722551
+      },
+      "renderer": "Canvas 2D",
+      "sailedMeters": 0,
+      "speedKnots": 0,
+      "stamina": 100,
+      "standing": false,
+      "swim": null,
+      "tension": 0,
+      "throttle": 0,
+      "time": "06:00:46",
+      "tripComplete": false,
+      "version": 3,
+      "walkedMeters": 46,
+      "waypoint": null
+    },
+    {
+      "wall": "2026-09-27T16:48:56.873Z",
+      "activeSeconds": 71,
+      "anchor": false,
+      "arrival": null,
+      "boat": {
+        "heading": 0.186,
+        "x": -38.2,
+        "z": -90.2
+      },
+      "breaks": 0,
+      "castPower": 0,
+      "casting": false,
+      "casts": 0,
+      "catches": [],
+      "conditions": {
+        "clockMode": "morning",
+        "customHour": 8,
+        "daylight": 0.1,
+        "fresh": false,
+        "mode": "real",
+        "period": 9,
+        "tideMLLW": 1.4900217948810488,
+        "waterTemp": 14.8,
+        "waveDirection": 294,
+        "waveHeight": 1.4,
+        "windDirection": 330,
+        "windKnots": 15.55072
+      },
+      "edition": "pixel",
+      "engine": true,
+      "fish": null,
+      "fishState": "idle",
+      "fps": 60,
+      "fuel": 100,
+      "gps": {
+        "lat": 36.96058342501775,
+        "lon": -122.02015628333876
+      },
+      "interaction": "",
+      "launchProgress": 0,
+      "launchStage": "afloat",
+      "lineDistance": 0,
+      "loaded": true,
+      "lureDepth": 0,
+      "menu": null,
+      "misses": 0,
+      "mode": "boat",
+      "moored": false,
+      "packed": [
+        "pfd",
+        "rod",
+        "tackle",
+        "bait",
+        "cooler",
+        "net",
+        "water",
+        "safety"
+      ],
+      "paused": false,
+      "phase": "launch",
+      "position": {
+        "x": -38.2,
+        "z": -90.2
+      },
+      "profile": {
+        "credits": 100,
+        "owned": [
+          "pfd",
+          "rod",
+          "tackle",
+          "bait",
+          "cooler",
+          "net",
+          "water",
+          "safety"
+        ],
+        "stock": {
+          "anchovy": 0,
+          "jig": 3,
+          "sardine": 0,
+          "shrimp": 0,
+          "squid": 12
+        }
+      },
+      "referenceDepth": {
+        "datum": "MHW",
+        "measured": true,
+        "resolutionMeters": 20.655,
+        "source": "NOAA NCEI Monterey 2012 Coastal DEM, 1/3 arc-second MHW (DEM 3545), ArcGIS raster 93",
+        "value": 7.03226619189204
+      },
+      "renderer": "Canvas 2D",
+      "sailedMeters": 35,
+      "speedKnots": 5.6,
+      "stamina": 100,
+      "standing": false,
+      "swim": null,
+      "tension": 0,
+      "throttle": 0.8,
+      "time": "06:01:11",
+      "tripComplete": false,
+      "version": 3,
+      "walkedMeters": 46,
+      "waypoint": "Wharf 西侧近岸"
+    },
+    {
+      "wall": "2026-09-27T16:50:04.796Z",
+      "activeSeconds": 139,
+      "anchor": false,
+      "arrival": null,
+      "boat": {
+        "heading": 0.22,
+        "x": -71.3,
+        "z": -284.6
+      },
+      "breaks": 0,
+      "castPower": 0,
+      "casting": false,
+      "casts": 0,
+      "catches": [],
+      "conditions": {
+        "clockMode": "morning",
+        "customHour": 8,
+        "daylight": 0.1,
+        "fresh": false,
+        "mode": "real",
+        "period": 9,
+        "tideMLLW": 1.4932955676930613,
+        "waterTemp": 14.8,
+        "waveDirection": 294,
+        "waveHeight": 1.4,
+        "windDirection": 330,
+        "windKnots": 15.55072
+      },
+      "edition": "pixel",
+      "engine": true,
+      "fish": null,
+      "fishState": "idle",
+      "fps": 60,
+      "fuel": 99,
+      "gps": {
+        "lat": 36.95958246233232,
+        "lon": -122.0183251626735
+      },
+      "interaction": "",
+      "launchProgress": 0,
+      "launchStage": "afloat",
+      "lineDistance": 0,
+      "loaded": true,
+      "lureDepth": 0,
+      "menu": null,
+      "misses": 0,
+      "mode": "boat",
+      "moored": false,
+      "packed": [
+        "pfd",
+        "rod",
+        "tackle",
+        "bait",
+        "cooler",
+        "net",
+        "water",
+        "safety"
+      ],
+      "paused": false,
+      "phase": "launch",
+      "position": {
+        "x": -71.3,
+        "z": -284.6
+      },
+      "profile": {
+        "credits": 100,
+        "owned": [
+          "pfd",
+          "rod",
+          "tackle",
+          "bait",
+          "cooler",
+          "net",
+          "water",
+          "safety"
+        ],
+        "stock": {
+          "anchovy": 0,
+          "jig": 3,
+          "sardine": 0,
+          "shrimp": 0,
+          "squid": 12
+        }
+      },
+      "referenceDepth": {
+        "datum": "MHW",
+        "measured": true,
+        "resolutionMeters": 20.655,
+        "source": "NOAA NCEI Monterey 2012 Coastal DEM, 1/3 arc-second MHW (DEM 3545), ArcGIS raster 93",
+        "value": 6.2266267116494385
+      },
+      "renderer": "Canvas 2D",
+      "sailedMeters": 233,
+      "speedKnots": 5.6,
+      "stamina": 100,
+      "standing": false,
+      "swim": null,
+      "tension": 0,
+      "throttle": 0.8,
+      "time": "06:02:19",
+      "tripComplete": false,
+      "version": 3,
+      "walkedMeters": 46,
+      "waypoint": "Wharf 西侧近岸"
+    },
+    {
+      "wall": "2026-09-27T16:50:22.405Z",
+      "check": "manual-stick-release",
+      "activeSeconds": 157,
+      "anchor": false,
+      "arrival": null,
+      "boat": {
+        "heading": 0.233,
+        "x": -81.2,
+        "z": -334.7
+      },
+      "breaks": 0,
+      "castPower": 0,
+      "casting": false,
+      "casts": 0,
+      "catches": [],
+      "conditions": {
+        "clockMode": "morning",
+        "customHour": 8,
+        "daylight": 0.1,
+        "fresh": false,
+        "mode": "real",
+        "period": 9,
+        "tideMLLW": 1.4932955676930613,
+        "waterTemp": 14.8,
+        "waveDirection": 294,
+        "waveHeight": 1.4,
+        "windDirection": 330,
+        "windKnots": 15.55072
+      },
+      "edition": "pixel",
+      "engine": true,
+      "fish": null,
+      "fishState": "idle",
+      "fps": 60,
+      "fuel": 99,
+      "gps": {
+        "lat": 36.95933341513385,
+        "lon": -122.01784263079894
+      },
+      "interaction": "",
+      "launchProgress": 0,
+      "launchStage": "afloat",
+      "lineDistance": 0,
+      "loaded": true,
+      "lureDepth": 0,
+      "menu": null,
+      "misses": 0,
+      "mode": "boat",
+      "moored": false,
+      "packed": [
+        "pfd",
+        "rod",
+        "tackle",
+        "bait",
+        "cooler",
+        "net",
+        "water",
+        "safety"
+      ],
+      "paused": false,
+      "phase": "launch",
+      "position": {
+        "x": -81.2,
+        "z": -334.7
+      },
+      "profile": {
+        "credits": 100,
+        "owned": [
+          "pfd",
+          "rod",
+          "tackle",
+          "bait",
+          "cooler",
+          "net",
+          "water",
+          "safety"
+        ],
+        "stock": {
+          "anchovy": 0,
+          "jig": 3,
+          "sardine": 0,
+          "shrimp": 0,
+          "squid": 12
+        }
+      },
+      "referenceDepth": {
+        "datum": "MHW",
+        "measured": true,
+        "resolutionMeters": 20.655,
+        "source": "NOAA NCEI Monterey 2012 Coastal DEM, 1/3 arc-second MHW (DEM 3545), ArcGIS raster 93",
+        "value": 6.806595755728434
+      },
+      "renderer": "Canvas 2D",
+      "sailedMeters": 284,
+      "speedKnots": 5.4,
+      "stamina": 100,
+      "standing": false,
+      "swim": null,
+      "tension": 0,
+      "throttle": 0,
+      "time": "06:02:37",
+      "tripComplete": false,
+      "version": 3,
+      "walkedMeters": 46,
+      "waypoint": null
+    },
+    {
+      "wall": "2026-09-27T16:51:18.934Z",
+      "activeSeconds": 214,
+      "anchor": false,
+      "arrival": null,
+      "boat": {
+        "heading": -0.829,
+        "x": -26.7,
+        "z": -462.4
+      },
+      "breaks": 0,
+      "castPower": 0,
+      "casting": false,
+      "casts": 0,
+      "catches": [],
+      "conditions": {
+        "clockMode": "morning",
+        "customHour": 8,
+        "daylight": 0.1,
+        "fresh": false,
+        "mode": "real",
+        "period": 9,
+        "tideMLLW": 1.4965340204475408,
+        "waterTemp": 14.8,
+        "waveDirection": 294,
+        "waveHeight": 1.4,
+        "windDirection": 330,
+        "windKnots": 15.55072
+      },
+      "edition": "pixel",
+      "engine": true,
+      "fish": null,
+      "fishState": "idle",
+      "fps": 60,
+      "fuel": 99,
+      "gps": {
+        "lat": 36.958182554353414,
+        "lon": -122.01723597598355
+      },
+      "interaction": "",
+      "launchProgress": 0,
+      "launchStage": "afloat",
+      "lineDistance": 0,
+      "loaded": true,
+      "lureDepth": 0,
+      "menu": null,
+      "misses": 0,
+      "mode": "boat",
+      "moored": false,
+      "packed": [
+        "pfd",
+        "rod",
+        "tackle",
+        "bait",
+        "cooler",
+        "net",
+        "water",
+        "safety"
+      ],
+      "paused": false,
+      "phase": "launch",
+      "position": {
+        "x": -26.7,
+        "z": -462.4
+      },
+      "profile": {
+        "credits": 100,
+        "owned": [
+          "pfd",
+          "rod",
+          "tackle",
+          "bait",
+          "cooler",
+          "net",
+          "water",
+          "safety"
+        ],
+        "stock": {
+          "anchovy": 0,
+          "jig": 3,
+          "sardine": 0,
+          "shrimp": 0,
+          "squid": 12
+        }
+      },
+      "referenceDepth": {
+        "datum": "MHW",
+        "measured": true,
+        "resolutionMeters": 20.655,
+        "source": "NOAA NCEI Monterey 2012 Coastal DEM, 1/3 arc-second MHW (DEM 3545), ArcGIS raster 93",
+        "value": 8.487572674818967
+      },
+      "renderer": "Canvas 2D",
+      "sailedMeters": 434,
+      "speedKnots": 5.6,
+      "stamina": 100,
+      "standing": false,
+      "swim": null,
+      "tension": 0,
+      "throttle": 0.8,
+      "time": "06:03:33",
+      "tripComplete": false,
+      "version": 3,
+      "walkedMeters": 46,
+      "waypoint": "Wharf 西侧近岸"
+    },
+    {
+      "wall": "2026-09-27T16:52:31.806Z",
+      "activeSeconds": 286,
+      "anchor": false,
+      "arrival": null,
+      "boat": {
+        "heading": -2.808,
+        "x": 102.9,
+        "z": -378.1
+      },
+      "breaks": 0,
+      "castPower": 0,
+      "casting": false,
+      "casts": 0,
+      "catches": [],
+      "conditions": {
+        "clockMode": "morning",
+        "customHour": 8,
+        "daylight": 0.1,
+        "fresh": false,
+        "mode": "real",
+        "period": 9,
+        "tideMLLW": 1.502904271329165,
+        "waterTemp": 14.8,
+        "waveDirection": 294,
+        "waveHeight": 1.4,
+        "windDirection": 330,
+        "windKnots": 15.55072
+      },
+      "edition": "pixel",
+      "engine": true,
+      "fish": null,
+      "fishState": "idle",
+      "fps": 60,
+      "fuel": 99,
+      "gps": {
+        "lat": 36.95787123986374,
+        "lon": -122.0189292998993
+      },
+      "interaction": "",
+      "launchProgress": 0,
+      "launchStage": "afloat",
+      "lineDistance": 0,
+      "loaded": true,
+      "lureDepth": 0,
+      "menu": null,
+      "misses": 0,
+      "mode": "boat",
+      "moored": false,
+      "packed": [
+        "pfd",
+        "rod",
+        "tackle",
+        "bait",
+        "cooler",
+        "net",
+        "water",
+        "safety"
+      ],
+      "paused": false,
+      "phase": "launch",
+      "position": {
+        "x": 102.9,
+        "z": -378.1
+      },
+      "profile": {
+        "credits": 100,
+        "owned": [
+          "pfd",
+          "rod",
+          "tackle",
+          "bait",
+          "cooler",
+          "net",
+          "water",
+          "safety"
+        ],
+        "stock": {
+          "anchovy": 0,
+          "jig": 3,
+          "sardine": 0,
+          "shrimp": 0,
+          "squid": 12
+        }
+      },
+      "referenceDepth": {
+        "datum": "MHW",
+        "measured": true,
+        "resolutionMeters": 20.655,
+        "source": "NOAA NCEI Monterey 2012 Coastal DEM, 1/3 arc-second MHW (DEM 3545), ArcGIS raster 93",
+        "value": 8.084823518997977
+      },
+      "renderer": "Canvas 2D",
+      "sailedMeters": 640,
+      "speedKnots": 5.4,
+      "stamina": 100,
+      "standing": false,
+      "swim": null,
+      "tension": 0,
+      "throttle": 0.8,
+      "time": "06:04:46",
+      "tripComplete": false,
+      "version": 3,
+      "walkedMeters": 46,
+      "waypoint": "Wharf 西侧近岸"
+    },
+    {
+      "wall": "2026-09-27T16:53:46.392Z",
+      "activeSeconds": 361,
+      "anchor": false,
+      "arrival": null,
+      "boat": {
+        "heading": -2.837,
+        "x": 177,
+        "z": -183
+      },
+      "breaks": 0,
+      "castPower": 0,
+      "casting": false,
+      "casts": 0,
+      "catches": [],
+      "conditions": {
+        "clockMode": "morning",
+        "customHour": 8,
+        "daylight": 0.1,
+        "fresh": false,
+        "mode": "real",
+        "period": 9,
+        "tideMLLW": 1.506035566890547,
+        "waterTemp": 14.8,
+        "waveDirection": 294,
+        "waveHeight": 1.4,
+        "windDirection": 330,
+        "windKnots": 15.55072
+      },
+      "edition": "pixel",
+      "engine": true,
+      "fish": null,
+      "fishState": "idle",
+      "fps": 60,
+      "fuel": 98,
+      "gps": {
+        "lat": 36.9586100856142,
+        "lon": -122.02108596683745
+      },
+      "interaction": "",
+      "launchProgress": 0,
+      "launchStage": "afloat",
+      "lineDistance": 0,
+      "loaded": true,
+      "lureDepth": 0,
+      "menu": null,
+      "misses": 0,
+      "mode": "boat",
+      "moored": false,
+      "packed": [
+        "pfd",
+        "rod",
+        "tackle",
+        "bait",
+        "cooler",
+        "net",
+        "water",
+        "safety"
+      ],
+      "paused": false,
+      "phase": "launch",
+      "position": {
+        "x": 177,
+        "z": -183
+      },
+      "profile": {
+        "credits": 100,
+        "owned": [
+          "pfd",
+          "rod",
+          "tackle",
+          "bait",
+          "cooler",
+          "net",
+          "water",
+          "safety"
+        ],
+        "stock": {
+          "anchovy": 0,
+          "jig": 3,
+          "sardine": 0,
+          "shrimp": 0,
+          "squid": 12
+        }
+      },
+      "referenceDepth": {
+        "datum": "MHW",
+        "measured": true,
+        "resolutionMeters": 20.655,
+        "source": "NOAA NCEI Monterey 2012 Coastal DEM, 1/3 arc-second MHW (DEM 3545), ArcGIS raster 93",
+        "value": 6.203788691997882
+      },
+      "renderer": "Canvas 2D",
+      "sailedMeters": 848,
+      "speedKnots": 5.4,
+      "stamina": 100,
+      "standing": false,
+      "swim": null,
+      "tension": 0,
+      "throttle": 0.8,
+      "time": "06:06:01",
+      "tripComplete": false,
+      "version": 3,
+      "walkedMeters": 46,
+      "waypoint": "Wharf 西侧近岸"
+    },
+    {
+      "wall": "2026-09-27T16:54:43.251Z",
+      "activeSeconds": 418,
+      "anchor": false,
+      "arrival": null,
+      "boat": {
+        "heading": -2.891,
+        "x": 227.6,
+        "z": -32.4
+      },
+      "breaks": 0,
+      "castPower": 0,
+      "casting": false,
+      "casts": 0,
+      "catches": [],
+      "conditions": {
+        "clockMode": "morning",
+        "customHour": 8,
+        "daylight": 0.1,
+        "fresh": false,
+        "mode": "real",
+        "period": 9,
+        "tideMLLW": 1.5091306983241095,
+        "waterTemp": 14.8,
+        "waveDirection": 294,
+        "waveHeight": 1.4,
+        "windDirection": 330,
+        "windKnots": 15.55072
+      },
+      "edition": "pixel",
+      "engine": true,
+      "fish": null,
+      "fishState": "idle",
+      "fps": 60,
+      "fuel": 98,
+      "gps": {
+        "lat": 36.959224174667675,
+        "lon": -122.0226991797363
+      },
+      "interaction": "",
+      "launchProgress": 0,
+      "launchStage": "afloat",
+      "lineDistance": 0,
+      "loaded": true,
+      "lureDepth": 0,
+      "menu": null,
+      "misses": 0,
+      "mode": "boat",
+      "moored": false,
+      "packed": [
+        "pfd",
+        "rod",
+        "tackle",
+        "bait",
+        "cooler",
+        "net",
+        "water",
+        "safety"
+      ],
+      "paused": false,
+      "phase": "launch",
+      "position": {
+        "x": 227.6,
+        "z": -32.4
+      },
+      "profile": {
+        "credits": 100,
+        "owned": [
+          "pfd",
+          "rod",
+          "tackle",
+          "bait",
+          "cooler",
+          "net",
+          "water",
+          "safety"
+        ],
+        "stock": {
+          "anchovy": 0,
+          "jig": 3,
+          "sardine": 0,
+          "shrimp": 0,
+          "squid": 12
+        }
+      },
+      "referenceDepth": {
+        "datum": "MHW",
+        "measured": true,
+        "resolutionMeters": 20.655,
+        "source": "NOAA NCEI Monterey 2012 Coastal DEM, 1/3 arc-second MHW (DEM 3545), ArcGIS raster 93",
+        "value": 4.774975279188894
+      },
+      "renderer": "Canvas 2D",
+      "sailedMeters": 1007,
+      "speedKnots": 5.4,
+      "stamina": 100,
+      "standing": false,
+      "swim": null,
+      "tension": 0,
+      "throttle": 0.8,
+      "time": "06:06:57",
+      "tripComplete": false,
+      "version": 3,
+      "walkedMeters": 46,
+      "waypoint": "Wharf 西侧近岸"
+    },
+    {
+      "wall": "2026-09-27T16:55:23.086Z",
+      "activeSeconds": 458,
+      "anchor": false,
+      "arrival": "fishing",
+      "boat": {
+        "heading": -3.121,
+        "x": 243.6,
+        "z": 22.1
+      },
+      "breaks": 0,
+      "castPower": 0,
+      "casting": false,
+      "casts": 0,
+      "catches": [],
+      "conditions": {
+        "clockMode": "morning",
+        "customHour": 8,
+        "daylight": 0.1,
+        "fresh": false,
+        "mode": "real",
+        "period": 9,
+        "tideMLLW": 1.5091306983241095,
+        "waterTemp": 14.8,
+        "waveDirection": 294,
+        "waveHeight": 1.4,
+        "windDirection": 330,
+        "windKnots": 15.55072
+      },
+      "edition": "pixel",
+      "engine": false,
+      "fish": null,
+      "fishState": "idle",
+      "fps": 60,
+      "fuel": 98,
+      "gps": {
+        "lat": 36.95946198487187,
+        "lon": -122.02326462374558
+      },
+      "interaction": "",
+      "launchProgress": 0,
+      "launchStage": "afloat",
+      "lineDistance": 0,
+      "loaded": true,
+      "lureDepth": 0,
+      "menu": null,
+      "misses": 0,
+      "mode": "boat",
+      "moored": false,
+      "packed": [
+        "pfd",
+        "rod",
+        "tackle",
+        "bait",
+        "cooler",
+        "net",
+        "water",
+        "safety"
+      ],
+      "paused": false,
+      "phase": "fish",
+      "position": {
+        "x": 243.6,
+        "z": 22.1
+      },
+      "profile": {
+        "credits": 100,
+        "owned": [
+          "pfd",
+          "rod",
+          "tackle",
+          "bait",
+          "cooler",
+          "net",
+          "water",
+          "safety"
+        ],
+        "stock": {
+          "anchovy": 0,
+          "jig": 3,
+          "sardine": 0,
+          "shrimp": 0,
+          "squid": 12
+        }
+      },
+      "referenceDepth": {
+        "datum": "MHW",
+        "measured": true,
+        "resolutionMeters": 20.655,
+        "source": "NOAA NCEI Monterey 2012 Coastal DEM, 1/3 arc-second MHW (DEM 3545), ArcGIS raster 93",
+        "value": 4.158410290182725
+      },
+      "renderer": "Canvas 2D",
+      "sailedMeters": 1067,
+      "speedKnots": -0.8,
+      "stamina": 100,
+      "standing": false,
+      "swim": null,
+      "tension": 0,
+      "throttle": 0,
+      "time": "06:07:37",
+      "tripComplete": false,
+      "version": 3,
+      "walkedMeters": 46,
+      "waypoint": null
+    },
+    {
+      "wall": "2026-09-27T16:55:30.773Z",
+      "check": "rotation-cancels-cast",
+      "activeSeconds": 465,
+      "anchor": true,
+      "arrival": "fishing",
+      "boat": {
+        "heading": -3.105,
+        "x": 243.8,
+        "z": 18.6
+      },
+      "breaks": 0,
+      "castPower": 0,
+      "casting": false,
+      "casts": 0,
+      "catches": [],
+      "conditions": {
+        "clockMode": "morning",
+        "customHour": 8,
+        "daylight": 0.1,
+        "fresh": false,
+        "mode": "real",
+        "period": 9,
+        "tideMLLW": 1.5121894472396855,
+        "waterTemp": 14.8,
+        "waveDirection": 294,
+        "waveHeight": 1.4,
+        "windDirection": 330,
+        "windKnots": 15.55072
+      },
+      "edition": "pixel",
+      "engine": false,
+      "fish": null,
+      "fishState": "idle",
+      "fps": 60,
+      "fuel": 98,
+      "gps": {
+        "lat": 36.95943849441473,
+        "lon": -122.02323808089336
+      },
+      "interaction": "",
+      "launchProgress": 0,
+      "launchStage": "afloat",
+      "lineDistance": 0,
+      "loaded": true,
+      "lureDepth": 0,
+      "menu": null,
+      "misses": 0,
+      "mode": "boat",
+      "moored": false,
+      "packed": [
+        "pfd",
+        "rod",
+        "tackle",
+        "bait",
+        "cooler",
+        "net",
+        "water",
+        "safety"
+      ],
+      "paused": false,
+      "phase": "fish",
+      "position": {
+        "x": 243.8,
+        "z": 18.6
+      },
+      "profile": {
+        "credits": 100,
+        "owned": [
+          "pfd",
+          "rod",
+          "tackle",
+          "bait",
+          "cooler",
+          "net",
+          "water",
+          "safety"
+        ],
+        "stock": {
+          "anchovy": 0,
+          "jig": 3,
+          "sardine": 0,
+          "shrimp": 0,
+          "squid": 12
+        }
+      },
+      "referenceDepth": {
+        "datum": "MHW",
+        "measured": true,
+        "resolutionMeters": 20.655,
+        "source": "NOAA NCEI Monterey 2012 Coastal DEM, 1/3 arc-second MHW (DEM 3545), ArcGIS raster 93",
+        "value": 4.197386940537921
+      },
+      "renderer": "Canvas 2D",
+      "sailedMeters": 1070,
+      "speedKnots": -0.6,
+      "stamina": 100,
+      "standing": false,
+      "swim": null,
+      "tension": 0,
+      "throttle": 0,
+      "time": "06:07:45",
+      "tripComplete": false,
+      "version": 3,
+      "walkedMeters": 46,
+      "waypoint": null
+    },
+    {
+      "wall": "2026-09-27T16:56:23.052Z",
+      "activeSeconds": 518,
+      "anchor": true,
+      "arrival": "fishing",
+      "boat": {
+        "heading": 3.005,
+        "x": 244.9,
+        "z": 18.7
+      },
+      "breaks": 0,
+      "castPower": 1,
+      "casting": false,
+      "casts": 1,
+      "catches": [],
+      "conditions": {
+        "clockMode": "morning",
+        "customHour": 8,
+        "daylight": 0.1,
+        "fresh": false,
+        "mode": "real",
+        "period": 9,
+        "tideMLLW": 1.5121894472396855,
+        "waterTemp": 14.8,
+        "waveDirection": 294,
+        "waveHeight": 1.4,
+        "windDirection": 330,
+        "windKnots": 15.55072
+      },
+      "edition": "pixel",
+      "engine": false,
+      "fish": null,
+      "fishState": "waiting",
+      "fps": 60,
+      "fuel": 98,
+      "gps": {
+        "lat": 36.95943222680978,
+        "lon": -122.02324743613096
+      },
+      "interaction": "",
+      "launchProgress": 0,
+      "launchStage": "afloat",
+      "lineDistance": 33,
+      "loaded": true,
+      "lureDepth": 3.8,
+      "menu": null,
+      "misses": 0,
+      "mode": "boat",
+      "moored": false,
+      "packed": [
+        "pfd",
+        "rod",
+        "tackle",
+        "bait",
+        "cooler",
+        "net",
+        "water",
+        "safety"
+      ],
+      "paused": false,
+      "phase": "fish",
+      "position": {
+        "x": 244.9,
+        "z": 18.7
+      },
+      "profile": {
+        "credits": 100,
+        "owned": [
+          "pfd",
+          "rod",
+          "tackle",
+          "bait",
+          "cooler",
+          "net",
+          "water",
+          "safety"
+        ],
+        "stock": {
+          "anchovy": 0,
+          "jig": 3,
+          "sardine": 0,
+          "shrimp": 0,
+          "squid": 11
+        }
+      },
+      "referenceDepth": {
+        "datum": "MHW",
+        "measured": true,
+        "resolutionMeters": 20.655,
+        "source": "NOAA NCEI Monterey 2012 Coastal DEM, 1/3 arc-second MHW (DEM 3545), ArcGIS raster 93",
+        "value": 4.182536975512349
+      },
+      "renderer": "Canvas 2D",
+      "sailedMeters": 1072,
+      "speedKnots": 0,
+      "stamina": 100,
+      "standing": false,
+      "swim": null,
+      "tension": 0,
+      "throttle": 0,
+      "time": "06:08:37",
+      "tripComplete": false,
+      "version": 3,
+      "walkedMeters": 46,
+      "waypoint": null
+    },
+    {
+      "wall": "2026-09-27T16:58:22.074Z",
+      "check": "ten-minute-active-play",
+      "activeSeconds": 637,
+      "anchor": true,
+      "arrival": "fishing",
+      "boat": {
+        "heading": 2.955,
+        "x": 245.1,
+        "z": 18.8
+      },
+      "breaks": 0,
+      "castPower": 1,
+      "casting": false,
+      "casts": 1,
+      "catches": [],
+      "conditions": {
+        "clockMode": "morning",
+        "customHour": 8,
+        "daylight": 0.1,
+        "fresh": true,
+        "mode": "real",
+        "period": 9,
+        "tideMLLW": 1.5181969862547542,
+        "waterTemp": 15,
+        "waveDirection": 295,
+        "waveHeight": 1.3,
+        "windDirection": 320,
+        "windKnots": 11.66304
+      },
+      "edition": "pixel",
+      "engine": false,
+      "fish": {
+        "bait": "anchovy",
+        "color": "#a6aa74",
+        "kg": 3.41,
+        "latin": "Paralichthys californicus",
+        "length": 60,
+        "max": 69,
+        "min": 38,
+        "name": "加州大比目鱼",
+        "power": 1.2,
+        "spot": "sand",
+        "weight": 2.5
+      },
+      "fishState": "fight",
+      "fps": 60,
+      "fuel": 98,
+      "gps": {
+        "lat": 36.959431092186946,
+        "lon": -122.02324974564456
+      },
+      "interaction": "",
+      "launchProgress": 0,
+      "launchStage": "afloat",
+      "lineDistance": 1.3,
+      "loaded": true,
+      "lureDepth": 3.8,
+      "menu": null,
+      "misses": 0,
+      "mode": "boat",
+      "moored": false,
+      "packed": [
+        "pfd",
+        "rod",
+        "tackle",
+        "bait",
+        "cooler",
+        "net",
+        "water",
+        "safety"
+      ],
+      "paused": false,
+      "phase": "fish",
+      "position": {
+        "x": 245.1,
+        "z": 18.8
+      },
+      "profile": {
+        "credits": 100,
+        "owned": [
+          "pfd",
+          "rod",
+          "tackle",
+          "bait",
+          "cooler",
+          "net",
+          "water",
+          "safety"
+        ],
+        "stock": {
+          "anchovy": 0,
+          "jig": 3,
+          "sardine": 0,
+          "shrimp": 0,
+          "squid": 11
+        }
+      },
+      "referenceDepth": {
+        "datum": "MHW",
+        "measured": true,
+        "resolutionMeters": 20.655,
+        "source": "NOAA NCEI Monterey 2012 Coastal DEM, 1/3 arc-second MHW (DEM 3545), ArcGIS raster 93",
+        "value": 4.178909292147804
+      },
+      "renderer": "Canvas 2D",
+      "sailedMeters": 1072,
+      "speedKnots": 0,
+      "stamina": 51,
+      "standing": false,
+      "swim": null,
+      "tension": 44,
+      "throttle": 0,
+      "time": "06:10:36",
+      "tripComplete": false,
+      "version": 3,
+      "walkedMeters": 46,
+      "waypoint": null
+    },
+    {
+      "wall": "2026-09-27T16:59:09.128Z",
+      "activeSeconds": 684,
+      "anchor": true,
+      "arrival": "fishing",
+      "boat": {
+        "heading": 2.966,
+        "x": 245.1,
+        "z": 18.8
+      },
+      "breaks": 0,
+      "castPower": 1,
+      "casting": false,
+      "casts": 1,
+      "catches": [],
+      "conditions": {
+        "clockMode": "morning",
+        "customHour": 8,
+        "daylight": 0.1,
+        "fresh": true,
+        "mode": "real",
+        "period": 9,
+        "tideMLLW": 1.5211453024037729,
+        "waterTemp": 15,
+        "waveDirection": 295,
+        "waveHeight": 1.3,
+        "windDirection": 320,
+        "windKnots": 11.66304
+      },
+      "edition": "pixel",
+      "engine": false,
+      "fish": {
+        "bait": "anchovy",
+        "color": "#a6aa74",
+        "kg": 3.41,
+        "latin": "Paralichthys californicus",
+        "length": 60,
+        "max": 69,
+        "min": 38,
+        "name": "加州大比目鱼",
+        "power": 1.2,
+        "spot": "sand",
+        "weight": 2.5
+      },
+      "fishState": "fight",
+      "fps": 60,
+      "fuel": 98,
+      "gps": {
+        "lat": 36.95943142488991,
+        "lon": -122.02324916752544
+      },
+      "interaction": "",
+      "launchProgress": 0,
+      "launchStage": "afloat",
+      "lineDistance": 1.3,
+      "loaded": true,
+      "lureDepth": 3.8,
+      "menu": null,
+      "misses": 0,
+      "mode": "boat",
+      "moored": false,
+      "packed": [
+        "pfd",
+        "rod",
+        "tackle",
+        "bait",
+        "cooler",
+        "net",
+        "water",
+        "safety"
+      ],
+      "paused": false,
+      "phase": "fish",
+      "position": {
+        "x": 245.1,
+        "z": 18.8
+      },
+      "profile": {
+        "credits": 100,
+        "owned": [
+          "pfd",
+          "rod",
+          "tackle",
+          "bait",
+          "cooler",
+          "net",
+          "water",
+          "safety"
+        ],
+        "stock": {
+          "anchovy": 0,
+          "jig": 3,
+          "sardine": 0,
+          "shrimp": 0,
+          "squid": 11
+        }
+      },
+      "referenceDepth": {
+        "datum": "MHW",
+        "measured": true,
+        "resolutionMeters": 20.655,
+        "source": "NOAA NCEI Monterey 2012 Coastal DEM, 1/3 arc-second MHW (DEM 3545), ArcGIS raster 93",
+        "value": 4.179821067164693
+      },
+      "renderer": "Canvas 2D",
+      "sailedMeters": 1072,
+      "speedKnots": 0,
+      "stamina": 21,
+      "standing": false,
+      "swim": null,
+      "tension": 44,
+      "throttle": 0,
+      "time": "06:11:23",
+      "tripComplete": false,
+      "version": 3,
+      "walkedMeters": 46,
+      "waypoint": null
+    },
+    {
+      "wall": "2026-09-27T16:59:22.982Z",
+      "check": "natural-catch",
+      "activeSeconds": 687,
+      "anchor": true,
+      "arrival": "fishing",
+      "boat": {
+        "heading": 2.967,
+        "x": 245,
+        "z": 18.8
+      },
+      "breaks": 0,
+      "castPower": 1,
+      "casting": false,
+      "casts": 1,
+      "catches": [],
+      "conditions": {
+        "clockMode": "morning",
+        "customHour": 8,
+        "daylight": 0.1,
+        "fresh": true,
+        "mode": "real",
+        "period": 9,
+        "tideMLLW": 1.5211453024037729,
+        "waterTemp": 15,
+        "waveDirection": 295,
+        "waveHeight": 1.3,
+        "windDirection": 320,
+        "windKnots": 11.66304
+      },
+      "edition": "pixel",
+      "engine": false,
+      "fish": {
+        "bait": "anchovy",
+        "color": "#a6aa74",
+        "kg": 3.41,
+        "latin": "Paralichthys californicus",
+        "length": 60,
+        "max": 69,
+        "min": 38,
+        "name": "加州大比目鱼",
+        "power": 1.2,
+        "spot": "sand",
+        "weight": 2.5
+      },
+      "fishState": "landed",
+      "fps": 60,
+      "fuel": 98,
+      "gps": {
+        "lat": 36.95943144491864,
+        "lon": -122.0232491331339
+      },
+      "interaction": "",
+      "launchProgress": 0,
+      "launchStage": "afloat",
+      "lineDistance": 1.3,
+      "loaded": true,
+      "lureDepth": 3.8,
+      "menu": "catch",
+      "misses": 0,
+      "mode": "boat",
+      "moored": false,
+      "packed": [
+        "pfd",
+        "rod",
+        "tackle",
+        "bait",
+        "cooler",
+        "net",
+        "water",
+        "safety"
+      ],
+      "paused": true,
+      "phase": "fish",
+      "position": {
+        "x": 245,
+        "z": 18.8
+      },
+      "profile": {
+        "credits": 100,
+        "owned": [
+          "pfd",
+          "rod",
+          "tackle",
+          "bait",
+          "cooler",
+          "net",
+          "water",
+          "safety"
+        ],
+        "stock": {
+          "anchovy": 0,
+          "jig": 3,
+          "sardine": 0,
+          "shrimp": 0,
+          "squid": 11
+        }
+      },
+      "referenceDepth": {
+        "datum": "MHW",
+        "measured": true,
+        "resolutionMeters": 20.655,
+        "source": "NOAA NCEI Monterey 2012 Coastal DEM, 1/3 arc-second MHW (DEM 3545), ArcGIS raster 93",
+        "value": 4.179875330023629
+      },
+      "renderer": "Canvas 2D",
+      "sailedMeters": 1072,
+      "speedKnots": 0,
+      "stamina": 19,
+      "standing": false,
+      "swim": null,
+      "tension": 44,
+      "throttle": 0,
+      "time": "06:11:27",
+      "tripComplete": false,
+      "version": 3,
+      "walkedMeters": 46,
+      "waypoint": null
+    },
+    {
+      "wall": "2026-09-27T16:59:29.368Z",
+      "check": "kept-in-cooler",
+      "activeSeconds": 687,
+      "anchor": true,
+      "arrival": "fishing",
+      "boat": {
+        "heading": 2.967,
+        "x": 245,
+        "z": 18.8
+      },
+      "breaks": 0,
+      "castPower": 1,
+      "casting": false,
+      "casts": 1,
+      "catches": [
+        {
+          "kept": true,
+          "kg": 3.41,
+          "length": 60,
+          "name": "加州大比目鱼",
+          "settled": false
+        }
+      ],
+      "conditions": {
+        "clockMode": "morning",
+        "customHour": 8,
+        "daylight": 0.1,
+        "fresh": true,
+        "mode": "real",
+        "period": 9,
+        "tideMLLW": 1.5240564847066709,
+        "waterTemp": 15,
+        "waveDirection": 295,
+        "waveHeight": 1.3,
+        "windDirection": 320,
+        "windKnots": 11.66304
+      },
+      "edition": "pixel",
+      "engine": false,
+      "fish": null,
+      "fishState": "idle",
+      "fps": 60,
+      "fuel": 98,
+      "gps": {
+        "lat": 36.9594314461275,
+        "lon": -122.0232491310596
+      },
+      "interaction": "",
+      "launchProgress": 0,
+      "launchStage": "afloat",
+      "lineDistance": 1.3,
+      "loaded": true,
+      "lureDepth": 3.8,
+      "menu": null,
+      "misses": 0,
+      "mode": "boat",
+      "moored": false,
+      "packed": [
+        "pfd",
+        "rod",
+        "tackle",
+        "bait",
+        "cooler",
+        "net",
+        "water",
+        "safety"
+      ],
+      "paused": false,
+      "phase": "fish",
+      "position": {
+        "x": 245,
+        "z": 18.8
+      },
+      "profile": {
+        "credits": 100,
+        "owned": [
+          "pfd",
+          "rod",
+          "tackle",
+          "bait",
+          "cooler",
+          "net",
+          "water",
+          "safety"
+        ],
+        "stock": {
+          "anchovy": 0,
+          "jig": 3,
+          "sardine": 0,
+          "shrimp": 0,
+          "squid": 11
+        }
+      },
+      "referenceDepth": {
+        "datum": "MHW",
+        "measured": true,
+        "resolutionMeters": 20.655,
+        "source": "NOAA NCEI Monterey 2012 Coastal DEM, 1/3 arc-second MHW (DEM 3545), ArcGIS raster 93",
+        "value": 4.179878602931728
+      },
+      "renderer": "Canvas 2D",
+      "sailedMeters": 1072,
+      "speedKnots": 0,
+      "stamina": 19,
+      "standing": false,
+      "swim": null,
+      "tension": 0,
+      "throttle": 0,
+      "time": "06:11:27",
+      "tripComplete": false,
+      "version": 3,
+      "walkedMeters": 46,
+      "waypoint": null
+    },
+    {
+      "wall": "2026-09-27T16:59:46.853Z",
+      "check": "overboard-pfd",
+      "activeSeconds": 700,
+      "anchor": true,
+      "arrival": "fishing",
+      "boat": {
+        "heading": 2.969,
+        "x": 245,
+        "z": 18.8
+      },
+      "breaks": 0,
+      "castPower": 0,
+      "casting": false,
+      "casts": 1,
+      "catches": [
+        {
+          "kept": true,
+          "kg": 3.41,
+          "length": 60,
+          "name": "加州大比目鱼",
+          "settled": false
+        }
+      ],
+      "conditions": {
+        "clockMode": "morning",
+        "customHour": 8,
+        "daylight": 0.1,
+        "fresh": true,
+        "mode": "real",
+        "period": 9,
+        "tideMLLW": 1.5240564847066709,
+        "waterTemp": 15,
+        "waveDirection": 295,
+        "waveHeight": 1.3,
+        "windDirection": 320,
+        "windKnots": 11.66304
+      },
+      "edition": "pixel",
+      "engine": false,
+      "fish": null,
+      "fishState": "idle",
+      "fps": 60,
+      "fuel": 98,
+      "gps": {
+        "lat": 36.95943152031696,
+        "lon": -122.02324900408207
+      },
+      "interaction": "抓住船尾梯",
+      "launchProgress": 0,
+      "launchStage": "afloat",
+      "lineDistance": 1.3,
+      "loaded": true,
+      "lureDepth": 0,
+      "menu": null,
+      "misses": 0,
+      "mode": "swim",
+      "moored": false,
+      "packed": [
+        "pfd",
+        "rod",
+        "tackle",
+        "bait",
+        "cooler",
+        "net",
+        "water",
+        "safety"
+      ],
+      "paused": false,
+      "phase": "fish",
+      "position": {
+        "x": 247.5,
+        "z": 17.8
+      },
+      "profile": {
+        "credits": 100,
+        "owned": [
+          "pfd",
+          "rod",
+          "tackle",
+          "bait",
+          "cooler",
+          "net",
+          "water",
+          "safety"
+        ],
+        "stock": {
+          "anchovy": 0,
+          "jig": 3,
+          "sardine": 0,
+          "shrimp": 0,
+          "squid": 11
+        }
+      },
+      "referenceDepth": {
+        "datum": "MHW",
+        "measured": true,
+        "resolutionMeters": 20.655,
+        "source": "NOAA NCEI Monterey 2012 Coastal DEM, 1/3 arc-second MHW (DEM 3545), ArcGIS raster 93",
+        "value": 4.1800789706494195
+      },
+      "renderer": "Canvas 2D",
+      "sailedMeters": 1072,
+      "speedKnots": 0,
+      "stamina": 19,
+      "standing": false,
+      "swim": {
+        "assist": true,
+        "cold": 0.06825899999999963,
+        "effort": 99.94400799999998,
+        "latched": true,
+        "pfd": true,
+        "rescue": 0,
+        "seconds": 4.550599999999979,
+        "verticalSpeed": 0,
+        "x": 247.5300545357386,
+        "y": 0.23999999862394683,
+        "z": 17.7955439543655
+      },
+      "tension": 0,
+      "throttle": 0,
+      "time": "06:11:39",
+      "tripComplete": false,
+      "version": 3,
+      "walkedMeters": 46,
+      "waypoint": null
+    },
+    {
+      "wall": "2026-09-27T17:00:48.955Z",
+      "check": "returning",
+      "activeSeconds": 762,
+      "anchor": false,
+      "arrival": null,
+      "boat": {
+        "heading": 0.357,
+        "x": 189.4,
+        "z": -101.7
+      },
+      "breaks": 0,
+      "castPower": 0,
+      "casting": false,
+      "casts": 1,
+      "catches": [
+        {
+          "kept": true,
+          "kg": 3.41,
+          "length": 60,
+          "name": "加州大比目鱼",
+          "settled": false
+        }
+      ],
+      "conditions": {
+        "clockMode": "morning",
+        "customHour": 8,
+        "daylight": 0.1,
+        "fresh": true,
+        "mode": "real",
+        "period": 9,
+        "tideMLLW": 1.5269300861003237,
+        "waterTemp": 15,
+        "waveDirection": 295,
+        "waveHeight": 1.3,
+        "windDirection": 320,
+        "windKnots": 11.66304
+      },
+      "edition": "pixel",
+      "engine": true,
+      "fish": null,
+      "fishState": "idle",
+      "fps": 60,
+      "fuel": 97,
+      "gps": {
+        "lat": 36.95903884668052,
+        "lon": -122.02184047159828
+      },
+      "interaction": "",
+      "launchProgress": 0,
+      "launchStage": "afloat",
+      "lineDistance": 1.3,
+      "loaded": true,
+      "lureDepth": 0,
+      "menu": null,
+      "misses": 0,
+      "mode": "boat",
+      "moored": false,
+      "packed": [
+        "pfd",
+        "rod",
+        "tackle",
+        "bait",
+        "cooler",
+        "net",
+        "water",
+        "safety"
+      ],
+      "paused": false,
+      "phase": "return",
+      "position": {
+        "x": 189.4,
+        "z": -101.7
+      },
+      "profile": {
+        "credits": 100,
+        "owned": [
+          "pfd",
+          "rod",
+          "tackle",
+          "bait",
+          "cooler",
+          "net",
+          "water",
+          "safety"
+        ],
+        "stock": {
+          "anchovy": 0,
+          "jig": 3,
+          "sardine": 0,
+          "shrimp": 0,
+          "squid": 11
+        }
+      },
+      "referenceDepth": {
+        "datum": "MHW",
+        "measured": true,
+        "resolutionMeters": 20.655,
+        "source": "NOAA NCEI Monterey 2012 Coastal DEM, 1/3 arc-second MHW (DEM 3545), ArcGIS raster 93",
+        "value": 5.59201807636674
+      },
+      "renderer": "Canvas 2D",
+      "sailedMeters": 1219,
+      "speedKnots": 5.6,
+      "stamina": 19,
+      "standing": false,
+      "swim": null,
+      "tension": 0,
+      "throttle": 0.8,
+      "time": "06:12:41",
+      "tripComplete": false,
+      "version": 3,
+      "walkedMeters": 46,
+      "waypoint": "租船登船平台"
+    },
+    {
+      "wall": "2026-09-27T17:01:50.960Z",
+      "activeSeconds": 824,
+      "anchor": false,
+      "arrival": null,
+      "boat": {
+        "heading": 0.369,
+        "x": 129.1,
+        "z": -270.2
+      },
+      "breaks": 0,
+      "castPower": 0,
+      "casting": false,
+      "casts": 1,
+      "catches": [
+        {
+          "kept": true,
+          "kg": 3.41,
+          "length": 60,
+          "name": "加州大比目鱼",
+          "settled": false
+        }
+      ],
+      "conditions": {
+        "clockMode": "morning",
+        "customHour": 8,
+        "daylight": 0.1,
+        "fresh": true,
+        "mode": "real",
+        "period": 9,
+        "tideMLLW": 1.5297661911752785,
+        "waterTemp": 15,
+        "waveDirection": 295,
+        "waveHeight": 1.3,
+        "windDirection": 320,
+        "windKnots": 11.66304
+      },
+      "edition": "pixel",
+      "engine": true,
+      "fish": null,
+      "fishState": "idle",
+      "fps": 60,
+      "fuel": 97,
+      "gps": {
+        "lat": 36.95837580401783,
+        "lon": -122.02000621573455
+      },
+      "interaction": "",
+      "launchProgress": 0,
+      "launchStage": "afloat",
+      "lineDistance": 1.3,
+      "loaded": true,
+      "lureDepth": 0,
+      "menu": null,
+      "misses": 0,
+      "mode": "boat",
+      "moored": false,
+      "packed": [
+        "pfd",
+        "rod",
+        "tackle",
+        "bait",
+        "cooler",
+        "net",
+        "water",
+        "safety"
+      ],
+      "paused": false,
+      "phase": "return",
+      "position": {
+        "x": 129.1,
+        "z": -270.2
+      },
+      "profile": {
+        "credits": 100,
+        "owned": [
+          "pfd",
+          "rod",
+          "tackle",
+          "bait",
+          "cooler",
+          "net",
+          "water",
+          "safety"
+        ],
+        "stock": {
+          "anchovy": 0,
+          "jig": 3,
+          "sardine": 0,
+          "shrimp": 0,
+          "squid": 11
+        }
+      },
+      "referenceDepth": {
+        "datum": "MHW",
+        "measured": true,
+        "resolutionMeters": 20.655,
+        "source": "NOAA NCEI Monterey 2012 Coastal DEM, 1/3 arc-second MHW (DEM 3545), ArcGIS raster 93",
+        "value": 7.047785026851761
+      },
+      "renderer": "Canvas 2D",
+      "sailedMeters": 1398,
+      "speedKnots": 5.6,
+      "stamina": 19,
+      "standing": false,
+      "swim": null,
+      "tension": 0,
+      "throttle": 0.8,
+      "time": "06:13:43",
+      "tripComplete": false,
+      "version": 3,
+      "walkedMeters": 46,
+      "waypoint": "租船登船平台"
+    },
+    {
+      "wall": "2026-09-27T17:02:52.376Z",
+      "activeSeconds": 863,
+      "anchor": false,
+      "arrival": null,
+      "boat": {
+        "heading": 0.12,
+        "x": 90.6,
+        "z": -374
+      },
+      "breaks": 0,
+      "castPower": 0,
+      "casting": false,
+      "casts": 1,
+      "catches": [
+        {
+          "kept": true,
+          "kg": 3.41,
+          "length": 60,
+          "name": "加州大比目鱼",
+          "settled": false
+        }
+      ],
+      "conditions": {
+        "clockMode": "morning",
+        "customHour": 8,
+        "daylight": 0.1,
+        "fresh": true,
+        "mode": "real",
+        "period": 9,
+        "tideMLLW": 1.5325643162253573,
+        "waterTemp": 15,
+        "waveDirection": 295,
+        "waveHeight": 1.3,
+        "windDirection": 320,
+        "windKnots": 11.66304
+      },
+      "edition": "pixel",
+      "engine": true,
+      "fish": null,
+      "fishState": "idle",
+      "fps": 60,
+      "fuel": 97,
+      "gps": {
+        "lat": 36.9579760933587,
+        "lon": -122.01886698502022
+      },
+      "interaction": "",
+      "launchProgress": 0,
+      "launchStage": "afloat",
+      "lineDistance": 1.3,
+      "loaded": true,
+      "lureDepth": 0,
+      "menu": null,
+      "misses": 0,
+      "mode": "boat",
+      "moored": false,
+      "packed": [
+        "pfd",
+        "rod",
+        "tackle",
+        "bait",
+        "cooler",
+        "net",
+        "water",
+        "safety"
+      ],
+      "paused": false,
+      "phase": "launch",
+      "position": {
+        "x": 90.6,
+        "z": -374
+      },
+      "profile": {
+        "credits": 100,
+        "owned": [
+          "pfd",
+          "rod",
+          "tackle",
+          "bait",
+          "cooler",
+          "net",
+          "water",
+          "safety"
+        ],
+        "stock": {
+          "anchovy": 0,
+          "jig": 3,
+          "sardine": 0,
+          "shrimp": 0,
+          "squid": 11
+        }
+      },
+      "referenceDepth": {
+        "datum": "MHW",
+        "measured": true,
+        "resolutionMeters": 20.655,
+        "source": "NOAA NCEI Monterey 2012 Coastal DEM, 1/3 arc-second MHW (DEM 3545), ArcGIS raster 93",
+        "value": 8.127821740738428
+      },
+      "renderer": "Canvas 2D",
+      "sailedMeters": 1509,
+      "speedKnots": 2.3,
+      "stamina": 19,
+      "standing": false,
+      "swim": null,
+      "tension": 0,
+      "throttle": 0.24,
+      "time": "06:14:23",
+      "tripComplete": false,
+      "version": 3,
+      "walkedMeters": 46,
+      "waypoint": "选定水面"
+    },
+    {
+      "wall": "2026-09-27T17:03:18.731Z",
+      "check": "return-course-reselected",
+      "activeSeconds": 890,
+      "anchor": false,
+      "arrival": null,
+      "boat": {
+        "heading": -2.684,
+        "x": 107.2,
+        "z": -377.3
+      },
+      "breaks": 0,
+      "castPower": 0,
+      "casting": false,
+      "casts": 1,
+      "catches": [
+        {
+          "kept": true,
+          "kg": 3.41,
+          "length": 60,
+          "name": "加州大比目鱼",
+          "settled": false
+        }
+      ],
+      "conditions": {
+        "clockMode": "morning",
+        "customHour": 8,
+        "daylight": 0.1,
+        "fresh": true,
+        "mode": "real",
+        "period": 9,
+        "tideMLLW": 1.5325643162253573,
+        "waterTemp": 15,
+        "waveDirection": 295,
+        "waveHeight": 1.3,
+        "windDirection": 320,
+        "windKnots": 11.66304
+      },
+      "edition": "pixel",
+      "engine": true,
+      "fish": null,
+      "fishState": "idle",
+      "fuel": 96,
+      "gps": {
+        "lat": 36.95784796481333,
+        "lon": -122.0189700602781
+      },
+      "interaction": "",
+      "launchProgress": 0,
+      "launchStage": "afloat",
+      "lineDistance": 1.3,
+      "loaded": true,
+      "lureDepth": 0,
+      "misses": 0,
+      "mode": "boat",
+      "moored": false,
+      "packed": [
+        "pfd",
+        "rod",
+        "tackle",
+        "bait",
+        "cooler",
+        "net",
+        "water",
+        "safety"
+      ],
+      "paused": false,
+      "phase": "return",
+      "position": {
+        "x": 107.2,
+        "z": -377.3
+      },
+      "profile": {
+        "credits": 100,
+        "owned": [
+          "pfd",
+          "rod",
+          "tackle",
+          "bait",
+          "cooler",
+          "net",
+          "water",
+          "safety"
+        ],
+        "stock": {
+          "anchovy": 0,
+          "jig": 3,
+          "sardine": 0,
+          "shrimp": 0,
+          "squid": 11
+        }
+      },
+      "referenceDepth": {
+        "datum": "MHW",
+        "measured": true,
+        "resolutionMeters": 20.655,
+        "source": "NOAA NCEI Monterey 2012 Coastal DEM, 1/3 arc-second MHW (DEM 3545), ArcGIS raster 93",
+        "value": 8.053795846163897
+      },
+      "renderer": "Canvas 2D",
+      "result": {
+        "action": null,
+        "message": "正在驶向 租船登船平台。",
+        "ok": true
+      },
+      "sailedMeters": 1536,
+      "speedKnots": 0.3,
+      "stamina": 19,
+      "standing": false,
+      "swim": null,
+      "tension": 0,
+      "throttle": 0,
+      "time": "06:14:49",
+      "tripComplete": false,
+      "version": 3,
+      "walkedMeters": 46,
+      "waypoint": "租船登船平台"
+    },
+    {
+      "wall": "2026-09-27T17:04:32.287Z",
+      "activeSeconds": 963,
+      "anchor": false,
+      "arrival": null,
+      "boat": {
+        "heading": 2.091,
+        "x": 1,
+        "z": -490.1
+      },
+      "breaks": 0,
+      "castPower": 0,
+      "casting": false,
+      "casts": 1,
+      "catches": [
+        {
+          "kept": true,
+          "kg": 3.41,
+          "length": 60,
+          "name": "加州大比目鱼",
+          "settled": false
+        }
+      ],
+      "conditions": {
+        "clockMode": "morning",
+        "customHour": 8,
+        "daylight": 0.1,
+        "fresh": true,
+        "mode": "real",
+        "period": 9,
+        "tideMLLW": 1.5380463575466763,
+        "waterTemp": 15,
+        "waveDirection": 295,
+        "waveHeight": 1.3,
+        "windDirection": 320,
+        "windKnots": 11.66304
+      },
+      "edition": "pixel",
+      "engine": true,
+      "fish": null,
+      "fishState": "idle",
+      "fps": 60,
+      "fuel": 96,
+      "gps": {
+        "lat": 36.95783023910861,
+        "lon": -122.0172286816072
+      },
+      "interaction": "",
+      "launchProgress": 0,
+      "launchStage": "afloat",
+      "lineDistance": 1.3,
+      "loaded": true,
+      "lureDepth": 0,
+      "menu": null,
+      "misses": 0,
+      "mode": "boat",
+      "moored": false,
+      "packed": [
+        "pfd",
+        "rod",
+        "tackle",
+        "bait",
+        "cooler",
+        "net",
+        "water",
+        "safety"
+      ],
+      "paused": false,
+      "phase": "return",
+      "position": {
+        "x": 1,
+        "z": -490.1
+      },
+      "profile": {
+        "credits": 100,
+        "owned": [
+          "pfd",
+          "rod",
+          "tackle",
+          "bait",
+          "cooler",
+          "net",
+          "water",
+          "safety"
+        ],
+        "stock": {
+          "anchovy": 0,
+          "jig": 3,
+          "sardine": 0,
+          "shrimp": 0,
+          "squid": 11
+        }
+      },
+      "referenceDepth": {
+        "datum": "MHW",
+        "measured": true,
+        "resolutionMeters": 20.655,
+        "source": "NOAA NCEI Monterey 2012 Coastal DEM, 1/3 arc-second MHW (DEM 3545), ArcGIS raster 93",
+        "value": 9.081799620880645
+      },
+      "renderer": "Canvas 2D",
+      "sailedMeters": 1725,
+      "speedKnots": 5.5,
+      "stamina": 19,
+      "standing": false,
+      "swim": null,
+      "tension": 0,
+      "throttle": 0.8,
+      "time": "06:16:03",
+      "tripComplete": false,
+      "version": 3,
+      "walkedMeters": 46,
+      "waypoint": "租船登船平台"
+    },
+    {
+      "wall": "2026-09-27T17:05:52.080Z",
+      "activeSeconds": 1043,
+      "anchor": false,
+      "arrival": null,
+      "boat": {
+        "heading": -2.94,
+        "x": -89.9,
+        "z": -302.9
+      },
+      "breaks": 0,
+      "castPower": 0,
+      "casting": false,
+      "casts": 1,
+      "catches": [
+        {
+          "kept": true,
+          "kg": 3.41,
+          "length": 60,
+          "name": "加州大比目鱼",
+          "settled": false
+        }
+      ],
+      "conditions": {
+        "clockMode": "morning",
+        "customHour": 8,
+        "daylight": 0.1,
+        "fresh": true,
+        "mode": "real",
+        "period": 9,
+        "tideMLLW": 1.5407298400570966,
+        "waterTemp": 15,
+        "waveDirection": 295,
+        "waveHeight": 1.3,
+        "windDirection": 320,
+        "windKnots": 11.66304
+      },
+      "edition": "pixel",
+      "engine": true,
+      "fish": null,
+      "fishState": "idle",
+      "fps": 60,
+      "fuel": 95,
+      "gps": {
+        "lat": 36.959589046356065,
+        "lon": -122.01803207829468
+      },
+      "interaction": "",
+      "launchProgress": 0,
+      "launchStage": "afloat",
+      "lineDistance": 1.3,
+      "loaded": true,
+      "lureDepth": 0,
+      "menu": null,
+      "misses": 0,
+      "mode": "boat",
+      "moored": false,
+      "packed": [
+        "pfd",
+        "rod",
+        "tackle",
+        "bait",
+        "cooler",
+        "net",
+        "water",
+        "safety"
+      ],
+      "paused": false,
+      "phase": "return",
+      "position": {
+        "x": -89.9,
+        "z": -302.9
+      },
+      "profile": {
+        "credits": 100,
+        "owned": [
+          "pfd",
+          "rod",
+          "tackle",
+          "bait",
+          "cooler",
+          "net",
+          "water",
+          "safety"
+        ],
+        "stock": {
+          "anchovy": 0,
+          "jig": 3,
+          "sardine": 0,
+          "shrimp": 0,
+          "squid": 11
+        }
+      },
+      "referenceDepth": {
+        "datum": "MHW",
+        "measured": true,
+        "resolutionMeters": 20.655,
+        "source": "NOAA NCEI Monterey 2012 Coastal DEM, 1/3 arc-second MHW (DEM 3545), ArcGIS raster 93",
+        "value": 6.230444661460936
+      },
+      "renderer": "Canvas 2D",
+      "sailedMeters": 1949,
+      "speedKnots": 5.5,
+      "stamina": 19,
+      "standing": false,
+      "swim": null,
+      "tension": 0,
+      "throttle": 0.8,
+      "time": "06:17:23",
+      "tripComplete": false,
+      "version": 3,
+      "walkedMeters": 46,
+      "waypoint": "租船登船平台"
+    },
+    {
+      "wall": "2026-09-27T17:06:57.720Z",
+      "activeSeconds": 1109,
+      "anchor": false,
+      "arrival": null,
+      "boat": {
+        "heading": -2.952,
+        "x": -52,
+        "z": -122.5
+      },
+      "breaks": 0,
+      "castPower": 0,
+      "casting": false,
+      "casts": 1,
+      "catches": [
+        {
+          "kept": true,
+          "kg": 3.41,
+          "length": 60,
+          "name": "加州大比目鱼",
+          "settled": false
+        }
+      ],
+      "conditions": {
+        "clockMode": "morning",
+        "customHour": 8,
+        "daylight": 0.1,
+        "fresh": true,
+        "mode": "real",
+        "period": 9,
+        "tideMLLW": 1.5433747104376263,
+        "waterTemp": 15,
+        "waveDirection": 295,
+        "waveHeight": 1.3,
+        "windDirection": 320,
+        "windKnots": 11.66304
+      },
+      "edition": "pixel",
+      "engine": true,
+      "fish": null,
+      "fishState": "idle",
+      "fps": 60,
+      "fuel": 95,
+      "gps": {
+        "lat": 36.960471241138166,
+        "lon": -122.0197862598964
+      },
+      "interaction": "",
+      "launchProgress": 0,
+      "launchStage": "afloat",
+      "lineDistance": 1.3,
+      "loaded": true,
+      "lureDepth": 0,
+      "menu": null,
+      "misses": 0,
+      "mode": "boat",
+      "moored": false,
+      "packed": [
+        "pfd",
+        "rod",
+        "tackle",
+        "bait",
+        "cooler",
+        "net",
+        "water",
+        "safety"
+      ],
+      "paused": false,
+      "phase": "return",
+      "position": {
+        "x": -52,
+        "z": -122.5
+      },
+      "profile": {
+        "credits": 100,
+        "owned": [
+          "pfd",
+          "rod",
+          "tackle",
+          "bait",
+          "cooler",
+          "net",
+          "water",
+          "safety"
+        ],
+        "stock": {
+          "anchovy": 0,
+          "jig": 3,
+          "sardine": 0,
+          "shrimp": 0,
+          "squid": 11
+        }
+      },
+      "referenceDepth": {
+        "datum": "MHW",
+        "measured": true,
+        "resolutionMeters": 20.655,
+        "source": "NOAA NCEI Monterey 2012 Coastal DEM, 1/3 arc-second MHW (DEM 3545), ArcGIS raster 93",
+        "value": 6.731533765411838
+      },
+      "renderer": "Canvas 2D",
+      "sailedMeters": 2133,
+      "speedKnots": 5.5,
+      "stamina": 19,
+      "standing": false,
+      "swim": null,
+      "tension": 0,
+      "throttle": 0.8,
+      "time": "06:18:28",
+      "tripComplete": false,
+      "version": 3,
+      "walkedMeters": 46,
+      "waypoint": "租船登船平台"
+    },
+    {
+      "wall": "2026-09-27T17:07:44.612Z",
+      "activeSeconds": 1156,
+      "anchor": false,
+      "arrival": "dock",
+      "boat": {
+        "heading": -3.016,
+        "x": -38,
+        "z": -52.9
+      },
+      "breaks": 0,
+      "castPower": 0,
+      "casting": false,
+      "casts": 1,
+      "catches": [
+        {
+          "kept": true,
+          "kg": 3.41,
+          "length": 60,
+          "name": "加州大比目鱼",
+          "settled": false
+        }
+      ],
+      "conditions": {
+        "clockMode": "morning",
+        "customHour": 8,
+        "daylight": 0.1,
+        "fresh": true,
+        "mode": "real",
+        "period": 9,
+        "tideMLLW": 1.5459808251783551,
+        "waterTemp": 15,
+        "waveDirection": 295,
+        "waveHeight": 1.3,
+        "windDirection": 320,
+        "windKnots": 11.66304
+      },
+      "edition": "pixel",
+      "engine": false,
+      "fish": null,
+      "fishState": "idle",
+      "fps": 60,
+      "fuel": 95,
+      "gps": {
+        "lat": 36.96081585089732,
+        "lon": -122.02045869784035
+      },
+      "interaction": "靠泊上岸",
+      "launchProgress": 0,
+      "launchStage": "afloat",
+      "lineDistance": 1.3,
+      "loaded": true,
+      "lureDepth": 0,
+      "menu": null,
+      "misses": 0,
+      "mode": "boat",
+      "moored": false,
+      "packed": [
+        "pfd",
+        "rod",
+        "tackle",
+        "bait",
+        "cooler",
+        "net",
+        "water",
+        "safety"
+      ],
+      "paused": false,
+      "phase": "return",
+      "position": {
+        "x": -38,
+        "z": -52.9
+      },
+      "profile": {
+        "credits": 100,
+        "owned": [
+          "pfd",
+          "rod",
+          "tackle",
+          "bait",
+          "cooler",
+          "net",
+          "water",
+          "safety"
+        ],
+        "stock": {
+          "anchovy": 0,
+          "jig": 3,
+          "sardine": 0,
+          "shrimp": 0,
+          "squid": 11
+        }
+      },
+      "referenceDepth": {
+        "datum": "MHW",
+        "measured": true,
+        "resolutionMeters": 20.655,
+        "source": "NOAA NCEI Monterey 2012 Coastal DEM, 1/3 arc-second MHW (DEM 3545), ArcGIS raster 93",
+        "value": 6.931032533833303
+      },
+      "renderer": "Canvas 2D",
+      "sailedMeters": 2207,
+      "speedKnots": -0.5,
+      "stamina": 19,
+      "standing": false,
+      "swim": null,
+      "tension": 0,
+      "throttle": 0,
+      "time": "06:19:15",
+      "tripComplete": false,
+      "version": 3,
+      "walkedMeters": 46,
+      "waypoint": null
+    },
+    {
+      "wall": "2026-09-27T17:11:15.449Z",
+      "check": "full-return",
+      "activeSeconds": 1366,
+      "anchor": false,
+      "arrival": "counter",
+      "boat": {
+        "heading": 0,
+        "x": -34.2,
+        "z": -55
+      },
+      "breaks": 0,
+      "castPower": 0,
+      "casting": false,
+      "casts": 1,
+      "catches": [
+        {
+          "kept": true,
+          "kg": 3.41,
+          "length": 60,
+          "name": "加州大比目鱼",
+          "settled": false
+        }
+      ],
+      "conditions": {
+        "clockMode": "morning",
+        "customHour": 8,
+        "daylight": 0.1,
+        "fresh": true,
+        "mode": "real",
+        "period": 9,
+        "tideMLLW": 1.553564461696069,
+        "waterTemp": 15,
+        "waveDirection": 295,
+        "waveHeight": 1.3,
+        "windDirection": 320,
+        "windKnots": 11.66304
+      },
+      "edition": "pixel",
+      "engine": false,
+      "fish": null,
+      "fishState": "idle",
+      "fps": 60,
+      "fuel": 95,
+      "gps": {
+        "lat": 36.96077778167208,
+        "lon": -122.02047168233857
+      },
+      "interaction": "码头小屋",
+      "launchProgress": 0,
+      "launchStage": "afloat",
+      "lineDistance": 1.3,
+      "loaded": false,
+      "lureDepth": 0,
+      "menu": null,
+      "misses": 0,
+      "mode": "walk",
+      "moored": true,
+      "packed": [
+        "pfd",
+        "rod",
+        "tackle",
+        "bait",
+        "cooler",
+        "net",
+        "water",
+        "safety"
+      ],
+      "paused": false,
+      "phase": "complete",
+      "position": {
+        "x": -7.8,
+        "z": -54
+      },
+      "profile": {
+        "credits": 100,
+        "owned": [
+          "pfd",
+          "rod",
+          "tackle",
+          "bait",
+          "cooler",
+          "net",
+          "water",
+          "safety"
+        ],
+        "stock": {
+          "anchovy": 0,
+          "jig": 3,
+          "sardine": 0,
+          "shrimp": 0,
+          "squid": 11
+        }
+      },
+      "referenceDepth": {
+        "datum": "MHW",
+        "measured": true,
+        "resolutionMeters": 20.655,
+        "source": "NOAA NCEI Monterey 2012 Coastal DEM, 1/3 arc-second MHW (DEM 3545), ArcGIS raster 93",
+        "value": 7.220447383722551
+      },
+      "renderer": "Canvas 2D",
+      "sailedMeters": 2208,
+      "speedKnots": 0,
+      "stamina": 19,
+      "standing": false,
+      "swim": null,
+      "tension": 0,
+      "throttle": 0,
+      "time": "06:22:46",
+      "tripComplete": true,
+      "version": 3,
+      "walkedMeters": 83,
+      "waypoint": null
+    },
+    {
+      "wall": "2026-09-27T17:11:21.354Z",
+      "check": "counter-trade",
+      "activeSeconds": 1370,
+      "anchor": false,
+      "arrival": "counter",
+      "boat": {
+        "heading": 0,
+        "x": -34.2,
+        "z": -55
+      },
+      "breaks": 0,
+      "castPower": 0,
+      "casting": false,
+      "casts": 1,
+      "catches": [
+        {
+          "kept": true,
+          "kg": 3.41,
+          "length": 60,
+          "name": "加州大比目鱼",
+          "settled": true
+        }
+      ],
+      "conditions": {
+        "clockMode": "morning",
+        "customHour": 8,
+        "daylight": 0.1,
+        "fresh": true,
+        "mode": "real",
+        "period": 9,
+        "tideMLLW": 1.553564461696069,
+        "waterTemp": 15,
+        "waveDirection": 295,
+        "waveHeight": 1.3,
+        "windDirection": 320,
+        "windKnots": 11.66304
+      },
+      "edition": "pixel",
+      "engine": false,
+      "fish": null,
+      "fishState": "idle",
+      "fuel": 95,
+      "gps": {
+        "lat": 36.96077778167208,
+        "lon": -122.02047168233857
+      },
+      "interaction": "码头小屋",
+      "launchProgress": 0,
+      "launchStage": "afloat",
+      "lineDistance": 1.3,
+      "loaded": false,
+      "lureDepth": 0,
+      "misses": 0,
+      "mode": "walk",
+      "moored": true,
+      "packed": [
+        "pfd",
+        "rod",
+        "tackle",
+        "bait",
+        "cooler",
+        "net",
+        "water",
+        "safety"
+      ],
+      "paused": true,
+      "phase": "complete",
+      "position": {
+        "x": -7.8,
+        "z": -54
+      },
+      "profile": {
+        "credits": 174,
+        "owned": [
+          "pfd",
+          "rod",
+          "tackle",
+          "bait",
+          "cooler",
+          "net",
+          "water",
+          "safety"
+        ],
+        "stock": {
+          "anchovy": 0,
+          "jig": 3,
+          "sardine": 0,
+          "shrimp": 0,
+          "squid": 11
+        }
+      },
+      "referenceDepth": {
+        "datum": "MHW",
+        "measured": true,
+        "resolutionMeters": 20.655,
+        "source": "NOAA NCEI Monterey 2012 Coastal DEM, 1/3 arc-second MHW (DEM 3545), ArcGIS raster 93",
+        "value": 7.220447383722551
+      },
+      "renderer": "Canvas 2D",
+      "result": {
+        "action": null,
+        "count": 1,
+        "message": "兑换 1 条鱼，获得 74 潮汐点。",
+        "ok": true,
+        "total": 74
+      },
+      "sailedMeters": 2208,
+      "speedKnots": 0,
+      "stamina": 19,
+      "standing": false,
+      "swim": null,
+      "tension": 0,
+      "throttle": 0,
+      "time": "06:22:50",
+      "tripComplete": true,
+      "version": 3,
+      "walkedMeters": 83,
+      "waypoint": null
+    }
+  ]
+}

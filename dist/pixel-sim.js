@@ -1,15 +1,15 @@
 /** Pixel gameplay. Geographic coordinates are metres; offshore navigation is compressed 1:2, while clock/fishing/swimming remain 1:1. */
-import {GEAR_CATALOG,BASE_GEAR,createProfile,equipmentStats,cargoWeight,settleFish,buyGear as purchaseGear,restock} from './equipment.js?v=20260927-pixel-v3';
-import {HARBOR,BOARDING_WALK_PATH,walkHeight,walkAllowed,walkBlocked,clearWalkSegment,canBoardFrom,harborWaterBlocked} from './harbor-layout.js?v=20260927-pixel-v3';
-import {FISHING_SPOTS,toGPS,bearingDegrees,onLand,onPier,MAP_BOUNDS} from './geography.js?v=20260927-pixel-v3';
-import {depthAt,depthInfoAt} from './bathymetry.js?v=20260927-pixel-v3';
-import {waterRoute,resolveVesselContact,contactAwareControl} from './navigation.js?v=20260927-pixel-v3';
-import {createVesselState,stepVessel,syncVessel,vesselWind,vesselAutopilot} from './vessel-physics.js?v=20260927-pixel-v3';
-import {newImmersion,stepImmersion,ladderPoint} from './swimming.js?v=20260927-pixel-v3';
-import {RIG_PROFILES,getRigProfile,stepRigLure,weightedRigFish} from './fishing-rigs.js?v=20260927-pixel-v3';
-import {assessCatchLedger,identifyRegulatedSpecies} from './fishing-regulations.js?v=20260927-pixel-v3';
-import {FishingPatrol} from './fish-patrol.js?v=20260927-pixel-v3';
-import {navigationStepScale} from './pixel-navigation-scale.js?v=20260927-pixel-v3';
+import {GEAR_CATALOG,BASE_GEAR,createProfile,equipmentStats,cargoWeight,settleFish,buyGear as purchaseGear,restock} from './equipment.js?v=20260927-pixel-v4';
+import {HARBOR,BOARDING_WALK_PATH,walkHeight,walkAllowed,walkBlocked,clearWalkSegment,canBoardFrom,harborWaterBlocked} from './harbor-layout.js?v=20260927-pixel-v4';
+import {FISHING_SPOTS,toGPS,bearingDegrees,onLand,onPier,MAP_BOUNDS} from './geography.js?v=20260927-pixel-v4';
+import {depthAt,depthInfoAt} from './bathymetry.js?v=20260927-pixel-v4';
+import {waterRoute,resolveVesselContact,contactAwareControl} from './navigation.js?v=20260927-pixel-v4';
+import {createVesselState,stepVessel,syncVessel,vesselWind,vesselAutopilot} from './vessel-physics.js?v=20260927-pixel-v4';
+import {newImmersion,stepImmersion,ladderPoint} from './swimming.js?v=20260927-pixel-v4';
+import {RIG_PROFILES,getRigProfile,stepRigLure,weightedRigFish} from './fishing-rigs.js?v=20260927-pixel-v4';
+import {assessCatchLedger,identifyRegulatedSpecies} from './fishing-regulations.js?v=20260927-pixel-v4';
+import {FishingPatrol} from './fish-patrol.js?v=20260927-pixel-v4';
+import {navigationStepScale} from './pixel-navigation-scale.js?v=20260927-pixel-v4';
 export {GEAR_CATALOG,BASE_GEAR,HARBOR,BOARDING_WALK_PATH,FISHING_SPOTS};
 export const PIXEL_FISH=[
  {name:'蓝岩鱼',latin:'Sebastes mystinus',color:'#718ba8',min:22,max:39,weight:.7,power:.86,spot:'kelp',bait:'squid'},
@@ -146,7 +146,7 @@ export class PixelSimulation {
  keepCatch(){return this.resolveCatch(true);}
  releaseCatch(){return this.resolveCatch(false);}
  resolveCatch(keep){const s=this.state;if(s.fishState!=='landed'||!s.fish)return{ok:false,message:''};if(keep&&cargoWeight(s.catches)+s.fish.kg>this.stats.capacity)return this.notify('冰箱装不下了，可以记录并放流。',null,false);const f={...s.fish,catchId:`pixel-${Date.now()}-${s.profile.nextCatch++}`,kept:keep,time:s.clock,fightSeconds:Math.round(s.fightTime)};s.catches.push(f);const reward=keep?0:settleFish(s.profile,f);if(s.baitOnHook)s.baitOnHook.condition*=.45;s.fish=null;s.fishState='idle';s.bobber=null;s.reeling=false;s.pumping=false;s.tension=0;this.journal(`${keep?'留鱼':'放流'} ${f.name} · ${f.length} cm / ${f.kg} kg。`);return this.notify(keep?'鱼获已装箱，返航后去小屋兑换。':`记录并放流，获得 ${reward} 潮汐点。`);}
- trade(){const s=this.state;if(this.inspectionPending())return{...this.notify('例行检查结束后可以兑换鱼获。',null,false),count:0,total:0};if(!this.atCounter)return this.notify('回小屋找值班员兑换鱼获。',null,false);let count=0,total=0;for(const f of s.catches)if(f.kept&&!f.settled){const n=settleFish(s.profile,f);if(n){count++;total+=n;}}if(count)this.journal(`兑换 ${count} 条鱼，获得 ${total} 潮汐点。`);return{...this.notify(count?`兑换 ${count} 条鱼，获得 ${total} 潮汐点。`:'冰箱里没有待兑换的鱼获。'),count,total};}
+ trade(){const s=this.state;if(this.inspectionPending())return{...this.notify('先关闭窗口，等例行检查结束后再兑换鱼获。',null,false),count:0,total:0};if(!this.atCounter)return this.notify('回小屋找值班员兑换鱼获。',null,false);let count=0,total=0;for(const f of s.catches)if(f.kept&&!f.settled){const n=settleFish(s.profile,f);if(n){count++;total+=n;}}if(count)this.journal(`兑换 ${count} 条鱼，获得 ${total} 潮汐点。`);return{...this.notify(count?`兑换 ${count} 条鱼，获得 ${total} 潮汐点。`:'冰箱里没有待兑换的鱼获。'),count,total};}
  dock(){const s=this.state;if(s.mode!=='boat'||s.fishState!=='idle'||Math.hypot(s.boatX-HARBOR.boatX,s.boatZ-HARBOR.boatZ)>=16||Math.abs(s.speed)>=.85)return this.notify('靠近登船平台，减速后靠泊。',null,false);this.patrol.considerDock(s);s.engine=false;s.throttle=0;s.anchor=false;s.waypoint=null;s.waterRoute=[];s.docking={fromX:s.boatX,fromZ:s.boatZ,fromHeading:s.heading,progress:0,duration:Math.max(4,Math.hypot(s.boatX-HARBOR.boatX,s.boatZ-HARBOR.boatZ)/.55)};return this.notify('慢慢靠泊，系好缆绳。');}
  stand(){const s=this.state;if(s.mode==='swim'){s.swim.assist=true;return this.notify('朝船尾梯游过去。');}if(s.mode!=='boat'||s.docking||s.fishState!=='idle')return this.notify('先收回钓组。',null,false);s.standing=!s.standing;s.deckX=0;s.deckZ=.8;s.engine=false;s.throttle=0;s.waypoint=null;s.waterRoute=[];return this.notify(s.standing?'扶稳船舷，慢慢走。':'回到驾驶座。');}
  enterWater(x,z,y){const s=this.state;this.retrieve();s.mode='swim';s.swim=newImmersion(x,z,y,s.pfd);s.standing=false;s.walkRoute=[];s.autoWalk=false;s.waypoint=null;s.waterRoute=[];if(s.lanyard){s.engine=false;s.throttle=0;}this.journal('落水，向船尾梯游去。');return this.notify(s.pfd?'救生衣托住你，慢慢游向船尾梯。':'落水了，尽快游向船尾梯。');}

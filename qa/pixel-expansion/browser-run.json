@@ -1,0 +1,3217 @@
+{
+  "startedAt": "2026-09-27T17:24:47.923Z",
+  "completedAt": "2026-09-27T17:38:38.051Z",
+  "build": "20260927-pixel-v3",
+  "codeCommit": "4030b43",
+  "samples": [
+    {
+      "wall": "2026-09-27T17:23:10.498Z",
+      "check": "no-instruments",
+      "edition": "pixel",
+      "renderer": "Canvas 2D",
+      "version": 4,
+      "mode": "walk",
+      "phase": "complete",
+      "time": "06:00:07",
+      "dayStartAt": "2026-09-27T13:00:00.000Z",
+      "activeSeconds": 7,
+      "position": {
+        "x": -10,
+        "z": -45
+      },
+      "boat": {
+        "x": -34.2,
+        "z": -55,
+        "heading": null
+      },
+      "navigation": {
+        "chart": false,
+        "compass": false,
+        "gps": false,
+        "sounder": false,
+        "heading": null,
+        "gpsPosition": null,
+        "depth": null,
+        "speedKnots": null
+      },
+      "navigationScale": 1,
+      "gps": null,
+      "referenceDepth": null,
+      "launchStage": "afloat",
+      "launchProgress": 0,
+      "packed": [
+        "pfd",
+        "rod",
+        "tackle",
+        "bait",
+        "cooler",
+        "net",
+        "water",
+        "safety"
+      ],
+      "profile": {
+        "credits": 174,
+        "owned": [
+          "pfd",
+          "rod",
+          "tackle",
+          "bait",
+          "cooler",
+          "net",
+          "descending_device",
+          "water",
+          "safety"
+        ],
+        "stock": {
+          "squid": 11,
+          "anchovy": 0,
+          "shrimp": 0,
+          "sardine": 0,
+          "jig": 3
+        }
+      },
+      "loaded": false,
+      "moored": true,
+      "engine": false,
+      "throttle": 0,
+      "anchor": false,
+      "speedKnots": null,
+      "fuel": 95,
+      "standing": false,
+      "swim": null,
+      "waypoint": null,
+      "arrival": null,
+      "fishState": "idle",
+      "casting": false,
+      "castPower": 0,
+      "rig": "bottom",
+      "rigWeightGrams": 85,
+      "fishingDepthMeters": null,
+      "rigPresentation": null,
+      "hookCount": 1,
+      "paidLineMeters": 0,
+      "tension": 0,
+      "stamina": 19,
+      "lineDistance": 0,
+      "lureDepth": null,
+      "fish": null,
+      "casts": 1,
+      "catches": [
+        {
+          "name": "加州大比目鱼",
+          "length": 60,
+          "kg": 3.41,
+          "kept": true,
+          "settled": true,
+          "confiscated": false
+        }
+      ],
+      "inspection": null,
+      "lastInspection": null,
+      "misses": 0,
+      "breaks": 0,
+      "sailedMeters": 2208,
+      "walkedMeters": 111,
+      "paused": true,
+      "interaction": "",
+      "tripComplete": true,
+      "conditions": {
+        "windKnots": 11.66304,
+        "windDirection": 320,
+        "waveHeight": 1.3,
+        "period": 9,
+        "waterTemp": 15,
+        "mode": "real",
+        "waveDirection": 295,
+        "tideMLLW": 1.5812680356519864,
+        "fresh": true,
+        "daylight": 0.1,
+        "clockMode": "morning",
+        "customHour": 8
+      },
+      "ecology": {
+        "active": [],
+        "counts": {
+          "bait": 0,
+          "dolphins": 0,
+          "whale": 0
+        },
+        "encounters": [],
+        "illustrativeRates": true
+      },
+      "menu": "map",
+      "rendererFPS": 60,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "build": "20260927-pixel-v3"
+    },
+    {
+      "wall": "2026-09-27T17:23:44.681Z",
+      "check": "purchased-not-packed",
+      "edition": "pixel",
+      "renderer": "Canvas 2D",
+      "version": 4,
+      "mode": "walk",
+      "phase": "complete",
+      "time": "06:00:21",
+      "dayStartAt": "2026-09-27T13:00:00.000Z",
+      "activeSeconds": 22,
+      "position": {
+        "x": -7.8,
+        "z": -54
+      },
+      "boat": {
+        "x": -34.2,
+        "z": -55,
+        "heading": null
+      },
+      "navigation": {
+        "chart": false,
+        "compass": false,
+        "gps": false,
+        "sounder": false,
+        "heading": null,
+        "gpsPosition": null,
+        "depth": null,
+        "speedKnots": null
+      },
+      "navigationScale": 1,
+      "gps": null,
+      "referenceDepth": null,
+      "launchStage": "afloat",
+      "launchProgress": 0,
+      "packed": [
+        "pfd",
+        "rod",
+        "tackle",
+        "bait",
+        "cooler",
+        "net",
+        "water",
+        "safety",
+        "descending_device"
+      ],
+      "profile": {
+        "credits": 19,
+        "owned": [
+          "pfd",
+          "rod",
+          "tackle",
+          "bait",
+          "cooler",
+          "net",
+          "descending_device",
+          "water",
+          "safety",
+          "nautical_chart",
+          "rig_dropper"
+        ],
+        "stock": {
+          "squid": 12,
+          "anchovy": 0,
+          "shrimp": 0,
+          "sardine": 0,
+          "jig": 3
+        }
+      },
+      "loaded": false,
+      "moored": true,
+      "engine": false,
+      "throttle": 0,
+      "anchor": false,
+      "speedKnots": null,
+      "fuel": 100,
+      "standing": false,
+      "swim": null,
+      "waypoint": null,
+      "arrival": "counter",
+      "fishState": "idle",
+      "casting": false,
+      "castPower": 0,
+      "rig": "bottom",
+      "rigWeightGrams": 85,
+      "fishingDepthMeters": null,
+      "rigPresentation": null,
+      "hookCount": 1,
+      "paidLineMeters": 0,
+      "tension": 0,
+      "stamina": 19,
+      "lineDistance": 0,
+      "lureDepth": null,
+      "fish": null,
+      "casts": 1,
+      "catches": [
+        {
+          "name": "加州大比目鱼",
+          "length": 60,
+          "kg": 3.41,
+          "kept": true,
+          "settled": true,
+          "confiscated": false
+        }
+      ],
+      "inspection": null,
+      "lastInspection": null,
+      "misses": 0,
+      "breaks": 0,
+      "sailedMeters": 2208,
+      "walkedMeters": 120,
+      "paused": true,
+      "interaction": "码头小屋",
+      "tripComplete": true,
+      "conditions": {
+        "windKnots": 11.66304,
+        "windDirection": 320,
+        "waveHeight": 1.3,
+        "period": 9,
+        "waterTemp": 15,
+        "mode": "real",
+        "waveDirection": 295,
+        "tideMLLW": 1.5812680356519864,
+        "fresh": true,
+        "daylight": 0.1,
+        "clockMode": "morning",
+        "customHour": 8
+      },
+      "ecology": {
+        "active": [],
+        "counts": {
+          "bait": 0,
+          "dolphins": 0,
+          "whale": 0
+        },
+        "encounters": [],
+        "illustrativeRates": true
+      },
+      "menu": "gear",
+      "rendererFPS": 60,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "build": "20260927-pixel-v3"
+    },
+    {
+      "wall": "2026-09-27T17:24:47.923Z",
+      "check": "final-integration-resume",
+      "edition": "pixel",
+      "renderer": "Canvas 2D",
+      "version": 4,
+      "mode": "walk",
+      "phase": "complete",
+      "time": "06:00:00",
+      "dayStartAt": "2026-09-27T13:00:00.000Z",
+      "activeSeconds": 0,
+      "position": {
+        "x": -10.2,
+        "z": -45.2
+      },
+      "boat": {
+        "x": -34.2,
+        "z": -55,
+        "heading": null
+      },
+      "navigation": {
+        "chart": true,
+        "compass": false,
+        "gps": false,
+        "sounder": false,
+        "heading": null,
+        "gpsPosition": null,
+        "depth": null,
+        "speedKnots": null
+      },
+      "navigationScale": 1,
+      "gps": null,
+      "referenceDepth": null,
+      "launchStage": "afloat",
+      "launchProgress": 0,
+      "packed": [
+        "pfd",
+        "rod",
+        "tackle",
+        "bait",
+        "cooler",
+        "net",
+        "water",
+        "safety",
+        "descending_device",
+        "nautical_chart",
+        "rig_dropper"
+      ],
+      "profile": {
+        "credits": 19,
+        "owned": [
+          "pfd",
+          "rod",
+          "tackle",
+          "bait",
+          "cooler",
+          "net",
+          "descending_device",
+          "water",
+          "safety",
+          "nautical_chart",
+          "rig_dropper"
+        ],
+        "stock": {
+          "squid": 12,
+          "anchovy": 0,
+          "shrimp": 0,
+          "sardine": 0,
+          "jig": 3
+        }
+      },
+      "loaded": false,
+      "moored": true,
+      "engine": false,
+      "throttle": 0,
+      "anchor": false,
+      "speedKnots": null,
+      "fuel": 100,
+      "standing": false,
+      "swim": null,
+      "waypoint": null,
+      "arrival": null,
+      "fishState": "idle",
+      "casting": false,
+      "castPower": 0,
+      "rig": "dropper",
+      "rigWeightGrams": 113,
+      "fishingDepthMeters": 2.5,
+      "rigPresentation": null,
+      "hookCount": 2,
+      "paidLineMeters": 0,
+      "tension": 0,
+      "stamina": 19,
+      "lineDistance": 0,
+      "lureDepth": null,
+      "fish": null,
+      "casts": 1,
+      "catches": [
+        {
+          "name": "加州大比目鱼",
+          "length": 60,
+          "kg": 3.41,
+          "kept": true,
+          "settled": true,
+          "confiscated": false
+        }
+      ],
+      "inspection": null,
+      "lastInspection": null,
+      "misses": 0,
+      "breaks": 0,
+      "sailedMeters": 2208,
+      "walkedMeters": 158,
+      "paused": false,
+      "interaction": "",
+      "tripComplete": true,
+      "conditions": {
+        "windKnots": 11.66304,
+        "windDirection": 320,
+        "waveHeight": 1.3,
+        "period": 9,
+        "waterTemp": 15,
+        "mode": "real",
+        "waveDirection": 295,
+        "tideMLLW": 1.5845858321773365,
+        "fresh": true,
+        "daylight": 0.1,
+        "clockMode": "morning",
+        "customHour": 8
+      },
+      "ecology": {
+        "active": [],
+        "counts": {
+          "bait": 0,
+          "dolphins": 0,
+          "whale": 0
+        },
+        "encounters": [],
+        "illustrativeRates": true
+      },
+      "menu": null,
+      "rendererFPS": 60,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "build": "20260927-pixel-v3"
+    },
+    {
+      "wall": "2026-09-27T17:25:24.928Z",
+      "check": "departure",
+      "edition": "pixel",
+      "renderer": "Canvas 2D",
+      "version": 4,
+      "mode": "boat",
+      "phase": "launch",
+      "time": "06:00:33",
+      "dayStartAt": "2026-09-27T13:00:00.000Z",
+      "activeSeconds": 34,
+      "position": {
+        "x": -34.2,
+        "z": -55
+      },
+      "boat": {
+        "x": -34.2,
+        "z": -55,
+        "heading": null
+      },
+      "navigation": {
+        "chart": true,
+        "compass": false,
+        "gps": false,
+        "sounder": false,
+        "heading": null,
+        "gpsPosition": null,
+        "depth": null,
+        "speedKnots": null
+      },
+      "navigationScale": 1,
+      "gps": null,
+      "referenceDepth": null,
+      "launchStage": "afloat",
+      "launchProgress": 0,
+      "packed": [
+        "pfd",
+        "rod",
+        "tackle",
+        "bait",
+        "cooler",
+        "net",
+        "water",
+        "safety",
+        "descending_device",
+        "nautical_chart",
+        "rig_dropper"
+      ],
+      "profile": {
+        "credits": 19,
+        "owned": [
+          "pfd",
+          "rod",
+          "tackle",
+          "bait",
+          "cooler",
+          "net",
+          "descending_device",
+          "water",
+          "safety",
+          "nautical_chart",
+          "rig_dropper"
+        ],
+        "stock": {
+          "squid": 12,
+          "anchovy": 0,
+          "shrimp": 0,
+          "sardine": 0,
+          "jig": 3
+        }
+      },
+      "loaded": true,
+      "moored": false,
+      "engine": true,
+      "throttle": 0.8,
+      "anchor": false,
+      "speedKnots": null,
+      "fuel": 100,
+      "standing": false,
+      "swim": null,
+      "waypoint": "Wharf 西侧近岸",
+      "arrival": null,
+      "fishState": "idle",
+      "casting": false,
+      "castPower": 0,
+      "rig": "dropper",
+      "rigWeightGrams": 113,
+      "fishingDepthMeters": 2.5,
+      "rigPresentation": null,
+      "hookCount": 2,
+      "paidLineMeters": 0,
+      "tension": 0,
+      "stamina": 19,
+      "lineDistance": 0,
+      "lureDepth": null,
+      "fish": null,
+      "casts": 1,
+      "catches": [
+        {
+          "name": "加州大比目鱼",
+          "length": 60,
+          "kg": 3.41,
+          "kept": true,
+          "settled": true,
+          "confiscated": false
+        }
+      ],
+      "inspection": null,
+      "lastInspection": null,
+      "misses": 0,
+      "breaks": 0,
+      "sailedMeters": 2208,
+      "walkedMeters": 198,
+      "paused": false,
+      "interaction": "靠泊上岸",
+      "tripComplete": false,
+      "conditions": {
+        "windKnots": 11.66304,
+        "windDirection": 320,
+        "waveHeight": 1.3,
+        "period": 9,
+        "waterTemp": 15,
+        "mode": "real",
+        "waveDirection": 295,
+        "tideMLLW": 1.5845858321773365,
+        "fresh": true,
+        "daylight": 0.1,
+        "clockMode": "morning",
+        "customHour": 8
+      },
+      "ecology": {
+        "active": [],
+        "counts": {
+          "bait": 0,
+          "dolphins": 0,
+          "whale": 0
+        },
+        "encounters": [],
+        "illustrativeRates": true
+      },
+      "menu": null,
+      "rendererFPS": 60,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "build": "20260927-pixel-v3"
+    },
+    {
+      "wall": "2026-09-27T17:26:08.529Z",
+      "check": "underway",
+      "edition": "pixel",
+      "renderer": "Canvas 2D",
+      "version": 4,
+      "mode": "boat",
+      "phase": "launch",
+      "time": "06:01:17",
+      "dayStartAt": "2026-09-27T13:00:00.000Z",
+      "activeSeconds": 77,
+      "position": {
+        "x": -67.9,
+        "z": -250.3
+      },
+      "boat": {
+        "x": -67.9,
+        "z": -250.3,
+        "heading": null
+      },
+      "navigation": {
+        "chart": true,
+        "compass": false,
+        "gps": false,
+        "sounder": false,
+        "heading": null,
+        "gpsPosition": null,
+        "depth": null,
+        "speedKnots": null
+      },
+      "navigationScale": 2,
+      "gps": null,
+      "referenceDepth": null,
+      "launchStage": "afloat",
+      "launchProgress": 0,
+      "packed": [
+        "pfd",
+        "rod",
+        "tackle",
+        "bait",
+        "cooler",
+        "net",
+        "water",
+        "safety",
+        "descending_device",
+        "nautical_chart",
+        "rig_dropper"
+      ],
+      "profile": {
+        "credits": 19,
+        "owned": [
+          "pfd",
+          "rod",
+          "tackle",
+          "bait",
+          "cooler",
+          "net",
+          "descending_device",
+          "water",
+          "safety",
+          "nautical_chart",
+          "rig_dropper"
+        ],
+        "stock": {
+          "squid": 12,
+          "anchovy": 0,
+          "shrimp": 0,
+          "sardine": 0,
+          "jig": 3
+        }
+      },
+      "loaded": true,
+      "moored": false,
+      "engine": true,
+      "throttle": 0.8,
+      "anchor": false,
+      "speedKnots": null,
+      "fuel": 100,
+      "standing": false,
+      "swim": null,
+      "waypoint": "Wharf 西侧近岸",
+      "arrival": null,
+      "fishState": "idle",
+      "casting": false,
+      "castPower": 0,
+      "rig": "dropper",
+      "rigWeightGrams": 113,
+      "fishingDepthMeters": 2.5,
+      "rigPresentation": null,
+      "hookCount": 2,
+      "paidLineMeters": 0,
+      "tension": 0,
+      "stamina": 19,
+      "lineDistance": 0,
+      "lureDepth": null,
+      "fish": null,
+      "casts": 1,
+      "catches": [
+        {
+          "name": "加州大比目鱼",
+          "length": 60,
+          "kg": 3.41,
+          "kept": true,
+          "settled": true,
+          "confiscated": false
+        }
+      ],
+      "inspection": null,
+      "lastInspection": null,
+      "misses": 0,
+      "breaks": 0,
+      "sailedMeters": 2407,
+      "walkedMeters": 198,
+      "paused": false,
+      "interaction": "",
+      "tripComplete": false,
+      "conditions": {
+        "windKnots": 11.66304,
+        "windDirection": 320,
+        "waveHeight": 1.3,
+        "period": 9,
+        "waterTemp": 15,
+        "mode": "real",
+        "waveDirection": 295,
+        "tideMLLW": 1.5864562017463777,
+        "fresh": true,
+        "daylight": 0.1,
+        "clockMode": "morning",
+        "customHour": 8
+      },
+      "ecology": {
+        "active": [],
+        "counts": {
+          "bait": 0,
+          "dolphins": 0,
+          "whale": 0
+        },
+        "encounters": [],
+        "illustrativeRates": true
+      },
+      "menu": null,
+      "rendererFPS": 60,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "build": "20260927-pixel-v3"
+    },
+    {
+      "wall": "2026-09-27T17:28:15.759Z",
+      "check": "offshore-route",
+      "edition": "pixel",
+      "renderer": "Canvas 2D",
+      "version": 4,
+      "mode": "boat",
+      "phase": "launch",
+      "time": "06:03:24",
+      "dayStartAt": "2026-09-27T13:00:00.000Z",
+      "activeSeconds": 205,
+      "position": {
+        "x": 188,
+        "z": -131.3
+      },
+      "boat": {
+        "x": 188,
+        "z": -131.3,
+        "heading": null
+      },
+      "navigation": {
+        "chart": true,
+        "compass": false,
+        "gps": false,
+        "sounder": false,
+        "heading": null,
+        "gpsPosition": null,
+        "depth": null,
+        "speedKnots": null
+      },
+      "navigationScale": 2,
+      "gps": null,
+      "referenceDepth": null,
+      "launchStage": "afloat",
+      "launchProgress": 0,
+      "packed": [
+        "pfd",
+        "rod",
+        "tackle",
+        "bait",
+        "cooler",
+        "net",
+        "water",
+        "safety",
+        "descending_device",
+        "nautical_chart",
+        "rig_dropper"
+      ],
+      "profile": {
+        "credits": 19,
+        "owned": [
+          "pfd",
+          "rod",
+          "tackle",
+          "bait",
+          "cooler",
+          "net",
+          "descending_device",
+          "water",
+          "safety",
+          "nautical_chart",
+          "rig_dropper"
+        ],
+        "stock": {
+          "squid": 12,
+          "anchovy": 0,
+          "shrimp": 0,
+          "sardine": 0,
+          "jig": 3
+        }
+      },
+      "loaded": true,
+      "moored": false,
+      "engine": true,
+      "throttle": 0.8,
+      "anchor": false,
+      "speedKnots": null,
+      "fuel": 99,
+      "standing": false,
+      "swim": null,
+      "waypoint": "Wharf 西侧近岸",
+      "arrival": null,
+      "fishState": "idle",
+      "casting": false,
+      "castPower": 0,
+      "rig": "dropper",
+      "rigWeightGrams": 113,
+      "fishingDepthMeters": 2.5,
+      "rigPresentation": null,
+      "hookCount": 2,
+      "paidLineMeters": 0,
+      "tension": 0,
+      "stamina": 19,
+      "lineDistance": 0,
+      "lureDepth": null,
+      "fish": null,
+      "casts": 1,
+      "catches": [
+        {
+          "name": "加州大比目鱼",
+          "length": 60,
+          "kg": 3.41,
+          "kept": true,
+          "settled": true,
+          "confiscated": false
+        }
+      ],
+      "inspection": null,
+      "lastInspection": null,
+      "misses": 0,
+      "breaks": 0,
+      "sailedMeters": 3129,
+      "walkedMeters": 198,
+      "paused": false,
+      "interaction": "",
+      "tripComplete": false,
+      "conditions": {
+        "windKnots": 11.66304,
+        "windDirection": 320,
+        "waveHeight": 1.3,
+        "period": 9,
+        "waterTemp": 15,
+        "mode": "real",
+        "waveDirection": 295,
+        "tideMLLW": 1.5900706029145733,
+        "fresh": true,
+        "daylight": 0.1,
+        "clockMode": "morning",
+        "customHour": 8
+      },
+      "ecology": {
+        "active": [],
+        "counts": {
+          "bait": 0,
+          "dolphins": 0,
+          "whale": 0
+        },
+        "encounters": [],
+        "illustrativeRates": true
+      },
+      "menu": null,
+      "rendererFPS": 60,
+      "viewport": {
+        "width": 844,
+        "height": 390
+      },
+      "build": "20260927-pixel-v3"
+    },
+    {
+      "wall": "2026-09-27T17:29:13.406Z",
+      "check": "arrival-bait-school",
+      "edition": "pixel",
+      "renderer": "Canvas 2D",
+      "version": 4,
+      "mode": "boat",
+      "phase": "fish",
+      "time": "06:04:22",
+      "dayStartAt": "2026-09-27T13:00:00.000Z",
+      "activeSeconds": 262,
+      "position": {
+        "x": 242.3,
+        "z": 20.5
+      },
+      "boat": {
+        "x": 242.3,
+        "z": 20.5,
+        "heading": null
+      },
+      "navigation": {
+        "chart": true,
+        "compass": false,
+        "gps": false,
+        "sounder": false,
+        "heading": null,
+        "gpsPosition": null,
+        "depth": null,
+        "speedKnots": null
+      },
+      "navigationScale": 1,
+      "gps": null,
+      "referenceDepth": null,
+      "launchStage": "afloat",
+      "launchProgress": 0,
+      "packed": [
+        "pfd",
+        "rod",
+        "tackle",
+        "bait",
+        "cooler",
+        "net",
+        "water",
+        "safety",
+        "descending_device",
+        "nautical_chart",
+        "rig_dropper"
+      ],
+      "profile": {
+        "credits": 19,
+        "owned": [
+          "pfd",
+          "rod",
+          "tackle",
+          "bait",
+          "cooler",
+          "net",
+          "descending_device",
+          "water",
+          "safety",
+          "nautical_chart",
+          "rig_dropper"
+        ],
+        "stock": {
+          "squid": 12,
+          "anchovy": 0,
+          "shrimp": 0,
+          "sardine": 0,
+          "jig": 3
+        }
+      },
+      "loaded": true,
+      "moored": false,
+      "engine": false,
+      "throttle": 0,
+      "anchor": true,
+      "speedKnots": null,
+      "fuel": 99,
+      "standing": false,
+      "swim": null,
+      "waypoint": null,
+      "arrival": "fishing",
+      "fishState": "idle",
+      "casting": false,
+      "castPower": 0,
+      "rig": "dropper",
+      "rigWeightGrams": 113,
+      "fishingDepthMeters": 2.5,
+      "rigPresentation": null,
+      "hookCount": 2,
+      "paidLineMeters": 0,
+      "tension": 0,
+      "stamina": 19,
+      "lineDistance": 0,
+      "lureDepth": null,
+      "fish": null,
+      "casts": 1,
+      "catches": [
+        {
+          "name": "加州大比目鱼",
+          "length": 60,
+          "kg": 3.41,
+          "kept": true,
+          "settled": true,
+          "confiscated": false
+        }
+      ],
+      "inspection": null,
+      "lastInspection": null,
+      "misses": 0,
+      "breaks": 0,
+      "sailedMeters": 3299,
+      "walkedMeters": 198,
+      "paused": false,
+      "interaction": "",
+      "tripComplete": false,
+      "conditions": {
+        "windKnots": 11.66304,
+        "windDirection": 320,
+        "waveHeight": 1.3,
+        "period": 9,
+        "waterTemp": 15,
+        "mode": "real",
+        "waveDirection": 295,
+        "tideMLLW": 1.591814754866936,
+        "fresh": true,
+        "daylight": 0.1,
+        "clockMode": "morning",
+        "customHour": 8
+      },
+      "ecology": {
+        "active": [
+          {
+            "id": 1,
+            "type": "bait",
+            "species": "anchovy-school",
+            "name": "饵鱼群与觅食海鸟",
+            "x": 251,
+            "z": 43,
+            "age": 13,
+            "members": 10
+          }
+        ],
+        "counts": {
+          "bait": 1,
+          "dolphins": 0,
+          "whale": 0
+        },
+        "encounters": [
+          {
+            "id": 1,
+            "type": "bait",
+            "species": "anchovy-school",
+            "name": "饵鱼群与觅食海鸟",
+            "elapsed": 250
+          }
+        ],
+        "illustrativeRates": true
+      },
+      "menu": null,
+      "rendererFPS": 60,
+      "viewport": {
+        "width": 844,
+        "height": 390
+      },
+      "build": "20260927-pixel-v3"
+    },
+    {
+      "wall": "2026-09-27T17:29:50.105Z",
+      "check": "working-dropper",
+      "edition": "pixel",
+      "renderer": "Canvas 2D",
+      "version": 4,
+      "mode": "boat",
+      "phase": "fish",
+      "time": "06:04:59",
+      "dayStartAt": "2026-09-27T13:00:00.000Z",
+      "activeSeconds": 299,
+      "position": {
+        "x": 243,
+        "z": 20.4
+      },
+      "boat": {
+        "x": 243,
+        "z": 20.4,
+        "heading": null
+      },
+      "navigation": {
+        "chart": true,
+        "compass": false,
+        "gps": false,
+        "sounder": false,
+        "heading": null,
+        "gpsPosition": null,
+        "depth": null,
+        "speedKnots": null
+      },
+      "navigationScale": 1,
+      "gps": null,
+      "referenceDepth": null,
+      "launchStage": "afloat",
+      "launchProgress": 0,
+      "packed": [
+        "pfd",
+        "rod",
+        "tackle",
+        "bait",
+        "cooler",
+        "net",
+        "water",
+        "safety",
+        "descending_device",
+        "nautical_chart",
+        "rig_dropper"
+      ],
+      "profile": {
+        "credits": 19,
+        "owned": [
+          "pfd",
+          "rod",
+          "tackle",
+          "bait",
+          "cooler",
+          "net",
+          "descending_device",
+          "water",
+          "safety",
+          "nautical_chart",
+          "rig_dropper"
+        ],
+        "stock": {
+          "squid": 12,
+          "anchovy": 0,
+          "shrimp": 0,
+          "sardine": 0,
+          "jig": 3
+        }
+      },
+      "loaded": true,
+      "moored": false,
+      "engine": false,
+      "throttle": 0,
+      "anchor": true,
+      "speedKnots": null,
+      "fuel": 99,
+      "standing": false,
+      "swim": null,
+      "waypoint": null,
+      "arrival": "fishing",
+      "fishState": "sinking",
+      "casting": false,
+      "castPower": 1,
+      "rig": "dropper",
+      "rigWeightGrams": 113,
+      "fishingDepthMeters": 2.5,
+      "rigPresentation": {
+        "depth": null,
+        "targetDepth": null,
+        "sinkRate": 0.8152900042978658,
+        "pumpHeight": 0,
+        "liftVelocity": 0,
+        "lineAngleDeg": 0.42816097216521354,
+        "verticalSpeed": 0,
+        "bottomContact": false,
+        "nearBottom": false,
+        "snagRiskPerSecond": 2.2593981327945105e-8,
+        "attraction": 0.8208468133105475
+      },
+      "hookCount": 2,
+      "paidLineMeters": 21.6,
+      "tension": 0,
+      "stamina": 19,
+      "lineDistance": 20.1,
+      "lureDepth": null,
+      "fish": null,
+      "casts": 2,
+      "catches": [
+        {
+          "name": "加州大比目鱼",
+          "length": 60,
+          "kg": 3.41,
+          "kept": true,
+          "settled": true,
+          "confiscated": false
+        }
+      ],
+      "inspection": null,
+      "lastInspection": null,
+      "misses": 0,
+      "breaks": 0,
+      "sailedMeters": 3300,
+      "walkedMeters": 198,
+      "paused": false,
+      "interaction": "",
+      "tripComplete": false,
+      "conditions": {
+        "windKnots": 11.66304,
+        "windDirection": 320,
+        "waveHeight": 1.3,
+        "period": 9,
+        "waterTemp": 15,
+        "mode": "real",
+        "waveDirection": 295,
+        "tideMLLW": 1.593516632743404,
+        "fresh": true,
+        "daylight": 0.1,
+        "clockMode": "morning",
+        "customHour": 8
+      },
+      "ecology": {
+        "active": [
+          {
+            "id": 1,
+            "type": "bait",
+            "species": "anchovy-school",
+            "name": "饵鱼群与觅食海鸟",
+            "x": 245,
+            "z": 40,
+            "age": 49,
+            "members": 10
+          }
+        ],
+        "counts": {
+          "bait": 1,
+          "dolphins": 0,
+          "whale": 0
+        },
+        "encounters": [
+          {
+            "id": 1,
+            "type": "bait",
+            "species": "anchovy-school",
+            "name": "饵鱼群与觅食海鸟",
+            "elapsed": 250
+          }
+        ],
+        "illustrativeRates": true
+      },
+      "menu": null,
+      "rendererFPS": 60,
+      "viewport": {
+        "width": 320,
+        "height": 568
+      },
+      "build": "20260927-pixel-v3"
+    },
+    {
+      "wall": "2026-09-27T17:30:34.805Z",
+      "check": "natural-hook",
+      "edition": "pixel",
+      "renderer": "Canvas 2D",
+      "version": 4,
+      "mode": "boat",
+      "phase": "fish",
+      "time": "06:05:43",
+      "dayStartAt": "2026-09-27T13:00:00.000Z",
+      "activeSeconds": 344,
+      "position": {
+        "x": 243.3,
+        "z": 20.4
+      },
+      "boat": {
+        "x": 243.3,
+        "z": 20.4,
+        "heading": null
+      },
+      "navigation": {
+        "chart": true,
+        "compass": false,
+        "gps": false,
+        "sounder": false,
+        "heading": null,
+        "gpsPosition": null,
+        "depth": null,
+        "speedKnots": null
+      },
+      "navigationScale": 1,
+      "gps": null,
+      "referenceDepth": null,
+      "launchStage": "afloat",
+      "launchProgress": 0,
+      "packed": [
+        "pfd",
+        "rod",
+        "tackle",
+        "bait",
+        "cooler",
+        "net",
+        "water",
+        "safety",
+        "descending_device",
+        "nautical_chart",
+        "rig_dropper"
+      ],
+      "profile": {
+        "credits": 19,
+        "owned": [
+          "pfd",
+          "rod",
+          "tackle",
+          "bait",
+          "cooler",
+          "net",
+          "descending_device",
+          "water",
+          "safety",
+          "nautical_chart",
+          "rig_dropper"
+        ],
+        "stock": {
+          "squid": 12,
+          "anchovy": 0,
+          "shrimp": 0,
+          "sardine": 0,
+          "jig": 3
+        }
+      },
+      "loaded": true,
+      "moored": false,
+      "engine": false,
+      "throttle": 0,
+      "anchor": true,
+      "speedKnots": null,
+      "fuel": 99,
+      "standing": false,
+      "swim": null,
+      "waypoint": null,
+      "arrival": "fishing",
+      "fishState": "fight",
+      "casting": false,
+      "castPower": 1,
+      "rig": "dropper",
+      "rigWeightGrams": 113,
+      "fishingDepthMeters": 2.5,
+      "rigPresentation": {
+        "depth": null,
+        "targetDepth": null,
+        "sinkRate": 0.8152900166941139,
+        "pumpHeight": 0,
+        "liftVelocity": 0,
+        "lineAngleDeg": 0.428171752404261,
+        "verticalSpeed": 0,
+        "bottomContact": true,
+        "nearBottom": true,
+        "snagRiskPerSecond": 0.00007023768253011561,
+        "attraction": 0.96
+      },
+      "hookCount": 2,
+      "paidLineMeters": 21.8,
+      "tension": 34,
+      "stamina": 100,
+      "lineDistance": 23.9,
+      "lureDepth": null,
+      "fish": {
+        "name": "铜岩鱼",
+        "latin": "Sebastes caurinus",
+        "color": "#cc9869",
+        "min": 27,
+        "max": 48,
+        "weight": 1.3,
+        "power": 1.03,
+        "spot": "reef",
+        "bait": "squid",
+        "length": 45,
+        "kg": 2.13,
+        "caughtAt": "2026-09-27T13:05:43.717Z",
+        "rig": {
+          "id": "dropper",
+          "hookCount": 2,
+          "lineCount": 1,
+          "weightGrams": 113,
+          "fishingDepthMeters": 2.5,
+          "wireLeader": false
+        },
+        "hookCount": 2,
+        "lineCount": 1,
+        "hasDescendingDevice": true,
+        "landingNetDiameterInches": 20,
+        "groundfishAboardAtCapture": false
+      },
+      "casts": 2,
+      "catches": [
+        {
+          "name": "加州大比目鱼",
+          "length": 60,
+          "kg": 3.41,
+          "kept": true,
+          "settled": true,
+          "confiscated": false
+        }
+      ],
+      "inspection": null,
+      "lastInspection": null,
+      "misses": 0,
+      "breaks": 0,
+      "sailedMeters": 3300,
+      "walkedMeters": 198,
+      "paused": false,
+      "interaction": "",
+      "tripComplete": false,
+      "conditions": {
+        "windKnots": 11.66304,
+        "windDirection": 320,
+        "waveHeight": 1.3,
+        "period": 9,
+        "waterTemp": 15,
+        "mode": "real",
+        "waveDirection": 295,
+        "tideMLLW": 1.593516632743404,
+        "fresh": true,
+        "daylight": 0.1,
+        "clockMode": "morning",
+        "customHour": 8
+      },
+      "ecology": {
+        "active": [],
+        "counts": {
+          "bait": 0,
+          "dolphins": 0,
+          "whale": 0
+        },
+        "encounters": [
+          {
+            "id": 1,
+            "type": "bait",
+            "species": "anchovy-school",
+            "name": "饵鱼群与觅食海鸟",
+            "elapsed": 250
+          }
+        ],
+        "illustrativeRates": true
+      },
+      "menu": null,
+      "rendererFPS": 60,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "build": "20260927-pixel-v3"
+    },
+    {
+      "wall": "2026-09-27T17:31:30.598Z",
+      "check": "fight-small-landscape",
+      "edition": "pixel",
+      "renderer": "Canvas 2D",
+      "version": 4,
+      "mode": "boat",
+      "phase": "fish",
+      "time": "06:06:39",
+      "dayStartAt": "2026-09-27T13:00:00.000Z",
+      "activeSeconds": 400,
+      "position": {
+        "x": 243.6,
+        "z": 20.4
+      },
+      "boat": {
+        "x": 243.6,
+        "z": 20.4,
+        "heading": null
+      },
+      "navigation": {
+        "chart": true,
+        "compass": false,
+        "gps": false,
+        "sounder": false,
+        "heading": null,
+        "gpsPosition": null,
+        "depth": null,
+        "speedKnots": null
+      },
+      "navigationScale": 1,
+      "gps": null,
+      "referenceDepth": null,
+      "launchStage": "afloat",
+      "launchProgress": 0,
+      "packed": [
+        "pfd",
+        "rod",
+        "tackle",
+        "bait",
+        "cooler",
+        "net",
+        "water",
+        "safety",
+        "descending_device",
+        "nautical_chart",
+        "rig_dropper"
+      ],
+      "profile": {
+        "credits": 19,
+        "owned": [
+          "pfd",
+          "rod",
+          "tackle",
+          "bait",
+          "cooler",
+          "net",
+          "descending_device",
+          "water",
+          "safety",
+          "nautical_chart",
+          "rig_dropper"
+        ],
+        "stock": {
+          "squid": 12,
+          "anchovy": 0,
+          "shrimp": 0,
+          "sardine": 0,
+          "jig": 3
+        }
+      },
+      "loaded": true,
+      "moored": false,
+      "engine": false,
+      "throttle": 0,
+      "anchor": true,
+      "speedKnots": null,
+      "fuel": 99,
+      "standing": false,
+      "swim": null,
+      "waypoint": null,
+      "arrival": "fishing",
+      "fishState": "fight",
+      "casting": false,
+      "castPower": 1,
+      "rig": "dropper",
+      "rigWeightGrams": 113,
+      "fishingDepthMeters": 2.5,
+      "rigPresentation": {
+        "depth": null,
+        "targetDepth": null,
+        "sinkRate": 0.8152900166941139,
+        "pumpHeight": 0,
+        "liftVelocity": 0,
+        "lineAngleDeg": 0.428171752404261,
+        "verticalSpeed": 0,
+        "bottomContact": true,
+        "nearBottom": true,
+        "snagRiskPerSecond": 0.00007023768253011561,
+        "attraction": 0.96
+      },
+      "hookCount": 2,
+      "paidLineMeters": 21.8,
+      "tension": 42,
+      "stamina": 64,
+      "lineDistance": 1.3,
+      "lureDepth": null,
+      "fish": {
+        "name": "铜岩鱼",
+        "latin": "Sebastes caurinus",
+        "color": "#cc9869",
+        "min": 27,
+        "max": 48,
+        "weight": 1.3,
+        "power": 1.03,
+        "spot": "reef",
+        "bait": "squid",
+        "length": 45,
+        "kg": 2.13,
+        "caughtAt": "2026-09-27T13:05:43.717Z",
+        "rig": {
+          "id": "dropper",
+          "hookCount": 2,
+          "lineCount": 1,
+          "weightGrams": 113,
+          "fishingDepthMeters": 2.5,
+          "wireLeader": false
+        },
+        "hookCount": 2,
+        "lineCount": 1,
+        "hasDescendingDevice": true,
+        "landingNetDiameterInches": 20,
+        "groundfishAboardAtCapture": false
+      },
+      "casts": 2,
+      "catches": [
+        {
+          "name": "加州大比目鱼",
+          "length": 60,
+          "kg": 3.41,
+          "kept": true,
+          "settled": true,
+          "confiscated": false
+        }
+      ],
+      "inspection": null,
+      "lastInspection": null,
+      "misses": 0,
+      "breaks": 0,
+      "sailedMeters": 3300,
+      "walkedMeters": 198,
+      "paused": false,
+      "interaction": "",
+      "tripComplete": false,
+      "conditions": {
+        "windKnots": 11.66304,
+        "windDirection": 320,
+        "waveHeight": 1.3,
+        "period": 9,
+        "waterTemp": 15,
+        "mode": "real",
+        "waveDirection": 295,
+        "tideMLLW": 1.5951762299164882,
+        "fresh": true,
+        "daylight": 0.1,
+        "clockMode": "morning",
+        "customHour": 8
+      },
+      "ecology": {
+        "active": [],
+        "counts": {
+          "bait": 0,
+          "dolphins": 0,
+          "whale": 0
+        },
+        "encounters": [
+          {
+            "id": 1,
+            "type": "bait",
+            "species": "anchovy-school",
+            "name": "饵鱼群与觅食海鸟",
+            "elapsed": 250
+          }
+        ],
+        "illustrativeRates": true
+      },
+      "menu": null,
+      "rendererFPS": 60,
+      "viewport": {
+        "width": 568,
+        "height": 320
+      },
+      "build": "20260927-pixel-v3"
+    },
+    {
+      "wall": "2026-09-27T17:32:52.540Z",
+      "check": "natural-landed-fish",
+      "edition": "pixel",
+      "renderer": "Canvas 2D",
+      "version": 4,
+      "mode": "boat",
+      "phase": "fish",
+      "time": "06:07:50",
+      "dayStartAt": "2026-09-27T13:00:00.000Z",
+      "activeSeconds": 471,
+      "position": {
+        "x": 243.7,
+        "z": 20.4
+      },
+      "boat": {
+        "x": 243.7,
+        "z": 20.4,
+        "heading": null
+      },
+      "navigation": {
+        "chart": true,
+        "compass": false,
+        "gps": false,
+        "sounder": false,
+        "heading": null,
+        "gpsPosition": null,
+        "depth": null,
+        "speedKnots": null
+      },
+      "navigationScale": 1,
+      "gps": null,
+      "referenceDepth": null,
+      "launchStage": "afloat",
+      "launchProgress": 0,
+      "packed": [
+        "pfd",
+        "rod",
+        "tackle",
+        "bait",
+        "cooler",
+        "net",
+        "water",
+        "safety",
+        "descending_device",
+        "nautical_chart",
+        "rig_dropper"
+      ],
+      "profile": {
+        "credits": 19,
+        "owned": [
+          "pfd",
+          "rod",
+          "tackle",
+          "bait",
+          "cooler",
+          "net",
+          "descending_device",
+          "water",
+          "safety",
+          "nautical_chart",
+          "rig_dropper"
+        ],
+        "stock": {
+          "squid": 12,
+          "anchovy": 0,
+          "shrimp": 0,
+          "sardine": 0,
+          "jig": 3
+        }
+      },
+      "loaded": true,
+      "moored": false,
+      "engine": false,
+      "throttle": 0,
+      "anchor": true,
+      "speedKnots": null,
+      "fuel": 99,
+      "standing": false,
+      "swim": null,
+      "waypoint": null,
+      "arrival": "fishing",
+      "fishState": "landed",
+      "casting": false,
+      "castPower": 1,
+      "rig": "dropper",
+      "rigWeightGrams": 113,
+      "fishingDepthMeters": 2.5,
+      "rigPresentation": {
+        "depth": null,
+        "targetDepth": null,
+        "sinkRate": 0.8152900166941139,
+        "pumpHeight": 0,
+        "liftVelocity": 0,
+        "lineAngleDeg": 0.428171752404261,
+        "verticalSpeed": 0,
+        "bottomContact": true,
+        "nearBottom": true,
+        "snagRiskPerSecond": 0.00007023768253011561,
+        "attraction": 0.96
+      },
+      "hookCount": 2,
+      "paidLineMeters": 21.8,
+      "tension": 61,
+      "stamina": 19,
+      "lineDistance": 1.3,
+      "lureDepth": null,
+      "fish": {
+        "name": "铜岩鱼",
+        "latin": "Sebastes caurinus",
+        "color": "#cc9869",
+        "min": 27,
+        "max": 48,
+        "weight": 1.3,
+        "power": 1.03,
+        "spot": "reef",
+        "bait": "squid",
+        "length": 45,
+        "kg": 2.13,
+        "caughtAt": "2026-09-27T13:05:43.717Z",
+        "rig": {
+          "id": "dropper",
+          "hookCount": 2,
+          "lineCount": 1,
+          "weightGrams": 113,
+          "fishingDepthMeters": 2.5,
+          "wireLeader": false
+        },
+        "hookCount": 2,
+        "lineCount": 1,
+        "hasDescendingDevice": true,
+        "landingNetDiameterInches": 20,
+        "groundfishAboardAtCapture": false
+      },
+      "casts": 2,
+      "catches": [
+        {
+          "name": "加州大比目鱼",
+          "length": 60,
+          "kg": 3.41,
+          "kept": true,
+          "settled": true,
+          "confiscated": false
+        }
+      ],
+      "inspection": null,
+      "lastInspection": null,
+      "misses": 0,
+      "breaks": 0,
+      "sailedMeters": 3300,
+      "walkedMeters": 198,
+      "paused": true,
+      "interaction": "",
+      "tripComplete": false,
+      "conditions": {
+        "windKnots": 11.66304,
+        "windDirection": 320,
+        "waveHeight": 1.3,
+        "period": 9,
+        "waterTemp": 15,
+        "mode": "real",
+        "waveDirection": 295,
+        "tideMLLW": 1.598367892655142,
+        "fresh": true,
+        "daylight": 0.1,
+        "clockMode": "morning",
+        "customHour": 8
+      },
+      "ecology": {
+        "active": [
+          {
+            "id": 2,
+            "type": "bait",
+            "species": "anchovy-school",
+            "name": "饵鱼群与觅食海鸟",
+            "x": 236,
+            "z": 1,
+            "age": 43,
+            "members": 7
+          }
+        ],
+        "counts": {
+          "bait": 1,
+          "dolphins": 0,
+          "whale": 0
+        },
+        "encounters": [
+          {
+            "id": 2,
+            "type": "bait",
+            "species": "anchovy-school",
+            "name": "饵鱼群与觅食海鸟",
+            "elapsed": 428
+          },
+          {
+            "id": 1,
+            "type": "bait",
+            "species": "anchovy-school",
+            "name": "饵鱼群与觅食海鸟",
+            "elapsed": 250
+          }
+        ],
+        "illustrativeRates": true
+      },
+      "menu": "catch",
+      "rendererFPS": 60,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "build": "20260927-pixel-v3"
+    },
+    {
+      "wall": "2026-09-27T17:32:57.851Z",
+      "check": "kept-and-returning",
+      "edition": "pixel",
+      "renderer": "Canvas 2D",
+      "version": 4,
+      "mode": "boat",
+      "phase": "return",
+      "time": "06:07:50",
+      "dayStartAt": "2026-09-27T13:00:00.000Z",
+      "activeSeconds": 471,
+      "position": {
+        "x": 243.7,
+        "z": 20.4
+      },
+      "boat": {
+        "x": 243.7,
+        "z": 20.4,
+        "heading": null
+      },
+      "navigation": {
+        "chart": true,
+        "compass": false,
+        "gps": false,
+        "sounder": false,
+        "heading": null,
+        "gpsPosition": null,
+        "depth": null,
+        "speedKnots": null
+      },
+      "navigationScale": 1,
+      "gps": null,
+      "referenceDepth": null,
+      "launchStage": "afloat",
+      "launchProgress": 0,
+      "packed": [
+        "pfd",
+        "rod",
+        "tackle",
+        "bait",
+        "cooler",
+        "net",
+        "water",
+        "safety",
+        "descending_device",
+        "nautical_chart",
+        "rig_dropper"
+      ],
+      "profile": {
+        "credits": 19,
+        "owned": [
+          "pfd",
+          "rod",
+          "tackle",
+          "bait",
+          "cooler",
+          "net",
+          "descending_device",
+          "water",
+          "safety",
+          "nautical_chart",
+          "rig_dropper"
+        ],
+        "stock": {
+          "squid": 12,
+          "anchovy": 0,
+          "shrimp": 0,
+          "sardine": 0,
+          "jig": 3
+        }
+      },
+      "loaded": true,
+      "moored": false,
+      "engine": true,
+      "throttle": 0.32,
+      "anchor": false,
+      "speedKnots": null,
+      "fuel": 99,
+      "standing": false,
+      "swim": null,
+      "waypoint": "租船登船平台",
+      "arrival": null,
+      "fishState": "idle",
+      "casting": false,
+      "castPower": 1,
+      "rig": "dropper",
+      "rigWeightGrams": 113,
+      "fishingDepthMeters": 2.5,
+      "rigPresentation": {
+        "depth": null,
+        "targetDepth": null,
+        "sinkRate": 0.8152900166941139,
+        "pumpHeight": 0,
+        "liftVelocity": 0,
+        "lineAngleDeg": 0.428171752404261,
+        "verticalSpeed": 0,
+        "bottomContact": true,
+        "nearBottom": true,
+        "snagRiskPerSecond": 0.00007023768253011561,
+        "attraction": 0.96
+      },
+      "hookCount": 2,
+      "paidLineMeters": 21.8,
+      "tension": 0,
+      "stamina": 19,
+      "lineDistance": 1.3,
+      "lureDepth": null,
+      "fish": null,
+      "casts": 2,
+      "catches": [
+        {
+          "name": "加州大比目鱼",
+          "length": 60,
+          "kg": 3.41,
+          "kept": true,
+          "settled": true,
+          "confiscated": false
+        },
+        {
+          "name": "铜岩鱼",
+          "length": 45,
+          "kg": 2.13,
+          "kept": true,
+          "settled": false,
+          "confiscated": false,
+          "caughtAt": "2026-09-27T13:05:43.717Z",
+          "rig": {
+            "id": "dropper",
+            "hookCount": 2,
+            "lineCount": 1,
+            "weightGrams": 113,
+            "fishingDepthMeters": 2.5,
+            "wireLeader": false
+          },
+          "hookCount": 2
+        }
+      ],
+      "inspection": null,
+      "lastInspection": null,
+      "misses": 0,
+      "breaks": 0,
+      "sailedMeters": 3300,
+      "walkedMeters": 198,
+      "paused": false,
+      "interaction": "",
+      "tripComplete": false,
+      "conditions": {
+        "windKnots": 11.66304,
+        "windDirection": 320,
+        "waveHeight": 1.3,
+        "period": 9,
+        "waterTemp": 15,
+        "mode": "real",
+        "waveDirection": 295,
+        "tideMLLW": 1.598367892655142,
+        "fresh": true,
+        "daylight": 0.1,
+        "clockMode": "morning",
+        "customHour": 8
+      },
+      "ecology": {
+        "active": [
+          {
+            "id": 2,
+            "type": "bait",
+            "species": "anchovy-school",
+            "name": "饵鱼群与觅食海鸟",
+            "x": 236,
+            "z": 1,
+            "age": 43,
+            "members": 7
+          }
+        ],
+        "counts": {
+          "bait": 1,
+          "dolphins": 0,
+          "whale": 0
+        },
+        "encounters": [
+          {
+            "id": 2,
+            "type": "bait",
+            "species": "anchovy-school",
+            "name": "饵鱼群与觅食海鸟",
+            "elapsed": 428
+          },
+          {
+            "id": 1,
+            "type": "bait",
+            "species": "anchovy-school",
+            "name": "饵鱼群与觅食海鸟",
+            "elapsed": 250
+          }
+        ],
+        "illustrativeRates": true
+      },
+      "menu": null,
+      "rendererFPS": 60,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "build": "20260927-pixel-v3"
+    },
+    {
+      "wall": "2026-09-27T17:34:04.189Z",
+      "check": "returning",
+      "edition": "pixel",
+      "renderer": "Canvas 2D",
+      "version": 4,
+      "mode": "boat",
+      "phase": "return",
+      "time": "06:08:57",
+      "dayStartAt": "2026-09-27T13:00:00.000Z",
+      "activeSeconds": 537,
+      "position": {
+        "x": 118.8,
+        "z": -296.4
+      },
+      "boat": {
+        "x": 118.8,
+        "z": -296.4,
+        "heading": null
+      },
+      "navigation": {
+        "chart": true,
+        "compass": false,
+        "gps": false,
+        "sounder": false,
+        "heading": null,
+        "gpsPosition": null,
+        "depth": null,
+        "speedKnots": null
+      },
+      "navigationScale": 2,
+      "gps": null,
+      "referenceDepth": null,
+      "launchStage": "afloat",
+      "launchProgress": 0,
+      "packed": [
+        "pfd",
+        "rod",
+        "tackle",
+        "bait",
+        "cooler",
+        "net",
+        "water",
+        "safety",
+        "descending_device",
+        "nautical_chart",
+        "rig_dropper"
+      ],
+      "profile": {
+        "credits": 19,
+        "owned": [
+          "pfd",
+          "rod",
+          "tackle",
+          "bait",
+          "cooler",
+          "net",
+          "descending_device",
+          "water",
+          "safety",
+          "nautical_chart",
+          "rig_dropper"
+        ],
+        "stock": {
+          "squid": 12,
+          "anchovy": 0,
+          "shrimp": 0,
+          "sardine": 0,
+          "jig": 3
+        }
+      },
+      "loaded": true,
+      "moored": false,
+      "engine": true,
+      "throttle": 0.8,
+      "anchor": false,
+      "speedKnots": null,
+      "fuel": 98,
+      "standing": false,
+      "swim": null,
+      "waypoint": "租船登船平台",
+      "arrival": null,
+      "fishState": "idle",
+      "casting": false,
+      "castPower": 1,
+      "rig": "dropper",
+      "rigWeightGrams": 113,
+      "fishingDepthMeters": 2.5,
+      "rigPresentation": {
+        "depth": null,
+        "targetDepth": null,
+        "sinkRate": 0.8152900166941139,
+        "pumpHeight": 0,
+        "liftVelocity": 0,
+        "lineAngleDeg": 0.428171752404261,
+        "verticalSpeed": 0,
+        "bottomContact": true,
+        "nearBottom": true,
+        "snagRiskPerSecond": 0.00007023768253011561,
+        "attraction": 0.96
+      },
+      "hookCount": 2,
+      "paidLineMeters": 21.8,
+      "tension": 0,
+      "stamina": 19,
+      "lineDistance": 1.3,
+      "lureDepth": null,
+      "fish": null,
+      "casts": 2,
+      "catches": [
+        {
+          "name": "加州大比目鱼",
+          "length": 60,
+          "kg": 3.41,
+          "kept": true,
+          "settled": true,
+          "confiscated": false
+        },
+        {
+          "name": "铜岩鱼",
+          "length": 45,
+          "kg": 2.13,
+          "kept": true,
+          "settled": false,
+          "confiscated": false,
+          "caughtAt": "2026-09-27T13:05:43.717Z",
+          "rig": {
+            "id": "dropper",
+            "hookCount": 2,
+            "lineCount": 1,
+            "weightGrams": 113,
+            "fishingDepthMeters": 2.5,
+            "wireLeader": false
+          },
+          "hookCount": 2
+        }
+      ],
+      "inspection": null,
+      "lastInspection": null,
+      "misses": 0,
+      "breaks": 0,
+      "sailedMeters": 3657,
+      "walkedMeters": 198,
+      "paused": false,
+      "interaction": "",
+      "tripComplete": false,
+      "conditions": {
+        "windKnots": 11.66304,
+        "windDirection": 320,
+        "waveHeight": 1.3,
+        "period": 9,
+        "waterTemp": 15,
+        "mode": "real",
+        "waveDirection": 295,
+        "tideMLLW": 1.599899735857111,
+        "fresh": true,
+        "daylight": 0.1,
+        "clockMode": "morning",
+        "customHour": 8
+      },
+      "ecology": {
+        "active": [],
+        "counts": {
+          "bait": 0,
+          "dolphins": 0,
+          "whale": 0
+        },
+        "encounters": [
+          {
+            "id": 2,
+            "type": "bait",
+            "species": "anchovy-school",
+            "name": "饵鱼群与觅食海鸟",
+            "elapsed": 428
+          },
+          {
+            "id": 1,
+            "type": "bait",
+            "species": "anchovy-school",
+            "name": "饵鱼群与觅食海鸟",
+            "elapsed": 250
+          }
+        ],
+        "illustrativeRates": true
+      },
+      "menu": null,
+      "rendererFPS": 60,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "build": "20260927-pixel-v3"
+    },
+    {
+      "wall": "2026-09-27T17:34:57.746Z",
+      "check": "return-near-wharf",
+      "edition": "pixel",
+      "renderer": "Canvas 2D",
+      "version": 4,
+      "mode": "boat",
+      "phase": "return",
+      "time": "06:09:50",
+      "dayStartAt": "2026-09-27T13:00:00.000Z",
+      "activeSeconds": 591,
+      "position": {
+        "x": -42.3,
+        "z": -457.6
+      },
+      "boat": {
+        "x": -42.3,
+        "z": -457.6,
+        "heading": null
+      },
+      "navigation": {
+        "chart": true,
+        "compass": false,
+        "gps": false,
+        "sounder": false,
+        "heading": null,
+        "gpsPosition": null,
+        "depth": null,
+        "speedKnots": null
+      },
+      "navigationScale": 2,
+      "gps": null,
+      "referenceDepth": null,
+      "launchStage": "afloat",
+      "launchProgress": 0,
+      "packed": [
+        "pfd",
+        "rod",
+        "tackle",
+        "bait",
+        "cooler",
+        "net",
+        "water",
+        "safety",
+        "descending_device",
+        "nautical_chart",
+        "rig_dropper"
+      ],
+      "profile": {
+        "credits": 19,
+        "owned": [
+          "pfd",
+          "rod",
+          "tackle",
+          "bait",
+          "cooler",
+          "net",
+          "descending_device",
+          "water",
+          "safety",
+          "nautical_chart",
+          "rig_dropper"
+        ],
+        "stock": {
+          "squid": 12,
+          "anchovy": 0,
+          "shrimp": 0,
+          "sardine": 0,
+          "jig": 3
+        }
+      },
+      "loaded": true,
+      "moored": false,
+      "engine": true,
+      "throttle": 0.8,
+      "anchor": false,
+      "speedKnots": null,
+      "fuel": 98,
+      "standing": false,
+      "swim": null,
+      "waypoint": "租船登船平台",
+      "arrival": null,
+      "fishState": "idle",
+      "casting": false,
+      "castPower": 1,
+      "rig": "dropper",
+      "rigWeightGrams": 113,
+      "fishingDepthMeters": 2.5,
+      "rigPresentation": {
+        "depth": null,
+        "targetDepth": null,
+        "sinkRate": 0.8152900166941139,
+        "pumpHeight": 0,
+        "liftVelocity": 0,
+        "lineAngleDeg": 0.428171752404261,
+        "verticalSpeed": 0,
+        "bottomContact": true,
+        "nearBottom": true,
+        "snagRiskPerSecond": 0.00007023768253011561,
+        "attraction": 0.96
+      },
+      "hookCount": 2,
+      "paidLineMeters": 21.8,
+      "tension": 0,
+      "stamina": 19,
+      "lineDistance": 1.3,
+      "lureDepth": null,
+      "fish": null,
+      "casts": 2,
+      "catches": [
+        {
+          "name": "加州大比目鱼",
+          "length": 60,
+          "kg": 3.41,
+          "kept": true,
+          "settled": true,
+          "confiscated": false
+        },
+        {
+          "name": "铜岩鱼",
+          "length": 45,
+          "kg": 2.13,
+          "kept": true,
+          "settled": false,
+          "confiscated": false,
+          "caughtAt": "2026-09-27T13:05:43.717Z",
+          "rig": {
+            "id": "dropper",
+            "hookCount": 2,
+            "lineCount": 1,
+            "weightGrams": 113,
+            "fishingDepthMeters": 2.5,
+            "wireLeader": false
+          },
+          "hookCount": 2
+        }
+      ],
+      "inspection": null,
+      "lastInspection": null,
+      "misses": 0,
+      "breaks": 0,
+      "sailedMeters": 3963,
+      "walkedMeters": 198,
+      "paused": false,
+      "interaction": "",
+      "tripComplete": false,
+      "conditions": {
+        "windKnots": 11.66304,
+        "windDirection": 320,
+        "waveHeight": 1.3,
+        "period": 9,
+        "waterTemp": 15,
+        "mode": "real",
+        "waveDirection": 295,
+        "tideMLLW": 1.6013888422934053,
+        "fresh": true,
+        "daylight": 0.1,
+        "clockMode": "morning",
+        "customHour": 8
+      },
+      "ecology": {
+        "active": [],
+        "counts": {
+          "bait": 0,
+          "dolphins": 0,
+          "whale": 0
+        },
+        "encounters": [
+          {
+            "id": 2,
+            "type": "bait",
+            "species": "anchovy-school",
+            "name": "饵鱼群与觅食海鸟",
+            "elapsed": 428
+          },
+          {
+            "id": 1,
+            "type": "bait",
+            "species": "anchovy-school",
+            "name": "饵鱼群与觅食海鸟",
+            "elapsed": 250
+          }
+        ],
+        "illustrativeRates": true
+      },
+      "menu": null,
+      "rendererFPS": 60,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "build": "20260927-pixel-v3"
+    },
+    {
+      "wall": "2026-09-27T17:36:03.275Z",
+      "check": "ten-minute-state",
+      "edition": "pixel",
+      "renderer": "Canvas 2D",
+      "version": 4,
+      "mode": "boat",
+      "phase": "return",
+      "time": "06:10:56",
+      "dayStartAt": "2026-09-27T13:00:00.000Z",
+      "activeSeconds": 656,
+      "position": {
+        "x": -48.8,
+        "z": -112.2
+      },
+      "boat": {
+        "x": -48.8,
+        "z": -112.2,
+        "heading": null
+      },
+      "navigation": {
+        "chart": true,
+        "compass": false,
+        "gps": false,
+        "sounder": false,
+        "heading": null,
+        "gpsPosition": null,
+        "depth": null,
+        "speedKnots": null
+      },
+      "navigationScale": 1.8231855597573499,
+      "gps": null,
+      "referenceDepth": null,
+      "launchStage": "afloat",
+      "launchProgress": 0,
+      "packed": [
+        "pfd",
+        "rod",
+        "tackle",
+        "bait",
+        "cooler",
+        "net",
+        "water",
+        "safety",
+        "descending_device",
+        "nautical_chart",
+        "rig_dropper"
+      ],
+      "profile": {
+        "credits": 19,
+        "owned": [
+          "pfd",
+          "rod",
+          "tackle",
+          "bait",
+          "cooler",
+          "net",
+          "descending_device",
+          "water",
+          "safety",
+          "nautical_chart",
+          "rig_dropper"
+        ],
+        "stock": {
+          "squid": 12,
+          "anchovy": 0,
+          "shrimp": 0,
+          "sardine": 0,
+          "jig": 3
+        }
+      },
+      "loaded": true,
+      "moored": false,
+      "engine": true,
+      "throttle": 0.8,
+      "anchor": false,
+      "speedKnots": null,
+      "fuel": 97,
+      "standing": false,
+      "swim": null,
+      "waypoint": "租船登船平台",
+      "arrival": null,
+      "fishState": "idle",
+      "casting": false,
+      "castPower": 1,
+      "rig": "dropper",
+      "rigWeightGrams": 113,
+      "fishingDepthMeters": 2.5,
+      "rigPresentation": {
+        "depth": null,
+        "targetDepth": null,
+        "sinkRate": 0.8152900166941139,
+        "pumpHeight": 0,
+        "liftVelocity": 0,
+        "lineAngleDeg": 0.428171752404261,
+        "verticalSpeed": 0,
+        "bottomContact": true,
+        "nearBottom": true,
+        "snagRiskPerSecond": 0.00007023768253011561,
+        "attraction": 0.96
+      },
+      "hookCount": 2,
+      "paidLineMeters": 21.8,
+      "tension": 0,
+      "stamina": 19,
+      "lineDistance": 1.3,
+      "lureDepth": null,
+      "fish": null,
+      "casts": 2,
+      "catches": [
+        {
+          "name": "加州大比目鱼",
+          "length": 60,
+          "kg": 3.41,
+          "kept": true,
+          "settled": true,
+          "confiscated": false
+        },
+        {
+          "name": "铜岩鱼",
+          "length": 45,
+          "kg": 2.13,
+          "kept": true,
+          "settled": false,
+          "confiscated": false,
+          "caughtAt": "2026-09-27T13:05:43.717Z",
+          "rig": {
+            "id": "dropper",
+            "hookCount": 2,
+            "lineCount": 1,
+            "weightGrams": 113,
+            "fishingDepthMeters": 2.5,
+            "wireLeader": false
+          },
+          "hookCount": 2
+        }
+      ],
+      "inspection": {
+        "id": 1,
+        "phase": "approaching",
+        "x": 5.1940778842683155,
+        "z": -149.77786559185245,
+        "heading": 2.667870524213889,
+        "progress": 0.36775618005882016,
+        "elapsed": 8.800999999999966,
+        "reason": "water"
+      },
+      "lastInspection": null,
+      "misses": 0,
+      "breaks": 0,
+      "sailedMeters": 4331,
+      "walkedMeters": 198,
+      "paused": false,
+      "interaction": "",
+      "tripComplete": false,
+      "conditions": {
+        "windKnots": 11.66304,
+        "windDirection": 320,
+        "waveHeight": 1.3,
+        "period": 9,
+        "waterTemp": 15,
+        "mode": "real",
+        "waveDirection": 295,
+        "tideMLLW": 1.6028350076257623,
+        "fresh": true,
+        "daylight": 0.1,
+        "clockMode": "morning",
+        "customHour": 8
+      },
+      "ecology": {
+        "active": [],
+        "counts": {
+          "bait": 0,
+          "dolphins": 0,
+          "whale": 0
+        },
+        "encounters": [
+          {
+            "id": 2,
+            "type": "bait",
+            "species": "anchovy-school",
+            "name": "饵鱼群与觅食海鸟",
+            "elapsed": 428
+          },
+          {
+            "id": 1,
+            "type": "bait",
+            "species": "anchovy-school",
+            "name": "饵鱼群与觅食海鸟",
+            "elapsed": 250
+          }
+        ],
+        "illustrativeRates": true
+      },
+      "menu": null,
+      "rendererFPS": 60,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "build": "20260927-pixel-v3"
+    },
+    {
+      "wall": "2026-09-27T17:37:08.216Z",
+      "check": "docking-patrol-blocked",
+      "edition": "pixel",
+      "renderer": "Canvas 2D",
+      "version": 4,
+      "mode": "boat",
+      "phase": "return",
+      "time": "06:12:01",
+      "dayStartAt": "2026-09-27T13:00:00.000Z",
+      "activeSeconds": 721,
+      "position": {
+        "x": -38.7,
+        "z": -61.3
+      },
+      "boat": {
+        "x": -38.7,
+        "z": -61.3,
+        "heading": null
+      },
+      "navigation": {
+        "chart": true,
+        "compass": false,
+        "gps": false,
+        "sounder": false,
+        "heading": null,
+        "gpsPosition": null,
+        "depth": null,
+        "speedKnots": null
+      },
+      "navigationScale": 1,
+      "gps": null,
+      "referenceDepth": null,
+      "launchStage": "afloat",
+      "launchProgress": 0,
+      "packed": [
+        "pfd",
+        "rod",
+        "tackle",
+        "bait",
+        "cooler",
+        "net",
+        "water",
+        "safety",
+        "descending_device",
+        "nautical_chart",
+        "rig_dropper"
+      ],
+      "profile": {
+        "credits": 19,
+        "owned": [
+          "pfd",
+          "rod",
+          "tackle",
+          "bait",
+          "cooler",
+          "net",
+          "descending_device",
+          "water",
+          "safety",
+          "nautical_chart",
+          "rig_dropper"
+        ],
+        "stock": {
+          "squid": 12,
+          "anchovy": 0,
+          "shrimp": 0,
+          "sardine": 0,
+          "jig": 3
+        }
+      },
+      "loaded": true,
+      "moored": false,
+      "engine": false,
+      "throttle": 0,
+      "anchor": false,
+      "speedKnots": null,
+      "fuel": 97,
+      "standing": false,
+      "swim": null,
+      "waypoint": null,
+      "arrival": "dock",
+      "fishState": "idle",
+      "casting": false,
+      "castPower": 1,
+      "rig": "dropper",
+      "rigWeightGrams": 113,
+      "fishingDepthMeters": 2.5,
+      "rigPresentation": {
+        "depth": null,
+        "targetDepth": null,
+        "sinkRate": 0.8152900166941139,
+        "pumpHeight": 0,
+        "liftVelocity": 0,
+        "lineAngleDeg": 0.428171752404261,
+        "verticalSpeed": 0,
+        "bottomContact": true,
+        "nearBottom": true,
+        "snagRiskPerSecond": 0.00007023768253011561,
+        "attraction": 0.96
+      },
+      "hookCount": 2,
+      "paidLineMeters": 21.8,
+      "tension": 0,
+      "stamina": 19,
+      "lineDistance": 1.3,
+      "lureDepth": null,
+      "fish": null,
+      "casts": 2,
+      "catches": [
+        {
+          "name": "加州大比目鱼",
+          "length": 60,
+          "kg": 3.41,
+          "kept": true,
+          "settled": true,
+          "confiscated": false
+        },
+        {
+          "name": "铜岩鱼",
+          "length": 45,
+          "kg": 2.13,
+          "kept": true,
+          "settled": false,
+          "confiscated": false,
+          "caughtAt": "2026-09-27T13:05:43.717Z",
+          "rig": {
+            "id": "dropper",
+            "hookCount": 2,
+            "lineCount": 1,
+            "weightGrams": 113,
+            "fishingDepthMeters": 2.5,
+            "wireLeader": false
+          },
+          "hookCount": 2
+        }
+      ],
+      "inspection": {
+        "id": 1,
+        "phase": "approaching",
+        "x": 9.596724527139537,
+        "z": -90.35500499192763,
+        "heading": 0.7902280848052894,
+        "progress": 0.4448182948924154,
+        "elapsed": 73.68460000000039,
+        "reason": "water"
+      },
+      "lastInspection": null,
+      "misses": 0,
+      "breaks": 0,
+      "sailedMeters": 4402,
+      "walkedMeters": 198,
+      "paused": false,
+      "interaction": "正在靠泊",
+      "tripComplete": false,
+      "conditions": {
+        "windKnots": 11.66304,
+        "windDirection": 320,
+        "waveHeight": 1.3,
+        "period": 9,
+        "waterTemp": 15,
+        "mode": "real",
+        "waveDirection": 295,
+        "tideMLLW": 1.6042382031947464,
+        "fresh": true,
+        "daylight": 0.1,
+        "clockMode": "morning",
+        "customHour": 8
+      },
+      "ecology": {
+        "active": [],
+        "counts": {
+          "bait": 0,
+          "dolphins": 0,
+          "whale": 0
+        },
+        "encounters": [
+          {
+            "id": 2,
+            "type": "bait",
+            "species": "anchovy-school",
+            "name": "饵鱼群与觅食海鸟",
+            "elapsed": 428
+          },
+          {
+            "id": 1,
+            "type": "bait",
+            "species": "anchovy-school",
+            "name": "饵鱼群与觅食海鸟",
+            "elapsed": 250
+          }
+        ],
+        "illustrativeRates": true
+      },
+      "menu": null,
+      "rendererFPS": 60,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "build": "20260927-pixel-v3"
+    },
+    {
+      "wall": "2026-09-27T17:38:24.569Z",
+      "check": "counter-trade-completed",
+      "edition": "pixel",
+      "renderer": "Canvas 2D",
+      "version": 4,
+      "mode": "walk",
+      "phase": "complete",
+      "time": "06:13:13",
+      "dayStartAt": "2026-09-27T13:00:00.000Z",
+      "activeSeconds": 793,
+      "position": {
+        "x": -7.8,
+        "z": -54
+      },
+      "boat": {
+        "x": -34.2,
+        "z": -55,
+        "heading": null
+      },
+      "navigation": {
+        "chart": true,
+        "compass": false,
+        "gps": false,
+        "sounder": false,
+        "heading": null,
+        "gpsPosition": null,
+        "depth": null,
+        "speedKnots": null
+      },
+      "navigationScale": 1,
+      "gps": null,
+      "referenceDepth": null,
+      "launchStage": "afloat",
+      "launchProgress": 0,
+      "packed": [
+        "pfd",
+        "rod",
+        "tackle",
+        "bait",
+        "cooler",
+        "net",
+        "water",
+        "safety",
+        "descending_device",
+        "nautical_chart",
+        "rig_dropper"
+      ],
+      "profile": {
+        "credits": 80,
+        "owned": [
+          "pfd",
+          "rod",
+          "tackle",
+          "bait",
+          "cooler",
+          "net",
+          "descending_device",
+          "water",
+          "safety",
+          "nautical_chart",
+          "rig_dropper"
+        ],
+        "stock": {
+          "squid": 12,
+          "anchovy": 0,
+          "shrimp": 0,
+          "sardine": 0,
+          "jig": 3
+        }
+      },
+      "loaded": false,
+      "moored": true,
+      "engine": false,
+      "throttle": 0,
+      "anchor": false,
+      "speedKnots": null,
+      "fuel": 97,
+      "standing": false,
+      "swim": null,
+      "waypoint": null,
+      "arrival": "counter",
+      "fishState": "idle",
+      "casting": false,
+      "castPower": 1,
+      "rig": "dropper",
+      "rigWeightGrams": 113,
+      "fishingDepthMeters": 2.5,
+      "rigPresentation": {
+        "depth": null,
+        "targetDepth": null,
+        "sinkRate": 0.8152900166941139,
+        "pumpHeight": 0,
+        "liftVelocity": 0,
+        "lineAngleDeg": 0.428171752404261,
+        "verticalSpeed": 0,
+        "bottomContact": true,
+        "nearBottom": true,
+        "snagRiskPerSecond": 0.00007023768253011561,
+        "attraction": 0.96
+      },
+      "hookCount": 2,
+      "paidLineMeters": 21.8,
+      "tension": 0,
+      "stamina": 19,
+      "lineDistance": 1.3,
+      "lureDepth": null,
+      "fish": null,
+      "casts": 2,
+      "catches": [
+        {
+          "name": "加州大比目鱼",
+          "length": 60,
+          "kg": 3.41,
+          "kept": true,
+          "settled": true,
+          "confiscated": false
+        },
+        {
+          "name": "铜岩鱼",
+          "length": 45,
+          "kg": 2.13,
+          "kept": true,
+          "settled": true,
+          "confiscated": false,
+          "caughtAt": "2026-09-27T13:05:43.717Z",
+          "rig": {
+            "id": "dropper",
+            "hookCount": 2,
+            "lineCount": 1,
+            "weightGrams": 113,
+            "fishingDepthMeters": 2.5,
+            "wireLeader": false
+          },
+          "hookCount": 2
+        }
+      ],
+      "inspection": null,
+      "lastInspection": null,
+      "misses": 0,
+      "breaks": 0,
+      "sailedMeters": 4402,
+      "walkedMeters": 235,
+      "paused": true,
+      "interaction": "码头小屋",
+      "tripComplete": true,
+      "conditions": {
+        "windKnots": 11.66304,
+        "windDirection": 320,
+        "waveHeight": 1.3,
+        "period": 9,
+        "waterTemp": 15,
+        "mode": "real",
+        "waveDirection": 295,
+        "tideMLLW": 1.6055983278397625,
+        "fresh": true,
+        "daylight": 0.1,
+        "clockMode": "morning",
+        "customHour": 8
+      },
+      "ecology": {
+        "active": [],
+        "counts": {
+          "bait": 0,
+          "dolphins": 0,
+          "whale": 0
+        },
+        "encounters": [
+          {
+            "id": 2,
+            "type": "bait",
+            "species": "anchovy-school",
+            "name": "饵鱼群与觅食海鸟",
+            "elapsed": 428
+          },
+          {
+            "id": 1,
+            "type": "bait",
+            "species": "anchovy-school",
+            "name": "饵鱼群与觅食海鸟",
+            "elapsed": 250
+          }
+        ],
+        "illustrativeRates": true
+      },
+      "menu": "staff",
+      "rendererFPS": 60,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "build": "20260927-pixel-v3"
+    },
+    {
+      "wall": "2026-09-27T17:38:38.049Z",
+      "check": "earned-compass-packed",
+      "edition": "pixel",
+      "renderer": "Canvas 2D",
+      "version": 4,
+      "mode": "walk",
+      "phase": "complete",
+      "time": "06:13:13",
+      "dayStartAt": "2026-09-27T13:00:00.000Z",
+      "activeSeconds": 793,
+      "position": {
+        "x": -7.8,
+        "z": -54
+      },
+      "boat": {
+        "x": -34.2,
+        "z": -55,
+        "heading": 0
+      },
+      "navigation": {
+        "chart": true,
+        "compass": true,
+        "gps": false,
+        "sounder": false,
+        "heading": 250.7605991533486,
+        "gpsPosition": null,
+        "depth": null,
+        "speedKnots": null
+      },
+      "navigationScale": 1,
+      "gps": null,
+      "referenceDepth": null,
+      "launchStage": "afloat",
+      "launchProgress": 0,
+      "packed": [
+        "pfd",
+        "rod",
+        "tackle",
+        "bait",
+        "cooler",
+        "net",
+        "water",
+        "safety",
+        "descending_device",
+        "nautical_chart",
+        "rig_dropper",
+        "compass"
+      ],
+      "profile": {
+        "credits": 35,
+        "owned": [
+          "pfd",
+          "rod",
+          "tackle",
+          "bait",
+          "cooler",
+          "net",
+          "descending_device",
+          "water",
+          "safety",
+          "nautical_chart",
+          "rig_dropper",
+          "compass"
+        ],
+        "stock": {
+          "squid": 12,
+          "anchovy": 0,
+          "shrimp": 0,
+          "sardine": 0,
+          "jig": 3
+        }
+      },
+      "loaded": false,
+      "moored": true,
+      "engine": false,
+      "throttle": 0,
+      "anchor": false,
+      "speedKnots": null,
+      "fuel": 97,
+      "standing": false,
+      "swim": null,
+      "waypoint": null,
+      "arrival": "counter",
+      "fishState": "idle",
+      "casting": false,
+      "castPower": 1,
+      "rig": "dropper",
+      "rigWeightGrams": 113,
+      "fishingDepthMeters": 2.5,
+      "rigPresentation": {
+        "depth": null,
+        "targetDepth": null,
+        "sinkRate": 0.8152900166941139,
+        "pumpHeight": 0,
+        "liftVelocity": 0,
+        "lineAngleDeg": 0.428171752404261,
+        "verticalSpeed": 0,
+        "bottomContact": true,
+        "nearBottom": true,
+        "snagRiskPerSecond": 0.00007023768253011561,
+        "attraction": 0.96
+      },
+      "hookCount": 2,
+      "paidLineMeters": 21.8,
+      "tension": 0,
+      "stamina": 19,
+      "lineDistance": 1.3,
+      "lureDepth": null,
+      "fish": null,
+      "casts": 2,
+      "catches": [
+        {
+          "name": "加州大比目鱼",
+          "length": 60,
+          "kg": 3.41,
+          "kept": true,
+          "settled": true,
+          "confiscated": false
+        },
+        {
+          "name": "铜岩鱼",
+          "length": 45,
+          "kg": 2.13,
+          "kept": true,
+          "settled": true,
+          "confiscated": false,
+          "caughtAt": "2026-09-27T13:05:43.717Z",
+          "rig": {
+            "id": "dropper",
+            "hookCount": 2,
+            "lineCount": 1,
+            "weightGrams": 113,
+            "fishingDepthMeters": 2.5,
+            "wireLeader": false
+          },
+          "hookCount": 2
+        }
+      ],
+      "inspection": null,
+      "lastInspection": null,
+      "misses": 0,
+      "breaks": 0,
+      "sailedMeters": 4402,
+      "walkedMeters": 235,
+      "paused": true,
+      "interaction": "码头小屋",
+      "tripComplete": true,
+      "conditions": {
+        "windKnots": 11.66304,
+        "windDirection": 320,
+        "waveHeight": 1.3,
+        "period": 9,
+        "waterTemp": 15,
+        "mode": "real",
+        "waveDirection": 295,
+        "tideMLLW": 1.6055983278397625,
+        "fresh": true,
+        "daylight": 0.1,
+        "clockMode": "morning",
+        "customHour": 8
+      },
+      "ecology": {
+        "active": [],
+        "counts": {
+          "bait": 0,
+          "dolphins": 0,
+          "whale": 0
+        },
+        "encounters": [
+          {
+            "id": 2,
+            "type": "bait",
+            "species": "anchovy-school",
+            "name": "饵鱼群与觅食海鸟",
+            "elapsed": 428
+          },
+          {
+            "id": 1,
+            "type": "bait",
+            "species": "anchovy-school",
+            "name": "饵鱼群与觅食海鸟",
+            "elapsed": 250
+          }
+        ],
+        "illustrativeRates": true
+      },
+      "menu": "gear",
+      "rendererFPS": 60,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "build": "20260927-pixel-v3"
+    }
+  ]
+}

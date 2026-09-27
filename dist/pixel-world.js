@@ -1,7 +1,7 @@
-import {pierRings,landPolygons,coastLines,buildingFootprints,FISHING_SPOTS,onLand,onPier} from './geography.js?v=20260927-pixel-v3';
-import {HARBOR} from './harbor-layout.js?v=20260927-pixel-v3';
-import {depthInfoAt} from './bathymetry.js?v=20260927-pixel-v3';
-import {createWildlife,drawWildlife} from './pixel-wildlife.js?v=20260927-pixel-v3';
+import {pierRings,landPolygons,coastLines,buildingFootprints,FISHING_SPOTS,onLand,onPier} from './geography.js?v=20260927-pixel-v4';
+import {HARBOR} from './harbor-layout.js?v=20260927-pixel-v4';
+import {depthInfoAt} from './bathymetry.js?v=20260927-pixel-v4';
+import {createWildlife,drawWildlife} from './pixel-wildlife.js?v=20260927-pixel-v4';
 
 // The map keeps the same metre coordinates as the sailing simulation. The
 // people and boat are deliberately enlarged, like a handheld-era RPG, so that

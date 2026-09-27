@@ -19,16 +19,30 @@ export class FishingPatrol {
     this.activeBoatSeconds=0;this.nextInspectionAt=300+240+this.random()*300;
     this.dockConsidered=false;this.retryAt=0;this.completed=0;
   }
+  clearWater(a,b){
+    const distance=Math.hypot(b.x-a.x,b.z-a.z);if(!Number.isFinite(distance))return false;
+    const steps=Math.max(1,Math.ceil(distance/.75));
+    for(let i=0;i<=steps;i++){const f=i/steps;if(!this.isWater(a.x+(b.x-a.x)*f,a.z+(b.z-a.z)*f))return false;}
+    return true;
+  }
+  sideTargets(state){
+    const center={x:number(state.boatX),z:number(state.boatZ)},heading=number(state.heading),side={x:Math.cos(heading),z:-Math.sin(heading)};
+    return[1,-1].map(sign=>({x:center.x+side.x*11*sign,z:center.z+side.z*11*sign,side:sign})).filter(target=>this.clearWater(center,target));
+  }
   spawn(state,reason){
     if(state.inspection||!cargo(state))return false;
     const bx=number(state.boatX),bz=number(state.boatZ),base=number(state.heading)+Math.PI/2;
-    let position=null;
+    const targets=this.sideTargets(state);let position=null,target=null;
     for(let attempt=0;attempt<12;attempt++){
       const angle=base+(attempt?this.random()*TAU:0),r=90+this.random()*45,x=bx-Math.sin(angle)*r,z=bz-Math.cos(angle)*r;
-      if(this.isWater(x,z)){position={x,z};break;}
+      if(!this.isWater(x,z))continue;
+      // Open water at each endpoint is insufficient around a long pier. Pick
+      // the near side of the player's boat and verify the entire approach.
+      const candidate={x,z},reachable=targets.filter(t=>this.clearWater(candidate,t)).sort((a,b)=>Math.hypot(a.x-x,a.z-z)-Math.hypot(b.x-x,b.z-z));
+      if(reachable.length){position=candidate;target=reachable[0];break;}
     }
     if(!position){this.retryAt=this.activeBoatSeconds+30;return false;}
-    state.inspection={id:++this.serial,phase:'approaching',...position,heading:Math.atan2(-(bx-position.x),-(bz-position.z)),progress:0,elapsed:0,reason};
+    state.inspection={id:++this.serial,phase:'approaching',...position,side:target.side,heading:Math.atan2(-(target.x-position.x),-(target.z-position.z)),progress:0,elapsed:0,blockedSeconds:0,reason};
     return true;
   }
   /** One independent 25% draw at a cargo-bearing return request per trip. */
@@ -40,12 +54,13 @@ export class FishingPatrol {
     return this.spawn(state,'dock');
   }
   navigate(p,target,speed,dt){
-    const dx=target.x-p.x,dz=target.z-p.z,d=Math.hypot(dx,dz);if(d<.02)return;
+    const dx=target.x-p.x,dz=target.z-p.z,d=Math.hypot(dx,dz);if(d<.02)return true;
     const desired=Math.atan2(-dx,-dz),step=Math.min(d,speed*dt);
     for(const offset of[0,.55,-.55,1.1,-1.1,Math.PI/2,-Math.PI/2]){
       const heading=desired+offset,nx=p.x-Math.sin(heading)*step,nz=p.z-Math.cos(heading)*step;
-      if(this.isWater(nx,nz)){p.x=nx;p.z=nz;p.heading=heading;return;}
+      if(this.clearWater(p,{x:nx,z:nz})){p.x=nx;p.z=nz;p.heading=heading;return Math.hypot(target.x-nx,target.z-nz)<d-.02;}
     }
+    return false;
   }
   update(state,dt,{assessment={violations:[]}}={}){
     const events=[];
@@ -62,15 +77,16 @@ export class FishingPatrol {
       }
       const p=state.inspection;if(!p)continue;
       p.elapsed=number(p.elapsed)+step;
-      const bx=number(state.boatX),bz=number(state.boatZ),heading=number(state.heading),side={x:Math.cos(heading),z:-Math.sin(heading)};
+      const bx=number(state.boatX),bz=number(state.boatZ),heading=number(state.heading);
       // Keep two enlarged pixel hulls separate while displaying the check.
-      let target={x:bx+side.x*11,z:bz+side.z*11};
-      if(!this.isWater(target.x,target.z))target={x:bx-side.x*11,z:bz-side.z*11};
+      const targets=this.sideTargets(state),target=targets.find(t=>t.side===p.side)||targets.sort((a,b)=>Math.hypot(a.x-p.x,a.z-p.z)-Math.hypot(b.x-p.x,b.z-p.z))[0];
+      if(target)p.side=target.side;
+      if(!target&&p.phase!=='departing'){p.phase='departing';p.elapsed=0;p.progress=0;this.nextInspectionAt=this.activeBoatSeconds+240+this.random()*300;}
       if(p.phase==='approaching'){
-        this.navigate(p,target,Math.max(7.5,Math.abs(number(state.speed))+3),step);
+        const progressed=this.navigate(p,target,Math.max(7.5,Math.abs(number(state.speed))+3),step);p.blockedSeconds=progressed?0:number(p.blockedSeconds)+step;
         p.progress=clamp(1-Math.hypot(p.x-target.x,p.z-target.z)/120,0,1);
         if(Math.hypot(p.x-target.x,p.z-target.z)<1.2){p.phase='checking';p.elapsed=0;p.progress=0;p.heading=heading;events.push({type:'inspection-start',id:p.id,reason:p.reason});}
-        else if(p.elapsed>120){p.phase='departing';p.elapsed=0;p.progress=0;this.nextInspectionAt=this.activeBoatSeconds+240+this.random()*300;}
+        else if(p.elapsed>120||p.blockedSeconds>8){p.phase='departing';p.elapsed=0;p.progress=0;this.nextInspectionAt=this.activeBoatSeconds+240+this.random()*300;}
       }else if(p.phase==='checking'){
         this.navigate(p,target,Math.max(7.5,Math.abs(number(state.speed))+3),step);p.heading=heading;p.progress=clamp(p.elapsed/8,0,1);
         if(p.elapsed>=8){

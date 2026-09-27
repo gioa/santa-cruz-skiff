@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import {readFile} from 'node:fs/promises';
 import {FishingPatrol} from '../dist/fish-patrol.js';
 
 function rng(seed){let a=seed>>>0;return()=>{a=(Math.imul(a,1664525)+1013904223)>>>0;return a/4294967296;};}
@@ -36,4 +37,29 @@ test('patrol does not materialize on blocked water or mutate unrelated game stat
 });
 test('an expired empty-cooler opportunity does not trigger on the first late catch',()=>{
   const p=new FishingPatrol({rng:rng(17)}),s=state();s.catches=[];for(let t=0;t<1000;t++)p.update(s,1);s.catches=[{kept:true,settled:false}];assert.deepEqual(p.update(s,1),[]);assert.equal(s.inspection,null);
+});
+test('a water endpoint across a long barrier is rejected in favor of a reachable approach side',()=>{
+  const values=[.1,.1,.1,.65,.1],isWater=(x,z)=>Math.abs(x)>5;let draw=0;
+  const p=new FishingPatrol({rng:()=>values[draw++]??.2,isWater}),s=state();Object.assign(s,{boatX:-20,boatZ:0,heading:Math.PI});
+  assert.equal(p.considerDock(s),true);assert.ok(s.inspection.x<-5,'the first candidate across the barrier must not be accepted');
+  const target=p.sideTargets(s).find(t=>t.side===s.inspection.side);assert.ok(target);for(let i=0;i<=300;i++){const t=i/300;assert.ok(isWater(s.inspection.x+(target.x-s.inspection.x)*t,s.inspection.z+(target.z-s.inspection.z)*t));}
+  let checked=false;for(let t=0;t<50;t++){const events=p.update(s,1);checked||=events.some(e=>e.type==='inspection-start');if(s.inspection)assert.ok(s.inspection.x<-5);}assert.equal(checked,true);
+});
+test('movement checks its water corridor and cannot jump a thin obstruction between valid endpoints',()=>{
+  const isWater=(x,z)=>Math.abs(x)>.4,p=new FishingPatrol({rng:rng(17),isWater}),position={x:-1,z:0,heading:0};
+  for(let i=0;i<40;i++){const before={x:position.x,z:position.z};p.navigate(position,{x:1,z:0},7.5,.25);assert.ok(position.x<-.4);for(let j=0;j<=12;j++){const f=j/12;assert.ok(isWater(before.x+(position.x-before.x)*f,before.z+(position.z-before.z)*f));}}
+});
+test('actual Santa Cruz wharf regression: patrol can reach the west-side boat and return berth without crossing pier',async()=>{
+  const previousFetch=globalThis.fetch;globalThis.fetch=async url=>new Response(await readFile(url));
+  try{
+    const {onLand,onPier}=await import('../dist/geography.js');const {harborWaterBlocked}=await import('../dist/harbor-layout.js');const isWater=(x,z)=>!onLand(x,z)&&!onPier(x,z)&&!harborWaterBlocked(x,z);
+    for(const [x,z,heading]of[[-48.8,-112.2,0],[-48.8,-112.2,Math.PI*.8],[-38,-52.6,0],[-38,-52.6,Math.PI*.8]]){
+      const seeded=rng(17);let draws=0;const p=new FishingPatrol({rng:()=>++draws<=2?.1:seeded(),isWater}),s=state();Object.assign(s,{boatX:x,boatZ:z,heading});
+      assert.ok(isWater(x,z));assert.equal(p.considerDock(s),true,`reachable spawn at ${x},${z}`);
+      const target=p.sideTargets(s).find(t=>t.side===s.inspection.side);assert.ok(target);
+      const length=Math.hypot(target.x-s.inspection.x,target.z-s.inspection.z),steps=Math.ceil(length/.4);for(let i=0;i<=steps;i++){const f=i/steps;assert.ok(isWater(s.inspection.x+(target.x-s.inspection.x)*f,s.inspection.z+(target.z-s.inspection.z)*f),'entire initial approach stays on the water side of the wharf');}
+      let start=false,result=false;for(let i=0;i<240;i++){const old=s.inspection?{x:s.inspection.x,z:s.inspection.z}:null,events=p.update(s,.25);start||=events.some(e=>e.type==='inspection-start');result||=events.some(e=>e.type==='inspection-result');if(s.inspection){assert.ok(isWater(s.inspection.x,s.inspection.z));if(old)for(let j=0;j<=6;j++){const f=j/6;assert.ok(isWater(old.x+(s.inspection.x-old.x)*f,old.z+(s.inspection.z-old.z)*f),'patrol movement never cuts through a pier or stair');}}}
+      assert.equal(start,true);assert.equal(result,true);
+    }
+  }finally{globalThis.fetch=previousFetch;}
 });
