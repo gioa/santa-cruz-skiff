@@ -1,38 +1,45 @@
-import {bindPointer} from './input.js?v=20260927-pixel-v10';
-import {rodPoseFromDrag,clockwiseTurns,createCrankInput} from './pixel-fishing-input.js?v=20260927-pixel-v10';
+import {bindPointer} from './input.js?v=20260927-pixel-v11';
+import {rodPoseFromDrag,clockwiseTurns,createCrankInput} from './pixel-fishing-input.js?v=20260927-pixel-v11';
 
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
-const activeStates=new Set(['sinking','waiting','bite','fight']);
 const rigNames={bottom:'沉底组',dropper:'双支线',slider:'滑铅组',jig:'软饵组',float:'浮漂组',sabiki:'羽毛组'};
 const mountNames={hand:'手持',port:'左舷竿架',starboard:'右舷竿架'};
 const TAU=Math.PI*2;
 
-export function mountFishingConsole(root,{sim,onFeedback,onMount,onStopReel=()=>{}}){
- const get=id=>root.querySelector('#'+id),pose=get('rod-pose'),wheel=get('reel-wheel'),drag=get('drag-knob'),mount=get('rod-mount'),spool=get('spool-toggle'),lower=get('lower-rig'),cast=get('cast-btn'),hold=get('reel-btn');
+export function mountFishingConsole(root,{sim,getActions,isRetrieving=()=>false,onFeedback,onMount,onRetrieve,onStopReel=()=>{}}){
+ const get=id=>root.querySelector('#'+id),pose=get('rod-pose'),wheel=get('reel-wheel'),drag=get('drag-knob'),mount=get('rod-mount'),spool=get('spool-toggle'),lower=get('lower-rig'),cast=get('cast-btn'),hold=get('reel-btn'),retrieve=get('retrieve-rig'),take=get('take-rod');
  const crank=createCrankInput();let rodGesture=null,crankAngle=null,dragGesture=null,rotation=0,lastFrame=0,keyboardReel=false;
- const usable=()=>{const s=sim.state;return s.mode==='boat'&&!s.moored&&!s.docking&&!s.paused&&s.inspection?.phase!=='checking';};
+ const actions=()=>getActions();
  const pointerAngle=e=>{const r=wheel.getBoundingClientRect(),x=e.clientX-r.left-r.width*.46,y=e.clientY-r.top-r.height*.49;return Math.hypot(x,y)<15?null:Math.atan2(y,x);};
  const pointers=[bindPointer(pose,{
-  start:e=>{if(!usable())return false;const s=sim.state,r=pose.getBoundingClientRect();rodGesture={x:e.clientX,y:e.clientY,elevation:s.rodElevation??45,azimuth:s.rodAzimuth??70,width:r.width,height:r.height};},
-  move:e=>{if(rodGesture){const p=rodPoseFromDrag(rodGesture,e.clientX-rodGesture.x,e.clientY-rodGesture.y,rodGesture);sim.setRodPose(p);}},
+  start:e=>{if(!actions().adjustPose)return false;const s=sim.state,r=pose.getBoundingClientRect();rodGesture={x:e.clientX,y:e.clientY,elevation:s.rodElevation??45,azimuth:s.rodAzimuth??70,width:r.width,height:r.height};},
+  move:e=>{if(!cancelUnavailable(actions()).adjustPose)return;if(rodGesture){const p=rodPoseFromDrag(rodGesture,e.clientX-rodGesture.x,e.clientY-rodGesture.y,rodGesture);sim.setRodPose(p);}},
   end:()=>{rodGesture=null;},cancel:()=>{rodGesture=null;}
  }),bindPointer(wheel,{
-  start:e=>{if(!usable()||!activeStates.has(sim.state.fishState))return false;crank.start();crankAngle=pointerAngle(e);},
-  move:e=>{const angle=pointerAngle(e);if(angle!=null&&crankAngle!=null){const turns=clockwiseTurns(crankAngle,angle);crank.turn(turns);}crankAngle=angle;},
+  start:e=>{if(!actions().reel)return false;crank.start();crankAngle=pointerAngle(e);},
+  move:e=>{if(!cancelUnavailable(actions()).reel)return;const angle=pointerAngle(e);if(angle!=null&&crankAngle!=null){const turns=clockwiseTurns(crankAngle,angle);crank.turn(turns);}crankAngle=angle;},
   end:()=>{crank.stop();crankAngle=null;},cancel:()=>{crank.stop();crankAngle=null;}
  }),bindPointer(drag,{
-  start:e=>{if(!usable())return false;dragGesture={y:e.clientY,value:sim.state.drag};},
-  move:e=>{if(dragGesture){const desired=clamp(dragGesture.value+(dragGesture.y-e.clientY)/180,.2,.85);sim.changeDrag(desired-sim.state.drag);}},
+  start:e=>{if(!actions().drag)return false;dragGesture={y:e.clientY,value:sim.state.drag};},
+  move:e=>{if(!cancelUnavailable(actions()).drag)return;if(dragGesture){const desired=clamp(dragGesture.value+(dragGesture.y-e.clientY)/180,.2,.85);sim.changeDrag(desired-sim.state.drag);}},
   end:()=>{dragGesture=null;},cancel:()=>{dragGesture=null;}
  })];
- pose.addEventListener('keydown',e=>{if(!['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Home'].includes(e.key)||!usable())return;e.preventDefault();e.stopPropagation();const s=sim.state;sim.setRodPose({elevation:e.key==='Home'?45:(s.rodElevation??45)+(e.key==='ArrowUp'?5:e.key==='ArrowDown'?-5:0),azimuth:e.key==='Home'?70:(s.rodAzimuth??70)+(e.key==='ArrowRight'?10:e.key==='ArrowLeft'?-10:0)});});
- drag.addEventListener('keydown',e=>{if(!['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key)||!usable())return;e.preventDefault();e.stopPropagation();sim.changeDrag(['ArrowUp','ArrowRight'].includes(e.key)?.05:-.05);});
- wheel.addEventListener('keydown',e=>{if(!['ArrowUp','ArrowRight',' ','Enter'].includes(e.key))return;e.preventDefault();e.stopPropagation();if(usable()&&activeStates.has(sim.state.fishState))keyboardReel=true;});
+ // A changing fishing phase can remove a control before the finger is lifted.
+ // End its gesture and queued travel so it cannot resume on a later phase.
+ function cancelUnavailable(a){
+  if(!a.adjustPose){pointers[0].reset();rodGesture=null;}
+  if(!a.reel){pointers[1].reset();crank.stop();crankAngle=null;keyboardReel=false;}
+  if(!a.drag){pointers[2].reset();dragGesture=null;}
+  return a;
+ }
+ pose.addEventListener('keydown',e=>{if(!['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Home'].includes(e.key)||!actions().adjustPose)return;e.preventDefault();e.stopPropagation();const s=sim.state;sim.setRodPose({elevation:e.key==='Home'?45:(s.rodElevation??45)+(e.key==='ArrowUp'?5:e.key==='ArrowDown'?-5:0),azimuth:e.key==='Home'?70:(s.rodAzimuth??70)+(e.key==='ArrowRight'?10:e.key==='ArrowLeft'?-10:0)});});
+ drag.addEventListener('keydown',e=>{if(!['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key)||!actions().drag)return;e.preventDefault();e.stopPropagation();sim.changeDrag(['ArrowUp','ArrowRight'].includes(e.key)?.05:-.05);});
+ wheel.addEventListener('keydown',e=>{if(!['ArrowUp','ArrowRight',' ','Enter'].includes(e.key))return;e.preventDefault();e.stopPropagation();if(actions().reel)keyboardReel=true;});
  wheel.addEventListener('keyup',e=>{if(['ArrowUp','ArrowRight',' ','Enter'].includes(e.key)){e.preventDefault();e.stopPropagation();keyboardReel=false;}});
  wheel.addEventListener('blur',()=>{keyboardReel=false;});
- spool.onclick=()=>{onStopReel();if(usable())onFeedback(sim.setReelMode(sim.state.reelMode==='free'?'brake':'free'));};
- lower.onclick=()=>{if(!usable())return;const s=sim.state;if(s.fishState==='bite')onFeedback(sim.hook());else if(s.fishState==='landed')onFeedback({ok:true,action:'catch'});else onFeedback(sim.lowerRig());};
- mount.onchange=()=>{onMount(mount.value);mount.value=sim.state.rodMount||'hand';};
+ spool.onclick=()=>{onStopReel();if(actions().spool)onFeedback(sim.setReelMode(sim.state.reelMode==='free'?'brake':'free'));};
+ lower.onclick=()=>{const a=actions();if(a.hook)onFeedback(sim.hook());else if(a.catch)onFeedback({ok:true,action:'catch'});else if(a.lower)onFeedback(sim.lowerRig());};
+ mount.onchange=()=>{if(actions().mount)onMount(mount.value);mount.value='hand';};take.onclick=()=>{if(actions().take)onMount('hand');};retrieve.onclick=()=>{if(actions().retrieve)onRetrieve();};
 
  function paintRod(canvas,s,compact=false){
   const c=canvas.getContext('2d'),w=canvas.width,h=canvas.height,elevation=(s.rodElevation??45)*Math.PI/180,bend=clamp(s.rodBend||0,0,1),azimuth=(s.rodAzimuth??70)/110;
@@ -58,14 +65,17 @@ export function mountFishingConsole(root,{sim,onFeedback,onMount,onStopReel=()=>
   c.fillStyle='#355e50';c.font='11px monospace';c.textAlign='left';c.fillText(`${(s.paidLineMeters||0).toFixed(1)} m`,8,15);c.fillStyle=s.reelMode==='free'?'#aa654c':'#4c7261';c.fillRect(w-13,7,6,6);
  }
  function update(){
-  const s=sim.state,enabled=usable(),active=activeStates.has(s.fishState),idle=s.fishState==='idle';
+  const s=sim.state,a=cancelUnavailable(actions()),show=(el,visible)=>{el.hidden=!visible;if(el.tagName==='BUTTON'||el.tagName==='SELECT')el.disabled=!visible;};
   get('tackle-name').textContent=`${mountNames[s.rodMount]||'手持'} · ${rigNames[s.rig]||'钓组'}`;get('rod-load').textContent=`${(s.rodLoadN||0).toFixed(1)} N`;
-  pose.setAttribute('aria-valuenow',String(Math.round(s.rodElevation??45)));pose.setAttribute('aria-valuetext',`抬竿 ${Math.round(s.rodElevation??45)} 度，朝向 ${Math.round(s.rodAzimuth??70)} 度，弯曲 ${Math.round((s.rodBend||0)*100)}%`);pose.setAttribute('aria-disabled',String(!enabled));
-  wheel.setAttribute('aria-valuenow',String(Math.round((s.paidLineMeters||0)*10)/10));wheel.setAttribute('aria-disabled',String(!enabled||!active));
-  mount.value=s.rodMount||'hand';mount.disabled=!enabled;spool.textContent=s.reelMode==='free'?'锁住线杯':'打开线杯';spool.setAttribute('aria-pressed',String(s.reelMode==='free'));spool.disabled=!enabled||!active;
-  lower.textContent=s.fishState==='bite'?'提竿！':s.fishState==='landed'?'鱼获':'船边下放';lower.disabled=!enabled||(!idle&&!['bite','landed'].includes(s.fishState));cast.disabled=!enabled||!idle&&s.fishState!=='casting'||s.rodMount!=='hand';hold.disabled=!enabled||!active;
-  drag.textContent=`✳ ${Math.round(s.drag*100)}%`;drag.setAttribute('aria-valuenow',String(Math.round(s.drag*100)));drag.setAttribute('aria-disabled',String(!enabled));
+  show(pose,a.pose);pose.setAttribute('role',a.adjustPose?'slider':'img');pose.tabIndex=a.adjustPose?0:-1;pose.style.cursor=a.adjustPose?'move':'default';pose.setAttribute('aria-valuenow',String(Math.round(s.rodElevation??45)));pose.setAttribute('aria-valuetext',`抬竿 ${Math.round(s.rodElevation??45)} 度，朝向 ${Math.round(s.rodAzimuth??70)} 度，弯曲 ${Math.round((s.rodBend||0)*100)}%`);pose.removeAttribute('aria-disabled');
+  wheel.setAttribute('role',a.reel?'slider':'img');wheel.tabIndex=a.reel?0:-1;wheel.style.cursor=a.reel?'grab':'default';wheel.setAttribute('aria-valuenow',String(Math.round((s.paidLineMeters||0)*10)/10));wheel.removeAttribute('aria-disabled');
+  show(get('reel-instrument'),a.reelInstrument);show(hold,a.reel);show(spool,a.spool);spool.textContent=s.reelMode==='free'?'锁住线杯':'打开线杯';spool.setAttribute('aria-pressed',String(s.reelMode==='free'));
+  show(lower,a.lower||a.hook||a.catch);lower.textContent=a.hook?'提竿！':a.catch?'鱼获':'船边下放';show(cast,a.cast);
+  show(mount,a.mount);mount.value='hand';show(take,a.take);show(retrieve,a.retrieve);retrieve.textContent=isRetrieving()?'停止收竿':'收回钓组';retrieve.setAttribute('aria-pressed',String(isRetrieving()));
+  show(drag,a.drag);drag.textContent=`✳ ${Math.round(s.drag*100)}%`;drag.setAttribute('aria-valuenow',String(Math.round(s.drag*100)));drag.removeAttribute('aria-disabled');
+  const tools=a.lower||a.hook||a.catch||a.cast||a.mount||a.take||a.retrieve||a.drag;root.querySelector('.fishing-toolbar').hidden=!tools;root.querySelector('.fishing-instruments').hidden=!a.pose&&!a.reelInstrument;
+  root.classList.toggle('rod-only',!a.reelInstrument);root.classList.toggle('no-tools',!tools);root.classList.toggle('has-status',['casting','bite','fight'].includes(s.fishState));
   const mini=document.getElementById('rod-monitor');if(mini){mini.querySelector('span').textContent=`${mountNames[s.rodMount]||'手持'} · ${(s.paidLineMeters||0).toFixed(1)} m`;mini.querySelector('b').textContent=s.fishState==='bite'?'咬钩！':`${(s.rodLoadN||0).toFixed(1)} N`;}
  }
- return{input:dt=>({reel:usable()?Math.max(crank.sample(dt),keyboardReel?1.2:0):0}),reset(){for(const p of pointers)p.reset();crank.stop();keyboardReel=false;rodGesture=null;crankAngle=null;dragGesture=null;},update,draw(dt){const s=sim.state;rotation+=(s.crankRate||0)*TAU*dt;lastFrame+=dt;if(lastFrame<1/30)return;lastFrame=0;if(!root.hidden){paintRod(pose,s);paintReel(s);}const mini=document.getElementById('rod-monitor');if(mini&&!mini.hidden)paintRod(mini.querySelector('canvas'),s,true);}};
+ return{input:dt=>{const a=cancelUnavailable(actions());return{reel:a.reel?Math.max(crank.sample(dt),keyboardReel?1.2:0):0};},reset(){for(const p of pointers)p.reset();crank.stop();keyboardReel=false;rodGesture=null;crankAngle=null;dragGesture=null;},update,draw(dt){const s=sim.state;rotation+=(s.crankRate||0)*TAU*dt;lastFrame+=dt;if(lastFrame<1/30)return;lastFrame=0;if(!root.hidden){paintRod(pose,s);paintReel(s);}const mini=document.getElementById('rod-monitor');if(mini&&!mini.hidden)paintRod(mini.querySelector('canvas'),s,true);}};
 }

@@ -128,35 +128,117 @@
 .rental-ticket{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:15px 18px;margin:15px 0 12px;background:#ead6a9;border:2px solid #889475;box-shadow:inset 0 0 0 3px #f4e6c3}.rental-ticket small{display:block;font-size:10px;color:#5e7463}.rental-ticket strong{display:block;font-size:15px;margin-top:5px}.rental-ticket>span{font:bold 24px monospace}.rental-message{min-height:0;margin:7px 0;color:#995e43;font-size:11px}.rental-message:empty{display:none}
 @media(max-height:500px){.rental-ticket{padding:8px 12px;margin:9px 0}.rental-ticket strong{font-size:13px}.rental-ticket>span{font-size:20px}}
 
-/* Physical tackle console: thumb-sized controls, one instrument per touch. */
-#boat-console{max-width:540px}#boat-console.fishing-open{width:min(540px,calc(100% - 24px))}
-#boat-fishing{display:grid;gap:6px;margin-top:6px;min-width:0}.tackle-caption{display:flex;justify-content:space-between;gap:8px;font-size:10px;color:#486857;line-height:17px}.tackle-caption b{font:11px monospace}.fishing-instruments{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:7px;height:150px}
-#rod-pose{display:block;width:100%;height:150px;background:#c8c39f;border:2px solid #8d9d79;touch-action:none;cursor:move;image-rendering:pixelated}
-.reel-instrument{position:relative;display:grid;grid-template-rows:104px 44px;min-width:0;background:#d8ccaa;border:2px solid #8d9d79;overflow:hidden}#reel-wheel{width:100%;height:104px;display:block;image-rendering:pixelated;touch-action:none;cursor:grab}.reel-instrument #reel-btn{position:absolute;right:2px;top:51px;width:44px;height:44px;min-height:44px;padding:2px;border:2px solid #405f50;background:#6d8e74;color:#fff1d1;font-size:10px;box-shadow:inset 0 0 0 2px #9faf87;touch-action:none}.reel-instrument #spool-toggle{width:100%;height:44px;min-height:44px;padding:3px;border:0;border-top:2px solid #8d9d79;background:#eee1be;font-size:11px}.reel-instrument #spool-toggle[aria-pressed=true]{background:#e9bb7e;color:#654e34}
-.fishing-toolbar{display:grid;grid-template-columns:1.05fr .7fr 1.15fr 61px;gap:5px;min-width:0}.fishing-toolbar button,.fishing-toolbar select{height:44px;min-height:44px;min-width:0;border:2px solid #6c8268;background:#f2e3bb;color:#365a48;padding:4px;font:11px ui-monospace,monospace;border-radius:0;touch-action:none}.fishing-toolbar #lower-rig{background:#527b67;color:#fff0ca;border-color:#345647}.fishing-toolbar #cast-btn{width:auto;height:44px;min-height:44px;display:block}.fishing-toolbar #cast-btn small{display:block;font-size:8px;margin:1px 0 0;opacity:.7}.fishing-toolbar #drag-knob{background:#d5c390;cursor:ns-resize;font:bold 11px monospace}.fishing-toolbar select{appearance:auto;touch-action:manipulation}.fishing-toolbar button:disabled{opacity:.44;cursor:default}#rod-pose:focus-visible,#reel-wheel:focus-visible,#drag-knob:focus-visible{outline:3px solid #e7a14e;outline-offset:1px}
-#rod-monitor{display:flex;align-items:center;gap:8px;height:40px;margin-top:5px;background:#d0c7a5;border:1px solid #8d9d79;font:10px monospace;color:#456854}#rod-monitor canvas{width:112px;height:36px;image-rendering:pixelated}#rod-monitor b{margin-left:auto;margin-right:8px;font-size:11px}#fishing-tab[aria-pressed=true]{background:#edc78a}.is-aboard #toast{bottom:calc(300px + env(safe-area-inset-bottom))}
-@media(max-width:380px){#boat-console.fishing-open{width:calc(100% - 12px);padding:6px}.fishing-toolbar{grid-template-columns:1fr .65fr 1fr 54px;gap:3px}.fishing-toolbar button,.fishing-toolbar select{font-size:10px}.fishing-instruments{gap:5px}.tackle-caption{font-size:9px}}
-@media(max-height:640px) and (orientation:portrait){.fishing-instruments,#rod-pose{height:126px}.reel-instrument{grid-template-rows:80px 44px}#reel-wheel{height:80px}.reel-instrument #reel-btn{top:33px}.is-aboard #toast{bottom:270px}}
-@media(max-height:500px) and (orientation:landscape){
- #boat-console,#boat-console.fishing-open{width:calc(100% - 20px);max-width:850px;display:grid;grid-template-columns:108px minmax(0,1fr);gap:7px;padding:6px}
- #boat-action-bar,#boat-action-bar:has(button:not([hidden]):nth-of-type(4)){width:108px;display:grid;grid-template-columns:repeat(2,52px);grid-auto-rows:52px;gap:4px;align-content:center}#boat-action-bar button{height:52px;min-height:44px;font-size:10px;padding:2px}
- #boat-fishing{margin:0;display:grid;grid-template-columns:minmax(105px,1.3fr) minmax(104px,1fr) 128px;gap:5px;align-items:stretch;height:112px}.tackle-caption{display:none}.fishing-instruments{display:contents}#rod-pose{height:112px;min-width:0}.reel-instrument{grid-template-rows:66px 44px}#reel-wheel{height:66px}.reel-instrument #reel-btn{top:20px;right:0;font-size:9px}
- .fishing-toolbar{grid-template-columns:repeat(2,minmax(44px,1fr));grid-template-rows:repeat(2,52px);gap:4px;align-content:center}.fishing-toolbar button,.fishing-toolbar select,.fishing-toolbar #cast-btn{height:52px;font-size:9px;padding:1px}.fishing-toolbar #drag-knob{font-size:10px}
- #rod-monitor{display:none}#helm{height:112px}.is-aboard #toast{bottom:140px}.is-aboard .fish-status{bottom:138px}
+/* Only legal gear choices occupy the lever: hidden reverse leaves no socket. */
+#boat-console .gear-lever{display:flex;flex-flow:column nowrap;gap:4px;min-height:0}
+#boat-console .gear-lever button{flex:1 1 44px;min-height:44px;min-width:44px;height:auto;grid-column:auto;grid-row:auto}
+@media(max-height:500px) and (orientation:landscape){#boat-console .gear-lever{flex-flow:row wrap;align-content:stretch}#boat-console .gear-lever button[data-gear=N]{grid-column:auto;grid-row:auto}}
+
+/* Physical tackle console: hidden actions remove their entire layout space. */
+#boat-console,#boat-console.fishing-open{
+ display:flex;flex-direction:column;gap:6px;width:min(540px,calc(100% - 24px));max-width:540px;min-width:0;height:auto;padding:8px
 }
-
-/* Native iOS selects stay at 16px to avoid focus-triggered page zoom. */
-.fishing-toolbar #rod-mount{font-size:16px;padding-left:3px}
-
-/* Fish feedback belongs to the instrument tray, keeping the sea unobstructed. */
-#boat-fishing .fish-status{position:static;transform:none;inset:auto;width:auto;padding:0;background:transparent;border:0;box-shadow:none;display:flex;align-items:center;gap:8px;min-height:23px;font-size:10px}
-#boat-fishing:has(.fish-status:not([hidden])) .tackle-caption{display:none}
-#boat-fishing .fish-status-head{font-size:10px;gap:5px;white-space:nowrap}#boat-fishing #fish-distance,#boat-fishing #fish-detail{display:none}
-#boat-fishing #tension-row{display:grid;grid-template-columns:1fr 1fr;flex:1;gap:3px 8px;min-width:0}#boat-fishing .meter-caption{font-size:8px;margin:0;grid-row:1}#boat-fishing .meter{height:4px;grid-row:2}#boat-fishing .meter-caption:nth-of-type(1),#boat-fishing .meter.tension{grid-column:1}#boat-fishing .meter-caption:nth-of-type(3),#boat-fishing .meter.stamina{grid-column:2}#boat-fishing #cast-row{flex:1}#boat-fishing #cast-row .meter{margin:0;height:6px}#boat-fishing #cast-row small{display:none}
-@media(max-height:500px) and (orientation:landscape){
- #boat-fishing:has(.fish-status:not([hidden])){height:141px;grid-template-rows:23px 112px;row-gap:6px}#boat-fishing .fish-status{grid-column:1/-1;grid-row:1}#boat-fishing:has(.fish-status:not([hidden])) #rod-pose,#boat-fishing:has(.fish-status:not([hidden])) .reel-instrument,#boat-fishing:has(.fish-status:not([hidden])) .fishing-toolbar{grid-row:2}
+#boat-console #boat-action-bar{
+ display:flex;flex-flow:row wrap;gap:5px;width:auto;min-width:0;justify-content:center;align-items:stretch
 }
-
-@media(max-height:500px) and (orientation:landscape){#boat-fishing #rod-pose{grid-column:1}#boat-fishing .reel-instrument{grid-column:2}#boat-fishing .fishing-toolbar{grid-column:3}}
-
-@media(max-width:560px) and (max-height:500px) and (orientation:landscape){#boat-console,#boat-console.fishing-open{grid-template-columns:96px minmax(0,1fr)}#boat-action-bar,#boat-action-bar:has(button:not([hidden]):nth-of-type(4)){width:96px;grid-template-columns:repeat(2,46px)}#boat-fishing{grid-template-columns:minmax(88px,1.3fr) minmax(92px,1fr) 128px}}
+#boat-console #boat-action-bar button{flex:1 1 64px;min-width:44px;min-height:44px;height:auto;padding:6px;font-size:11px}
+#boat-console #boat-action-bar.hidden{display:none}
+#boat-console #helm,#boat-console #rod-monitor,#boat-console #boat-fishing{margin:0;min-width:0}
+#boat-console.actions-only{width:max-content;max-width:min(540px,calc(100% - 24px))}
+#boat-console.actions-only #boat-action-bar{width:auto;max-width:100%}
+#boat-console.actions-only #boat-action-bar button{flex:1 1 auto;min-width:88px}
+#boat-fishing{
+ --tackle-height:142px;display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:none;gap:6px;height:auto;min-width:0;align-items:stretch
+}
+#boat-fishing.rod-only{--tackle-height:104px}
+.tackle-caption{display:flex;justify-content:space-between;gap:8px;font-size:10px;color:#486857;line-height:17px;min-width:0}
+.tackle-caption b{font:11px monospace}
+#boat-fishing.has-status .tackle-caption,#boat-fishing:has(.fish-status:not([hidden])) .tackle-caption{display:none}
+#boat-fishing .fishing-instruments{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(112px,1fr);gap:6px;height:var(--tackle-height);min-width:0}
+#boat-fishing.rod-only .fishing-instruments,#boat-fishing .fishing-instruments:has(>.reel-instrument[hidden]){grid-template-columns:minmax(0,1fr)}
+#boat-fishing #rod-pose{
+ display:block;width:100%;height:100%;min-width:0;min-height:44px;grid-column:auto;grid-row:auto;background:#c8c39f;border:2px solid #8d9d79;touch-action:none;cursor:move;image-rendering:pixelated
+}
+#boat-fishing .reel-instrument{
+ position:relative;display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(44px,1fr) 44px;grid-column:auto;grid-row:auto;min-width:0;min-height:92px;height:100%;background:#d8ccaa;border:2px solid #8d9d79;overflow:hidden
+}
+#boat-fishing #reel-wheel{display:block;width:100%;height:100%;min-height:44px;image-rendering:pixelated;touch-action:none;cursor:grab}
+#boat-fishing .reel-instrument #reel-btn{
+ position:absolute;right:2px;top:calc((100% - 44px)/2 - 22px);width:44px;height:44px;min-width:44px;min-height:44px;padding:2px;border:2px solid #405f50;background:#6d8e74;color:#fff1d1;font-size:10px;box-shadow:inset 0 0 0 2px #9faf87;touch-action:none
+}
+#boat-fishing .reel-instrument #spool-toggle{width:100%;height:44px;min-height:44px;min-width:44px;padding:3px;border:0;border-top:2px solid #8d9d79;background:#eee1be;font-size:11px;touch-action:manipulation}
+#boat-fishing .reel-instrument #spool-toggle[aria-pressed=true]{background:#e9bb7e;color:#654e34}
+#boat-fishing .fishing-toolbar{
+ display:flex;flex-flow:row wrap;align-items:stretch;gap:5px;min-width:0;height:auto;grid-column:auto;grid-row:auto
+}
+#boat-fishing .fishing-toolbar button,#boat-fishing .fishing-toolbar select{
+ flex:1 1 64px;width:auto;height:44px;min-height:44px;min-width:44px;border:2px solid #6c8268;background:#f2e3bb;color:#365a48;padding:4px 6px;font:11px ui-monospace,monospace;line-height:1.2;border-radius:0;white-space:nowrap;touch-action:manipulation
+}
+#boat-fishing .fishing-toolbar #lower-rig{flex-basis:82px;background:#527b67;color:#fff0ca;border-color:#345647}
+#boat-fishing .fishing-toolbar #cast-btn{flex-basis:52px;display:block;width:auto;min-height:44px;height:44px;touch-action:none}
+#boat-fishing .fishing-toolbar #cast-btn small{display:block;font-size:8px;line-height:1;margin:2px 0 0;opacity:.7}
+#boat-fishing .fishing-toolbar #retrieve-rig{flex-basis:78px}
+#boat-fishing .fishing-toolbar #take-rod{flex-basis:68px;background:#edc78a}
+#boat-fishing .fishing-toolbar #drag-knob{flex-basis:62px;background:#d5c390;cursor:ns-resize;font:bold 11px monospace;touch-action:none}
+/* 16px keeps native mobile selects from zooming the viewport on focus. */
+#boat-fishing .fishing-toolbar #rod-mount{flex:1 1 108px;min-width:108px;font-size:16px;padding:4px;appearance:auto;touch-action:manipulation}
+#boat-fishing .fishing-toolbar button:disabled{opacity:.44;cursor:default}
+#boat-fishing.no-tools .fishing-toolbar{display:none}
+#rod-pose:focus-visible,#reel-wheel:focus-visible,#drag-knob:focus-visible{outline:3px solid #e7a14e;outline-offset:1px}
+#rod-monitor{display:flex;align-items:center;gap:8px;height:36px;background:#d0c7a5;border:1px solid #8d9d79;font:10px monospace;color:#456854}
+#rod-monitor canvas{width:112px;height:32px;image-rendering:pixelated}#rod-monitor b{margin-left:auto;margin-right:8px;font-size:11px}
+#fishing-tab[aria-pressed=true]{background:#edc78a}
+/* The status strip replaces the caption; it never reserves a hidden row. */
+#boat-fishing .fish-status{
+ position:static;transform:none;inset:auto;width:auto;max-width:none;padding:0;margin:0;background:transparent;border:0;box-shadow:none;display:flex;align-items:center;gap:8px;min-height:23px;height:auto;font-size:10px;grid-column:auto;grid-row:auto
+}
+#boat-fishing .fish-status-head{font-size:10px;gap:5px;white-space:nowrap}
+#boat-fishing #fish-distance,#boat-fishing #fish-detail{display:none}
+#boat-fishing #tension-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);flex:1;gap:3px 8px;min-width:0}
+#boat-fishing .meter-caption{font-size:8px;margin:0;grid-row:1}
+#boat-fishing .meter{height:4px;grid-row:2}
+#boat-fishing .meter-caption:nth-of-type(1),#boat-fishing .meter.tension{grid-column:1}
+#boat-fishing .meter-caption:nth-of-type(3),#boat-fishing .meter.stamina{grid-column:2}
+#boat-fishing #cast-row{flex:1;min-width:0}#boat-fishing #cast-row .meter{margin:0;height:6px}#boat-fishing #cast-row small{display:none}
+@media(max-width:380px){
+ #boat-console,#boat-console.fishing-open{width:calc(100% - 12px);padding:6px;bottom:calc(6px + env(safe-area-inset-bottom));gap:5px}
+ #boat-console.actions-only{width:max-content;max-width:calc(100% - 12px)}
+ #boat-console #boat-action-bar{gap:4px}#boat-fishing{gap:5px}.tackle-caption{font-size:9px}
+ #boat-fishing .fishing-instruments{gap:5px}#boat-fishing .fishing-toolbar{gap:4px}
+}
+@media(max-height:640px) and (orientation:portrait){
+ #boat-fishing{--tackle-height:122px}#boat-fishing.rod-only{--tackle-height:88px}
+}
+@media(max-height:500px) and (orientation:landscape){
+ #boat-console,#boat-console.fishing-open{
+  display:flex;flex-flow:row nowrap;align-items:stretch;gap:6px;width:min(540px,calc(100% - 20px));max-width:540px;padding:6px;bottom:calc(6px + env(safe-area-inset-bottom))
+ }
+ /* A hidden bar is removed by [hidden], so it cannot reserve a side column. */
+ #boat-console #boat-action-bar{
+  display:flex;flex-flow:row wrap;flex:0 0 104px;width:104px;min-width:0;gap:4px;align-content:center;align-items:stretch
+ }
+ #boat-console #boat-action-bar button{flex:1 1 44px;min-width:44px;min-height:44px;height:44px;padding:3px;font-size:10px}
+ #boat-console.actions-only{width:max-content;max-width:min(540px,calc(100% - 20px))}
+ #boat-console.actions-only #boat-action-bar{flex:0 1 auto;width:auto;max-width:100%;flex-wrap:wrap}
+ #boat-console.actions-only #boat-action-bar button{flex:1 1 auto;min-width:88px}
+ #boat-console #rod-monitor{display:none}
+ #boat-console #helm{flex:1;min-width:0;height:100px}
+ #boat-console #boat-fishing{
+  --tackle-height:104px;display:grid;flex:1;min-width:0;height:auto;grid-template-columns:minmax(0,1fr) 128px;grid-template-rows:none;gap:5px;align-items:stretch
+ }
+ #boat-console #boat-fishing.rod-only{--tackle-height:92px}
+ #boat-console #boat-fishing.no-tools{grid-template-columns:minmax(0,1fr)}
+ #boat-fishing .tackle-caption{display:none}
+ #boat-fishing .fishing-instruments{display:grid;grid-column:1;grid-row:1;grid-template-columns:minmax(0,1.2fr) minmax(92px,1fr);gap:5px;height:var(--tackle-height)}
+ #boat-fishing.rod-only .fishing-instruments,#boat-fishing .fishing-instruments:has(>.reel-instrument[hidden]){grid-template-columns:minmax(0,1fr)}
+ #boat-fishing #rod-pose,#boat-fishing .reel-instrument{grid-column:auto;grid-row:auto;height:100%}
+ #boat-fishing .fishing-toolbar{grid-column:2;grid-row:1;display:flex;flex-flow:row wrap;align-content:center;gap:4px}
+ #boat-fishing .fishing-toolbar button{flex:1 1 48px;height:44px;min-height:44px;font-size:10px;padding:3px}
+ #boat-fishing .fishing-toolbar #lower-rig,#boat-fishing .fishing-toolbar #cast-btn{flex-basis:48px}
+ #boat-fishing .fishing-toolbar #retrieve-rig{flex-basis:64px}
+ #boat-fishing .fishing-toolbar #take-rod{flex-basis:56px}
+ #boat-fishing .fishing-toolbar #drag-knob{flex-basis:60px;font-size:10px}
+ #boat-fishing .fishing-toolbar #rod-mount{order:10;flex:1 1 108px;min-width:108px;height:44px;font-size:16px;padding:3px}
+ #boat-fishing .fish-status{grid-column:1/-1;grid-row:1;min-height:23px}
+ #boat-fishing.has-status .fishing-instruments,#boat-fishing.has-status .fishing-toolbar{grid-row:2}
+ #boat-fishing.no-tools .fishing-toolbar{display:none}
+}
