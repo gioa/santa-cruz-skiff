@@ -5,7 +5,7 @@ globalThis.fetch=async url=>new Response(await readFile(url));
 const {PixelSimulation,HARBOR,BASE_GEAR}=await import('../dist/pixel-sim.js');
 const {hullPenetration}=await import('../dist/navigation.js');
 const runUntil=(sim,predicate,seconds=600,input={})=>{let elapsed=0;while(!predicate(sim.state)&&elapsed<seconds){sim.step(.1,typeof input==='function'?input(sim.state):input);elapsed+=.1;}assert.ok(predicate(sim.state),`timed out after ${elapsed.toFixed(1)}s: ${JSON.stringify(sim.publicState())}`);return elapsed;};
-function departure(sim){assert.equal(sim.start().ok,true);assert.equal(sim.walkTo('counter').ok,true);runUntil(sim,()=>sim.atCounter&&sim.state.walkRoute.length===0,20);assert.equal(sim.interact().action,'staff');assert.equal(sim.packStarter().ok,true);assert.equal(sim.launchBoat().ok,true);assert.equal(sim.walkTo('boarding').ok,true);runUntil(sim,s=>s.walkRoute.length===0&&s.launchStage==='afloat',70);assert.equal(sim.board().ok,true);assert.equal(sim.unmoor().ok,true);}
+function departure(sim,chart=false){assert.equal(sim.start().ok,true);assert.equal(sim.walkTo('counter').ok,true);runUntil(sim,()=>sim.atCounter&&sim.state.walkRoute.length===0,20);assert.equal(sim.interact().action,'staff');assert.equal(sim.packStarter().ok,true);if(chart){assert.equal(sim.buyGear('nautical_chart').ok,true);assert.equal(sim.equip('nautical_chart').ok,true);}assert.equal(sim.launchBoat().ok,true);assert.equal(sim.walkTo('boarding').ok,true);runUntil(sim,s=>s.walkRoute.length===0&&s.launchStage==='afloat',70);assert.equal(sim.board().ok,true);assert.equal(sim.unmoor().ok,true);}
 
 test('pixel edition starts near the shop at 06:00 and honors pause + 1:1 clock',()=>{
  const sim=new PixelSimulation();assert.equal(sim.state.mode,'intro');assert.ok(Math.hypot(sim.state.playerX-HARBOR.counterX,sim.state.playerZ-HARBOR.counterZ)<10);sim.start();for(let i=0;i<240;i++)sim.step(.25);assert.equal(sim.state.clock,'06:01:00');sim.pause(true);sim.step(.25);assert.equal(sim.state.clock,'06:01:00');sim.pause(false);assert.equal(sim.state.profile.credits,100);
@@ -13,7 +13,7 @@ test('pixel edition starts near the shop at 06:00 and honors pause + 1:1 clock',
 });
 
 test('complete walking, hoist, sailing, fishing, return, fish trade and equipment loop',()=>{
- const sim=new PixelSimulation({rng:()=>.05});departure(sim);assert.deepEqual(sim.state.packed,BASE_GEAR.map(g=>g.id));assert.equal(sim.state.pfd,true);assert.ok(sim.state.walked>35);assert.equal(sim.selectWaypoint('sand').ok,true);
+ const sim=new PixelSimulation({rng:()=>.05,patrolRng:()=>.9,profile:{version:2,credits:220}});departure(sim,true);assert.deepEqual(sim.state.packed,[...BASE_GEAR.map(g=>g.id),'nautical_chart']);assert.equal(sim.state.pfd,true);assert.ok(sim.state.walked>35);assert.equal(sim.selectWaypoint('sand').ok,true);
  let maxSpeed=0;runUntil(sim,s=>s.arrival==='fishing',420,s=>{maxSpeed=Math.max(maxSpeed,Math.abs(s.speed));return{};});assert.ok(maxSpeed>1&&maxSpeed<5,'SI vessel speeds remain believable');assert.ok(sim.state.sailed>200);assert.equal(sim.state.engine,false);assert.equal(hullPenetration(sim.vessel),0);runUntil(sim,s=>Math.abs(s.speed)<.5,30);assert.equal(sim.toggleAnchor().ok,true);
  assert.equal(sim.startCast().ok,true);for(let i=0;i<15;i++)sim.step(.1);assert.equal(sim.releaseCast().ok,true);assert.equal(sim.state.profile.stock.squid,11);runUntil(sim,s=>s.fishState==='bite',100);assert.equal(sim.hook().ok,true);runUntil(sim,s=>s.fishState==='landed',240,{reel:true});assert.equal(sim.keepCatch().ok,true);assert.equal(sim.state.catches.length,1);assert.equal(sim.state.profile.credits,100,'kept fish require a counter trade');assert.equal(sim.selectWaypoint('dock').ok,true);runUntil(sim,s=>s.arrival==='dock',420);runUntil(sim,s=>Math.abs(s.speed)<.5,30);assert.equal(sim.dock().ok,true);runUntil(sim,s=>s.mode==='walk',40);assert.equal(sim.state.tripComplete,true);assert.equal(sim.walkTo('counter').ok,true);runUntil(sim,()=>sim.atCounter&&sim.state.walkRoute.length===0,70);const reward=sim.trade();assert.equal(reward.count,1);assert.ok(reward.total>0);const earned=sim.state.profile.credits;assert.equal(sim.trade().total,0,'same fish cannot be sold twice');assert.equal(sim.state.profile.credits,earned);assert.equal(sim.buyGear('rig_slider').ok,true);assert.equal(sim.state.profile.credits,earned-25);assert.equal(sim.equip('rig_slider').ok,true);assert.equal(sim.setRig({rig:'slider',bait:'squid'}).ok,true);assert.ok(sim.state.elapsed>300,'travel and fight are not accelerated');
 });
@@ -27,7 +27,7 @@ test('actual departure can fall overboard, cut the engine, swim back and reboard
 });
 
 test('mobile steering and throttle cancel assisted route without teleporting the boat',()=>{
- const sim=new PixelSimulation();departure(sim);sim.selectWaypoint('sand');for(let i=0;i<60;i++)sim.step(.1);const before={x:sim.state.boatX,z:sim.state.boatZ};sim.step(.1,{steer:-.7,throttle:.2});assert.equal(sim.state.waypoint,null);assert.deepEqual(sim.state.waterRoute,[]);assert.equal(sim.state.throttle,.2);assert.ok(Math.hypot(sim.state.boatX-before.x,sim.state.boatZ-before.z)<.5);assert.ok(sim.state.tiller<0);
+ const sim=new PixelSimulation({profile:{version:2,credits:220}});departure(sim,true);sim.selectWaypoint('sand');for(let i=0;i<60;i++)sim.step(.1);const before={x:sim.state.boatX,z:sim.state.boatZ};sim.step(.1,{steer:-.7,throttle:.2});assert.equal(sim.state.waypoint,null);assert.deepEqual(sim.state.waterRoute,[]);assert.equal(sim.state.throttle,.2);assert.ok(Math.hypot(sim.state.boatX-before.x,sim.state.boatZ-before.z)<.5);assert.ok(sim.state.tiller<0);
 });
 
 test('saved equipment and settled fish persist while each resumed day begins at 06:00',()=>{
@@ -39,7 +39,7 @@ test('an interrupted immersion restores the player and the boat together without
 });
 
 test('releasing momentary joystick throttle selects neutral; untouched autopilot and explicit slider remain active',()=>{
- const sim=new PixelSimulation();departure(sim);sim.toggleEngine();sim.step(.1,{throttle:.6});assert.equal(sim.state.throttle,.6);sim.step(.1,{});assert.equal(sim.state.throttle,0);assert.equal(sim.state.engine,true,'neutral keeps motor running');sim.setThrottle(.3);sim.step(.1,{});sim.step(.1,{});assert.equal(sim.state.throttle,.3,'explicit throttle slider holds its setting');sim.selectWaypoint('sand');sim.step(.1,{});assert.ok(sim.state.waypoint);assert.ok(sim.state.throttle>0);sim.step(.1,{steer:1});assert.equal(sim.state.waypoint,null);assert.equal(sim.state.throttle,0,'helm takeover does not inherit hidden autopilot thrust');
+ const sim=new PixelSimulation({profile:{version:2,credits:220}});departure(sim,true);sim.toggleEngine();sim.step(.1,{throttle:.6});assert.equal(sim.state.throttle,.6);sim.step(.1,{});assert.equal(sim.state.throttle,0);assert.equal(sim.state.engine,true,'neutral keeps motor running');sim.setThrottle(.3);sim.step(.1,{});sim.step(.1,{});assert.equal(sim.state.throttle,.3,'explicit throttle slider holds its setting');sim.selectWaypoint('sand');sim.step(.1,{});assert.ok(sim.state.waypoint);assert.ok(sim.state.throttle>0);sim.step(.1,{steer:1});assert.equal(sim.state.waypoint,null);assert.equal(sim.state.throttle,0,'helm takeover does not inherit hidden autopilot thrust');
 });
 
 test('rig selection validates real carried rods and bait while unrelated packing preserves a selected rod',()=>{
@@ -47,7 +47,7 @@ test('rig selection validates real carried rods and bait while unrelated packing
 });
 
 test('map object destinations identify a return to the dock and reject points on the pier',()=>{
- const sim=new PixelSimulation();departure(sim);assert.equal(sim.selectWaypoint({x:HARBOR.counterX,z:HARBOR.counterZ,name:'inside shop'}).ok,false);assert.equal(sim.selectWaypoint({x:HARBOR.returnX,z:HARBOR.returnZ,name:'登船平台',kind:'dock'}).ok,true);assert.equal(sim.state.waypoint.returning,true);assert.equal(sim.state.phase,'return');
+ const sim=new PixelSimulation({profile:{version:2,credits:220}});departure(sim,true);assert.equal(sim.selectWaypoint({x:HARBOR.counterX,z:HARBOR.counterZ,name:'inside shop'}).ok,false);assert.equal(sim.selectWaypoint({x:HARBOR.returnX,z:HARBOR.returnZ,name:'登船平台',kind:'dock'}).ok,true);assert.equal(sim.state.waypoint.returning,true);assert.equal(sim.state.phase,'return');
 });
 
 test('guided stair arrival never clips open water and remains still for a minute after arrival',()=>{

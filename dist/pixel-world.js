@@ -1,5 +1,7 @@
-import {pierRings,landPolygons,coastLines,buildingFootprints,FISHING_SPOTS} from './geography.js?v=20260927-pixel-v2';
-import {HARBOR} from './harbor-layout.js?v=20260927-pixel-v2';
+import {pierRings,landPolygons,coastLines,buildingFootprints,FISHING_SPOTS,onLand,onPier} from './geography.js?v=20260927-pixel-v3';
+import {HARBOR} from './harbor-layout.js?v=20260927-pixel-v3';
+import {depthInfoAt} from './bathymetry.js?v=20260927-pixel-v3';
+import {createWildlife,drawWildlife} from './pixel-wildlife.js?v=20260927-pixel-v3';
 
 // The map keeps the same metre coordinates as the sailing simulation. The
 // people and boat are deliberately enlarged, like a handheld-era RPG, so that
@@ -8,11 +10,13 @@ const TAU=Math.PI*2, clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const hash=(x,y=0)=>{let n=Math.imul(x|0,374761393)+Math.imul(y|0,668265263);n=(n^(n>>>13))*1274126177;return((n^(n>>>16))>>>0)/4294967295;};
 const rectRing=r=>[{x:r.minX,z:r.minZ},{x:r.maxX,z:r.minZ},{x:r.maxX,z:r.maxZ},{x:r.minX,z:r.maxZ}];
 
-export function createPixelWorld(canvas,{sprites={}}={}){
+export function createPixelWorld(canvas,{sprites={},conditions={}}={}){
   const ctx=canvas.getContext('2d',{alpha:false});
   const camera={x:HARBOR.spawnX-7,z:HARBOR.spawnZ-7,scale:6,width:640,height:360};
   let cssWidth=640,cssHeight=360,clock=0,zoomOverride=null,initialized=false,lastBoat=null;
   const wakes=[];
+  let seaConditions=conditions;
+  const ecology=createWildlife({habitat:(x,z)=>({water:!onLand(x,z)&&!onPier(x,z),depth:depthInfoAt(x,z).value??0}),origin:{x:HARBOR.boatX,z:HARBOR.boatZ}});
   const deckPattern=document.createElement('canvas');deckPattern.width=32;deckPattern.height=20;
   const dc=deckPattern.getContext('2d');dc.fillStyle='#cfa474';dc.fillRect(0,0,32,20);
   for(let y=0;y<20;y+=5){dc.fillStyle=y%10?'#dcb47f':'#bd9069';dc.fillRect(0,y,32,1);dc.fillStyle='#aa7f60';dc.fillRect(y%10?13:26,y,1,5);dc.fillStyle='#e5bf88';dc.fillRect(2,y+1,9,1);dc.fillStyle='#c3976e';dc.fillRect(16,y+3,11,1);}
@@ -184,6 +188,22 @@ export function createPixelWorld(canvas,{sprites={}}={}){
       ctx.fillStyle='rgba(23,91,95,.15)';ctx.fillRect(p.x+8,p.y+19,7,2);if(!sprite(flap>0?'gull2':'gull',p.x,p.y,.6)){pixelLine(p.x-5,p.y+flap,p.x,p.y,'#f4eed0',1);pixelLine(p.x,p.y,p.x+5,p.y+flap,'#f4eed0',1);ctx.fillStyle='#b7bba4';ctx.fillRect(p.x,p.y,1,2);}
     }
   }
+  function patrol(state){
+    const patrol=state.inspection;if(!patrol||!Number.isFinite(patrol.x)||!Number.isFinite(patrol.z)||!visible(patrol.x,patrol.z,100))return;
+    const p=point(patrol.x,patrol.z),scale=clamp(camera.scale*.19,.8,1.3),moving=patrol.phase==='approaching'||patrol.phase==='departing';
+    ctx.save();ctx.translate(p.x,p.y+Math.round(Math.sin(clock*1.4)*.6));ctx.rotate(-(patrol.heading||0));ctx.scale(scale,scale);
+    smallShadow(4,6,32,68,.2);
+    if(moving){ctx.globalAlpha=.55;for(let i=0;i<5;i++){ctx.fillStyle='#d8ead3';ctx.fillRect(-8-i*2,32+i*5+(clock*8)%5,3,1);ctx.fillRect(7+i*2,32+i*5+(clock*8)%5,3,1);}ctx.globalAlpha=1;}
+    ctx.fillStyle='#244c68';ctx.beginPath();ctx.moveTo(0,-36);ctx.lineTo(8,-29);ctx.lineTo(15,-13);ctx.lineTo(16,27);ctx.lineTo(12,34);ctx.lineTo(-12,34);ctx.lineTo(-16,27);ctx.lineTo(-15,-13);ctx.lineTo(-8,-29);ctx.closePath();ctx.fill();
+    ctx.fillStyle='#efeed7';ctx.beginPath();ctx.moveTo(0,-33);ctx.lineTo(7,-26);ctx.lineTo(12,-12);ctx.lineTo(13,26);ctx.lineTo(10,30);ctx.lineTo(-10,30);ctx.lineTo(-13,26);ctx.lineTo(-12,-12);ctx.lineTo(-7,-26);ctx.closePath();ctx.fill();
+    ctx.fillStyle='#c0d2ca';ctx.fillRect(-10,-10,20,34);ctx.fillStyle='#f7f1d7';ctx.fillRect(-8,-11,16,3);ctx.fillRect(-11,25,22,3);ctx.fillStyle='#3d758d';ctx.fillRect(-14,-7,3,23);ctx.fillRect(11,-7,3,23);
+    ctx.fillStyle='#284758';ctx.fillRect(-8,-9,16,16);ctx.fillStyle='#c6d8cf';ctx.fillRect(-7,-10,14,3);ctx.fillStyle='#628d9c';ctx.fillRect(-6,-5,12,7);ctx.fillStyle='#a6c4c4';ctx.fillRect(-5,-4,4,4);ctx.fillStyle='#e9eddb';ctx.fillRect(-8,6,16,3);
+    ctx.fillStyle='#2d465a';ctx.fillRect(-5,30,10,9);ctx.fillStyle='#95b2b1';ctx.fillRect(-4,31,8,2);ctx.fillStyle='#40596b';ctx.fillRect(-2,38,4,5);
+    if(camera.scale>=4){ctx.fillStyle='#315b6b';ctx.font='bold 5px monospace';ctx.textAlign='center';ctx.fillText('DFW',0,-17);}
+    pixelLine(-7,5,-7,-18,'#a9c4ba',1);ctx.fillStyle=Math.sin(clock*4)>0?'#e4ba69':'#877955';ctx.fillRect(-9,-19,4,3);
+    if(sprites.dockWorker)ctx.drawImage(sprites.dockWorker,-7,3,14,23);
+    ctx.restore();
+  }
   function routeMarker(state){
     // A tiny in-world pennant only at the chosen destination. It is a visual
     // compass, not an arrow carpet or a text tutorial over the water.
@@ -201,16 +221,18 @@ export function createPixelWorld(canvas,{sprites={}}={}){
     if(fishing&&state.bobber){targetX+=(state.bobber.x-focus.x)*.23;targetZ+=(state.bobber.z-focus.z)*.23;}
     const blend=1-Math.exp(-dt*3.7);
     if(!initialized){camera.x=targetX;camera.z=targetZ;camera.scale=wantedZoom;initialized=true;}else{camera.x+=(targetX-camera.x)*blend;camera.z+=(targetZ-camera.z)*blend;camera.scale+=(wantedZoom-camera.scale)*blend;}
-    ctx.imageSmoothingEnabled=false;ocean();terrain();drawWake(state,dt);routeMarker(state);buildings();dockLife();boat(state);
+    const nature=ecology.update(state,dt,seaConditions);
+    ctx.imageSmoothingEnabled=false;ocean();drawWildlife(ctx,nature,{project:point,scale:camera.scale,sprites,layer:'water'});terrain();drawWake(state,dt);routeMarker(state);buildings();dockLife();boat(state);patrol(state);
     if(mode==='walk'||mode==='intro')person(focus.x,focus.z,{walking:state.walking,heading:state.yaw||0});
     if(mode==='swim'){
       const p=point(focus.x,focus.z);ctx.strokeStyle='#c5e4c4';ctx.strokeRect(p.x-12,p.y+2,24,5);ctx.fillStyle='#e3b78d';ctx.fillRect(p.x-4,p.y-8,9,9);ctx.fillStyle='#365762';ctx.fillRect(p.x-5,p.y-11,11,4);ctx.fillStyle=state.pfd===false?'#57827d':'#e99b50';ctx.fillRect(p.x-7,p.y,14,5);pixelLine(p.x-8,p.y+1,p.x-14,p.y+Math.sin(clock*6)*3,'#e2b68d',3);pixelLine(p.x+8,p.y+1,p.x+14,p.y-Math.sin(clock*6)*3,'#e2b68d',3);
     }
-    wildlife();
+    wildlife();drawWildlife(ctx,nature,{project:point,scale:camera.scale,sprites,layer:'air'});
     // Subtle warm morning light is baked into the palette, never a dark filter.
     // Dawn therefore remains readable on a phone in daylight.
-    return {camera,rodVisible:fishing};
+    return {camera,rodVisible:fishing,wildlife:ecology.snapshot()};
   }
   resize(canvas.clientWidth||640,canvas.clientHeight||360);
-  return {resize,draw,screenToWorld,worldToScreen:point,camera,setZoom:value=>{zoomOverride=value==null?null:clamp(value,1.5,9);}};
+  function publicState(){const active=ecology.snapshot(),history=ecology.history;return{renderer:'Canvas 2D',camera:{x:+camera.x.toFixed(2),z:+camera.z.toFixed(2),scale:+camera.scale.toFixed(2),width:camera.width,height:camera.height},wildlife:{active,counts:active.reduce((counts,e)=>(counts[e.type]=(counts[e.type]||0)+1,counts),{bait:0,dolphins:0,whale:0}),encounters:history.map(e=>({...e})),illustrativeRates:true}};}
+  return {resize,draw,screenToWorld,worldToScreen:point,camera,wildlife:ecology,publicState,setConditions:value=>{seaConditions=value||{};},setZoom:value=>{zoomOverride=value==null?null:clamp(value,1.5,9);}};
 }

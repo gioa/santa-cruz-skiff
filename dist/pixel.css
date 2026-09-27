@@ -68,3 +68,6 @@
   .fish-status .meter{height:6px}
   .fish-status .stamina{height:4px}
 }
+/* Instruments occupy space only after they have been carried aboard. */
+.trip-info>div:empty{display:none}.instrument-empty{padding:20px;text-align:center;font-size:72px;color:var(--teal);line-height:1.1}.source-details{margin-top:18px;border-top:1px solid #163e4730;padding-top:14px}.source-details summary{cursor:pointer;min-height:44px;font-size:12px}.trip-info>div>span:not([hidden])+span:not([hidden])::before{content:'·';margin-right:6px;opacity:.55}
+.gps-reading{font:24px/1.7 'Space Mono',monospace;background:var(--deep);color:var(--paper);padding:22px;margin:18px 0;letter-spacing:1px}
