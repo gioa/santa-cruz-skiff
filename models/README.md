@@ -1,6 +1,6 @@
 # Santa Cruz asset upgrade
 
-Runtime files: `boat.js`, `harbor-assets.js`, `harbor-shapes.js`. Total source payload is approximately 48 KB. Copy these beside the current `vendor/three.module.js` folder. All geometry is local, synchronous and native Three.js. No external images, model fetches or installation are needed.
+Runtime geometry: `boat.js`, `harbor-assets.js`, `harbor-shapes.js`, `angler-model.js`, `fishing-rod.js` and `deck-instruments.js`. All geometry is authored native Three.js. Local photographic PBR maps ship in `dist/assets/env-*`; no runtime CDN or installation is required. Attribution: `dist/assets/env-sources.json`.
 
 ## Method and limits
 
@@ -43,7 +43,7 @@ Feet are at y=0, approximate height is 1.82 m, front is -Z. Poses: `idle`, `wave
 
 - JavaScript syntax checks passed.
 - Crane: 9,926 triangles, 19 meshes.
-- Worker: 9,918 triangles, 23 meshes.
+- Worker: 12,286 triangles, 23 meshes. Boat: 53,352 triangles, 41 meshes (was 83 before batching). First-person hands and seated angler use separate clothing/skin geometry.
 - Crane/worker vertex scan found no nonfinite geometry values.
 - Browser rendering checked the whole crane and a close worker view. Corrected bib/waist/sleeve intersections found during that inspection.
 - `proof.html` is a temporary visual proof, not a production dependency.

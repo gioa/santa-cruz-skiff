@@ -1,5 +1,5 @@
-import {toGPS,fromGPS,geography,coastLines,pierRings,landPolygons,FISHING_SPOTS} from './geography.js';
-import {depthInfoAt} from './bathymetry.js';
+import {toGPS,fromGPS,geography,coastLines,pierRings,landPolygons,FISHING_SPOTS} from './geography.js?v=20260927-immersive';
+import {depthInfoAt} from './bathymetry.js?v=20260927-immersive';
 // North-up chart uses the same geographic projection as the world.
 export function createCharts(state){
  const origin=toGPS(20.8,-77),e=111320*Math.cos(origin.lat*Math.PI/180),n=111132;

@@ -1,4 +1,4 @@
-import {bindPointer, stickVector} from './input.js';
+import {bindPointer, stickVector} from './input.js?v=20260927-immersive';
 const $ = selector => document.querySelector(selector);
 
 export function createMobileControls({state: s, actions: a}) {
@@ -66,7 +66,8 @@ export function createMobileControls({state: s, actions: a}) {
     joystick.setAttribute('aria-label', s.mode==='swim'?'拖动摇杆游泳，松开漂浮':helm ? '左右拖动操舵，松开回正；油门独立控制' : '拖动摇杆行走，松开停止');
     $('#touch-guide').hidden = s.mode!=='walk';
     $('#touch-guide').textContent = s.autoWalk ? '停止步行' : '沿栈道走';
-    $('#touch-helm').hidden = !helm || s.moored;
+    $('#touch-helm').hidden = !helm || s.moored || (!s.assisted&&!s.engine);
+    joystick.hidden = !s.assisted && helm && s.anchor;
     $('#touch-engine').hidden = !helm;
     $('#touch-engine').textContent = s.engine ? '停机' : '启动';
     $('#touch-engine').setAttribute('aria-pressed', String(s.engine));

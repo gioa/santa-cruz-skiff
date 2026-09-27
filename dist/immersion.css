@@ -1,0 +1,61 @@
+/* The sea is the interface. Guidance remains an opt-in accessibility setting. */
+body.immersive.playing .brand,body.immersive.playing .top-meta,
+body.immersive.playing #compass,body.immersive.playing #objectives,
+body.immersive.playing #nav-card,body.immersive.playing #telemetry,
+body.immersive.playing #fishing-status,body.immersive.playing #controls-hint,
+body.immersive.playing #help-btn,body.immersive.playing #sound-btn,
+body.immersive.playing #journal-btn,body.immersive.playing #photo-btn,
+body.immersive.playing #touch-look-hint,body.immersive.playing #stick-label,
+body.immersive.playing #touch-guide,body.immersive.playing #touch-cast-hint,
+body.immersive.playing #touch-reel small,body.immersive.playing .throttle-ends,
+body.immersive.playing .context-controls{display:none!important}
+body.immersive .vignette{background:linear-gradient(180deg,#050c1218,transparent 15%,transparent 85%,#040c1222);box-shadow:none}
+body.immersive.playing .topbar{top:max(16px,env(safe-area-inset-top));right:max(18px,env(safe-area-inset-right));left:auto}
+body.immersive.playing .icon-btn{width:48px;height:48px;border:1px solid #ffffff20;background:#0c172524;backdrop-filter:blur(5px);color:#eff4f5bb}
+body.immersive.playing #toolbar{bottom:24px;left:24px;right:24px;border:0;padding:0;gap:12px;pointer-events:none}
+body.immersive.playing #toolbar button{pointer-events:auto;min-width:48px;min-height:48px;padding:0 13px;border:1px solid #ecf1ed26;border-radius:50px;background:#10202e45;backdrop-filter:blur(5px);font-size:12px;letter-spacing:1px;color:#f1f4efdb}
+body.immersive.playing #toolbar kbd{display:none}
+body.immersive.playing .tool-group{gap:8px}
+.icon-label{display:inline}
+.control-symbol{display:none;width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:1.35;stroke-linecap:round;stroke-linejoin:round}
+body.immersive .control-symbol{display:block}
+body.immersive .icon-label{display:none}
+body.immersive.playing #interact{bottom:19%;padding:8px 14px;min-height:46px;border:1px solid #ffffff2a;border-radius:3px;background:#0e1b2544;backdrop-filter:blur(6px);box-shadow:none;font-size:12px;letter-spacing:2px;gap:9px}
+body.immersive.playing #interact kbd{background:transparent;border-color:#ffffff40;color:#ffffffa6}
+body.immersive.playing #reticle{width:3px;height:3px;opacity:.3}
+body.immersive.playing #toast{top:auto;bottom:94px;padding:8px 12px;border:0;border-radius:3px;background:#0c17254f;backdrop-filter:blur(4px);font-size:12px;max-width:min(420px,80%);letter-spacing:1px}
+body.immersive.playing #power-wrap{width:100px;bottom:150px;background:transparent;padding:0;font-size:0}
+body.immersive.playing #power-wrap>span,body.immersive.playing #power-wrap>small{display:none}
+body.immersive.playing .power-track{height:3px;background:#ffffff26;border-radius:4px}
+body.immersive.playing #touch-controls button{background:#0e1c2a42;border-color:#e5eef02b;backdrop-filter:blur(5px);box-shadow:none;color:#eef3f2cf;font-size:12px;font-weight:400;border-radius:50px}
+body.immersive.playing #touch-controls button.held,body.immersive.playing #touch-controls button:active{background:#6684846b;border-color:#ecf5f08c}
+body.immersive.playing .touch-nav{top:calc(16px + var(--safe-t));right:calc(77px + var(--safe-r));bottom:auto;left:auto;transform:none;flex-direction:row;gap:8px}
+body.immersive.playing .touch-nav button{width:48px;height:48px;padding:0;display:flex;align-items:center;justify-content:center}
+body.immersive.playing #touch-helm{background:#0f1e2b3b;border-color:#ffffff1f;padding:6px;border-radius:10px}
+body.immersive.playing #joystick{opacity:.6;border-color:#e9f4f02b;background:radial-gradient(circle,transparent 0 36%,#152b3936 37% 62%,transparent 63%);box-shadow:none}
+body.immersive.playing #joystick.held{opacity:1}
+body.immersive.playing #joystick>span{opacity:.45}
+body.immersive.playing #stick-thumb{background:#e8f1ed24;border-color:#e2ece64a;box-shadow:none}
+body.immersive.playing #touch-controls .touch-action{background:#c2cbb546;color:#fff4df;border-color:#ecf4da55;width:76px;height:76px;font-size:15px;border-radius:50%}
+body.immersive.playing #touch-controls #touch-reel{background:#1b43465c}
+body.immersive.playing #touch-controls .touch-interact{background:#bbcbb641;border-color:#e1eadf55;width:auto;min-width:84px;min-height:52px;padding:12px 20px;font-size:13px;color:#f3f0db}
+body.immersive.playing #touch-controls #touch-cast.bite{background:#c6b4786b;box-shadow:0 0 12px #d6c09426;animation:none}
+body.immersive.playing #touch-drag{background:#0c1c263f;border-color:#ffffff26;border-radius:24px}
+body.immersive.playing #touch-center{opacity:.65;min-width:48px;padding:0;font-size:21px}
+body.immersive.playing .touch-left,body.immersive.playing .touch-right{bottom:calc(26px + var(--safe-b))}
+body.immersive.playing #throttle-value,body.immersive.playing #touch-drag-value{font-size:10px;font-variant-numeric:tabular-nums}
+body.immersive #modal{background:linear-gradient(145deg,#172127fa,#0f1a20fa);border-color:#e8ece222;box-shadow:0 25px 90px #0008;border-radius:7px}
+body.immersive #modal h2{font:500 23px/1.5 system-ui;letter-spacing:1px}
+body.immersive #modal .eyebrow{font-size:9px;letter-spacing:2px;color:#bcc4c28f}
+body.immersive .touch-menu-grid button{background:#e0eee906;border-color:#dcebe722;border-radius:4px;min-height:52px}
+body.immersive .intro h1{font-size:clamp(38px,5vw,66px);letter-spacing:10px}
+body.immersive .intro p,body.immersive .intro h1 span,body.immersive .intro-note{display:none}
+body.immersive .intro .primary{background:#dfe6d62b;border:1px solid #e5eee850;color:#f0f3e9;backdrop-filter:blur(8px);font-weight:400}
+body.immersive .intro .eyebrow{font-size:9px;letter-spacing:4px}
+body.immersive .location-card{font-size:11px;opacity:.6}
+body.immersive .location-card strong{font-size:18px}
+@media(orientation:landscape) and (max-height:600px){body.immersive.playing .touch-nav{top:calc(10px + var(--safe-t));right:calc(70px + var(--safe-r))}body.immersive.playing #touch-engine,body.immersive.playing #touch-anchor{position:static}body.immersive.playing .touch-left,body.immersive.playing .touch-right{bottom:calc(14px + var(--safe-b))}body.immersive.playing #touch-controls .touch-action{height:70px!important}body.immersive.playing #toast{bottom:68px;max-width:260px}body.immersive.playing #power-wrap{bottom:100px}}
+@media(max-width:360px){body.immersive.playing .touch-nav{gap:5px;right:calc(67px + var(--safe-r))}body.immersive.playing #touch-controls .touch-action{width:68px;min-width:68px;height:68px}body.immersive.playing .touch-left{left:calc(8px + var(--safe-l))}body.immersive.playing .touch-right{right:calc(10px + var(--safe-r))}}
+
+body.immersive .catch-icon,body.immersive .catch-species~.sub,body.immersive .catch-species+.big-stats>div:nth-child(3){display:none}
+.voyage-readout{font:13px/1.7 monospace;color:#c8d3ceaa;margin-bottom:22px}.voyage-readout span{padding:0 8px;color:#9aa39c}

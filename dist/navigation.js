@@ -1,4 +1,4 @@
-import {onLand,onPier,landPolygons,pierRings} from './geography.js';
+import {onLand,onPier,landPolygons,pierRings} from './geography.js?v=20260927-immersive';
 const blocked=(x,z)=>onLand(x,z)||onPier(x,z);
 const edges=[...landPolygons,...pierRings].flatMap(r=>r.map((a,i)=>[a,r[(i+1)%r.length]]));
 function cross(a,b,c){return(b.x-a.x)*(c.z-a.z)-(b.z-a.z)*(c.x-a.x);}

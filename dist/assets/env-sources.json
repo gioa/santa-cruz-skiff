@@ -1,0 +1,19 @@
+{
+  "title": "Environment material sources",
+  "retrieved": "2026-09-27",
+  "textures": [{
+    "name": "Weathered Brown Planks",
+    "source": "https://polyhaven.com/a/weathered_brown_planks",
+    "license": "CC0 1.0 Universal",
+    "licenseURL": "https://polyhaven.com/license",
+    "authors": {"Dimitrios Savva": "Photography", "Rico Cilliers": "Processing"},
+    "resolution": "1024 × 1024",
+    "sourcePhysicalSizeMetres": [1.8, 1.8],
+    "files": ["env-wood-color.jpg", "env-wood-normal.jpg", "env-wood-roughness.jpg"],
+    "normalConvention": "OpenGL",
+    "notes": "Local copies of official Poly Haven 1K JPEG albedo, normal and roughness. CC0 photographic material; no runtime API or remote texture dependency. Material UV scale varies by authored surface."
+  }],
+  "authoredGeometry": "Metre-scale close harbor fixtures, framed windows, shelving, physical roof seams, cleats, rope coils, deck boards and tidal stains are authored approximations, not claimed to be a survey of the rental business.",
+  "water": "Displaced mesh and hull sampler share the exact height field. Analytical derivative normals, air-water normal incidence Fresnel 0.02037, instanced wake. This is still a real-time wave approximation, not a Navier–Stokes fluid solver.",
+  "lighting": "Solar position stays below the horizon before sunrise. A practical warm dock lamp and eye-adapted ambient fill retain predawn readability. Moon/stars are illustrative."
+}
