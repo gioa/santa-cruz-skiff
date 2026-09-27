@@ -1,4 +1,4 @@
-import {onPier,onLand,insidePolygon,buildingFootprints} from './geography.js?v=20260927-articulated-v4';
+import {onPier,onLand,insidePolygon,buildingFootprints} from './geography.js?v=20260927-articulated-v5';
 
 // Looking seaward along the wharf (-z), the rental stair is on the left (-x).
 // Plan dimensions are authored estimates from reference photographs. The City

@@ -6,13 +6,16 @@ import * as THREE from './vendor/three.module.js';
 export function configureOcean(water){
  water.material.uniforms.waveState={value:new THREE.Vector4(.25,9,0,0)};
  water.material.uniforms.boatPosition={value:new THREE.Vector3(20.8,-77,0)};
+ water.material.uniforms.boatWorldInverse={value:new THREE.Matrix4()};
  water.material.uniforms.surfaceLight={value:.7};
  water.material.uniforms.boatMaskEnabled={value:0};
  const heightCode=`uniform vec4 waveState;
  varying vec3 swellNormal;
  void main() {
  vec3 wavePosition=position;
- float wx=position.x,wz=-position.y;
+ // The dense grid can follow the boat without dragging the wave phase with it.
+ vec3 waveWorld=(modelMatrix*vec4(position,1.)).xyz;
+ float wx=waveWorld.x,wz=waveWorld.z;
  float sa=sin(waveState.z),ca=cos(waveState.z);
  float q=wx*sa+wz*ca;
  float k=39.47841760435743/(9.81*waveState.y*waveState.y);
@@ -24,21 +27,48 @@ export function configureOcean(water){
  float dz=cos(phase)*waveState.x*.27*k*ca-cos(crossPhase)*waveState.x*.0066+cos(ripplePhase)*.007;
  swellNormal=normalize(vec3(-dx,1.,-dz));`;
  water.material.vertexShader=water.material.vertexShader.replace('void main() {',heightCode).replaceAll('vec4( position, 1.0 )','vec4( wavePosition, 1.0 )');
+ // Test the displaced water fragment against the boat's actual hollow volume.
+ // A yaw-only maximum-beam ellipse cuts a visible hole next to a heeling hull.
+ // Full local coordinates include heave, roll and pitch; the width is inverted
+ // from boat.js's inner plank cross section at this fragment's actual height.
  const cutHull=`void main() {
- vec2 d=worldPosition.xz-boatPosition.xy;
- float ch=cos(boatPosition.z),sh=sin(boatPosition.z);
- vec2 bp=vec2(d.x*ch-d.y*sh,d.x*sh+d.y*ch);
- float u=clamp((bp.y+2.6)/4.8,0.,1.);
- float w=.88*pow(sin(min(1.,u/.5)*1.5708),.72)*(1.-.135*u*u*u);
- if(boatMaskEnabled>.5&&bp.y>-2.57&&bp.y<2.17&&abs(bp.x)<w)discard;`;
+ if(boatMaskEnabled>.5){
+  vec3 bp=(boatWorldInverse*worldPosition).xyz;
+  if(bp.z>-2.57&&bp.z<2.155&&abs(bp.x)<.95){
+   float u=clamp((bp.z+2.6)/4.8,0.,1.);
+   float sheer=.735+.18*pow(1.-u,5.)+.045*u*u;
+   float keel=-.29+.55*pow(1.-u,6.)+.075*pow(u,4.);
+   float height=(bp.y-keel-.0135)/(sheer-keel);
+   if(height>0.&&height<1.){
+    float t=pow(height,1./1.7);
+    float beam=max(.012,.95*pow(sin(min(1.,u/.5)*1.57079632679),.72)*(1.-.135*u*u*u));
+    float insideWidth=max(0.,beam*sin(t*1.57079632679)-.030);
+    if(abs(bp.x)<insideWidth)discard;
+   }
+  }
+ }`;
  water.material.fragmentShader=water.material.fragmentShader
- .replace('uniform float alpha;','uniform float alpha;\nuniform vec3 boatPosition;\nuniform float surfaceLight;\nuniform float boatMaskEnabled;\nvarying vec3 swellNormal;')
+ .replace('uniform float alpha;','uniform float alpha;\nuniform vec3 boatPosition;\nuniform mat4 boatWorldInverse;\nuniform float surfaceLight;\nuniform float boatMaskEnabled;\nvarying vec3 swellNormal;')
  .replace('void main() {',cutHull)
  .replace('vec3 surfaceNormal = normalize( noise.xzy * vec3( 1.5, 1.0, 1.5 ) );','vec3 surfaceNormal = normalize(swellNormal + vec3(noise.x,0.,noise.y)*.19);')
  .replace('float rf0 = 0.3;','float rf0 = 0.02037;')
  .replace('vec3 scatter = max( 0.0, dot( surfaceNormal, eyeDirection ) ) * waterColor;','vec3 scatter = max(0.0,dot(surfaceNormal,eyeDirection))*waterColor*surfaceLight;')
  .replace('( vec3( 0.1 ) + reflectionSample * 0.9 + reflectionSample * specularLight )','(reflectionSample + specularLight*.45)');
  return water;
+}
+
+
+// Metre-scale CPU reference for regression tests; the shader uses the same
+// cross-section inversion. A 3 mm safety inset stays inside tessellated planks.
+export function waterPointInsideHull(x,y,z){
+ if(z<=-2.57||z>=2.155||Math.abs(x)>=.95)return false;
+ const u=Math.min(1,Math.max(0,(z+2.6)/4.8));
+ const sheer=.735+.18*(1-u)**5+.045*u*u,keel=-.29+.55*(1-u)**6+.075*u**4;
+ const height=(y-keel-.0135)/(sheer-keel);
+ if(height<=0||height>=1)return false;
+ const beam=Math.max(.012,.95*Math.sin(Math.min(1,u/.5)*Math.PI/2)**.72*(1-.135*u**3));
+ const insideWidth=Math.max(0,beam*Math.sin(height**(1/1.7)*Math.PI/2)-.030);
+ return Math.abs(x)<insideWidth;
 }
 
 // Instancing keeps a 60-particle wake to one draw call (previously 35 draws).

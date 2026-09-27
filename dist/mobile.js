@@ -1,4 +1,4 @@
-import {bindPointer, stickVector} from './input.js?v=20260927-articulated-v4';
+import {bindPointer, stickVector} from './input.js?v=20260927-articulated-v5';
 const $ = selector => document.querySelector(selector);
 
 export function createMobileControls({state: s, actions: a}) {

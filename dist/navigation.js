@@ -1,5 +1,5 @@
-import {onLand,onPier,landPolygons,pierRings} from './geography.js?v=20260927-articulated-v4';
-import {harborWaterBlocked,harborObstacleRings} from './harbor-layout.js?v=20260927-articulated-v4';
+import {onLand,onPier,landPolygons,pierRings} from './geography.js?v=20260927-articulated-v5';
+import {harborWaterBlocked,harborObstacleRings} from './harbor-layout.js?v=20260927-articulated-v5';
 const geographicBlocked=(x,z)=>onLand(x,z)||onPier(x,z);
 const blocked=(x,z)=>geographicBlocked(x,z)||harborWaterBlocked(x,z);
 const polygonEdges=rings=>rings.flatMap(r=>r.map((a,i)=>[a,r[(i+1)%r.length]]));

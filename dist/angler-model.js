@@ -1,5 +1,5 @@
 import * as THREE from './vendor/three.module.js';
-import {solveTwoBone} from './arm-ik.js?v=20260927-articulated-v4';
+import {solveTwoBone} from './arm-ik.js?v=20260927-articulated-v5';
 // Authored, metre-scale fisherman: lofted clothing, shaped face, articulated hands.
 // Fictional character. No photogrammetry or human identity is implied.
 function mergeGeometry(parts){const arrays={position:[],normal:[],uv:[]};for(const src of parts){const g=src.index?src.toNonIndexed():src;for(const key of Object.keys(arrays)){const a=g.getAttribute(key),n=key==='uv'?2:3;for(let i=0;i<g.attributes.position.count;i++)for(let j=0;j<n;j++)arrays[key].push(a?a.array[i*n+j]:0);}if(g!==src)g.dispose();src.dispose();}const g=new THREE.BufferGeometry();for(const[k,a]of Object.entries(arrays))g.setAttribute(k,new THREE.Float32BufferAttribute(a,k==='uv'?2:3));g.computeBoundingSphere();return g;}

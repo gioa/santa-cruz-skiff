@@ -1,16 +1,16 @@
 import * as THREE from './vendor/three.module.js';
 import {Water} from './vendor/Water.js';
 import {Sky} from './vendor/Sky.js';
-import {createRod,createFish} from './world.js?v=20260927-articulated-v4';
-import {createEnvironmentMaterials,metreUV} from './env-materials.js?v=20260927-articulated-v4';
-import {configureOcean,createWake} from './env-water.js?v=20260927-articulated-v4';
-import {addHarborDetail,addWindowDetail} from './env-detail.js?v=20260927-articulated-v4';
-import {createWharfSurface,createWharfLanding} from './wharf-landing.js?v=20260927-articulated-v4';
-import {createRentalShop} from './rental-shop.js?v=20260927-articulated-v4';
-import {HARBOR} from './harbor-layout.js?v=20260927-articulated-v4';
-import {geography,fromGPS,coastLines,pierRings,buildingFootprints,landPolygons,onLand,FISHING_SPOTS} from './geography.js?v=20260927-articulated-v4';
-import {bathymetry,elevationAt,depthAt} from './bathymetry.js?v=20260927-articulated-v4';
-import {sea,solarPosition,updateSea} from './marine.js?v=20260927-articulated-v4';
+import {createRod,createFish} from './world.js?v=20260927-articulated-v5';
+import {createEnvironmentMaterials,metreUV} from './env-materials.js?v=20260927-articulated-v5';
+import {configureOcean,createWake} from './env-water.js?v=20260927-articulated-v5';
+import {addHarborDetail,addWindowDetail} from './env-detail.js?v=20260927-articulated-v5';
+import {createWharfSurface,createWharfLanding} from './wharf-landing.js?v=20260927-articulated-v5';
+import {createRentalShop} from './rental-shop.js?v=20260927-articulated-v5';
+import {HARBOR} from './harbor-layout.js?v=20260927-articulated-v5';
+import {geography,fromGPS,coastLines,pierRings,buildingFootprints,landPolygons,onLand,FISHING_SPOTS} from './geography.js?v=20260927-articulated-v5';
+import {bathymetry,elevationAt,depthAt} from './bathymetry.js?v=20260927-articulated-v5';
+import {sea,solarPosition,updateSea} from './marine.js?v=20260927-articulated-v5';
 export {createRod,createFish,depthAt,FISHING_SPOTS};
 export {HARBOR};
 export function waveHeight(x,z,t,strength=1){const h=Math.min(3,sea.waveHeight||.25);const angle=(sea.waveDirection-134)*Math.PI/180;const q=x*Math.sin(angle)+z*Math.cos(angle);const period=Math.max(4,sea.period);const k=4*Math.PI*Math.PI/(9.81*period*period);return strength*(Math.sin(q*k+t*2*Math.PI/period)*h*.27+Math.sin(x*.11-z*.06+t*1.15)*h*.11+Math.sin(z*.28+t*1.7)*.025);}
@@ -88,7 +88,7 @@ export function buildWorld(scene,renderer){
  return {water,sky,sunLight,hemi,wood,gearObjects,terrain,box,cyl,sign,
  installHarborAssets(module,staffName){const davit=module.createReferenceDavit({outreach:HARBOR.craneOutreach});davit.position.set(HARBOR.craneX,HARBOR.deckHeight,HARBOR.craneZ);davit.rotation.y=HARBOR.craneRotation;scene.add(davit);const staff=module.createDockWorker(staffName);staff.position.set(-5.7,HARBOR.deckHeight,-54);staff.rotation.y=Math.PI/2;scene.add(staff);const operator=module.createDockWorker('吊艇操作员');operator.position.set(HARBOR.craneX+1.15,HARBOR.deckHeight,HARBOR.craneZ+1);operator.rotation.y=Math.PI/2;scene.add(operator);harborAssets={davit,staff,operator};return harborAssets;},
  update(t,dt,boat,speed,quality,state){if(t-lastLight>2){updateSea();updateLighting();lastLight=t;}water.material.uniforms.time.value=t;water.material.uniforms.waveState.value.set(Math.min(3,sea.waveHeight||.25),Math.max(4,sea.period),(sea.waveDirection-134)*Math.PI/180,0);water.material.uniforms.sunDirection.value.copy(sun);water.material.uniforms.sunColor.value.copy(sunLight.color).multiplyScalar(sunLight.intensity*.3);water.material.uniforms.waterColor.value.setHex(0x143d3e);water.material.uniforms.surfaceLight.value=.66+sea.daylight*.44;shopLight.intensity=12+(1-sea.daylight)*34;dockLight.intensity=10+(1-sea.daylight)*36;pontoonLight.intensity=3+(1-sea.daylight)*13;
- if(boat){skyKey.target.position.copy(boat.position);skyKey.position.copy(boat.position).add(new THREE.Vector3(-7,10,4));water.material.uniforms.boatPosition.value.set(boat.position.x,boat.position.z,boat.rotation.y);water.material.uniforms.boatMaskEnabled.value=boat.position.y<waveHeight(boat.position.x,boat.position.z,t)+.75?1:0;}if(harborAssets){const lowering=state?.launchStage==='lowering',raising=state?.launchStage==='raising';const lowCable=HARBOR.deckHeight+harborAssets.davit.userData.anchorHeight-harborAssets.davit.userData.hookBottomOffset-1.15,progress=state?.launchProgress||0;const length=state?.launchStage==='attaching'?THREE.MathUtils.lerp(1.3,lowCable,progress):state?.launchStage==='stored'?1.95:lowering?THREE.MathUtils.lerp(1.95,lowCable,progress):raising?THREE.MathUtils.lerp(lowCable,1.95,progress):1.3;const currentLength=harborAssets.davit.userData.getCableLength();harborAssets.davit.userData.setCableLength?.(state?.launchStage==='afloat'?Math.max(1.3,currentLength-dt*.75):length);harborAssets.operator.userData.setPose?.(lowering||raising||state?.launchStage==='attaching'?'operate':'idle');harborAssets.davit.userData.update?.(t,dt);harborAssets.staff.userData.update?.(t,dt);harborAssets.operator.userData.update?.(t,dt,lowering||raising);}
+ if(boat){water.position.x=boat.position.x;water.position.z=boat.position.z;boat.updateWorldMatrix(true,false);water.material.uniforms.boatWorldInverse.value.copy(boat.matrixWorld).invert();skyKey.target.position.copy(boat.position);skyKey.position.copy(boat.position).add(new THREE.Vector3(-7,10,4));water.material.uniforms.boatPosition.value.set(boat.position.x,boat.position.z,boat.rotation.y);water.material.uniforms.boatMaskEnabled.value=boat.position.y<waveHeight(boat.position.x,boat.position.z,t)+.75?1:0;}if(harborAssets){const lowering=state?.launchStage==='lowering',raising=state?.launchStage==='raising';const lowCable=HARBOR.deckHeight+harborAssets.davit.userData.anchorHeight-harborAssets.davit.userData.hookBottomOffset-1.15,progress=state?.launchProgress||0;const length=state?.launchStage==='attaching'?THREE.MathUtils.lerp(1.3,lowCable,progress):state?.launchStage==='stored'?1.95:lowering?THREE.MathUtils.lerp(1.95,lowCable,progress):raising?THREE.MathUtils.lerp(lowCable,1.95,progress):1.3;const currentLength=harborAssets.davit.userData.getCableLength();harborAssets.davit.userData.setCableLength?.(state?.launchStage==='afloat'?Math.max(1.3,currentLength-dt*.75):length);harborAssets.operator.userData.setPose?.(lowering||raising||state?.launchStage==='attaching'?'operate':'idle');harborAssets.davit.userData.update?.(t,dt);harborAssets.staff.userData.update?.(t,dt);harborAssets.operator.userData.update?.(t,dt,lowering||raising);}
  updateWake(t,dt,boat,speed);updateWindowLight(sea.daylight);
  }};
 }
