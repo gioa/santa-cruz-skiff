@@ -59,3 +59,12 @@
   #modal-layer{padding-top:calc(10px + var(--safe-top));padding-bottom:calc(10px + var(--safe-bottom))}
   #modal{max-height:calc(100dvh - 20px - var(--safe-top) - var(--safe-bottom))}
 }
+/* In short landscape, keep the boat in the central playfield unobscured. */
+@media(max-height:420px) and (orientation:landscape){
+  .fish-status{top:auto;bottom:calc(12px + var(--safe-bottom));width:180px;padding:8px 10px}
+  .fish-status small{display:none}
+  .fish-status .meter-caption{margin-top:5px;margin-bottom:3px;font-size:8px}
+  .fish-status-head{font-size:10px;gap:5px}
+  .fish-status .meter{height:6px}
+  .fish-status .stamina{height:4px}
+}
