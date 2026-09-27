@@ -1,7 +1,12 @@
 export const marine=await fetch(new URL('./data/marine.json',import.meta.url)).then(r=>r.json()).catch(()=>({errors:['snapshot unavailable']}));
-export const sea={mode:'real',windKnots:0,windDirection:315,waveHeight:0,period:9,waveDirection:294,waterTemp:14,tideMLLW:null,fresh:false,daylight:.1,clockMode:'real',customHour:8};
+export const sea={mode:'real',windKnots:0,windDirection:315,waveHeight:0,period:9,waveDirection:294,waterTemp:14,tideMLLW:null,fresh:false,daylight:.1,clockMode:'morning',customHour:8};
 export function localDateParts(date=new Date()){const parts=new Intl.DateTimeFormat('en-US',{timeZone:'America/Los_Angeles',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hourCycle:'h23'}).formatToParts(date);return Object.fromEntries(parts.map(p=>[p.type,p.value]));}
 export function clockText(date=new Date()){const p=localDateParts(date);return `${p.hour}:${p.minute}:${p.second}`;}
+function localHourOnDate(date,hour){const p=localDateParts(date),utcNoon=new Date(`${p.year}-${p.month}-${p.day}T20:00:00Z`),offset=20-Number(localDateParts(utcNoon).hour);return new Date(Date.UTC(Number(p.year),Number(p.month)-1,Number(p.day),hour+offset));}
+let morningStart=localHourOnDate(new Date(),6).getTime(),clockSeconds=0;
+export function resetTripClock(date=new Date()){morningStart=localHourOnDate(date,6).getTime();clockSeconds=0;}
+export function advanceTripClock(dt){if(Number.isFinite(dt)&&dt>0)clockSeconds+=dt;}
+export function gameDate(now=new Date()){return sea.clockMode==='morning'?new Date(morningStart+clockSeconds*1000):now;}
 function observation(station,key){return marine[station]?.values?.[key];}
 export function updateSea(now=Date.now()){
  const wind=observation('46042','WSPD'),wave=observation('46236','WVHT');
@@ -16,7 +21,7 @@ export function updateSea(now=Date.now()){
 }
 // Solar position uses NOAA's fractional-year approximation, not an accelerated game clock.
 export function solarPosition(date=new Date(),lat=36.9605644,lon=-122.0207135){
- if(sea.clockMode==='custom'){const p=localDateParts(date);const utcNoon=new Date(`${p.year}-${p.month}-${p.day}T20:00:00Z`),localNoon=localDateParts(utcNoon),offset=20-Number(localNoon.hour);date=new Date(Date.UTC(Number(p.year),Number(p.month)-1,Number(p.day),sea.customHour+offset));}
+ date=sea.clockMode==='custom'?localHourOnDate(date,sea.customHour):gameDate(date);
  const year=date.getUTCFullYear(),day=Math.floor((date-Date.UTC(year,0,0))/864e5),hour=date.getUTCHours()+date.getUTCMinutes()/60;
  const days=(Date.UTC(year+1,0,1)-Date.UTC(year,0,1))/864e5;const gamma=2*Math.PI/days*(day-1+(hour-12)/24);
  const eq=229.18*(.000075+.001868*Math.cos(gamma)-.032077*Math.sin(gamma)-.014615*Math.cos(2*gamma)-.040849*Math.sin(2*gamma));
@@ -26,7 +31,7 @@ export function solarPosition(date=new Date(),lat=36.9605644,lon=-122.0207135){
  const east=-Math.cos(dec)*Math.sin(hourAngle),north=Math.cos(phi)*Math.sin(dec)-Math.sin(phi)*Math.cos(dec)*Math.cos(hourAngle);
  return {east,north,up,altitude:Math.asin(Math.max(-1,Math.min(1,up)))};
 }
-export function marineSummary(){const updated=marine['46236']?.values?.WVHT?.observedAt;return{label:sea.mode==='real'?(sea.fresh?'NOAA 区域观测':'历史观测 / 非实时'):'自定义海况',waveHeight:sea.waveHeight,period:sea.period,windKnots:sea.windKnots,waterTemp:sea.waterTemp,observedAt:updated||null,waveStation:marine['46236']?.name,stationDistanceKm:marine['46236']?.distanceKm,tideMLLW:sea.tideMLLW,tideStatus:sea.tideMLLW===null?'无可用预报':'高低潮之间近似插值 · MLLW',clock:'America/Los_Angeles · 1:1',lighting:sea.clockMode==='real'?'真实昼夜':'自定义晨光'};}
+export function marineSummary(){const updated=marine['46236']?.values?.WVHT?.observedAt;return{label:sea.mode==='real'?(sea.fresh?'NOAA 区域观测':'历史观测 / 非实时'):'自定义海况',waveHeight:sea.waveHeight,period:sea.period,windKnots:sea.windKnots,waterTemp:sea.waterTemp,observedAt:updated||null,waveStation:marine['46236']?.name,stationDistanceKm:marine['46236']?.distanceKm,tideMLLW:sea.tideMLLW,tideStatus:sea.tideMLLW===null?'无可用预报':'现实时间 · 高低潮之间近似插值 · MLLW',clock:sea.clockMode==='morning'?'06:00 开始 · 1:1 航程时间':'America/Los_Angeles · 1:1',lighting:sea.clockMode==='morning'?'航程昼夜':sea.clockMode==='real'?'真实昼夜':'自定义晨光'};}
 updateSea();
 
 // Same-origin snapshot refresh; failed updates retain the original observation timestamps.
