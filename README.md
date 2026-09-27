@@ -47,6 +47,8 @@ Default view removes persistent tutorials, mini-map, telemetry and fish stamina 
 
 `vessel-physics.js` integrates effective thrust, quadratic drag, added mass, yaw inertia, wind leeway and anchored-rode spring/damping. Hull support points sample the same water field as the GPU. Crew movement creates heel/trim; cargo changes acceleration and displacement. Autopilot uses tiller forces with progressive arrival throttle. This is a tuned approximation, not measured sea-trial dynamics or CFD.
 
+The corrected rental area places the turquoise storefront on the right and the stair/hoist on the left when walking seaward. A narrow, shoreward-descending white-railed stair leads to a small fixed timber landing, replacing the invented long floating pontoon. Asphalt, parking bays, dense timber piles and ladder handrails follow visual references. Default 06:00 uses adapted blue twilight for readability while retaining the astronomical sun and 1:1 clock. See `qa/wharf-correction/REFERENCES.md` for inspected photographs/video and dimensional limitations.
+
 PBR timber uses three local Poly Haven CC0 1K textures (684 KB total). Repeated roads/wakes are instanced and skiff geometry batched. These improvements do not constitute 4A production quality. See `qa/immersion/PLAYTEST.md` for test scope and actual screenshots.
 
 ## Simulation and boundaries

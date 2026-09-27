@@ -1,4 +1,4 @@
-import {bindPointer, stickVector} from './input.js?v=20260927-immersive';
+import {bindPointer, stickVector} from './input.js?v=20260927-wharf-dawn';
 const $ = selector => document.querySelector(selector);
 
 export function createMobileControls({state: s, actions: a}) {

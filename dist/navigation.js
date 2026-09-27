@@ -1,9 +1,15 @@
-import {onLand,onPier,landPolygons,pierRings} from './geography.js?v=20260927-immersive';
-const blocked=(x,z)=>onLand(x,z)||onPier(x,z);
-const edges=[...landPolygons,...pierRings].flatMap(r=>r.map((a,i)=>[a,r[(i+1)%r.length]]));
+import {onLand,onPier,landPolygons,pierRings} from './geography.js?v=20260927-wharf-dawn';
+import {harborWaterBlocked,harborObstacleRings} from './harbor-layout.js?v=20260927-wharf-dawn';
+const geographicBlocked=(x,z)=>onLand(x,z)||onPier(x,z);
+const blocked=(x,z)=>geographicBlocked(x,z)||harborWaterBlocked(x,z);
+const polygonEdges=rings=>rings.flatMap(r=>r.map((a,i)=>[a,r[(i+1)%r.length]]));
+const edges=polygonEdges([...landPolygons,...pierRings]),harborEdges=polygonEdges(harborObstacleRings);
 function cross(a,b,c){return(b.x-a.x)*(c.z-a.z)-(b.z-a.z)*(c.x-a.x);}
 function intersects(a,b,c,d){if(Math.max(a.x,b.x)<Math.min(c.x,d.x)||Math.min(a.x,b.x)>Math.max(c.x,d.x)||Math.max(a.z,b.z)<Math.min(c.z,d.z)||Math.min(a.z,b.z)>Math.max(c.z,d.z))return false;return cross(a,b,c)*cross(a,b,d)<=0&&cross(c,d,a)*cross(c,d,b)<=0;}
-export function clearWaterSegment(a,b){const len=Math.hypot(b.x-a.x,b.z-a.z)||1,px=-(b.z-a.z)/len*2.4,pz=(b.x-a.x)/len*2.4;for(const side of [-1,0,1]){const p={x:a.x+px*side,z:a.z+pz*side},q={x:b.x+px*side,z:b.z+pz*side};if(blocked(p.x,p.z)||blocked(q.x,q.z))return false;if(edges.some(([c,d])=>intersects(p,q,c,d)))return false;}return true;}
+function clearsObstacle(a,b,radius,isBlocked,obstacleEdges){const len=Math.hypot(b.x-a.x,b.z-a.z)||1,px=-(b.z-a.z)/len*radius,pz=(b.x-a.x)/len*radius;for(const side of [-1,0,1]){const p={x:a.x+px*side,z:a.z+pz*side},q={x:b.x+px*side,z:b.z+pz*side};if(isBlocked(p.x,p.z)||isBlocked(q.x,q.z))return false;if(obstacleEdges.some(([c,d])=>intersects(p,q,c,d)))return false;}return true;}
+// Preserve coastal clearance; close alongside the fixed landing, use the
+// vessel's 0.9 m half-beam plus 0.25 m to permit a real-sized berth departure.
+export function clearWaterSegment(a,b){return clearsObstacle(a,b,2.4,geographicBlocked,edges)&&clearsObstacle(a,b,1.15,harborWaterBlocked,harborEdges);}
 export function waterRoute(start,target){if(blocked(target.x,target.z))return null;if(clearWaterSegment(start,target))return[{...target}];
  const step=30,margin=450,minX=Math.min(start.x,target.x)-margin,minZ=Math.min(start.z,target.z)-margin,w=Math.ceil((Math.abs(start.x-target.x)+2*margin)/step)+1,h=Math.ceil((Math.abs(start.z-target.z)+2*margin)/step)+1;
  if(w*h>25000)return null;const pos=i=>({x:minX+(i%w)*step,z:minZ+Math.floor(i/w)*step});const cell=p=>Math.round((p.z-minZ)/step)*w+Math.round((p.x-minX)/step),first=cell(start),last=cell(target);const costs=new Float64Array(w*h).fill(Infinity),parent=new Int32Array(w*h).fill(-1),closed=new Uint8Array(w*h),blockedCache=new Int8Array(w*h).fill(-1);const bad=i=>{if(blockedCache[i]<0){const p=pos(i);blockedCache[i]=blocked(p.x,p.z)?1:0;}return blockedCache[i];};

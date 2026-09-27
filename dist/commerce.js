@@ -1,7 +1,8 @@
-import {GEAR_CATALOG,BASE_GEAR,buyGear,restock,settleFish,cargoWeight,carriedWeight,equipmentStats} from './equipment.js?v=20260927-immersive';
+import {GEAR_CATALOG,BASE_GEAR,buyGear,restock,settleFish,cargoWeight,carriedWeight,equipmentStats} from './equipment.js?v=20260927-wharf-dawn';
+import {HARBOR} from './harbor-layout.js?v=20260927-wharf-dawn';
 const $=selector=>document.querySelector(selector);
 export function createCommerce({state:s,openModal,closeModal,toast,save,onPacked,launchBoat,staffName}){
- const shore=()=>s.mode==='walk'&&Math.hypot(s.playerX-1.5,s.playerZ+53)<12;
+ const shore=()=>s.mode==='walk'&&Math.hypot(s.playerX-HARBOR.counterX,s.playerZ-HARBOR.counterZ)<12;
  function showStaff(){if(!shore()){toast('回到租船柜台旁，可整理储物柜、兑换鱼获和补给。');return;}
   openModal('staff',`<div class="eyebrow">15 MUNICIPAL WHARF / 码头柜台</div><h2 id="modal-title">${staffName}</h2><div class="account-strip"><strong>${s.profile.credits} 潮汐点</strong><span>待兑换鱼获 ${cargoWeight(s.catches).toFixed(2)} kg</span></div><div class="touch-menu-grid"><button id="staff-pack">整理装备与储物柜</button><button id="staff-launch">${s.launchStage==='afloat'?'吊臂回收空艇':'请求吊臂下放木艇'}</button><button id="staff-trade">鱼获兑换 · 虚拟点数</button><button id="staff-shop">浏览装备商店</button><button id="staff-free">免费补齐基础包</button><button id="staff-return">回到码头</button></div><p class="sub fine-print">角色交互与潮汐点为游戏系统。真实租船商家的公开信息不代表其提供鱼获收购、积分或游戏中的服务。</p>`);
   $('#staff-pack').onclick=()=>showInventory();$('#staff-shop').onclick=showShop;$('#staff-launch').onclick=()=>{closeModal();launchBoat();};$('#staff-return').onclick=closeModal;

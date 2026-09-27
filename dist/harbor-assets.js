@@ -1,9 +1,9 @@
 import * as THREE from './vendor/three.module.js';
-import { HARBOR_SHAPES } from './harbor-shapes.js?v=20260927-immersive';
-import {clothMap} from './angler-model.js?v=20260927-immersive';
+import { HARBOR_SHAPES } from './harbor-shapes.js?v=20260927-wharf-dawn';
+import {clothMap} from './angler-model.js?v=20260927-wharf-dawn';
 // Authored metric geometry. Blender export crashed locally; runtime mesh construction is Three.js.
 // These assets are generic dock equipment and a fictional worker, not replicas of real staff.
-const COLORS={galvanized:0x81928e,paint:0xa6b6b0,edges:0x454f51,ochre:0xc49a50,bolt:0xb9c1bf,black:0x252e30,cable:0x495659,concrete:0x8f9387,rust:0x815038,orange:0xbc784e,orangeShade:0x84513a,navy:0x465c6e,navyLight:0x596e7e,skin:0xc1977d,skinShade:0xa77d67,lip:0x9b7768,eye:0xd2cec3,pupil:0x463d2b,cap:0xa39f82,boot:0x626f5f,reflect:0xd5d5ad};
+const COLORS={galvanized:0x81928e,paint:0x36745e,edges:0x454f51,ochre:0xc49a50,bolt:0xb9c1bf,black:0x252e30,cable:0x495659,concrete:0x8f9387,rust:0x815038,orange:0xbc784e,orangeShade:0x84513a,navy:0x465c6e,navyLight:0x596e7e,skin:0xc1977d,skinShade:0xa77d67,lip:0x9b7768,eye:0xd2cec3,pupil:0x463d2b,cap:0xa39f82,boot:0x626f5f,reflect:0xd5d5ad};
 const ORIGINS={davitBase:[0,0,0],davitSlew:[0,.64,0],hook:[0,0,0],workerBody:[0,0,0],workerHead:[0,1.545,0],workerArmL:[-.205,1.435,0],workerArmR:[.205,1.435,0]};
 const geoCache=new Map();let materials;
 function mats(){if(materials)return materials;materials={};for(const [k,v]of Object.entries(COLORS)){const metal=['galvanized','edges','bolt','cable'].includes(k);materials[k]=new THREE.MeshStandardMaterial({color:v,roughness:metal?.44:k.includes('skin')?.85:['navy','navyLight','cap'].includes(k)?.98:.82,metalness:metal?.7:k==='paint'?.2:0});}for(const k of ['navy','navyLight','cap','orange','orangeShade']){materials[k].map=clothMap('#eeeeea',k.length*7);materials[k].roughness=['orange','orangeShade'].includes(k)?.79:.98;}return materials;}
@@ -33,6 +33,44 @@ export function createDavit(options={}){
  const getHookWorldPosition=(target=new THREE.Vector3())=>{crane.updateWorldMatrix(true,true);return hook.localToWorld(target.set(0,-.43,0));};
  const labelCanvas=document.createElement('canvas');labelCanvas.width=512;labelCanvas.height=256;const ctx=labelCanvas.getContext('2d');ctx.fillStyle='#c49a50';ctx.fillRect(0,0,512,256);ctx.fillStyle='#252e30';ctx.textAlign='center';ctx.font='bold 44px sans-serif';ctx.fillText('BOAT HOIST',256,86);ctx.font='bold 28px sans-serif';ctx.fillText('KEEP CLEAR OF LOAD',256,151);const tex=new THREE.CanvasTexture(labelCanvas);tex.colorSpace=THREE.SRGBColorSpace;const sign=new THREE.Mesh(new THREE.PlaneGeometry(.55,.275),new THREE.MeshStandardMaterial({map:tex,roughness:.9,side:THREE.DoubleSide}));sign.position.set(.12,2.35,.19);slew.add(sign);
  crane.userData={hook,cables,slew,outreach,setCableLength,getHookWorldPosition,setYaw:angle=>{slew.rotation.y=angle;},getCableLength:()=>cableLength,hookBottomOffset:.43,anchorHeight:4.04,stats:null};setCableLength(options.cableLength??2.8);crane.userData.stats=stats(crane);return crane;
+}
+// Approximate silhouette from the rental launch video: an inclined green jib
+// rises from its low heel, with a short intermediate mast and wire stays.
+// The operating dimensions are authored; this is not a surveyed hoist model.
+export function createReferenceDavit(options={}){
+ const outreach=THREE.MathUtils.clamp(options.outreach??4.9,2.5,9),anchorHeight=4.8,mastHeight=2.7;
+ const crane=new THREE.Group();crane.name='Santa Cruz inclined boat hoist';const slew=new THREE.Group();slew.name='Inclined green jib and winch';crane.add(part('davitBase',outreach),slew);
+ const key='referenceDavit:'+outreach;let batches=geoCache.get(key);
+ if(!batches){const gs={},add=(kind,c)=>{const g=geometry(c,3.7);g.translate(0,.64,0);(gs[kind]??=[]).push(g);};
+  const beam=(a,b,w,d,kind='paint')=>add(kind,{type:'beam',args:['davitSlew',kind,a,b,w,d],rotation:[0,0,0]});
+  const rod=(a,b,r,kind='cable',segments=10)=>add(kind,{type:'rod',args:['davitSlew',kind,a,b,r,r,'',segments],rotation:[0,0,0]});
+  const box=(p,s,kind='paint',radius=.015)=>add(kind,{type:'box',args:['davitSlew',kind,p,s,'',radius],rotation:[0,0,0]});
+  const heel=[-1.65,.55,0],tip=[outreach,anchorHeight,0],head=[0,mastHeight,0];
+  beam([0,.68,0],head,.19,.21);box([0,.78,0],[.32,.16,.34],'edges');box([0,mastHeight-.08,0],[.28,.28,.32]);
+  // Paired inclined channels, with a visible gap and transverse spacers.
+  for(const z of[-.13,.13]){beam([heel[0],heel[1],z],[tip[0],tip[1],z],.12,.09);beam([heel[0],heel[1],z],[0,mastHeight,z],.09,.085);rod([0,mastHeight+.06,z],[outreach,anchorHeight+.15,z],.015,'cable');}
+  for(let i=0;i<=5;i++){const t=i/5,x=heel[0]+(outreach-heel[0])*t,y=heel[1]+(anchorHeight-heel[1])*t;beam([x,y,-.17],[x,y,.17],.065,.065);}
+  box([-1.65,.28,0],[.55,.13,.66],'edges');box([-1.65,.12,0],[.68,.24,.76],'concrete',.025);
+  for(const z of[-.26,.26]){rod([-1.82,.35,z],[-1.82,.43,z],.025,'bolt',6);rod([-1.48,.35,z],[-1.48,.43,z],.025,'bolt',6);}
+  rod([-1.65,.55,-.24],[-1.65,.55,.24],.055,'bolt',14);
+  // Reuse the detailed drum, brake wheel and controls below the short mast.
+  const reuse=/winch|drum|spindle|wrap|handwheel|control|switch|button/;
+  for(const c of HARBOR_SHAPES){if(c.args[0]!=='davitSlew'||!c.args.some(v=>typeof v==='string'&&reuse.test(v)))continue;if(c.type==='curve')continue;add(c.args[1],c);}
+  // Hoisting lead follows the mast and inclined jib to a compact nose sheave.
+  rod([-.04,1.4,-.18],[.08,mastHeight,-.13],.01);rod([.08,mastHeight,-.13],[outreach,anchorHeight-.06,-.13],.01);
+  for(const z of[-.18,.18])box([outreach,anchorHeight,z],[.27,.43,.045],'paint',.035);
+  rod([outreach,anchorHeight,-.15],[outreach,anchorHeight,.15],.15,'edges',24);rod([outreach,anchorHeight,-.23],[outreach,anchorHeight,.23],.034,'bolt',12);
+  for(const z of[-.09,.09])add('cable',{type:'ring',args:['davitSlew','cable',[outreach,anchorHeight,z],.15,.011,'nose pulley groove','z',24],rotation:[0,0,0]});
+  batches=Object.fromEntries(Object.entries(gs).map(([k,v])=>[k,merged(v)]));geoCache.set(key,batches);
+ }
+ for(const[k,g]of Object.entries(batches)){const mesh=new THREE.Mesh(g,mats()[k]);mesh.name='Reference hoist '+k;mesh.castShadow=mesh.receiveShadow=true;slew.add(mesh);}
+ const hook=part('hook',outreach);hook.name='Davit lifting block and safety hook';slew.add(hook);
+ const cables=[];for(const z of[-.075,.075]){const line=new THREE.Mesh(new THREE.CylinderGeometry(.011,.011,1,7),mats().cable);line.name='Hoisting steel wire rope';line.position.set(outreach,2,z);line.castShadow=true;slew.add(line);cables.push(line);}
+ let cableLength=2.8;
+ const setCableLength=length=>{cableLength=THREE.MathUtils.clamp(Number(length)||.35,.35,9);hook.position.set(outreach,anchorHeight-cableLength,0);for(const line of cables){line.scale.y=Math.max(.01,cableLength-.08);line.position.y=anchorHeight-(cableLength-.08)/2;}return hook;};
+ const getHookWorldPosition=(target=new THREE.Vector3())=>{crane.updateWorldMatrix(true,true);return hook.localToWorld(target.set(0,-.43,0));};
+ crane.userData={hook,cables,slew,outreach,mastHeight,anchorHeight,hookBottomOffset:.43,setCableLength,getCableLength:()=>cableLength,getHookWorldPosition,setYaw:angle=>{slew.rotation.y=angle;},stats:null};
+ setCableLength(options.cableLength??2.8);crane.userData.stats=stats(crane);return crane;
 }
 export function createDockWorker(name='Dock crew'){
  const worker=new THREE.Group();worker.name=name;const body=part('workerBody'),head=part('workerHead'),left=part('workerArmL'),right=part('workerArmR');head.position.fromArray(ORIGINS.workerHead);left.position.fromArray(ORIGINS.workerArmL);right.position.fromArray(ORIGINS.workerArmR);worker.add(body,head,left,right);let pose='idle';
