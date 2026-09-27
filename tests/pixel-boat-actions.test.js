@@ -11,12 +11,12 @@ function ready({moored=false}={}){
  assert.ok(sim.launchBoat().ok);run(sim,24.1);Object.assign(sim.state,{playerX:HARBOR.boardingX,playerZ:HARBOR.boardingZ});assert.ok(sim.board().ok);if(!moored)assert.ok(sim.unmoor().ok);return sim;
 }
 function actions(sim,options={}){return boatActions(sim.state,{hasRod:sim.stats.hasRod,hasAnchor:sim.hasGear('anchor'),hasChart:sim.hasGear('nautical_chart'),canLower:sim.fishingReadiness().ok,canCast:sim.fishingReadiness(true).ok,nearDock:false,...options});}
-const actionKeys=['unmoor','dock','engine','anchor','switchPanel','more','sit','adjustPose','reel','spool','drag','lower','cast','hook','catch','retrieve','mount','take','stand','assemble','return'];
+const actionKeys=['unmoor','dock','engine','anchor','switchPanel','adjustPose','reel','spool','drag','lower','cast','hook','catch','retrieve','mount','take','assemble','return'];
 const offered=a=>actionKeys.filter(key=>a[key]).sort();
 
 test('each reachable fishing phase offers only its permitted actions, distinguishing hand and side holders',()=>{
  const sim=ready(),base=structuredClone(sim.state),cases=[
-  ['idle','hand',['engine','anchor','more','adjustPose','lower','cast','mount','stand','assemble','return']],
+  ['idle','hand',['engine','anchor','adjustPose','lower','cast','mount','assemble','return']],
   ['casting','hand',['adjustPose','cast']],
   ['flight','hand',[]],
   ['sinking','hand',['adjustPose','reel','spool','drag','retrieve','mount']],
@@ -26,7 +26,7 @@ test('each reachable fishing phase offers only its permitted actions, distinguis
   ['landed','hand',['catch']],
  ];
  for(const mount of['port','starboard'])cases.push(
-  ['idle',mount,['engine','anchor','more','adjustPose','lower','take','stand','assemble','return']],
+  ['idle',mount,['engine','anchor','adjustPose','lower','take','assemble','return']],
   ['sinking',mount,['engine','anchor','adjustPose','spool','drag','take','return']],
   ['waiting',mount,['engine','anchor','adjustPose','spool','drag','take','return']],
   ['bite',mount,['adjustPose','spool','drag','take']],
@@ -39,7 +39,7 @@ test('each reachable fishing phase offers only its permitted actions, distinguis
 
 test('a hand-held deployed rig hides boat operation until a real reel retrieve or side-holder transition',()=>{
  const sim=ready();assert.equal(actions(sim).engine,true);assert.ok(sim.lowerRig().ok);sim.state.biteAt=1e6;sim.state.snagThreshold=Infinity;run(sim,5);
- for(const key of['engine','anchor','return','dock','stand','more','switchPanel'])assert.equal(actions(sim,{nearDock:true})[key],false,key);assert.equal(sim.toggleEngine().ok,false);assert.equal(sim.setThrottle(.2),false);assert.equal(actions(sim).retrieve,true);
+ for(const key of['engine','anchor','return','dock','assemble','switchPanel'])assert.equal(actions(sim,{nearDock:true})[key],false,key);assert.equal(sim.toggleEngine().ok,false);assert.equal(sim.setThrottle(.2),false);assert.equal(actions(sim).retrieve,true);
  const line=sim.state.paidLineMeters;sim.step(.1,{reel:1.2});assert.ok(sim.state.paidLineMeters<line);assert.equal(actions(sim).engine,false,'one crank stroke must not act as an instant retrieve');
  for(let t=0;t<40&&sim.state.fishState!=='idle';t+=.1)sim.step(.1,{reel:1.2});assert.equal(sim.state.fishState,'idle');assert.equal(actions(sim).engine,true);
  assert.ok(sim.lowerRig().ok);assert.ok(sim.setRodMount('port').ok);assert.equal(actions(sim).engine,true);assert.equal(actions(sim).retrieve,false);assert.equal(actions(sim).reel,false);assert.ok(sim.toggleEngine().ok);assert.ok(sim.setThrottle(.2));run(sim,2);const helm=actions(sim,{panel:'helm'});assert.equal(helm.helm,true);assert.equal(helm.monitor,true);assert.equal(helm.tackle,false);assert.equal(helm.switchPanel,true);assert.equal(actions(sim).take,false,'a driven boat cannot immediately pick up the rod');
@@ -52,21 +52,23 @@ test('a mounted bite offers pickup rather than strike, and pickup exposes the re
 
 test('the charging cast keeps its release control while incompatible controls stay absent',()=>{
  const sim=ready();assert.equal(actions(sim).cast,true);assert.ok(sim.startCast().ok);run(sim,.8);const charging=actions(sim);assert.equal(sim.fishingReadiness(true).ok,false,'new cast readiness is distinct from completing the current cast');assert.equal(charging.cast,true);
- for(const key of['lower','reel','spool','drag','mount','take','engine','anchor','return','dock','stand','more'])assert.equal(charging[key],false,key);
+ for(const key of['lower','reel','spool','drag','mount','take','engine','anchor','return','dock','assemble'])assert.equal(charging[key],false,key);
  assert.ok(sim.releaseCast().ok);const flight=actions(sim);assert.equal(flight.cast,false);assert.equal(flight.adjustPose,false);assert.equal(flight.reel,false);assert.equal(flight.mount,false);assert.equal(flight.engine,false);run(sim,3);assert.ok(['sinking','waiting'].includes(sim.state.fishState));assert.equal(actions(sim).reel,true);assert.equal(actions(sim).mount,true);
 });
 
 test('mooring, inspection, pause and docking suppress the complete active control set',()=>{
- const sim=ready({moored:true});assert.deepEqual(offered(actions(sim,{nearDock:true})),['unmoor']);assert.equal(actions(sim).tackle,false);assert.equal(actions(sim).helm,false);assert.ok(sim.unmoor().ok);assert.equal(actions(sim).unmoor,false);
+ const sim=ready({moored:true});assert.deepEqual(offered(actions(sim,{nearDock:true})),['assemble','unmoor']);assert.equal(actions(sim).tackle,false);assert.equal(actions(sim).helm,false);assert.ok(sim.unmoor().ok);assert.equal(actions(sim).unmoor,false);
  const base=structuredClone(sim.state);for(const patch of[{paused:true},{inspection:{phase:'checking'}},{docking:{progress:.5}},{rentalPaid:false},{launchStage:'lowering'},{mode:'walk'}]){
   const a=boatActions({...base,...patch},{hasRod:true,hasAnchor:true,hasChart:true,canLower:true,canCast:true,nearDock:true});assert.deepEqual(offered(a),[],JSON.stringify(patch));assert.equal(a.console,false);assert.equal(a.tackle,false);assert.equal(a.helm,false);
  }
  sim.pause(true);assert.deepEqual(offered(actions(sim)),[]);sim.pause(false);assert.ok(sim.dock().ok);assert.deepEqual(offered(actions(sim)),[]);
 });
 
-test('standing offers only sitting, even for an already deployed legacy rod; landed fish offers only catch handling',()=>{
- const sim=ready();assert.ok(sim.stand().ok);assert.deepEqual(offered(actions(sim)),['sit']);assert.ok(sim.lowerRig().ok);run(sim,1);const paid=sim.state.paidLineMeters;assert.deepEqual(offered(actions(sim)),['sit']);assert.ok(sim.stand().ok);assert.equal(sim.state.paidLineMeters,paid);assert.equal(actions(sim).reel,true);
- sim.state.fishState='landed';sim.state.fish={name:'test',latin:'Scomber japonicus',length:30,kg:.6};assert.deepEqual(offered(actions(sim,{nearDock:true})),['catch']);assert.ok(sim.keepCatch().ok);assert.equal(actions(sim).catch,false);assert.equal(actions(sim).engine,true);
+test('legacy standing flags cannot trap rod controls and a landed fish offers only catch handling',()=>{
+ const sim=ready(),normal=offered(actions(sim));sim.state.standing=true;assert.deepEqual(offered(actions(sim)),normal);
+ assert.ok(sim.lowerRig().ok);run(sim,1);assert.equal(actions(sim).reel,true);assert.equal(actions(sim).assemble,false);
+ for(const key of['stand','sit','more'])assert.equal(key in actions(sim),false);
+ sim.state.fishState='landed';sim.state.fish={name:'test',latin:'Scomber japonicus',length:30,kg:.6};assert.deepEqual(offered(actions(sim,{nearDock:true})),['catch']);assert.ok(sim.keepCatch().ok);assert.equal(actions(sim).catch,false);assert.equal(actions(sim).assemble,true);assert.equal(actions(sim).engine,true);
 });
 
 test('anchor and chart routes require their actual equipment and near-dock is an explicit contextual capability',()=>{

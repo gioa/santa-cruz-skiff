@@ -1,18 +1,18 @@
 /** Pixel gameplay. Offshore travel uses a 1:2 map scale and the calendar clock runs at 2x. Input, fishing and animations use active real seconds. */
-import {GEAR_CATALOG,BASE_GEAR,createProfile,equipmentStats,cargoWeight,settleFish,buyGear as purchaseGear,restock} from './equipment.js?v=20260927-pixel-v14';
-import {HARBOR,BOARDING_WALK_PATH,walkHeight,walkAllowed,canBoardFrom,harborWaterBlocked} from './pixel-harbor-layout.js?v=20260927-pixel-v14';
-import {walkingBlocked as walkBlocked,walkingPointOpen,walkingSegmentOpen as safeWalkSegment,createGroundWalkSearch,advanceGroundWalk} from './pixel-walking-path.js?v=20260927-pixel-v14';
-import {FISHING_SPOTS,toGPS,bearingDegrees,onLand,onPier,MAP_BOUNDS} from './pixel-geography.js?v=20260927-pixel-v14';
-import {depthAt,depthInfoAt} from './bathymetry.js?v=20260927-pixel-v14';
-import {waterRoute,resolveVesselContact,contactAwareControl,clearResumeVesselPose} from './pixel-navigation.js?v=20260927-pixel-v14';
-import {createVesselState,stepVessel,syncVessel,vesselWind,vesselAutopilot} from './vessel-physics.js?v=20260927-pixel-v14';
-import {RIG_PROFILES,getRigProfile,weightedRigFish} from './fishing-rigs.js?v=20260927-pixel-v14';
-import {MAX_PAID_LINE_METERS,MAX_TROLL_SPEED_MPS,MAX_TROLL_THROTTLE,reelTurnsPerSecond,rodTipPosition,fishingCurrent,relativeFishingFlow,stepFishingLine} from './pixel-fishing-physics.js?v=20260927-pixel-v14';
-import {createFishFight,stepFishFight,canLandFish} from './pixel-fish-fight.js?v=20260927-pixel-v14';
-import {ensureRodLoadouts,getRodAssembly,setRodAssembly,syncActiveRodLoadout} from './pixel-rod-loadouts.js?v=20260927-pixel-v14';
-import {assessCatchLedger,identifyRegulatedSpecies} from './fishing-regulations.js?v=20260927-pixel-v14';
-import {FishingPatrol} from './fish-patrol.js?v=20260927-pixel-v14';
-import {NAVIGATION_COMPRESSION,navigationStepScale} from './pixel-navigation-scale.js?v=20260927-pixel-v14';
+import {GEAR_CATALOG,BASE_GEAR,createProfile,equipmentStats,cargoWeight,settleFish,buyGear as purchaseGear,restock} from './equipment.js?v=20260927-pixel-v15';
+import {HARBOR,BOARDING_WALK_PATH,walkHeight,walkAllowed,canBoardFrom,harborWaterBlocked} from './pixel-harbor-layout.js?v=20260927-pixel-v15';
+import {walkingBlocked as walkBlocked,walkingPointOpen,walkingSegmentOpen as safeWalkSegment,createGroundWalkSearch,advanceGroundWalk} from './pixel-walking-path.js?v=20260927-pixel-v15';
+import {FISHING_SPOTS,toGPS,bearingDegrees,onLand,onPier,MAP_BOUNDS} from './pixel-geography.js?v=20260927-pixel-v15';
+import {depthAt,depthInfoAt} from './bathymetry.js?v=20260927-pixel-v15';
+import {waterRoute,resolveVesselContact,contactAwareControl,clearResumeVesselPose} from './pixel-navigation.js?v=20260927-pixel-v15';
+import {createVesselState,stepVessel,syncVessel,vesselWind,vesselAutopilot} from './vessel-physics.js?v=20260927-pixel-v15';
+import {RIG_PROFILES,getRigProfile,weightedRigFish} from './fishing-rigs.js?v=20260927-pixel-v15';
+import {MAX_PAID_LINE_METERS,MAX_TROLL_SPEED_MPS,MAX_TROLL_THROTTLE,reelTurnsPerSecond,rodTipPosition,fishingCurrent,relativeFishingFlow,stepFishingLine} from './pixel-fishing-physics.js?v=20260927-pixel-v15';
+import {createFishFight,stepFishFight,canLandFish} from './pixel-fish-fight.js?v=20260927-pixel-v15';
+import {ensureRodLoadouts,getRodAssembly,setRodAssembly,syncActiveRodLoadout} from './pixel-rod-loadouts.js?v=20260927-pixel-v15';
+import {assessCatchLedger,identifyRegulatedSpecies} from './fishing-regulations.js?v=20260927-pixel-v15';
+import {FishingPatrol} from './fish-patrol.js?v=20260927-pixel-v15';
+import {NAVIGATION_COMPRESSION,navigationStepScale} from './pixel-navigation-scale.js?v=20260927-pixel-v15';
 export const GAME_TIME_SCALE=1/NAVIGATION_COMPRESSION;
 export const WALK_SPEED=2.90;
 export const BOAT_RENTAL_PRICE=15; // Virtual game credits, not a real rental quote.
@@ -84,7 +84,7 @@ export class PixelSimulation {
   const changed=previous!==rodId||s.rig!==assembly.rig||s.rigWeightGrams!==assembly.weightGrams||s.fishingDepthMeters!==assembly.fishingDepthMeters;
   Object.assign(s,{rig:assembly.rig,bait:assembly.bait,drag:assembly.drag,rigWeightGrams:assembly.weightGrams,fishingDepthMeters:assembly.fishingDepthMeters});this.activeRodId=rodId;if(changed){s.rigPresentation=null;s.pumpHeight=0;}return assembly;
  }
- selectRod(rodId){const s=this.state;if(s.fishState!=='idle')return this.notify('先收回钓组。',null,false);if(!GEAR_CATALOG.some(g=>g.id===rodId&&g.slot==='rod')||!s.profile.owned.includes(rodId))return this.notify('背包里没有这根船竿。',null,false);this.enableRodAssembly(rodId);this.applyActiveRod(rodId);return this.notify('已拿起这根船竿。');}
+ selectRod(rodId){const s=this.state;if(s.fishState!=='idle')return this.notify('先收回钓组。',null,false);if(!GEAR_CATALOG.some(g=>g.id===rodId&&g.slot==='rod')||!s.profile.owned.includes(rodId))return this.notify('背包里没有这根船竿。',null,false);this.enableRodAssembly(rodId);this.applyActiveRod(rodId);return this.notify('已换用这根船竿。');}
  equipRod(rodId){return this.selectRod(rodId);}
  get stats(){const s=this.state,stats=equipmentStats(s.profile,s.packed),reel=GEAR_CATALOG.find(g=>g.id===s.profile.loadout.reel&&g.slot==='reel'&&this.hasGear(g.id));return{...stats,hasRod:Boolean(this.hasGear(s.profile.loadout.rod)&&GEAR_CATALOG.some(g=>g.id===s.profile.loadout.rod&&g.slot==='rod')),smooth:reel?.smooth||1};}
 
@@ -95,7 +95,7 @@ export class PixelSimulation {
   const s=this.state;if(s.mode!=='intro')return this.notify('',null,false);
   if(!resume&&hasSavedBoatRental(this.saved)&&s.profile.credits<BOAT_RENTAL_PRICE)return this.notify('潮汐点不足以开启新航次，请继续上次已租航程。',null,false);
   if(resume&&this.saved?.edition==='pixel'){
-   const p=this.saved;Object.assign(s,clone(p),{profile:createProfile(p.profile),mode:p.mode==='boat'?'boat':'walk',engine:false,throttle:0,speed:0,waypoint:null,waterRoute:[],walkRoute:[],autoWalk:false,casting:false,castFlight:null,bobber:null,fishState:'idle',fish:null,standing:false,swim:null,docking:null,paused:false,fishFight:null,fishPullN:0,fishMotion:null,time:0,elapsed:0,gameElapsed:0,timeScale:GAME_TIME_SCALE,clock:'06:00:00',events:[],tension:0,lureDepth:0,lineDistance:0,castPower:0,reeling:false,pumping:false,arrival:null});
+   const p=this.saved;Object.assign(s,clone(p),{profile:createProfile(p.profile),mode:p.mode==='boat'?'boat':'walk',engine:false,throttle:0,speed:0,waypoint:null,waterRoute:[],walkRoute:[],autoWalk:false,casting:false,castFlight:null,bobber:null,fishState:'idle',fish:null,standing:false,deckX:0,deckZ:.8,walking:false,swim:null,docking:null,paused:false,fishFight:null,fishPullN:0,fishMotion:null,time:0,elapsed:0,gameElapsed:0,timeScale:GAME_TIME_SCALE,clock:'06:00:00',events:[],tension:0,lureDepth:0,lineDistance:0,castPower:0,reeling:false,pumping:false,arrival:null});
    s.packed=(p.packed||[]).filter(id=>s.profile.owned.includes(id));s.catches=p.catches||[];
    if(s.mode==='walk'){s.playerX=HARBOR.spawnX;s.playerZ=HARBOR.spawnZ;s.loaded=false;}
    // Restoring an interrupted immersion is the same explicit free recovery as
@@ -145,14 +145,14 @@ export class PixelSimulation {
  }
  clearWalking(){const s=this.state;this.walkSearch=null;s.walkRoute=[];s.autoWalk=false;s.walkPending=false;s.walkTarget=null;s.walkArrival=null;s.arrival=null;}
  walkSearchNow(){return performance.now();}
- board(){const s=this.state;if(!s.rentalPaid)return this.notify(`先到小屋支付 ${BOAT_RENTAL_PRICE} 潮汐点租船。`,null,false);if(this.inspectionPending())return this.notify('等例行检查结束再出发。',null,false);if(s.mode!=='walk'||!canBoardFrom(s.playerX,s.playerZ))return this.notify('沿左侧台阶走到登船平台。',null,false);if(s.launchStage!=='afloat')return this.notify('等吊臂放稳木艇，再登船。',null,false);s.mode='boat';s.loaded=true;s.moored=true;s.standing=false;this.clearWalking();s.phase='launch';s.tripComplete=false;s.yaw=0;s.inspection=null;this.patrol.resetTrip();this.journal('带上装备，登上木艇。');return this.notify('坐稳了，解开缆绳出发。');}
+ board(){const s=this.state;if(!s.rentalPaid)return this.notify(`先到小屋支付 ${BOAT_RENTAL_PRICE} 潮汐点租船。`,null,false);if(this.inspectionPending())return this.notify('等例行检查结束再出发。',null,false);if(s.mode!=='walk'||!canBoardFrom(s.playerX,s.playerZ))return this.notify('沿左侧台阶走到登船平台。',null,false);if(s.launchStage!=='afloat')return this.notify('等吊臂放稳木艇，再登船。',null,false);s.mode='boat';s.loaded=true;s.moored=true;s.standing=false;s.deckX=0;s.deckZ=.8;s.walking=false;this.clearWalking();s.phase='launch';s.tripComplete=false;s.yaw=0;s.inspection=null;this.patrol.resetTrip();this.journal('带上装备，登上木艇。');return this.notify('坐稳了，解开缆绳出发。');}
  unmoor(){const s=this.state;if(!this.rentalReady)return this.notify('',null,false);if(s.mode!=='boat'||!s.moored||s.launchStage!=='afloat')return this.notify('',null,false);s.moored=false;return this.notify('缆绳已解开。');}
  interact(){const s=this.state;if(s.paused)return this.notify('',null,false);if(s.mode==='walk'){if(this.atCounter)return{ok:true,action:'staff',message:''};if(canBoardFrom(s.playerX,s.playerZ))return this.board();return this.notify('靠近小屋柜台或左侧登船平台。',null,false);}if(s.mode==='boat'){if(s.moored)return this.unmoor();if(s.fishState==='bite')return this.hook();if(s.fishState==='idle'&&Math.hypot(s.boatX-HARBOR.boatX,s.boatZ-HARBOR.boatZ)<16&&Math.abs(s.speed)<.85)return this.dock();}return this.notify('',null,false);}
- toggleEngine(){const s=this.state;if(!this.rentalReady)return this.notify('先在小屋租船，等木艇下水后再启动。',null,false);if(this.inspectionChecking())return this.notify('正在进行例行检查。',null,false);if(s.mode!=='boat'||s.standing||s.docking)return this.notify('坐回驾驶座。',null,false);if(s.moored)return this.notify('先解开缆绳。',null,false);if(s.anchor)return this.notify('先起锚。',null,false);if(!s.engine&&!this.canOperateHelm)return this.notify('先将鱼竿放入船边竿架。',null,false);if(!s.engine&&s.fuel<=0)return this.notify('燃油用尽，可呼叫免费救援。',null,false);s.engine=!s.engine;s.throttle=0;if(!s.engine){s.waypoint=null;s.waterRoute=[];}return this.notify(s.engine?'发动机已启动。':'发动机已关闭。');}
- setThrottle(value){const s=this.state;if(!this.rentalReady)return false;if(this.inspectionChecking())return false;if(s.mode!=='boat'||!s.engine||s.moored||s.anchor||s.standing)return false;if(!this.canOperateHelm&&finite(value)!==0)return false;s.throttle=this.canOperateHelm?clamp(finite(value),s.fishState==='idle'?-.3:0,s.fishState==='idle'?1:MAX_TROLL_THROTTLE):0;this.transientThrottle=false;s.waypoint=null;s.waterRoute=[];return true;}
- toggleAnchor(){const s=this.state;if(s.mode!=='boat'||s.paused||this.inspectionChecking()||s.moored||s.docking||s.standing||!this.canOperateHelm)return this.notify('',null,false);if(!s.anchor){if(!this.hasGear('anchor'))return this.notify('先在小屋购买船锚，并在背包启用。',null,false);if(s.engine||Math.abs(s.speed)>.85)return this.notify('停机、减速后再下锚。',null,false);}s.anchor=!s.anchor;s.waypoint=null;s.waterRoute=[];return this.notify(s.anchor?'锚链缓缓入水。':'锚已收回。');}
+ toggleEngine(){const s=this.state;if(!this.rentalReady)return this.notify('先在小屋租船，等木艇下水后再启动。',null,false);if(this.inspectionChecking())return this.notify('正在进行例行检查。',null,false);if(s.mode!=='boat'||s.docking)return this.notify('',null,false);if(s.moored)return this.notify('先解开缆绳。',null,false);if(s.anchor)return this.notify('先起锚。',null,false);if(!s.engine&&!this.canOperateHelm)return this.notify('先将鱼竿放入船边竿架。',null,false);if(!s.engine&&s.fuel<=0)return this.notify('燃油用尽，可呼叫免费救援。',null,false);s.engine=!s.engine;s.throttle=0;if(!s.engine){s.waypoint=null;s.waterRoute=[];}return this.notify(s.engine?'发动机已启动。':'发动机已关闭。');}
+ setThrottle(value){const s=this.state;if(!this.rentalReady)return false;if(this.inspectionChecking())return false;if(s.mode!=='boat'||!s.engine||s.moored||s.anchor)return false;if(!this.canOperateHelm&&finite(value)!==0)return false;s.throttle=this.canOperateHelm?clamp(finite(value),s.fishState==='idle'?-.3:0,s.fishState==='idle'?1:MAX_TROLL_THROTTLE):0;this.transientThrottle=false;s.waypoint=null;s.waterRoute=[];return true;}
+ toggleAnchor(){const s=this.state;if(s.mode!=='boat'||s.paused||this.inspectionChecking()||s.moored||s.docking||!this.canOperateHelm)return this.notify('',null,false);if(!s.anchor){if(!this.hasGear('anchor'))return this.notify('先在小屋购买船锚，并在背包启用。',null,false);if(s.engine||Math.abs(s.speed)>.85)return this.notify('停机、减速后再下锚。',null,false);}s.anchor=!s.anchor;s.waypoint=null;s.waterRoute=[];return this.notify(s.anchor?'锚链缓缓入水。':'锚已收回。');}
  selectWaypoint(destination){
-  const s=this.state;if(!this.rentalReady)return this.notify('先在小屋租船，等木艇下水后再出发。',null,false);if(this.inspectionChecking())return this.notify('正在进行例行检查。',null,false);if(!this.hasGear('nautical_chart'))return this.notify('带上海图后可以标记航线。',null,false);if(s.mode!=='boat'||s.moored||s.standing||s.docking)return this.notify('先登船、解缆并坐稳。',null,false);if(!this.canOperateHelm)return this.notify('先收回钓组或将鱼竿放入竿架。',null,false);if(s.fuel<=0)return this.notify('需要燃油，可使用免费救援。',null,false);
+  const s=this.state;if(!this.rentalReady)return this.notify('先在小屋租船，等木艇下水后再出发。',null,false);if(this.inspectionChecking())return this.notify('正在进行例行检查。',null,false);if(!this.hasGear('nautical_chart'))return this.notify('带上海图后可以标记航线。',null,false);if(s.mode!=='boat'||s.moored||s.docking)return this.notify('先登船并解缆。',null,false);if(!this.canOperateHelm)return this.notify('先收回钓组或将鱼竿放入竿架。',null,false);if(s.fuel<=0)return this.notify('需要燃油，可使用免费救援。',null,false);
   const target=typeof destination==='object'?{...destination,name:destination.name||'选定水面'}:destination==='dock'?{x:HARBOR.returnX,z:HARBOR.returnZ,name:'租船登船平台',kind:'dock'}:FISHING_SPOTS.find(p=>p.kind===destination);
   if(!target||!Number.isFinite(target.x)||!Number.isFinite(target.z))return this.notify('没有找到这个钓点。',null,false);
   const route=waterRoute({x:s.boatX,z:s.boatZ},target);if(!route)return this.notify('这条航线无法安全穿过码头。',null,false);
@@ -201,8 +201,9 @@ export class PixelSimulation {
  resolveCatch(keep){const s=this.state;if(s.fishState!=='landed'||!s.fish)return{ok:false,message:''};if(keep&&cargoWeight(s.catches)+s.fish.kg>this.stats.capacity)return this.notify('冰箱装不下了，可以记录并放流。',null,false);const f={...s.fish,catchId:`pixel-${Date.now()}-${s.profile.nextCatch++}`,kept:keep,time:s.clock,fightSeconds:Math.round(s.fightTime)};s.catches.push(f);const reward=keep?0:settleFish(s.profile,f);if(s.baitOnHook)s.baitOnHook.condition*=.45;s.fishState='idle';this.retrieve();this.journal(`${keep?'留鱼':'放流'} ${f.name} · ${f.length} cm / ${f.kg} kg。`);return this.notify(keep?'鱼获已装箱，返航后去小屋兑换。':`记录并放流，获得 ${reward} 潮汐点。`);}
  trade(){const s=this.state;if(this.inspectionPending())return{...this.notify('先关闭窗口，等例行检查结束后再兑换鱼获。',null,false),count:0,total:0};if(!this.atCounter)return this.notify('回小屋找值班员兑换鱼获。',null,false);let count=0,total=0;for(const f of s.catches)if(f.kept&&!f.settled){const n=settleFish(s.profile,f);if(n){count++;total+=n;}}if(count)this.journal(`兑换 ${count} 条鱼，获得 ${total} 潮汐点。`);return{...this.notify(count?`兑换 ${count} 条鱼，获得 ${total} 潮汐点。`:'冰箱里没有待兑换的鱼获。'),count,total};}
  dock(){const s=this.state;if(s.mode!=='boat'||s.paused||s.moored||s.docking||this.inspectionChecking()||s.fishState!=='idle'||Math.hypot(s.boatX-HARBOR.boatX,s.boatZ-HARBOR.boatZ)>=16||Math.abs(s.speed)>=.85)return this.notify('靠近登船平台，减速后靠泊。',null,false);this.patrol.considerDock(s);s.engine=false;s.throttle=0;s.anchor=false;s.waypoint=null;s.waterRoute=[];s.docking={fromX:s.boatX,fromZ:s.boatZ,fromHeading:s.heading,progress:0,duration:Math.max(4,Math.hypot(s.boatX-HARBOR.boatX,s.boatZ-HARBOR.boatZ)/.55)};return this.notify('慢慢靠泊，系好缆绳。');}
- stand(){const s=this.state;if(s.mode!=='boat'||s.docking||(!s.standing&&s.fishState!=='idle'))return this.notify('先收回钓组。',null,false);s.standing=!s.standing;s.deckX=0;s.deckZ=.8;s.engine=false;s.throttle=0;s.waypoint=null;s.waterRoute=[];return this.notify(s.standing?'扶稳船舷，慢慢走。':'回到驾驶座。');}
- // Compatibility with old controls: the pixel edition no longer enters water.
+ // Compatibility with old controls: the angler stays at the controls aboard.
+ stand(){return{ok:false,message:''};}
+ // The pixel edition no longer enters water.
  enterWater(){return{ok:false,message:''};}
  jump(){return{ok:false,message:''};}
  reboard(){return{ok:false,message:''};}
@@ -212,14 +213,16 @@ export class PixelSimulation {
  snapshot(){this.rememberHookBait();const copy=clone(this.state);copy.events=[];copy.toast='';copy.toastId=0;return copy;}
 
  step(dt,input={}){
-  const s=this.state;if(s.mode==='intro'||s.paused||!Number.isFinite(dt)||dt<=0)return s;dt=Math.min(.25,dt);s.time+=dt;s.elapsed+=dt;s.gameElapsed+=dt*GAME_TIME_SCALE;s.clock=this.clock();s.walking=false;
+  const s=this.state;
+  // Discard old deck-walking posture even while a menu pauses the simulation.
+  if(s.mode==='boat'){s.standing=false;s.deckX=0;s.deckZ=.8;s.walking=false;}
+  if(s.mode==='intro'||s.paused||!Number.isFinite(dt)||dt<=0)return s;dt=Math.min(.25,dt);s.time+=dt;s.elapsed+=dt;s.gameElapsed+=dt*GAME_TIME_SCALE;s.clock=this.clock();s.walking=false;
   if(!s.rentalPaid&&s.launchStage!=='stored'){s.launchStage='stored';s.launchProgress=0;}
   if(s.launchStage==='lowering'){s.launchProgress=Math.min(1,s.launchProgress+dt/24);if(s.launchProgress===1){s.launchStage='afloat';s.launchProgress=0;this.notify('木艇已下水，可以登船。');}}
   if(s.docking){this.stepDocking(dt);this.stepPatrol(dt);return s;}
   this.stepBoat(dt,input);
   if(s.mode==='walk')this.stepWalking(dt,input);
   else if(s.mode==='swim')this.rescue();
-  else if(s.standing)this.stepDeck(dt,input);
   this.stepFishing(dt,input);this.stepPatrol(dt);return s;
  }
  clock(){if(!this.state.dayStartAt)return'06:00:00';return pacificClock.format(new Date(this.captureTimestamp()));}
@@ -243,10 +246,9 @@ export class PixelSimulation {
   const moved=Math.hypot(x-startX,z-startZ);if(moved>1e-8){s.walked+=moved;s.playerX=x;s.playerZ=z;s.yaw=Math.atan2(-dx,-dz);s.walking=true;}
   if(blocked&&s.autoWalk)this.clearWalking();
  }
- stepDeck(dt,input){const s=this.state,beforeX=s.deckX,beforeZ=s.deckZ;s.deckX=clamp(s.deckX+finite(input.moveX)*dt*.8,-.72,.72);s.deckZ=clamp(s.deckZ+finite(input.moveZ)*dt*.8,-1.85,1.70);s.walking=Math.hypot(s.deckX-beforeX,s.deckZ-beforeZ)>1e-8;}
 
  stepBoat(dt,input){const s=this.state;if(!this.rentalReady){this.stopPropulsion();s.speed=0;s.moored=true;s.navigationScale=1;return;}if(this.inspectionChecking()){this.stopPropulsion();input={};}s.navigationScale=clamp(finite(this.navigationScale(s),1),1,2);const total=dt*s.navigationScale,count=Math.max(1,Math.ceil(total/.1));for(let i=0;i<count;i++)this.stepBoatPhysics(total/count,input);if(s.engine){s.fuel=Math.max(0,s.fuel-dt*(.0018+Math.abs(s.throttle)*.006));if(!s.fuel){this.stopPropulsion();this.notify('燃油用尽，可呼叫免费救援。');}}}
- stepBoatPhysics(dt,input){const s=this.state,v=this.vessel;if(s.moored){s.speed=0;return;}let steer=s.mode==='boat'&&!s.standing?clamp(finite(input.steer),-1,1):0;const manualThrottle=Number.isFinite(input.throttle)&&s.mode==='boat'&&!s.standing;
+ stepBoatPhysics(dt,input){const s=this.state,v=this.vessel;if(s.moored){s.speed=0;return;}let steer=s.mode==='boat'?clamp(finite(input.steer),-1,1):0;const manualThrottle=Number.isFinite(input.throttle)&&s.mode==='boat';
   if(Math.abs(steer)>.08||manualThrottle){if(s.waypoint)s.throttle=0;s.waypoint=null;s.waterRoute=[];}
   if(manualThrottle&&s.engine){s.throttle=clamp(input.throttle,-.3,1);this.transientThrottle=true;}
   else if(this.transientThrottle){s.throttle=0;this.transientThrottle=false;}
@@ -256,7 +258,7 @@ export class PixelSimulation {
   const contactOptions={dt,extraPenetration:(x,z)=>Math.max(0,.7-(depthInfoAt(x,z).value??99))};
   if(s.waypoint&&s.waterRoute.length){const final=s.waterRoute.length===1,control=contactAwareControl(v,vesselAutopilot(v,s.waterRoute[0],{final}),contactOptions);steer=control.steer;s.throttle=control.throttle;if(control.arrived){s.waterRoute.shift();if(!s.waterRoute.length){s.arrival=s.waypoint.returning?'dock':'fishing';s.phase=s.waypoint.returning?'return':'fish';s.waypoint=null;s.throttle=0;s.engine=false;this.notify(s.arrival==='dock'?'到码头了，停稳后靠泊。':'抵达钓点，停机等船慢下来。');}}}
   if(!this.canOperateHelm){s.throttle=0;s.waypoint=null;s.waterRoute=[];steer=0;}else if(s.fishState!=='idle'){s.throttle=clamp(s.throttle,0,MAX_TROLL_THROTTLE);}
-  const before={x:v.x,z:v.z,heading:v.heading};stepVessel(v,{dt,time:s.time,engine:s.engine,throttle:s.fishState!=='idle'&&Math.abs(s.speed)>MAX_TROLL_SPEED_MPS?0:s.throttle,steer,anchor:s.anchor,payloadKg:s.loaded?this.stats.weight+cargoWeight(s.catches):0,crewKg:s.mode==='boat'?82:0,crewX:s.standing?s.deckX:0,crewZ:s.standing?s.deckZ:.9,seaAnchor:s.packed.includes('sea_anchor'),currentX:fishingCurrent(this.conditions).x,currentZ:fishingCurrent(this.conditions).z,...vesselWind(this.conditions.windKnots,this.conditions.windDirection)});
+  const before={x:v.x,z:v.z,heading:v.heading};stepVessel(v,{dt,time:s.time,engine:s.engine,throttle:s.fishState!=='idle'&&Math.abs(s.speed)>MAX_TROLL_SPEED_MPS?0:s.throttle,steer,anchor:s.anchor,payloadKg:s.loaded?this.stats.weight+cargoWeight(s.catches):0,crewKg:s.mode==='boat'?82:0,crewX:0,crewZ:.9,seaAnchor:s.packed.includes('sea_anchor'),currentX:fishingCurrent(this.conditions).x,currentZ:fishingCurrent(this.conditions).z,...vesselWind(this.conditions.windKnots,this.conditions.windDirection)});
   resolveVesselContact(v,before,contactOptions);if(v.x<MAP_BOUNDS.minX||v.x>MAP_BOUNDS.maxX||v.z<MAP_BOUNDS.minZ||v.z>MAP_BOUNDS.maxZ){syncVessel(v,{...before});s.throttle=0;s.waypoint=null;s.waterRoute=[];this.notify('已到海图资料边缘。');}
   s.sailed+=Math.hypot(v.x-before.x,v.z-before.z);s.boatX=v.x;s.boatZ=v.z;s.heading=v.heading;s.speed=v.speed;s.tiller=v.tiller;s.roll=v.roll;s.pitch=v.pitch;
  }

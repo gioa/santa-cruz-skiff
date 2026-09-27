@@ -22,10 +22,16 @@ test('missed bite expires, bait persists and disconnected pointer cancellation c
  const sim=new PixelSimulation({rng:()=>0});departure(sim);assert.equal(sim.startCast().ok,true);sim.cancelCast();assert.equal(sim.state.fishState,'idle');assert.equal(sim.state.profile.stock.squid,12);sim.startCast();sim.step(.1);sim.releaseCast();runUntil(sim,s=>s.fishState==='bite',100);for(let i=0;i<100;i++)sim.step(.1);assert.equal(sim.state.fishState,'idle');assert.equal(sim.state.misses,1);assert.equal(sim.state.profile.stock.squid,11);sim.startCast();sim.releaseCast();assert.equal(sim.state.profile.stock.squid,11,'usable hook bait is retained for recast');
 });
 
-test('boat deck edges block movement and old water-entry actions cannot start swimming',()=>{
- const sim=new PixelSimulation();departure(sim);sim.toggleEngine();sim.setThrottle(.2);for(let i=0;i<50;i++)sim.step(.1);assert.equal(sim.jump().ok,false);assert.equal(sim.state.mode,'boat');assert.equal(sim.state.swim,null);assert.equal(sim.stand().ok,true);
- for(const [moveX,moveZ]of[[1,0],[-1,0],[0,1],[0,-1],[1,1]]){for(let i=0;i<100;i++)sim.step(.25,{moveX,moveZ});assert.equal(sim.state.mode,'boat');assert.ok(Math.abs(sim.state.deckX)<=.72);assert.ok(sim.state.deckZ>=-1.85&&sim.state.deckZ<=1.70);}
- assert.equal(sim.enterWater(999,999,1).ok,false);assert.equal(sim.reboard().ok,false);assert.equal(sim.state.swim,null);assert.ok(sim.state.packed.includes('rod'));
+test('onboard walking and old water-entry controls cannot move the seated angler or interrupt propulsion',()=>{
+ const sim=new PixelSimulation();departure(sim);sim.toggleEngine();sim.setThrottle(.2);for(let i=0;i<50;i++)sim.step(.1);assert.equal(sim.jump().ok,false);assert.equal(sim.stand().ok,false);assert.equal(sim.state.engine,true);assert.equal(sim.state.throttle,.2);
+ const walked=sim.state.walked,position=[sim.state.playerX,sim.state.playerZ];
+ for(const [moveX,moveZ]of[[1,0],[-1,0],[0,1],[0,-1],[1,1]]){for(let i=0;i<100;i++)sim.step(.25,{moveX,moveZ});assert.equal(sim.state.mode,'boat');assert.equal(sim.state.standing,false);assert.deepEqual([sim.state.deckX,sim.state.deckZ],[0,.8]);assert.equal(sim.state.walking,false);}
+ assert.equal(sim.state.walked,walked);assert.deepEqual([sim.state.playerX,sim.state.playerZ],position);assert.equal(sim.walkTo('counter').ok,false);assert.equal(sim.enterWater(999,999,1).ok,false);assert.equal(sim.reboard().ok,false);assert.equal(sim.state.swim,null);assert.ok(sim.state.packed.includes('rod'));
+});
+
+test('legacy standing voyages resume seated with helm and gear accessible',()=>{
+ const sim=new PixelSimulation();departure(sim);const saved=sim.snapshot();Object.assign(saved,{standing:true,deckX:.7,deckZ:-1.8});const restored=new PixelSimulation({saved});assert.ok(restored.start(true).ok);
+ assert.equal(restored.state.mode,'boat');assert.equal(restored.state.standing,false);assert.deepEqual([restored.state.deckX,restored.state.deckZ],[0,.8]);assert.deepEqual(restored.state.packed,saved.packed);assert.ok(restored.selectRod('rod').ok);assert.ok(restored.toggleEngine().ok);assert.equal(restored.setThrottle(.2),true);
 });
 
 test('mobile steering and throttle cancel assisted route without teleporting the boat',()=>{
