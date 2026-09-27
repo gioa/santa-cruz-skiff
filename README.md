@@ -10,7 +10,7 @@ Serve `dist/` through any HTTP server; the files are ready for GitHub Pages or V
 python3 -m http.server 4173 --directory dist
 ```
 
-Open `http://localhost:4173`. Desktop keyboard + mouse is recommended. A reduced touch interface is provided. WebGL 2 and hardware acceleration are required.
+Open `http://localhost:4173`. Desktop keyboard/mouse and a dedicated dual-thumb touch interface are supported. Touch devices are detected automatically; Settings can force touch or keyboard mode. WebGL 2 and hardware acceleration are required.
 
 ## Complete journey
 
@@ -26,6 +26,19 @@ Walk the wharf → collect eight pieces of equipment → descend the steps to th
 - Up/Down: drag adjustment during a fish fight.
 - V: first-person or chase camera; P: clean photo view; photo button: PNG download.
 - Escape: instructions/pause; chart has course assistance and simulated VHF recovery.
+
+## Phone controls
+
+- Left analog stick: camera-relative walking; horizontal steering aboard. Release returns to neutral.
+- Drag the sea with a separate finger to look. Looking never reels in touch mode.
+- Throttle stays where set. Use Neutral to ease down, Engine to stop the motor. These are separate from the steering stick.
+- Gold action: hold/release to cast, tap to strike, hold to pump during a fight.
+- Reel: hold/release, or toggle continuous reel. Minus/plus changes drag during the fight.
+- Context action: gear, boarding, unmooring and docking. Bag contains equipment, log, camera and settings.
+- Each surface owns its pointer. Interruptions cancel charging; modal opening, focus loss, rotation and resize clear held actions. App switching pauses the trip.
+- Portrait and short landscape layouts, safe-area insets, 44–48 px minimum interactive targets, native modal scrolling and 16 px select inputs.
+
+`npm run check` checks scripts; `npm test` exercises pointer ownership, cancellation, multitouch source isolation and analog deadzone behavior. See `qa/mobile/TESTING.md` for browser evidence and limits.
 
 ## Simulation and boundaries
 

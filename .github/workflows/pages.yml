@@ -24,6 +24,9 @@ jobs:
           node --check dist/world.js
           node --check dist/boat.js
           node --check dist/audio.js
+          node --check dist/input.js
+          node --check dist/mobile.js
+          node --test tests/*.test.js
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
