@@ -1,0 +1,56 @@
+{
+  "commit": "917c1a6d5fad6e18874ae4d8ae1eb0a61559e38c",
+  "workflow": "https://github.com/gioa/santa-cruz-skiff/actions/runs/36338755042",
+  "files": [
+    {
+      "file": "index.html",
+      "matches": true,
+      "sha256": "898bedc502d4a16e56096e86dc7669db15542065720d8edad6836b2462035576"
+    },
+    {
+      "file": "pixel-game.js",
+      "matches": true,
+      "sha256": "7b553eb225f5c3477e9b10eeb89ecfa8efc2bd0217bc2151f903f6a1a620dd64"
+    },
+    {
+      "file": "pixel.css",
+      "matches": true,
+      "sha256": "00b0975685b6b6f495cede2432a64c1c0100284a89b422107078f563e2963c42"
+    },
+    {
+      "file": "pixel-world.js",
+      "matches": true,
+      "sha256": "95063a6f738856b8bab6d22c3eec081c2a255bdd2de90c6433b5d385350e3356"
+    },
+    {
+      "file": "pixel-sim.js",
+      "matches": true,
+      "sha256": "1555d071d1e002e9e438a716ce94c3682a076f61993305665acf0d0b456965e2"
+    },
+    {
+      "file": "pixel-audio.js",
+      "matches": true,
+      "sha256": "5df8ae1a913da23c09468507f3258c01943c707893214e316b0993a6cfc4cafb"
+    },
+    {
+      "file": "pixel-camera.js",
+      "matches": true,
+      "sha256": "d0d08ebb28966bf3973f87663bd151707971df8816d1d62e4d29a9e71e576912"
+    },
+    {
+      "file": "pixel-inventory.js",
+      "matches": true,
+      "sha256": "d0095c8c48db06541eaecea3654b15a98ffbf10402ca662aeed9808b1bed361a"
+    },
+    {
+      "file": "pixel-item-icons.js",
+      "matches": true,
+      "sha256": "e03c17dd6e8fbdd6ce976ec908cc66b25685546b419d5c67ea117e5917c4398a"
+    },
+    {
+      "file": "pixel-action-layout.js",
+      "matches": true,
+      "sha256": "18ede816943a28a58066837dde81bc260def24165e7f6ca83555105037bbbaa6"
+    }
+  ]
+}

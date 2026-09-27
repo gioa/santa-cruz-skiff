@@ -20,3 +20,19 @@ All actions used normal UI controls or the page's validated player-action tools.
 - AudioContext is running after clicking Resume; scheduled music notes and effects increment. Music toggle off clears musical voices, on restarts music. Set volume to0.25 and verified it in read-only runtime output. Music continues through the bag/settings while simulation stays paused.
 
 Screenshots and the final runtime samples are stored alongside this report.
+
+## Natural fishing result
+
+On the final code build, navigated to Wharf west-side fishing spot, stopped, lowered the anchor and cast the two-hook dropper rig. A natural bite was hooked and reeled through a 130-second fight. Landed a 36 cm, 1.16 kg copper rockfish, retained it through the normal catch dialog, raised the anchor and began the return route. Screenshots04–07 document the actual fishing UI and catch; they are not rendered fixtures. At 364 active seconds the game counter was 727 seconds (independent rounding within 1 second). Music had scheduled 4,449 notes with bounded live voices; the console showed no warnings/errors.
+
+## Publishing
+
+Code commit `917c1a6d5fad6e18874ae4d8ae1eb0a61559e38c` deployed successfully through [GitHub Pages run 36338755042](https://github.com/gioa/santa-cruz-skiff/actions/runs/36338755042). All 10 checked public entry/module/CSS files exactly matched local SHA-256 hashes; see `deployment.json`.
+
+## Completed active-time run
+
+The final sustained session reached **602 active seconds (10:02)** at dock arrival, with the game clock at 06:20 (2× calendar rate). It included real sailing in both directions, a natural bite, a 130-second fight, retention and a naturally occurring patrol. The patrol confiscated the new copper rockfish because the persisted same-day catch ledger already contained one retained copper rockfish from the preceding session (maximum 1); this confirms that sale/earlier settlement does not reset the species daily ledger. No fish was inserted and no inspection was forced.
+
+A final `v5.1` presentation refinement also reserves the actual HUD/tool/information rectangles during button placement, including their device safe-area offsets. It does not change simulation, timing, inventory or audio. The sustained session above used `v5`; final `v5.1` receives a separate local/public UI smoke check.
+
+Completed at the hut counter after **670 active seconds (11:10)**; calendar 06:22:19 (1,339 game seconds; independent rounding). Camera x stayed fixed until the return walk reached the right deadzone boundary, then moved from -45.27 to -25.41 while camera z stayed -76.63. Final balance remained 19 because the confiscated fish was correctly unavailable for exchange. Browser logs were empty. The local v5.1 smoke check resumed successfully with saved gear and audio preferences.
