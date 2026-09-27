@@ -1,0 +1,48 @@
+{
+  "activeSeconds": 1064,
+  "anchor": false,
+  "breaks": 0,
+  "casts": 2,
+  "catches": [
+    {
+      "kept": false,
+      "length": 31,
+      "name": "蓝岩鱼"
+    }
+  ],
+  "engine": false,
+  "fishState": "idle",
+  "fps": 60,
+  "fuel": 99,
+  "interaction": "",
+  "lineDistance": 1.3,
+  "loaded": false,
+  "misses": 1,
+  "mode": "walk",
+  "moored": true,
+  "packed": [
+    "pfd",
+    "rod",
+    "tackle",
+    "bait",
+    "cooler",
+    "net",
+    "water",
+    "safety"
+  ],
+  "paused": false,
+  "phase": "complete",
+  "position": {
+    "x": 10,
+    "z": -76
+  },
+  "renderErrors": [],
+  "sailedMeters": 382,
+  "speedKnots": 0,
+  "stamina": 19,
+  "tension": 58,
+  "time": "09:10",
+  "tripComplete": true,
+  "walkedMeters": 110,
+  "waypoint": null
+}

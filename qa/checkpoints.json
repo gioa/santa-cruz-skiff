@@ -1,0 +1,229 @@
+{
+  "startedAt": "2026-09-27T07:29:57.111Z",
+  "finishedAt": "2026-09-27T07:48:24.601Z",
+  "wallSeconds": 1107.49,
+  "checkpoints": [
+    {
+      "at": "2026-09-27T07:29:57.111Z",
+      "state": {
+        "activeSeconds": 3,
+        "anchor": false,
+        "breaks": 0,
+        "casts": 0,
+        "catches": [],
+        "engine": false,
+        "fishState": "idle",
+        "fps": 60,
+        "fuel": 100,
+        "interaction": "",
+        "lineDistance": 0,
+        "loaded": false,
+        "misses": 0,
+        "mode": "walk",
+        "moored": true,
+        "packed": [],
+        "paused": false,
+        "phase": "walk",
+        "position": {
+          "x": 1.9,
+          "z": 18.6
+        },
+        "renderErrors": [],
+        "sailedMeters": 0,
+        "speedKnots": 0,
+        "stamina": 100,
+        "tension": 0,
+        "time": "06:42",
+        "tripComplete": false,
+        "walkedMeters": 7,
+        "waypoint": null
+      }
+    },
+    {
+      "at": "2026-09-27T07:37:19.754Z",
+      "state": {
+        "activeSeconds": 424,
+        "anchor": false,
+        "breaks": 0,
+        "casts": 0,
+        "catches": [],
+        "engine": true,
+        "fishState": "idle",
+        "fps": 60,
+        "fuel": 100,
+        "interaction": "",
+        "lineDistance": 0,
+        "loaded": true,
+        "misses": 0,
+        "mode": "boat",
+        "moored": false,
+        "packed": [
+          "pfd",
+          "rod",
+          "tackle",
+          "bait",
+          "cooler",
+          "net",
+          "water",
+          "safety"
+        ],
+        "paused": false,
+        "phase": "launch",
+        "position": {
+          "x": 14.6,
+          "z": -80.2
+        },
+        "renderErrors": [],
+        "sailedMeters": 3,
+        "speedKnots": 4.2,
+        "stamina": 100,
+        "tension": 0,
+        "time": "07:41",
+        "tripComplete": false,
+        "walkedMeters": 110,
+        "waypoint": "海带林边缘"
+      }
+    },
+    {
+      "at": "2026-09-27T07:45:56.883Z",
+      "state": {
+        "activeSeconds": 942,
+        "anchor": true,
+        "breaks": 0,
+        "casts": 2,
+        "catches": [],
+        "engine": false,
+        "fishState": "fight",
+        "fps": 60,
+        "fuel": 100,
+        "interaction": "",
+        "lineDistance": 1.3,
+        "loaded": true,
+        "misses": 1,
+        "mode": "boat",
+        "moored": false,
+        "packed": [
+          "pfd",
+          "rod",
+          "tackle",
+          "bait",
+          "cooler",
+          "net",
+          "water",
+          "safety"
+        ],
+        "paused": false,
+        "phase": "fish",
+        "position": {
+          "x": -104.3,
+          "z": -195.5
+        },
+        "renderErrors": [],
+        "sailedMeters": 220,
+        "speedKnots": 0,
+        "stamina": 52,
+        "tension": 67,
+        "time": "08:53",
+        "tripComplete": false,
+        "walkedMeters": 110,
+        "waypoint": null
+      }
+    },
+    {
+      "at": "2026-09-27T07:47:01.449Z",
+      "state": {
+        "activeSeconds": 993,
+        "anchor": true,
+        "breaks": 0,
+        "casts": 2,
+        "catches": [],
+        "engine": false,
+        "fishState": "caught",
+        "fps": 60,
+        "fuel": 100,
+        "interaction": "",
+        "lineDistance": 1.3,
+        "loaded": true,
+        "misses": 1,
+        "mode": "boat",
+        "moored": false,
+        "packed": [
+          "pfd",
+          "rod",
+          "tackle",
+          "bait",
+          "cooler",
+          "net",
+          "water",
+          "safety"
+        ],
+        "paused": true,
+        "phase": "fish",
+        "position": {
+          "x": -104.3,
+          "z": -194.7
+        },
+        "renderErrors": [],
+        "sailedMeters": 221,
+        "speedKnots": 0,
+        "stamina": 19,
+        "tension": 58,
+        "time": "09:00",
+        "tripComplete": false,
+        "walkedMeters": 110,
+        "waypoint": null
+      }
+    },
+    {
+      "at": "2026-09-27T07:48:21.267Z",
+      "state": {
+        "activeSeconds": 1061,
+        "anchor": false,
+        "breaks": 0,
+        "casts": 2,
+        "catches": [
+          {
+            "kept": false,
+            "length": 31,
+            "name": "蓝岩鱼"
+          }
+        ],
+        "engine": false,
+        "fishState": "idle",
+        "fps": 60,
+        "fuel": 99,
+        "interaction": "",
+        "lineDistance": 1.3,
+        "loaded": true,
+        "misses": 1,
+        "mode": "walk",
+        "moored": true,
+        "packed": [
+          "pfd",
+          "rod",
+          "tackle",
+          "bait",
+          "cooler",
+          "net",
+          "water",
+          "safety"
+        ],
+        "paused": true,
+        "phase": "complete",
+        "position": {
+          "x": 10,
+          "z": -76
+        },
+        "renderErrors": [],
+        "sailedMeters": 382,
+        "speedKnots": 0,
+        "stamina": 19,
+        "tension": 58,
+        "time": "09:10",
+        "tripComplete": true,
+        "walkedMeters": 110,
+        "waypoint": null
+      }
+    }
+  ]
+}
