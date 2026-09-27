@@ -23,7 +23,7 @@ Start at 06:00, a few steps from the rental counter → check the personal backp
 - **R:** engine. **Q:** anchor. **I:** equipment. **M:** chart. **J:** catches.
 - **Hold Space / cast button, then release:** charge and cast. Tap at a bite to strike. Hold while fishing to lift the lure or raise the rod.
 - **Hold F / reel button:** reel. During a fight the on-screen − / + buttons change drag.
-- Tap accessible ground to walk there; after carrying a chart, tap navigable water to choose an assisted course.
+- Tap accessible ground once to walk there automatically. Tap the counter attendant or rental hut to approach the counter; tap the skiff or landing to take the left-side stair route. A small ground marker shows the destination. A new tap replaces the route, and the joystick/WASD takes over immediately. After enabling a chart, tap navigable water to choose an assisted course.
 - The boat actions menu allows standing, moving within the deck rails, assembling rods and returning. Wharf edges and boat rails block the player; the pixel edition has no falling or swimming mechanic. Settings includes free recovery.
 - Opening a menu pauses simulation. Focus loss, orientation change and pointer cancellation clear held actions. Switching away pauses the trip.
 
@@ -91,3 +91,9 @@ See `qa/pixel-usability/PLAYTEST.md` for this update’s actual browser checks.
 - Mobile UI disables text selection and callouts. The map jump on pointer-down was a shared `.held` rule translating the entire canvas by 2 CSS pixels; that press effect now applies only to buttons. The canvas and joystick remain stationary under touch.
 
 See `qa/pixel-rods/PLAYTEST.md` for responsive browser verification.
+
+## Clearer dock and one-tap walking
+
+The opening dock keeps only its functional counter attendant; three decorative bystanders are removed. The attendant has an independent sprite with a navy work cap, yellow oilskin, teal apron, silver moustache and clipboard, visibly distinct from the angler's cream sunhat and coral lifejacket. Pointer targets follow the actual enlarged artwork with a minimum 44 CSS-pixel hit area. Touch-down captures the destination, so camera movement during a tap cannot move the intended target.
+
+See `qa/pixel-walking/PLAYTEST.md` for the browser checks.

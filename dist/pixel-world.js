@@ -1,9 +1,9 @@
-import {pierRings,landPolygons,coastLines,buildingFootprints,FISHING_SPOTS,onLand,onPier} from './geography.js?v=20260927-pixel-v6';
-import {HARBOR} from './harbor-layout.js?v=20260927-pixel-v6';
-import {depthInfoAt} from './bathymetry.js?v=20260927-pixel-v6';
-import {createWildlife,drawWildlife} from './pixel-wildlife.js?v=20260927-pixel-v6';
-import {cameraOffset,unprojectPixel,stepDeadzoneCamera,keepCameraPointsVisible,cameraDeadzone,rectilinearOutline} from './pixel-camera.js?v=20260927-pixel-v6';
-import {ladderPoint} from './swimming.js?v=20260927-pixel-v6';
+import {pierRings,landPolygons,coastLines,buildingFootprints,FISHING_SPOTS,onLand,onPier} from './geography.js?v=20260927-pixel-v6.1';
+import {HARBOR} from './harbor-layout.js?v=20260927-pixel-v6.1';
+import {depthInfoAt} from './bathymetry.js?v=20260927-pixel-v6.1';
+import {createWildlife,drawWildlife} from './pixel-wildlife.js?v=20260927-pixel-v6.1';
+import {cameraOffset,unprojectPixel,stepDeadzoneCamera,keepCameraPointsVisible,cameraDeadzone,rectilinearOutline} from './pixel-camera.js?v=20260927-pixel-v6.1';
+import {ladderPoint} from './swimming.js?v=20260927-pixel-v6.1';
 
 // The map keeps the same metre coordinates as the sailing simulation. The
 // people and boat are deliberately enlarged, like a handheld-era RPG, so that
@@ -134,8 +134,9 @@ export function createPixelWorld(canvas,{sprites={},conditions={}}={}){
     // Work equipment stays beside the hut, leaving the actual walking path clear.
     const props=[[-11,-51,'crate'],[-11.8,-49,'bucket'],[-3,-46,'crate'],[-1,-45.8,'cooler'],[-21,-74,'barrel'],[-19,-38,'bench']];
     for(const[x,z,name]of props){if(!visible(x,z,25))continue;const p=point(x,z),s=clamp(camera.scale/6,.45,1.1);smallShadow(p.x+2,p.y+1,15*s,5*s,.15);if(sprite(name,p.x,p.y,s))continue;ctx.fillStyle=name==='bucket'?'#789f96':'#94744f';ctx.fillRect(p.x-5*s,p.y-9*s,10*s,9*s);ctx.fillStyle='#e3c48c';ctx.fillRect(p.x-6*s,p.y-10*s,12*s,2*s);ctx.fillStyle='#b79861';ctx.fillRect(p.x-3*s,p.y-7*s,2*s,5*s);}
+    // The counter attendant is the only dock NPC. Keep the spawn-to-counter
+    // and stair approaches free of decorative bystanders or wandering crowds.
     if(visible(-8,-56,30))person(-8,-56,{staff:true,heading:Math.PI*.5});
-    for(const [x,z,phase]of[[-18,-21,0],[-17,-87,1],[-14,-104,2]]){if(!visible(x,z,40))continue;person(x+Math.sin(clock*.11+phase)*1.3,z,{staff:phase===2,walking:Math.sin(clock*.3+phase)>.6,heading:phase});}
     // A pair of parked rental skiffs on the deck advertises the service without
     // adding clickable markers or floating instructional text.
     for(const [x,z]of[[-21,-48],[-21,-43.5]]){const p=point(x,z);if(!visible(x,z,50))continue;ctx.save();ctx.translate(p.x,p.y);ctx.rotate(Math.PI/2);const s=clamp(camera.scale*.083,.35,.6);ctx.fillStyle='#8b7054';ctx.fillRect(-15*s,-24*s,30*s,5*s);ctx.fillRect(-15*s,22*s,30*s,5*s);if(sprites.boat)ctx.drawImage(sprites.boat,-24*s,-44*s,48*s,88*s);else{ctx.fillStyle='#ecdeb1';ctx.fillRect(-6,-17,12,31);ctx.fillStyle='#568f7e';ctx.fillRect(-4,-7,8,19);ctx.fillStyle='#c5a47b';ctx.fillRect(-4,-4,8,2);ctx.fillRect(-4,6,8,2);}ctx.restore();}
@@ -219,8 +220,13 @@ export function createPixelWorld(canvas,{sprites={},conditions={}}={}){
     ctx.restore();
   }
   function routeMarker(state){
-    // A tiny in-world pennant only at the chosen destination. It is a visual
-    // compass, not an arrow carpet or a text tutorial over the water.
+    // One small ground marker gives immediate feedback for tap-to-walk.
+    if(state.mode==='walk'&&state.autoWalk&&state.walkRoute?.length){
+      const target=state.walkRoute.at(-1),p=point(target.x,target.z),r=6+Math.round(Math.sin(clock*5));
+      ctx.fillStyle='#244d50';ctx.fillRect(p.x-r-1,p.y-4,5,2);ctx.fillRect(p.x+r-3,p.y-4,5,2);ctx.fillRect(p.x-r-1,p.y+3,5,2);ctx.fillRect(p.x+r-3,p.y+3,5,2);
+      ctx.fillStyle='#ffe3a0';for(const side of[-1,1]){ctx.fillRect(p.x+side*r-(side>0?3:0),p.y-4,4,1);ctx.fillRect(p.x+side*r,p.y-4,1,3);ctx.fillRect(p.x+side*r-(side>0?3:0),p.y+3,4,1);ctx.fillRect(p.x+side*r,p.y+1,1,3);}return;
+    }
+    // Offshore courses keep their small destination pennant.
     const w=state.waypoint;if(!w||!visible(w.x,w.z,10))return;const p=point(w.x,w.z);ctx.globalAlpha=.55;ctx.strokeStyle='#e9dc9a';ctx.lineWidth=1;ctx.strokeRect(p.x-5,p.y-2,10,4);ctx.globalAlpha=1;pixelLine(p.x,p.y,p.x,p.y-14,'#efdfaa',1);ctx.fillStyle='#e4b762';ctx.fillRect(p.x+1,p.y-14,7,4);
   }
   function draw(state,dt=1/60){
@@ -261,6 +267,25 @@ export function createPixelWorld(canvas,{sprites={},conditions={}}={}){
     const ladderAnchor=boatSocket(-25,27,ladder),engine=boatSocket(0,38,motor);
     return{counter,npc:counter,boarding,boat:boatAnchor,dock,returnDock:dock,ladder:ladderAnchor,engine};
   }
+  function walkingTargetAt(x,y,state){
+    if(state.mode!=='walk')return null;
+    const ratio=cssWidth/canvas.width,hit=(cx,cy,w,h)=>Math.abs(x-cx)<=Math.max(44,w)/2&&Math.abs(y-cy)<=Math.max(44,h)/2;
+    // Hit the actual enlarged artwork, not the ground behind the sprite.
+    const staff=cssWorldToScreen(-8,-56),personScale=clamp(camera.scale/5.8,.7,1.25)*ratio;
+    if(hit(staff.x,staff.y-13*personScale,22*personScale,30*personScale))return'counter';
+    const landing=cssWorldToScreen(HARBOR.boardingX,HARBOR.boardingZ);
+    if(hit(landing.x,landing.y,44,44))return'boarding';
+    const bx=state.boatX??HARBOR.boatX,bz=state.boatZ??HARBOR.boatZ;
+    if(Math.hypot(bx-HARBOR.boatX,bz-HARBOR.boatZ)<16){
+      const boatPoint=cssWorldToScreen(bx,bz),scale=clamp(camera.scale*.14,.64,.95)*ratio,heading=state.heading||0;
+      const lift=['stored','lowering'].includes(state.launchStage)?(1-(state.launchStage==='lowering'?state.launchProgress||0:0))*20*ratio:0;
+      const dx=x-boatPoint.x,dy=y-boatPoint.y+lift,c=Math.cos(heading),a=Math.sin(heading);
+      if(Math.abs(dx*c-dy*a)<=Math.max(44,48*scale)/2&&Math.abs(dx*a+dy*c)<=Math.max(44,88*scale)/2)return'boarding';
+    }
+    const hutPoint=cssWorldToScreen(-.2,-50.3),hutScale=clamp(camera.scale/8,.35,1.1)*ratio;
+    if(hit(hutPoint.x,hutPoint.y-54*hutScale,128*hutScale,108*hutScale))return'counter';
+    return null;
+  }
   function publicState(){const active=ecology.snapshot(),history=ecology.history;return{renderer:'Canvas 2D',camera:{x:+camera.x.toFixed(2),z:+camera.z.toFixed(2),scale:+camera.scale.toFixed(2),width:camera.width,height:camera.height,mode:'deadzone',deadzone:cameraDeadzone(camera,lastMode||'walk')},wildlife:{active,counts:active.reduce((counts,e)=>(counts[e.type]=(counts[e.type]||0)+1,counts),{bait:0,dolphins:0,whale:0}),encounters:history.map(e=>({...e})),illustrativeRates:true}};}
-  return {resize,draw,screenToWorld,worldToScreen:point,cssWorldToScreen,interactionAnchors,camera,wildlife:ecology,publicState,setConditions:value=>{seaConditions=value||{};},setZoom:value=>{zoomOverride=value==null?null:Math.round(clamp(value,2,9));}};
+  return {resize,draw,screenToWorld,worldToScreen:point,cssWorldToScreen,interactionAnchors,walkingTargetAt,camera,wildlife:ecology,publicState,setConditions:value=>{seaConditions=value||{};},setZoom:value=>{zoomOverride=value==null?null:Math.round(clamp(value,2,9));}};
 }

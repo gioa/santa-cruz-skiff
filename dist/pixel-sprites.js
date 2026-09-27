@@ -110,6 +110,34 @@ function personSprite({worker=false,back=false,step=0,fish=false,drive=false,sid
   });
 }
 
+// The counter keeper has their own silhouette, face and work clothes rather
+// than the angler sprite with another vest colour. Keep the same foot anchor.
+function dockWorkerSprite(){return raster(16,26,({rect:r,px,poly:p,line:l})=>{
+  r(2,24,13,1,'#20364266');
+  // Wider planted stance and tall waterproof boots.
+  r(4,20,4,5,'ink');r(10,20,4,5,'ink');r(4,20,3,3,'greenDark');r(10,20,3,3,'greenDark');
+  r(3,24,5,1,'ink');r(10,24,5,1,'ink');r(4,23,3,1,'steel');r(11,23,2,1,'slate');
+  // Broad yellow oilskin shoulders, over a dark teal shop apron.
+  p([[4,11],[11,11],[14,13],[15,18],[13,21],[3,21],[1,18],[2,13]],'ink');
+  r(3,12,10,9,'wood');r(3,12,9,7,'gold');r(3,13,2,5,'yellow');r(12,13,2,6,'peach');
+  r(5,12,1,4,'greenDark');r(10,12,1,4,'greenDark');r(5,15,7,6,'greenDark');
+  r(6,15,4,5,'green');r(6,15,4,1,'jade');r(6,18,5,2,'deep');r(7,18,3,1,'jade');
+  // White employee badge and clipped VHF with a short aerial.
+  r(8,13,3,2,'cream');px(9,13,'slate');r(11,14,2,4,'ink');r(12,12,1,3,'ink');px(12,15,'mint');
+  r(1,15,3,4,'gold');r(1,15,1,3,'yellow');r(13,18,2,3,'skin');px(14,18,'skinLight');
+  // A distinct rectangular clipboard is held against the left side.
+  r(0,16,6,7,'woodDark');r(1,17,4,5,'ivory');r(1,17,4,1,'white');r(2,16,2,2,'steel');
+  r(2,19,2,1,'woodMid');r(2,21,2,1,'woodMid');r(4,18,2,2,'skin');px(4,18,'skinLight');
+  // Older, rounded face, silver sideburns and moustache below the eyes.
+  r(6,10,4,3,'skinDark');r(4,5,8,6,'ink');r(3,7,2,3,'skinDark');r(12,7,2,3,'skinDark');
+  r(5,6,7,5,'skin');r(5,6,5,2,'skinLight');r(4,6,1,4,'light');r(11,6,1,4,'steel');
+  px(6,8,'ink');px(10,8,'ink');r(8,8,1,2,'skinDark');r(6,10,5,1,'cream');r(7,11,3,1,'light');
+  // Compact navy work cap: no broad cream sunhat or coral lifejacket.
+  p([[5,1],[10,1],[12,3],[12,6],[3,6],[3,3]],'ink');r(5,2,6,3,'navy');r(4,3,7,2,'navy');
+  r(5,2,5,1,'denim');r(3,5,10,1,'steel');r(5,6,9,1,'ink');r(6,6,6,1,'navy');
+  r(7,3,3,2,'gold');px(8,3,'cream');
+});}
+
 function hutSprite(){return raster(128,108,({rect:r,px,line:l,poly:p})=>{
   // A coastal timber rental cottage, with a low teal roof, deck and side wall.
   p([[12,54],[112,54],[124,95],[117,102],[10,102],[4,96]],'#223a463d');
@@ -262,7 +290,7 @@ export function createPixelSprites(){
     boat:boatSprite(),angler,anglerBack,anglerWalk1:personSprite({step:1}),anglerWalk2:personSprite({step:2}),
     anglerFish:personSprite({fish:true}),anglerDrive:personSprite({back:true,drive:true}),
     anglerLeft:personSprite({side:-1}),anglerRight:personSprite({side:1}),
-    dockWorker:personSprite({worker:true}),hut,tackleShop:hut,
+    dockWorker:dockWorkerSprite(),hut,tackleShop:hut,
     crate:crateSprite(),cooler:coolerSprite(),buoy:buoySprite(),kelp:kelpSprite(),rock:rockSprite(),
     gull:gullSprite(),gull2:gullSprite(true),palm:palmSprite(),fish,icons,
     directions:{

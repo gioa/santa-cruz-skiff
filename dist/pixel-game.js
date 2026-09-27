@@ -1,16 +1,16 @@
-import {mountRodWorkbench} from './pixel-rod-ui.js?v=20260927-pixel-v6';
-import {layoutWorldAction} from './pixel-action-layout.js?v=20260927-pixel-v6';
-import {PixelSimulation,GEAR_CATALOG,FISHING_SPOTS,HARBOR} from './pixel-sim.js?v=20260927-pixel-v6';
-import {createPixelSprites} from './pixel-sprites.js?v=20260927-pixel-v6';
-import {createPixelWorld} from './pixel-world.js?v=20260927-pixel-v6';
-import {bindPointer,stickVector,ActionSources} from './input.js?v=20260927-pixel-v6';
-import {PixelAudio} from './pixel-audio.js?v=20260927-pixel-v6';
-import {inventorySlots,moveInventorySlot} from './pixel-inventory.js?v=20260927-pixel-v6';
-import {drawItemIcon} from './pixel-item-icons.js?v=20260927-pixel-v6';
-import {sea,marineSummary,updateSea} from './marine.js?v=20260927-pixel-v6';
-import {depthInfoAt} from './bathymetry.js?v=20260927-pixel-v6';
-import {compressedDistance} from './pixel-navigation-scale.js?v=20260927-pixel-v6';
-import {landPolygons,pierRings,bearingDegrees} from './geography.js?v=20260927-pixel-v6';
+import {mountRodWorkbench} from './pixel-rod-ui.js?v=20260927-pixel-v6.1';
+import {layoutWorldAction} from './pixel-action-layout.js?v=20260927-pixel-v6.1';
+import {PixelSimulation,GEAR_CATALOG,FISHING_SPOTS,HARBOR} from './pixel-sim.js?v=20260927-pixel-v6.1';
+import {createPixelSprites} from './pixel-sprites.js?v=20260927-pixel-v6.1';
+import {createPixelWorld} from './pixel-world.js?v=20260927-pixel-v6.1';
+import {bindPointer,stickVector,ActionSources} from './input.js?v=20260927-pixel-v6.1';
+import {PixelAudio} from './pixel-audio.js?v=20260927-pixel-v6.1';
+import {inventorySlots,moveInventorySlot} from './pixel-inventory.js?v=20260927-pixel-v6.1';
+import {drawItemIcon} from './pixel-item-icons.js?v=20260927-pixel-v6.1';
+import {sea,marineSummary,updateSea} from './marine.js?v=20260927-pixel-v6.1';
+import {depthInfoAt} from './bathymetry.js?v=20260927-pixel-v6.1';
+import {compressedDistance} from './pixel-navigation-scale.js?v=20260927-pixel-v6.1';
+import {landPolygons,pierRings,bearingDegrees} from './geography.js?v=20260927-pixel-v6.1';
 const $=id=>document.getElementById(id),show=(id,value)=>{$(id).hidden=!value;},txt=(id,v)=>{if($(id).textContent!==String(v))$(id).textContent=v;};
 const SAVE='santa-cruz-pixel-v1',esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let saved=null;try{saved=JSON.parse(localStorage.getItem(SAVE)||'null');}catch{}
@@ -101,7 +101,11 @@ function stickEnd(){stick={x:0,y:0};$('stick-thumb').style.transform='';if(stick
 pointers.push(bindPointer($('joystick'),{start:e=>{if(menu)return false;stickMove(e);},move:stickMove,end:stickEnd,cancel:stickEnd}));
 pointers.push(bindPointer($('cast-btn'),{start:()=>castDown('pointer'),end:()=>castUp('pointer'),cancel:()=>castUp('pointer',true)}));
 pointers.push(bindPointer($('reel-btn'),{start:()=>{if(menu)return false;sources.set('reel','pointer',true);},end:()=>sources.set('reel','pointer',false),cancel:()=>sources.set('reel','pointer',false)}));
-let canvasDown=null;pointers.push(bindPointer($('world'),{start:e=>{canvasDown={x:e.clientX,y:e.clientY};},end:e=>{if(!started||menu||!canvasDown||Math.hypot(e.clientX-canvasDown.x,e.clientY-canvasDown.y)>12)return;const p=world.screenToWorld(e.clientX,e.clientY),s=sim.state;if(s.mode==='walk')feedback(sim.walkTo(p));else if(s.mode==='boat'&&s.fishState==='idle'&&!s.moored)feedback(sim.selectWaypoint(p));}}));
+let canvasDown=null;pointers.push(bindPointer($('world'),{
+ start:e=>{if(!started||menu)return false;const mode=sim.state.mode;canvasDown={x:e.clientX,y:e.clientY,mode,target:world.walkingTargetAt(e.clientX,e.clientY,sim.state)||world.screenToWorld(e.clientX,e.clientY)};},
+ end:e=>{const down=canvasDown;canvasDown=null;if(!started||menu||!down||down.mode!==sim.state.mode||Math.hypot(e.clientX-down.x,e.clientY-down.y)>12)return;const s=sim.state;if(s.mode==='walk')feedback(sim.walkTo(down.target));else if(s.mode==='boat'&&s.fishState==='idle'&&!s.moored)feedback(sim.selectWaypoint(down.target));},
+ cancel:()=>{canvasDown=null;}
+}));
 window.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal();return;}if(menu){if(e.key==='Tab'){const focusable=[...$('modal').querySelectorAll('button:not(:disabled),select,input,a[href]')].filter(el=>!el.hidden);const first=focusable[0],last=focusable.at(-1);if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}}return;}if(!started)return;const k=e.key.toLowerCase();if(['w','a','s','d','arrowup','arrowdown','arrowleft','arrowright',' ','f'].includes(k))e.preventDefault();if(e.repeat)return;keys.add(k);if(k===' ')castDown('keyboard');if(k==='f')sources.set('reel','keyboard',true);if(k==='e')feedback(sim.interact());if(k==='q')feedback(sim.toggleAnchor());if(k==='r')feedback(sim.toggleEngine());if(k==='i')openGear();if(k==='m')openMap();if(k==='j')openJournal();if(k==='g')$('guide-btn').click();});
 window.addEventListener('keyup',e=>{const k=e.key.toLowerCase();keys.delete(k);if(k===' ')castUp('keyboard');if(k==='f')sources.set('reel','keyboard',false);if(['w','s','arrowup','arrowdown'].includes(k)&&sim.state.mode==='boat'&&sim.state.engine&&!sim.state.waypoint)sim.setThrottle(0);});
 window.addEventListener('blur',()=>{clearInputs();sim.pause(true);audio.setPaused(true);});window.addEventListener('focus',()=>{audio.setPaused(document.hidden);sim.pause(document.hidden||Boolean(menu));lastFrame=performance.now();});window.addEventListener('resize',()=>{clearInputs();world.resize(innerWidth,innerHeight);});document.addEventListener('visibilitychange',()=>{clearInputs();audio.setPaused(document.hidden);sim.pause(document.hidden||Boolean(menu));lastFrame=performance.now();persist();});window.addEventListener('pagehide',persist);
@@ -111,7 +115,7 @@ function updateUI(){const s=sim.state;if(s.engine&&!lastEngineOn)audio.event('en
  txt('stick-label',s.mode==='walk'?'行走 · WASD':s.standing?'船上活动':'转向 / 前进倒车');updateWorldActions();show('cast-btn',sailing&&!s.moored&&!s.engine&&!s.docking);show('reel-btn',['fight','sinking','waiting'].includes(fish));show('drag-control',fish==='fight');txt('drag-label',`泄力 ${Math.round(s.drag*100)}%`);txt('cast-label',['fight','sinking','waiting'].includes(fish)?'轻提':fish==='bite'?'提竿！':fish==='landed'?'查看鱼获':['sinking','waiting','flight'].includes(fish)?'收回':'抛竿');txt('cast-hint',['fight','sinking','waiting'].includes(fish)?'按住抬竿':fish==='bite'?'现在！':['sinking','waiting','flight','landed'].includes(fish)?'轻点':'按住 · 松开抛');
  show('fish-status',fish!=='idle'&&fish!=='landed');show('tension-row',fish==='fight');show('cast-row',s.casting);txt('fish-title',({casting:'手里的这一竿',flight:'鱼饵划过海风',sinking:'鱼饵正在下沉',waiting:'等一尾鱼',bite:'咬钩了！',fight:'与鱼周旋'})[fish]||'');txt('fish-distance',fish==='fight'?`${s.lineDistance.toFixed(1)} m`:'');txt('fish-detail',fish==='fight'?'按住收线，张力过高时松手。':fish==='bite'?'点「提竿」':fish==='waiting'?(s.rigPresentation?.bottomContact?'铅坠触底':'留意鱼线的动静'):fish==='sinking'?(nav.sounder?`钓组深度 ${s.lureDepth.toFixed(1)} m`:'鱼线缓缓放出'):'');$('tension-fill').style.width=`${Math.min(100,s.tension)}%`;$('tension-fill').style.background=s.tension>80?'#d7745e':'#3d9b94';$('stamina-fill').style.width=`${s.stamina}%`;$('power-fill').style.width=`${s.castPower*100}%`;txt('tension-value',`${Math.round(s.tension)}%`);txt('stamina-value',`${Math.round(s.stamina)}%`);
  if(s.toastId!==lastToastId){lastToastId=s.toastId;toast(s.toast);}if(fish==='bite'&&lastFishState!=='bite'){audio.event('bite');if(navigator.vibrate)navigator.vibrate([70,60,70]);}if(fish==='flight'&&lastFishState!=='flight')audio.cast();if(lastFishState==='flight'&&['sinking','waiting'].includes(fish))audio.event('plop');const newlyLanded=fish==='landed'&&lastFishState!=='landed';lastFishState=fish;if(newlyLanded){audio.event('catch');openCatch();}
- $('game-state').textContent=JSON.stringify({...sim.publicState(),camera:world.publicState().camera,audio:audio.publicState(),ecology:world.publicState().wildlife,menu,rendererFPS:Math.round(fps),viewport:{width:innerWidth,height:innerHeight},build:'20260927-pixel-v6'});
+ $('game-state').textContent=JSON.stringify({...sim.publicState(),camera:world.publicState().camera,audio:audio.publicState(),ecology:world.publicState().wildlife,menu,rendererFPS:Math.round(fps),viewport:{width:innerWidth,height:innerHeight},build:'20260927-pixel-v6.1'});
 }
 function frame(now){const dt=Math.min(.1,Math.max(0,(now-lastFrame)/1000));lastFrame=now;sim.step(dt,input());world.draw(sim.state,dt);updateWorldActions();audio.update(sim.state.time,sim.state.engine&&!sim.state.paused,sim.state.throttle,sim.state.walking&&!sim.state.paused,{speed:Math.abs(sim.state.speed),wave:sea.waveHeight,underwater:false,strain:sim.state.tension/100,slipping:sim.state.fishState==='fight'&&!sim.state.reeling&&!sim.state.paused,roll:sim.state.roll,reeling:sim.state.reeling&&!sim.state.paused});uiElapsed+=dt;saveElapsed+=dt;fpsTimer+=dt;frames++;if(fpsTimer>1){fps=frames/fpsTimer;frames=0;fpsTimer=0;}if(uiElapsed>.1){uiElapsed=0;updateUI();}if(saveElapsed>10){saveElapsed=0;persist();}requestAnimationFrame(frame);}
 // Page-scoped tools expose the same validated player actions as the controls.
