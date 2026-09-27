@@ -1,0 +1,6 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {newImmersion,stepImmersion,ladderPoint} from '../dist/swimming.js';
+test('fall follows gravity before water entry, then a worn PFD floats at zero effort',()=>{const s=newImmersion(0,0,4,true);stepImmersion(s,{dt:.1});assert.ok(s.y<4&&s.y>3.8);s.effort=0;for(let i=0;i<300;i++)stepImmersion(s,{dt:.05,water:0});assert.ok(s.y>.15);assert.ok(s.effort>=0);});
+test('pausing with dt zero does not drain effort or add cold',()=>{const s=newImmersion(1,2,.2);const before=JSON.stringify(s);stepImmersion(s,{dt:0,dx:1,temperature:10});assert.equal(JSON.stringify(s),before);});
+test('swimming moves in real meter units and consumes effort',()=>{const s=newImmersion(0,0,.2);for(let i=0;i<200;i++)stepImmersion(s,{dt:.05,dx:1,temperature:14});assert.ok(s.x>8&&s.x<11);assert.ok(s.effort<100&&s.effort>90);assert.ok(s.cold>0);});
+test('ladder rotates with boat, separated from outboard center',()=>{const a=ladderPoint(20,-77,0),b=ladderPoint(20,-77,Math.PI/2);assert.equal(a.x,18.85);assert.ok(Math.abs(b.x-21.42)<1e-9);assert.ok(Math.abs(b.z+75.85)<1e-9);});
+test('diagonal swimming cannot exceed cardinal speed',()=>{const a=newImmersion(0,0,.2),b=newImmersion(0,0,.2);stepImmersion(a,{dt:1,dx:1});stepImmersion(b,{dt:1,dx:1,dz:1});assert.ok(Math.abs(a.x-Math.hypot(b.x,b.z))<1e-9);});

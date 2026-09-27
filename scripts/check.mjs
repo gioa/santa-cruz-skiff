@@ -1,0 +1,1 @@
+import {readdirSync} from 'node:fs';import {execFileSync} from 'node:child_process';for(const file of readdirSync('dist').filter(f=>f.endsWith('.js')))execFileSync(process.execPath,['--check','dist/'+file],{stdio:'inherit'});

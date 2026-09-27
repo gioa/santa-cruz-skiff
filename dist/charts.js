@@ -1,0 +1,13 @@
+import {toGPS,fromGPS,geography,coastLines,pierRings,landPolygons,FISHING_SPOTS} from './geography.js';
+import {depthInfoAt} from './bathymetry.js';
+// North-up chart uses the same geographic projection as the world.
+export function createCharts(state){
+ const origin=toGPS(20.8,-77),e=111320*Math.cos(origin.lat*Math.PI/180),n=111132;
+ function view(w,h,large){const center=large?{lon:-122.013,lat:36.955}:toGPS(state.mode==='walk'?state.playerX:state.mode==='swim'?state.swim.x:state.boatX,state.mode==='walk'?state.playerZ:state.mode==='swim'?state.swim.z:state.boatZ);const span=large?Math.max(5600,w/h*3300):750,scale=w/span;return{scale,center,map:(x,z)=>{const g=toGPS(x,z);return[w/2+(g.lon-center.lon)*e*scale,h/2-(g.lat-center.lat)*n*scale];},unmap:(x,y)=>fromGPS(center.lon+(x-w/2)/scale/e,center.lat-(y-h/2)/scale/n)};}
+ function draw(ctx,w,h,large){const v=view(w,h,large);ctx.fillStyle='#12343e';ctx.fillRect(0,0,w,h);const cell=large?18:24;for(let y=0;y<h;y+=cell)for(let x=0;x<w;x+=cell){const p=v.unmap(x+cell/2,y+cell/2),d=depthInfoAt(p.x,p.z);if(d.measured){const t=Math.min(1,d.value/60);ctx.fillStyle=`rgb(${Math.round(30-17*t)},${Math.round(83-43*t)},${Math.round(93-43*t)})`;ctx.fillRect(x,y,cell+1,cell+1);if(large&&x%(cell*5)===0&&y%(cell*4)===0&&d.value>0){ctx.fillStyle='#7aa4a7';ctx.font='9px monospace';ctx.fillText(d.value.toFixed(0),x+2,y+10);}}}
+ const poly=(points,fill,stroke)=>{ctx.beginPath();points.forEach((p,i)=>ctx[i?'lineTo':'moveTo'](...v.map(p.x,p.z)));ctx.closePath();ctx.fillStyle=fill;ctx.fill();ctx.strokeStyle=stroke;ctx.stroke();};landPolygons.forEach(p=>poly(p,'#606f62','#9aab8f'));pierRings.forEach(p=>poly(p,'#d0bf91','#dfcc9a'));
+ ctx.font=large?'11px sans-serif':'9px sans-serif';ctx.textAlign='center';FISHING_SPOTS.forEach((s,i)=>{const p=v.map(s.x,s.z);ctx.fillStyle='#edc987';ctx.beginPath();ctx.arc(...p,4,0,Math.PI*2);ctx.fill();if(large){ctx.fillStyle='#edf0d9';ctx.fillText(`${i+1} · ${s.name}`,p[0],p[1]-12);}});
+ const pos=state.mode==='walk'?{x:state.playerX,z:state.playerZ}:state.mode==='swim'?state.swim:{x:state.boatX,z:state.boatZ},me=v.map(pos.x,pos.z);if(state.waypoint){ctx.beginPath();ctx.moveTo(...me);for(const p of state.waypoint.route||[state.waypoint])ctx.lineTo(...v.map(p.x,p.z));ctx.setLineDash([4,4]);ctx.strokeStyle='#f5d692';ctx.stroke();ctx.setLineDash([]);}ctx.fillStyle='#fff3cb';ctx.beginPath();ctx.arc(...me,5,0,Math.PI*2);ctx.fill();ctx.fillStyle='#e7e6d6';ctx.textAlign='left';ctx.font='10px monospace';ctx.fillText('N ↑',w-37,17);const scaleMeters=large?500:100;ctx.fillRect(12,h-22,scaleMeters*v.scale,2);ctx.fillText(scaleMeters+' m',12,h-8);return v;
+ }
+ return{draw,point:(x,y,w,h)=>view(w,h,true).unmap(x,y)};
+}

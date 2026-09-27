@@ -2,6 +2,8 @@ name: Publish fishing game
 on:
   push:
     branches: [main]
+  schedule:
+    - cron: '17,47 * * * *'
   workflow_dispatch:
 permissions:
   contents: read
@@ -18,14 +20,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Check JavaScript
+      - name: Refresh public NOAA observations
+        run: python3 scripts/refresh-marine.py
+      - name: Check JavaScript and simulation invariants
         run: |
-          node --check dist/game.js
-          node --check dist/world.js
-          node --check dist/boat.js
-          node --check dist/audio.js
-          node --check dist/input.js
-          node --check dist/mobile.js
+          node scripts/check.mjs
           node --test tests/*.test.js
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3

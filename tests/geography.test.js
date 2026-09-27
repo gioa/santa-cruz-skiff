@@ -1,0 +1,6 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {readFile} from 'node:fs/promises';
+const originalFetch=globalThis.fetch;globalThis.fetch=async url=>new Response(await readFile(url));
+const geo=await import('../dist/geography.js');globalThis.fetch=originalFetch;
+test('rental coordinate roundtrips in meter projection',()=>{const p=geo.fromGPS(-122.0207135,36.9605644);assert.ok(Math.abs(p.x+2.2)<1e-9&&Math.abs(p.z+56)<1e-9);const ll=geo.toGPS(p.x,p.z);assert.equal(ll.lat,36.9605644);assert.equal(ll.lon,-122.0207135);});
+test('OSM coast distinguishes ocean, land and pier at known reference points',()=>{const sea=geo.fromGPS(-122.020,36.950),town=geo.fromGPS(-122.02,36.965);assert.equal(geo.onLand(sea.x,sea.z),false);assert.equal(geo.onLand(town.x,town.z),true);assert.equal(geo.onPier(-2.2,-56),true);assert.equal(geo.onPier(20.8,-77),false);});
+test('map distance is not compressed and bearings follow real pier orientation',()=>{const east=geo.fromGPS(-122.0107135,36.9605644);assert.ok(Math.hypot(east.x+2.2,east.z+56)>880);assert.ok(Math.hypot(east.x+2.2,east.z+56)<900);assert.equal(geo.bearingDegrees(0),134);assert.equal(geo.bearingDegrees(Math.PI/2),44);});

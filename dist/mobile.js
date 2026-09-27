@@ -13,7 +13,7 @@ export function createMobileControls({state: s, actions: a}) {
   const usable = () => enabled && s.mode !== 'intro' && !s.paused;
   const controller = bindPointer(joystick, {
     start(event) {
-      if (!usable() || (s.mode === 'boat' && s.moored)) return false;
+      if (!usable() || (s.mode === 'boat' && s.moored && !s.standing)) return false;
       const rect = joystick.getBoundingClientRect();
       center = {x: rect.left + rect.width / 2, y: rect.top + rect.height / 2};
       radius = rect.width * .32;
@@ -24,7 +24,7 @@ export function createMobileControls({state: s, actions: a}) {
   });
   function updateStick(event) {
     stick = stickVector(event.clientX - center.x, event.clientY - center.y, radius);
-    if (s.mode === 'boat') stick.y = 0;
+    if (s.mode === 'boat' && !s.standing) stick.y = 0;
     thumb.style.transform = `translate(${stick.x * radius}px, ${stick.y * radius}px)`;
   }
   function applyMode() {
@@ -58,19 +58,19 @@ export function createMobileControls({state: s, actions: a}) {
   function update({prompt, reeling}) {
     root.hidden = !enabled || s.mode === 'intro';
     if (!enabled) return;
-    const boat = s.mode === 'boat', fight = s.fishState === 'fight';
+    const boat = s.mode === 'boat', helm=boat&&!s.standing, fight = s.fishState === 'fight';
     document.body.classList.toggle('touch-boat', boat);
     document.body.classList.toggle('touch-fight', fight);
     document.body.classList.toggle('touch-paused', s.paused);
-    $('#stick-label').textContent = boat ? '左右操舵' : '拖动行走';
-    joystick.setAttribute('aria-label', boat ? '左右拖动操舵，松开回正；油门独立控制' : '拖动摇杆行走，松开停止');
-    $('#touch-guide').hidden = boat;
+    $('#stick-label').textContent = s.mode==='swim'?'拖动游泳':s.standing?'船内行走':boat ? '左右操舵' : '拖动行走';
+    joystick.setAttribute('aria-label', s.mode==='swim'?'拖动摇杆游泳，松开漂浮':helm ? '左右拖动操舵，松开回正；油门独立控制' : '拖动摇杆行走，松开停止');
+    $('#touch-guide').hidden = s.mode!=='walk';
     $('#touch-guide').textContent = s.autoWalk ? '停止步行' : '沿栈道走';
-    $('#touch-helm').hidden = !boat || s.moored;
-    $('#touch-engine').hidden = !boat;
+    $('#touch-helm').hidden = !helm || s.moored;
+    $('#touch-engine').hidden = !helm;
     $('#touch-engine').textContent = s.engine ? '停机' : '启动';
     $('#touch-engine').setAttribute('aria-pressed', String(s.engine));
-    $('#touch-anchor').hidden = !boat;
+    $('#touch-anchor').hidden = !helm;
     $('#touch-anchor').textContent = s.anchor ? '起锚' : '下锚';
     $('#touch-anchor').setAttribute('aria-pressed', String(s.anchor));
     $('#touch-throttle').disabled = !s.engine || s.moored || s.anchor || s.paused;
@@ -81,7 +81,7 @@ export function createMobileControls({state: s, actions: a}) {
     $('#touch-neutral').textContent = s.waypoint ? '接管停船' : '空挡';
     $('#touch-interact').hidden = !prompt;
     $('#touch-interact').textContent = prompt;
-    $('#touch-cast').hidden = !boat || s.moored;
+    $('#touch-cast').hidden = !helm || s.moored;
     const label = s.fishState === 'bite' ? '提竿！' : fight ? '轻提竿' : s.fishState === 'idle' ? '抛竿' : '收回';
     $('#touch-cast-label').textContent = label;
     $('#touch-cast-hint').textContent = s.fishState === 'idle' ? '按住 · 松开抛' : fight ? '按住提竿' : '轻点';
@@ -94,7 +94,7 @@ export function createMobileControls({state: s, actions: a}) {
     $('#touch-drag-value').textContent = `泄力 ${Math.round(s.drag * 100)}%`;
     $('#drag-less').disabled = s.drag <= .2;
     $('#drag-more').disabled = s.drag >= .85;
-    $('#touch-look-hint').textContent = boat ? '滑动海面环顾 · 双指可同时操作' : '左手行走 · 右手滑动环顾';
+    $('#touch-look-hint').textContent = s.mode==='swim'?'左手游泳 · 右手环顾寻找木艇':boat ? '滑动海面环顾 · 双手可同时操作' : '左手行走 · 右手滑动环顾';
   }
   applyMode();
   return {
