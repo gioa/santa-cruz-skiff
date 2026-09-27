@@ -1,74 +1,53 @@
-# 潮汐之间 · Santa Cruz Skiff
+# 潮汐之间 · Santa Cruz Pixel Fishing
 
-A self-contained WebGL 2 / Three.js first-person wooden-skiff fishing game, inspired by Santa Cruz's Municipal Wharf and the 16-foot, 8 hp rental skiffs operated by Santa Cruz Boat Rental / Capitola Boat & Bait.
+A self-contained, top-down **2D cartoon pixel fishing game** set around Santa Cruz Wharf and Monterey Bay. The default page is the new pixel edition. Original hand-drawn Canvas sprites include the wood skiff, outboard, holding/steering/fishing poses, rental hut, dock workers, tackle and fish. The previous Three.js edition is preserved at `legacy-3d.html`.
 
-## Play
+Play: https://joyx.design/santa-cruz-skiff/
 
-Serve `dist/` through any HTTP server; the files are ready for GitHub Pages or Vercel static hosting. No API keys, backend, build step, analytics, or runtime CDN dependencies are required.
+## Run
 
 ```sh
 python3 -m http.server 4173 --directory dist
+npm run check
+npm test
 ```
 
-Open `http://localhost:4173`. Desktop keyboard/mouse and a dedicated dual-thumb touch interface are supported. Touch devices are detected automatically; Settings can force touch or keyboard mode. WebGL 2 and hardware acceleration are required.
+No build step, API key, backend or account. The pixel edition uses Canvas 2D and does not load Three.js or require WebGL. Fonts have system fallbacks. Saves stay in local storage, under a separate pixel-edition key.
 
-## Complete journey
+## The journey
 
-Walk the wharf → visit the counter, freely pack free starter gear or upgrades, lower the empty skiff with the davit → descend the steps to the pontoon → board and stow gear → unmoor → start the 8 hp outboard → navigate to four mapped coastal destinations or an arbitrary water waypoint → stop and anchor → choose bait/rig/drag → cast, wait, strike, manage line tension → net, record and release/keep a fish → navigate home → tie up, walk back to the hut, exchange virtual retained fish for credits, restock, buy upgrades, and recover the empty skiff with the davit.
+Start at 06:00, a few steps from the rental counter → pack free starter equipment → request the empty skiff's davit lowering → walk down the real left-side stair alignment → board → unmoor → start the engine and steer, or choose a chart waypoint → coast down, anchor and select a rig → hold/release to cast → watch the float and strike → reel and manage drag/tension → keep the fish or record/release → return, dock, walk to the counter and exchange retained catches → buy and pack equipment.
 
-- WASD: walk; W/S adjust throttle and A/D steer while aboard.
-- Drag the scene: look around. Shift: walk faster.
-- E: contextual interaction, including gear preparation, boarding, unmooring, docking.
-- G: accessible automatic walk along the pier. WASD takes over.
-- B: full trip tools (also available on the desktop toolbar); C: stand/sit aboard. Overboard: move/swim, use the stern ladder, or free game assistance.
-- R: engine; Q: anchor; I: equipment; J: log; M: chart.
-- Hold/release Space: cast. Tap Space at a bite: strike. Hold Space during a fight: lift rod.
-- Hold left mouse / on-screen reel button: reel. F: toggle continuous reeling.
-- Up/Down: drag adjustment during a fish fight.
-- V: first-person or chase camera; P: clean photo view; photo button: PNG download.
-- Escape: trip menu/pause; chart has course assistance and simulated VHF recovery.
+- **WASD / left joystick:** walk or swim; aboard, forward/reverse throttle and steering. Releasing the momentary control returns to neutral while the boat retains momentum.
+- **E:** contextual interaction. **G:** walk to the hut or boarding platform.
+- **R:** engine. **Q:** anchor. **I:** equipment. **M:** chart. **J:** catches.
+- **Hold Space / cast button, then release:** charge and cast. Tap at a bite to strike. Hold during a fight to raise the rod.
+- **Hold F / reel button:** reel. During a fight the on-screen − / + buttons change drag.
+- Tap accessible ground to walk there; tap navigable water to choose an assisted course.
+- The boat actions menu allows standing, moving on deck, entering the water, changing rigs and returning. Swimmers can approach the stern ladder and climb back. Settings includes free recovery.
+- Opening a menu pauses simulation. Focus loss, orientation change and pointer cancellation clear held actions. Switching away pauses the trip.
 
-## Phone controls
+The touch interface remains visible on all devices, supports separate pointer ownership for the two thumbs and keeps a tall world view in portrait. It does not rely on mouse hover or pointer lock.
 
-- Left analog stick: camera-relative walking; horizontal steering aboard. Release returns to neutral.
-- Drag the sea with a separate finger to look. Looking never reels in touch mode.
-- Throttle stays where set. Use Neutral to ease down, Engine to stop the motor. These are separate from the steering stick.
-- Cast action: hold/release to cast, tap to strike, hold to pump during a fight.
-- Reel: hold/release, or toggle continuous reel. Minus/plus changes drag during the fight.
-- Context action: gear, boarding, unmooring and docking. Bag contains equipment, log, camera and settings.
-- Each surface owns its pointer. Interruptions cancel charging; modal opening, focus loss, rotation and resize clear held actions. App switching pauses the trip.
-- Portrait and short landscape layouts, safe-area insets, 44–48 px minimum interactive targets, native modal scrolling and 16 px select inputs.
+## Implementation
 
-`npm run check` checks scripts; `npm test` exercises pointer ownership, cancellation, multitouch source isolation and analog deadzone behavior. See `qa/mobile/TESTING.md` for browser evidence and limits.
+- `pixel-sprites.js`: original authored low-resolution sprites; no downloaded sprite pack.
+- `pixel-world.js`: nearest-neighbour rendering, smooth camera, animated water/birds/wakes, left landing and davit, fishing line attached to rod tip and driver's hand attached to tiller.
+- `pixel-sim.js`: DOM-free game model and validated player actions.
+- `pixel-game.js` / `pixel.css`: interface, keyboard/touch input, menus, saves, audio and page-scoped accessible tools.
 
-## Immersive presentation and physical response
+The edition reuses the real metre-coordinate OSM coastline, wharf and building footprints, NOAA depth grid, SI vessel dynamics, hull collisions, swimming model, gear catalogue and economic invariants. The 24-second davit sequence and normal walking/boating/fishing time advance at 1:1 active time. New and resumed days start at 06:00. Menus pause the clock. Portrait and landscape share the same simulation.
 
-Default view removes persistent tutorials, mini-map, telemetry and fish stamina bars. Settings can opt back into guidance. Boat-mounted compass/clock, context interaction, translucent thumb controls, rod deflection and layered mechanical/water audio provide feedback. First-person hands and a detailed graphite rod/reel replace the floating rod. Casting follows a gravity-driven trajectory.
+The equipment catalogue has free starter gear plus rods, reel, line, leaders, several rigs/baits, sinkers, larger cooler, sounder and drift equipment. There are five representative fish species. Habitat, depth, bait and tackle affect probabilities; species are not locked behind specific purchases. The fish reward ledger prevents double settlement. Retained fish require a counter visit; released fish earn a recorded release reward.
 
-`vessel-physics.js` integrates effective thrust, quadratic drag, added mass, yaw inertia, wind leeway and anchored-rode spring/damping. Hull support points sample the same water field as the GPU. Crew movement creates heel/trim; cargo changes acceleration and displacement. Autopilot uses tiller forces with progressive arrival throttle. This is a tuned approximation, not measured sea-trial dynamics or CFD.
+## Data and scope
 
-The corrected rental area places the turquoise storefront on the right and the stair/hoist on the left when walking seaward. A narrow, shoreward-descending white-railed stair leads to a small fixed timber landing, replacing the invented long floating pontoon. Asphalt, parking bays, dense timber piles and ladder handrails follow visual references. Default 06:00 uses adapted blue twilight for readability while retaining the astronomical sun and 1:1 clock. See `qa/wharf-correction/REFERENCES.md` for inspected photographs/video and dimensional limitations.
+This is an artistic fishing simulator, not a surveyed digital twin. Geography is metre-scale; character, building and boat art are deliberately stylized/enlarged for a readable pixel world. Employees are fictional, not asserted real staff identities. Fish and sea dynamics are approximations. Five species are representative, not an exhaustive regional list. Virtual catches and credits are game systems, not real-world harvest or sale guidance.
 
-PBR timber uses three local Poly Haven CC0 1K textures (684 KB total). Repeated roads/wakes are instanced and skiff geometry batched. These improvements do not constitute 4A production quality. See `qa/immersion/PLAYTEST.md` for test scope and actual screenshots.
+Bathymetry is the historical NOAA Monterey 2012 MHW reference grid, not a live instrument reading. MLLW tide predictions remain separate. Wind/wave/temperature come from offshore NOAA buoys around 23–40 km away; they are regional observations, not measurements at the skiff. Settings shows the observation timestamp and freshness. GitHub Pages refreshes the snapshot at scheduled minutes 17/47 when GitHub scheduling permits; the page checks it every ten minutes and retains original timestamps on failure.
 
-## Simulation and boundaries
-
-Actual meter-scale OSM coast, wharf, roads and building footprints; four fishing areas and arbitrary chart waypoints; NOAA 2012 MHW elevation grid for reference depth and a purchased sounder profile; Each new or resumed session starts at Pacific 06:00 and advances with active simulation time at 1:1, with matching solar day/night; real local time remains selectable; NOAA observations and tide predictions retain real-world timestamps; attributed NOAA regional wind/wave/temperature and separate MLLW tidal predictions. Twenty-four gear/supply items, free starter equipment, virtual credits, stock, capacity, soft species probabilities, once-only catch settlement, save migration. Overboard gravity, PFD flotation, swimming effort and cold feedback, engine cut-off lanyard, stern reboarding ladder and explicit free game assistance. Empty-skiff davit lowering/recovery, authored dock workers, upgraded hull/motor details.
-
-This is an evolving simulator, **not a surveyed digital twin**. The horizontal geography is derived from OSM at real-world scale; buildings, waves, drift, fish and propulsion remain approximate. No precise local sediment classification or verified current employee names were available: bottom materials are illustrative and staff are clearly labeled simulated characters. Historical MHW bathymetry is never presented as a live depth measurement or combined with unconverted MLLW tides. Source buoy observations come from 23/40 km offshore, not at the skiff. Five representative fish species are implemented; this is not the full regional species list. Custom morning lighting and custom seas are explicit options, while 06:00 trip starts and real regional observations are the defaults.
-
-GitHub Pages attempts a new NOAA snapshot deployment at minutes 17/47 each hour; GitHub may delay scheduled jobs. The page checks the same-origin snapshot every ten minutes. Failed refreshes retain original observation timestamps; stale observations are labeled. No account, location permission or secret API key is used.
-
-## Research and licenses
-
-See `dist/SOURCES.html` for current primary source notes and `dist/credits.html` for in-game source and license information. Game geometry, UI, procedural textures and audio are authored for this project, except the attributed external resources below. Three.js and its Water/Sky addons are MIT licensed; license included at `dist/vendor/THREE-LICENSE.txt`. Ocean normal texture is from the Three.js r180 examples. Photographic wood PBR: Poly Haven Weathered Brown Planks (CC0); authors and sources are in `dist/assets/env-sources.json`.
+Sources: `dist/SOURCES.html`, `dist/credits.html`, `dist/data/`, and `qa/wharf-correction/REFERENCES.md`. © OpenStreetMap contributors. NOAA public data. Pixel art, interface and procedural audio are authored for this game. Legacy Three.js MIT and Poly Haven CC0 assets remain attributed with the preserved 3D edition.
 
 ## Validation
 
-See `qa/immersion/PLAYTEST.md` for this update and `qa/v2/PLAYTEST.md` for the previous simulation version, and `qa/PLAYTEST.md` for the historical initial-version run; `qa/` contains screenshots for the actual browser test and its limitations. The game exposes a read-only state tool and normal start/waypoint tools through WebMCP when the browser supports it. Every tool uses the same validation as the UI.
-
-## Model authoring and reproducibility
-
-`models/build_harbor.py` is the authored Blender scene script. Blender 5.0.1 crashed in this environment before executing it, so the shipped boat, davit and workers use authored Three.js geometry (`boat.js`, `harbor-assets.js`, `harbor-shapes.js`), not a claimed Blender export. See `models/README.md`.
-
-`python3 scripts/refresh-marine.py` updates the public NOAA snapshot. `scripts/build-geography.py --coast <overpass-coast-buildings.json> --pier <overpass-wharf.json>` converts the attributed OSM extract. The compact source data and NOAA grid metadata ship in `dist/data/`. `npm test` verifies pointer isolation, economic invariants, geographic projection, 8 coast-safe navigation legs, immersion and vertical-datum separation.
+`npm run check` syntax-checks every shipped JavaScript module. `npm test` covers the pixel full journey, economy, casting/bait, swim/reboarding, resume recovery, momentary mobile input, rigs and destinations, plus existing vessel/collision/geography/depth/pointer suites. See `qa/pixel/PLAYTEST.md` for actual browser evidence and responsive screenshots. Page-scoped WebMCP tools expose only normal player actions and a read-only state report; they cannot teleport, skip time, force bites or create fish.
