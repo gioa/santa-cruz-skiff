@@ -61,5 +61,5 @@ test('old deployed anchors, ropes and empty tanks resume as a usable boat withou
 });
 
 test('running the engine consumes no fuel and an empty legacy tank never stops propulsion',()=>{
- const sim=equipped();aboard(sim);sim.state.fuel=0;assert.ok(sim.toggleEngine().ok);assert.ok(sim.setThrottle(.25));run(sim,60);assert.equal(sim.state.engine,true);assert.equal(sim.state.fuel,0);assert.ok(sim.state.sailed>20);assert.ok(sim.toggleEngine().ok);assert.ok(sim.toggleEngine().ok);
+ const sim=equipped();aboard(sim);sim.state.fuel=0;assert.ok(sim.toggleEngine().ok);assert.ok(sim.setThrottle(.25));run(sim,60);assert.equal(sim.state.engine,true);assert.equal(sim.state.fuel,0);assert.ok(sim.state.sailed>20);sim.setThrottle(0);assert.ok(sim.toggleEngine().ok);assert.ok(sim.toggleEngine().ok);
 });

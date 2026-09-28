@@ -44,3 +44,5 @@ export function hitSkiff(x,y,geometry,{minimum=44}={}){
   const dx=x-geometry.screenX,dy=y-geometry.screenY,c=Math.cos(geometry.heading),s=Math.sin(geometry.heading);
   return Math.abs(dx*c-dy*s)<=Math.max(minimum,geometry.width)/2&&Math.abs(dx*s+dy*c)<=Math.max(minimum,geometry.height)/2;
 }
+
+export const SKIFF_HULL_OUTLINE=Object.freeze([[24,1],[29,4],[34,10],[39,21],[42,36],[42,66],[39,78],[9,78],[6,66],[6,36],[9,21],[14,10],[19,4]].map(p=>Object.freeze(p)));

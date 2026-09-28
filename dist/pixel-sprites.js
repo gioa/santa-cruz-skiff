@@ -2,6 +2,7 @@
  * Transparent canvases can be drawn directly; callers should disable smoothing.
  * Boat points north. Figures stand at the bottom centre of their 16 × 26 cell.
  */
+import {SKIFF_HULL_OUTLINE} from './pixel-boat-geometry.js?v=20260927-pixel-v35';
 const C = {
   ink:'#223a46', deep:'#304956', slate:'#4c6872', steel:'#79959a', light:'#b9d0cb',
   cream:'#fff0ca', ivory:'#e6d9ad', sand:'#c4b17f', wood:'#b87850', woodDark:'#795544',
@@ -38,7 +39,7 @@ function raster(width,height,paint) {
 
 function boatSprite({outboard=true}={}){return raster(48,88,({rect:r,px,line:l,poly:p})=>{
   // Narrow open clinker skiff, viewed from above; the trim has separate light faces.
-  p([[24,1],[29,4],[34,10],[39,21],[42,36],[42,66],[39,78],[9,78],[6,66],[6,36],[9,21],[14,10],[19,4]],'ink');
+  p(SKIFF_HULL_OUTLINE,'ink');
   p([[24,3],[28,6],[33,12],[37,23],[40,37],[40,66],[37,76],[11,76],[8,66],[8,37],[11,23],[15,13],[20,6]],'woodDark');
   p([[24,4],[29,9],[34,17],[38,32],[39,54],[38,70],[36,74],[12,74],[10,67],[9,52],[10,32],[14,17],[19,9]],'peach');
   p([[24,7],[28,12],[32,19],[36,33],[37,53],[36,70],[12,70],[11,53],[12,34],[16,19],[20,12]],'greenDark');

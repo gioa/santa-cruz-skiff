@@ -35,7 +35,7 @@ test('each reachable fishing phase offers only its permitted actions, distinguis
  );
  for(const[fishState,rodMount,expected]of cases){
   const state={...base,fishState,rodMount},a=boatActions(state,{hasRod:true,hasAnchor:true,hasChart:true,canLower:fishState==='idle',canCast:fishState==='idle'&&rodMount==='hand',nearDock:false});
-  assert.deepEqual(offered(a),expected.sort(),`${fishState}/${rodMount}`);assert.equal(a.helm,false);assert.equal(a.console,true);assert.equal(a.tackle,true);
+  assert.deepEqual(offered(a),(expected.includes('engine')?[...expected,'switchPanel']:expected).sort(),`${fishState}/${rodMount}`);assert.equal(a.helm,false);assert.equal(a.console,true);assert.equal(a.tackle,true);
  }
 });
 
@@ -91,4 +91,9 @@ test('readiness is side-effect free and hides missing bait or gear using exactly
 test('readiness capabilities preserve handheld and mounted speed/engine thresholds without mutating state',()=>{
  const sim=ready();sim.state.speed=.91;assert.equal(actions(sim).lower,false);assert.equal(actions(sim).cast,false);sim.state.speed=0;assert.ok(sim.toggleEngine().ok);assert.equal(actions(sim).lower,false);assert.equal(actions(sim).cast,false);assert.ok(sim.setRodMount('port').ok);assert.equal(actions(sim).lower,true);assert.equal(actions(sim).cast,false);sim.state.speed=1.56;assert.equal(actions(sim).lower,false);sim.state.speed=1.55;assert.equal(actions(sim).lower,true);
  const state=structuredClone(sim.state),context={hasRod:true,hasAnchor:true,hasChart:true,canLower:true,canCast:false,nearDock:false};boatActions(sim.state,context);assert.deepEqual(sim.state,state);assert.deepEqual(context,{hasRod:true,hasAnchor:true,hasChart:true,canLower:true,canCast:false,nearDock:false});
+});
+
+test('unpowered helm stays available for neutral handle ignition and switching back to tackle',()=>{
+ const sim=ready();assert.equal(sim.state.engine,false);assert.equal(actions(sim).switchPanel,true);
+ const a=actions(sim,{panel:'helm'});assert.equal(a.helm,true);assert.equal(a.tackle,false);assert.equal(a.switchPanel,true);assert.equal(a.switchLabel,'钓鱼');
 });

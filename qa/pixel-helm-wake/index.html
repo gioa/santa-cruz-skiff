@@ -1,0 +1,20 @@
+<!doctype html><html lang="zh"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>握把启停与航迹 · 本机验收</title><link rel="stylesheet" href="../../dist/pixel.css"><style>#qa{position:fixed;top:10px;left:10px;z-index:99;background:#fff1d5;padding:8px;color:#173f43;font:12px system-ui}#qa button{padding:8px;margin-right:4px}#result{display:block;font:11px monospace;max-width:350px}#message{display:block}#boat-console{width:calc(100% - 24px)}</style><main id="app" class="is-aboard"><canvas id="world"></canvas><div id="controls" class="controls"><section id="boat-console" class="helm-open">  <div id="helm">
+   <div id="tiller-touch" class="tiller-touch" role="slider" tabindex="0" aria-label="舷外机握把，左右摆动" aria-valuemin="-35" aria-valuemax="35" aria-valuenow="0"><span class="helm-label">握把 · 空挡轻点启停</span><div class="tiller-travel" aria-hidden="true"></div><div class="tiller-arm" aria-hidden="true"><i class="tiller-shaft"></i><i class="tiller-handgrip"></i></div><div class="outboard-head" aria-hidden="true"><span>8</span></div></div>
+   <div class="throttle-panel"><div id="throttle-touch" class="in-neutral" role="slider" tabindex="0" aria-label="前后挡与油门推杆，向上前进向下倒车，中间空挡" aria-valuemin="-100" aria-valuemax="100" aria-valuenow="0" aria-valuetext="空挡"><span class="helm-label"><span>推杆</span><span class="throttle-readout"><b id="throttle-gear">N</b><b id="throttle-value">0%</b></span></span><div class="throttle-gate" aria-hidden="true"><i class="throttle-detent"></i></div><div class="throttle-markings" aria-hidden="true"><span class="throttle-forward"><b>F</b><small>前进</small></span><span class="throttle-neutral"><b>N</b><small>空挡</small></span><span class="throttle-reverse"><b>R</b><small>倒车</small></span></div><div class="throttle-lever" aria-hidden="true"><i class="throttle-stem"></i><i class="throttle-knob"><span></span></i></div></div></div>
+  </div>
+</section></div></main><div id="qa">本机验收 · 使用正式模拟与握把组件<br><button id="reset">重置</button><button id="pause">暂停 / 继续</button><output id="result"></output><output id="message"></output></div>
+<script type="module">
+import {PixelSimulation,FISHING_SPOTS} from '../../dist/pixel-sim.js';
+import {createPixelWorld} from '../../dist/pixel-world.js';
+import {createPixelSprites} from '../../dist/pixel-sprites.js';
+import {syncVessel} from '../../dist/vessel-physics.js';
+import {mountHelm} from '../../dist/pixel-helm-ui.js';
+if(!['localhost','127.0.0.1'].includes(location.hostname))throw Error('Local QA only');
+const $=id=>document.getElementById(id),sim=new PixelSimulation({rng:()=>.5,patrolRng:()=>1});sim.start();
+function seed(){Object.assign(sim.state,{mode:'boat',rentalPaid:true,launchStage:'afloat',moored:false,engine:false,throttle:0,speed:0,boatX:FISHING_SPOTS[1].x,boatZ:FISHING_SPOTS[1].z,heading:-.45,fishState:'idle',paused:false});syncVessel(sim.vessel,{x:sim.state.boatX,z:sim.state.boatZ,heading:sim.state.heading,clearMotion:true});}
+seed();const world=createPixelWorld($('world'),{sprites:createPixelSprites()}),feedback=r=>{$('message').textContent=r?.message||'';return r;};
+const helm=mountHelm($('helm'),{getState:()=>({...sim.state,canOperateHelm:sim.canOperateHelm}),onIdle:()=>sim.setThrottle(0),onFeedback:feedback,onToggleEngine:()=>feedback(sim.toggleEngine())});
+$('reset').onclick=()=>{helm.reset();seed();};$('pause').onclick=()=>sim.pause(!sim.state.paused);
+function resize(){world.resize(innerWidth,innerHeight);}onresize=resize;resize();let last=performance.now();
+function frame(now){const dt=Math.min(.1,(now-last)/1000);last=now;sim.step(dt,helm.input());helm.update();world.draw(sim.state,sim.state.paused?0:dt);const c=helm.snapshot();$('result').textContent=`${innerWidth}×${innerHeight} · ${sim.state.engine?'发动机运转':'发动机熄火'} · ${c.gear} · 油门 ${Math.round(sim.state.throttle*100)}% · 速度 ${(sim.state.speed*1.944).toFixed(1)} kn`;requestAnimationFrame(frame);}requestAnimationFrame(frame);
+</script></html>

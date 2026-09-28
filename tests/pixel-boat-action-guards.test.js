@@ -41,5 +41,5 @@ test('legacy deck posture clears during a paused boat frame without dropping the
 });
 
 test('stale standing flags never block helm access',()=>{
- const sim=ready(),s=sim.state;s.standing=true;assert.ok(sim.toggleEngine().ok);assert.equal(sim.setThrottle(.2),true);assert.ok(sim.toggleEngine().ok);assert.equal(sim.toggleAnchor().ok,false);sim.step(.1);assert.equal(s.standing,false);
+ const sim=ready(),s=sim.state;s.standing=true;assert.ok(sim.toggleEngine().ok);assert.equal(sim.setThrottle(.2),true);assert.equal(sim.toggleEngine().ok,false);assert.equal(s.engine,true);sim.setThrottle(0);assert.ok(sim.toggleEngine().ok);assert.equal(sim.toggleAnchor().ok,false);sim.step(.1);assert.equal(s.standing,false);
 });

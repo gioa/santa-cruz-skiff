@@ -22,7 +22,7 @@ function stored(speciesId,extra={}){return{speciesId,name:speciesId,catchId:`${s
 
 test('purchased navigation tools require packing; starting without chart still permits manual boating and fishing',()=>{
  const sim=prepared();assert.equal(sim.selectWaypoint('sand').ok,false);assert.equal(sim.navigationInstruments().chart,false);assert.equal(sim.publicState().gps,null);assert.equal(sim.publicState().referenceDepth,null);assert.equal(sim.publicState().boat.heading,null);assert.equal(sim.publicState().speedKnots,null);
- assert.equal(sim.toggleEngine().ok,true);assert.equal(sim.setThrottle(.25),true);run(sim,3);assert.ok(sim.state.speed>0);sim.toggleEngine();until(sim,s=>Math.abs(s.speed)<.5,30);assert.equal(sim.lowerRig().ok,true);sim.retrieve();
+ assert.equal(sim.toggleEngine().ok,true);assert.equal(sim.setThrottle(.25),true);run(sim,3);assert.ok(sim.state.speed>0);sim.setThrottle(0);assert.ok(sim.toggleEngine().ok);until(sim,s=>Math.abs(s.speed)<.5,30);assert.equal(sim.lowerRig().ok,true);sim.retrieve();
  const equipped=prepared(['nautical_chart','compass','gps','sounder']);equipped.state.heading=.4;const nav=equipped.navigationInstruments();assert.equal(nav.heading,bearingDegrees(.4));assert.deepEqual(nav.gpsPosition,toGPS(equipped.state.boatX,equipped.state.boatZ));assert.equal(typeof nav.depth.value,'number');assert.equal(equipped.selectWaypoint('sand').ok,true);
  equipped.state.packed=equipped.state.packed.filter(id=>!['nautical_chart','compass','gps','sounder'].includes(id));assert.equal(equipped.selectWaypoint('dock').ok,false);assert.equal(equipped.navigationInstruments().gps,false);assert.equal(equipped.publicState().referenceDepth,null);
  equipped.state.packed.push('sounder');equipped.state.profile.owned=equipped.state.profile.owned.filter(id=>id!=='sounder');assert.equal(equipped.navigationInstruments().sounder,false,'packing an unowned item grants no instrument');
@@ -35,7 +35,7 @@ test('handheld GPS follows walking position rather than the moored boat and jump
 test('offshore navigation covers about twice the geography while fuel and vessel speed stay unscaled and both modes share the 2x clock',()=>{
  const fast=prepared(),real=prepared([],{navigationScale:()=>1}),departureTime=fast.state.elapsed;for(const sim of[fast,real]){offshore(sim);sim.toggleEngine();sim.setThrottle(.7);run(sim,60);}
  assert.ok(fast.state.sailed/real.state.sailed>1.8&&fast.state.sailed/real.state.sailed<2.2);assert.equal(fast.state.clock,real.state.clock);assert.ok(Math.abs(fast.state.elapsed-departureTime-60)<1e-7);assert.ok(Math.abs(fast.state.speed-real.state.speed)<.05);assert.ok(Math.abs(fast.state.fuel-real.state.fuel)<1e-8);assert.equal(fast.state.navigationScale,2);
- fast.toggleEngine();run(fast,.1);assert.equal(fast.state.navigationScale,1);assert.equal(fast.jump().ok,false);const before=fast.state.elapsed;run(fast,2);assert.ok(Math.abs(fast.state.elapsed-before-2)<1e-6);assert.equal(fast.state.mode,'boat');
+ fast.setThrottle(0);assert.ok(fast.toggleEngine().ok);run(fast,.1);assert.equal(fast.state.navigationScale,1);assert.equal(fast.jump().ok,false);const before=fast.state.elapsed;run(fast,2);assert.ok(Math.abs(fast.state.elapsed-before-2)<1e-6);assert.equal(fast.state.mode,'boat');
 });
 
 test('premade rig weights and suspended depth selection stay distinct and valid',()=>{

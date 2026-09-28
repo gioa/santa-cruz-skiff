@@ -11,13 +11,13 @@ class Element extends EventTarget{
  setPointerCapture(id){this.captured.add(id);}
  hasPointerCapture(id){return this.captured.has(id);}
  releasePointerCapture(id){this.captured.delete(id);this.send('lostpointercapture',id);}
- send(type,id=1,extra={}){const event=new Event(type,{cancelable:true});Object.assign(event,{pointerId:id,pointerType:'touch',button:0,clientX:75,clientY:100},extra);this.dispatchEvent(event);return event;}
+ send(type,id=1,extra={}){const event=new Event(type,{cancelable:true});if('timeStamp' in extra){Object.defineProperty(event,'timeStamp',{value:extra.timeStamp});extra={...extra};delete extra.timeStamp;}Object.assign(event,{pointerId:id,pointerType:'touch',button:0,clientX:75,clientY:100},extra);this.dispatchEvent(event);return event;}
  key(key){return this.send('keydown',1,{key});}
 }
 function fixture(){
  const s={mode:'boat',engine:true,standing:false,moored:false,docking:null,paused:false,fishState:'idle',canOperateHelm:true,speed:0,throttle:0},handle=new Element(),lever=new Element(),arm=new Element(),meter=new Element(),gear=new Element(),feedback=[];
  const selectors={'#tiller-touch':handle,'.tiller-arm':arm,'#throttle-touch':lever,'#throttle-value':meter,'#throttle-gear':gear};let idles=0;
- const root={hidden:false,querySelector:selector=>selectors[selector]},helm=mountHelm(root,{getState:()=>s,onIdle:()=>{if(!s.waypoint)s.throttle=0;idles++;},onFeedback:value=>feedback.push(value)});helm.update();
+ const root={hidden:false,querySelector:selector=>selectors[selector]},helm=mountHelm(root,{getState:()=>s,onIdle:()=>{if(!s.waypoint)s.throttle=0;idles++;},onFeedback:value=>feedback.push(value),onToggleEngine:()=>{s.engine=!s.engine;return{ok:true};}});helm.update();
  return{s,helm,root,handle,lever,meter,gear,feedback,get idles(){return idles;}};
 }
 const close=(value,expected)=>assert.ok(Math.abs(value-expected)<1e-9,`${value} != ${expected}`);
@@ -43,7 +43,7 @@ test('initial zero-distance and sub-two-pixel touch jitter leave automatic navig
 test('a second finger cannot move or release the lever owner and tiller steering remains independent',()=>{
  const f=fixture();f.lever.send('pointerdown',1);f.lever.send('pointerdown',2);f.lever.send('pointermove',2,{clientY:30});f.lever.send('pointerup',2);assert.equal(f.helm.snapshot().gear,'N');assert.equal(f.lever.hasPointerCapture(1),true);
  f.lever.send('pointermove',1,{clientY:55});const power=f.helm.snapshot().throttle;
- f.handle.send('pointerdown',3,{clientX:95,clientY:75});assert.ok(f.helm.snapshot().steer>0);close(f.helm.snapshot().throttle,power);f.handle.send('pointerup',3);const steer=f.helm.snapshot().steer;
+ f.handle.send('pointerdown',3,{clientX:75,clientY:75});f.handle.send('pointermove',3,{clientX:95,clientY:75});assert.ok(f.helm.snapshot().steer>0);close(f.helm.snapshot().throttle,power);f.handle.send('pointerup',3);const steer=f.helm.snapshot().steer;
  f.lever.send('pointermove',1,{clientY:70});assert.ok(f.helm.snapshot().throttle<power);close(f.helm.snapshot().steer,steer);f.lever.send('pointerup',1);
 });
 
@@ -83,4 +83,29 @@ test('keyboard crosses the neutral detent in one deliberate step and reversal ne
  f.lever.key('ArrowDown');assert.equal(f.helm.snapshot().gear,'N');assert.ok(f.feedback.length>0);const reports=f.feedback.length;f.lever.key('ArrowDown');assert.equal(f.feedback.length,reports,'same blocked shift does not spam feedback');
  f.s.speed=.2;for(let frame=0;frame<50;frame++){f.helm.update();assert.equal(f.helm.input().throttle,0);}f.lever.key('ArrowDown');assert.equal(f.helm.snapshot().gear,'R');assert.ok(f.helm.input().throttle<0);assert.equal(f.lever.attributes['aria-valuemin'],'-100');
  const event=f.lever.key('f');assert.equal(event.defaultPrevented,false,'unrelated keyboard controls are untouched');
+});
+
+
+test('neutral tap starts and stops, while steering drag and cancellation never toggle',()=>{
+ const f=fixture();f.s.engine=false;f.helm.update();assert.equal(f.handle.attributes['aria-disabled'],'false');assert.equal(f.lever.attributes['aria-disabled'],'true');
+ // Event.timeStamp is native readonly; ordinary synthetic taps have a short elapsed time.
+ f.handle.send('pointerdown');f.handle.send('pointerup');assert.equal(f.s.engine,true);assert.equal(f.helm.snapshot().gear,'N');
+ f.handle.send('pointerdown',2);f.handle.send('pointermove',2,{clientX:110});f.handle.send('pointerup',2,{clientX:110});assert.equal(f.s.engine,true);assert.ok(f.helm.snapshot().steer>0);
+ f.handle.send('pointerdown',3);f.handle.send('pointercancel',3);f.handle.send('pointerup',3);assert.equal(f.s.engine,true);
+ f.handle.send('pointerdown',4);f.handle.send('pointerup',5);assert.equal(f.s.engine,true);f.handle.send('pointerup',4);assert.equal(f.s.engine,false);
+ f.handle.key('Enter');assert.equal(f.s.engine,true);f.handle.key(' ');assert.equal(f.s.engine,false);
+});
+
+test('ignition refuses engaged gears, route throttle and unavailable controls without neutralizing them',()=>{
+ const f=fixture();f.lever.key('ArrowUp');const before=f.helm.snapshot();f.handle.send('pointerdown');f.handle.send('pointerup');assert.equal(f.s.engine,true);assert.deepEqual(f.helm.snapshot(),before);assert.match(f.feedback.at(-1).message,/空挡/);
+ f.lever.key('Home');f.s.throttle=.3;f.s.waypoint={};assert.equal(f.helm.toggleIgnition().ok,false);assert.equal(f.s.engine,true);assert.equal(f.s.throttle,.3);
+ f.s.throttle=0;for(const patch of[{paused:true},{canOperateHelm:false},{docking:{}},{inspection:{phase:'checking'}}]){const g=fixture();Object.assign(g.s,patch);g.handle.send('pointerdown');g.handle.send('pointerup');assert.equal(g.s.engine,true);}
+ f.root.hidden=true;assert.equal(f.helm.toggleIgnition().ok,false);assert.equal(f.s.engine,true);
+});
+
+
+test('long press or an outward-and-back drag does not masquerade as an ignition tap',()=>{
+ const f=fixture();f.handle.send('pointerdown',1,{timeStamp:100});f.handle.send('pointerup',1,{timeStamp:800});assert.equal(f.s.engine,true);
+ f.handle.send('pointerdown',2);f.handle.send('pointermove',2,{clientX:120});f.handle.send('pointermove',2,{clientX:75});f.handle.send('pointerup',2);assert.equal(f.s.engine,true);
+ f.s.engine=false;f.helm.update();f.handle.send('pointerdown',3);f.handle.send('pointermove',3,{clientX:120});f.handle.send('pointerup',3,{clientX:120});assert.equal(f.s.engine,false);
 });

@@ -1,11 +1,12 @@
-import {pierRings,landPolygons,coastLines,buildingFootprints,FISHING_SPOTS,onLand,onPier} from './pixel-geography.js?v=20260927-pixel-v34';
-import {HARBOR} from './harbor-layout.js?v=20260927-pixel-v34';
-import {depthInfoAt} from './bathymetry.js?v=20260927-pixel-v34';
-import {createWildlife,drawWildlife} from './pixel-wildlife.js?v=20260927-pixel-v34';
-import {cameraOffset,projectPixel,unprojectPixel,stepDeadzoneCamera,cameraDeadzone,cameraPlayfield,fitCameraBounds,zoomCameraAt,rectilinearOutline} from './pixel-camera.js?v=20260927-pixel-v34';
-import {ladderPoint} from './swimming.js?v=20260927-pixel-v34';
-import {SKIFF_RACKS,boatRenderPose,parkedSkiffPoses,skiffScreenPose,hitSkiff,outboardPose} from './pixel-boat-geometry.js?v=20260927-pixel-v34';
-import {getRodCurve,getReelPose,getFishingLine,getFishingPresentation} from './pixel-rod-geometry.js?v=20260927-pixel-v34';
+import {pierRings,landPolygons,coastLines,buildingFootprints,FISHING_SPOTS,onLand,onPier} from './pixel-geography.js?v=20260927-pixel-v35';
+import {HARBOR} from './harbor-layout.js?v=20260927-pixel-v35';
+import {depthInfoAt} from './bathymetry.js?v=20260927-pixel-v35';
+import {createWildlife,drawWildlife} from './pixel-wildlife.js?v=20260927-pixel-v35';
+import {cameraOffset,projectPixel,unprojectPixel,stepDeadzoneCamera,cameraDeadzone,cameraPlayfield,fitCameraBounds,zoomCameraAt,rectilinearOutline} from './pixel-camera.js?v=20260927-pixel-v35';
+import {ladderPoint} from './swimming.js?v=20260927-pixel-v35';
+import {SKIFF_HULL_OUTLINE,SKIFF_RACKS,boatRenderPose,parkedSkiffPoses,skiffScreenPose,hitSkiff,outboardPose} from './pixel-boat-geometry.js?v=20260927-pixel-v35';
+import {wakeProfile,wakeOrigin} from './pixel-wake.js?v=20260927-pixel-v35';
+import {getRodCurve,getReelPose,getFishingLine,getFishingPresentation} from './pixel-rod-geometry.js?v=20260927-pixel-v35';
 
 // The map keeps the same metre coordinates as the sailing simulation. The
 // people and boat are deliberately enlarged, like a handheld-era RPG, so that
@@ -149,11 +150,25 @@ export function createPixelWorld(canvas,{sprites={},conditions={}}={}){
     for(const pose of SKIFF_RACKS)skiffRack(pose);
     for(const pose of parkedSkiffPoses())if(visible(pose.x,pose.z,100))boat({mode:'walk',fishState:'idle',launchStage:'stored'},pose);
   }
+  function hullShadow(points,alpha){
+    ctx.fillStyle=`rgba(22,57,65,${alpha})`;ctx.beginPath();points.forEach(([x,y],i)=>i?ctx.lineTo(x,y):ctx.moveTo(x,y));ctx.closePath();ctx.fill();
+  }
   function drawWake(state,dt){
     if(state.launchStage!=='afloat'){wakes.length=0;lastBoat=null;return;}
-    const x=state.boatX??HARBOR.boatX,z=state.boatZ??HARBOR.boatZ;
-    if(lastBoat&&Math.hypot(lastBoat.x-x,lastBoat.z-z)>.6&&Math.abs(state.speed||0)>.25){wakes.push({x,z,h:state.heading||0,life:0});lastBoat={x,z};}else if(!lastBoat)lastBoat={x,z};
-    for(let i=wakes.length-1;i>=0;i--){const w=wakes[i];w.life+=dt;if(w.life>6){wakes.splice(i,1);continue;}const p=point(w.x,w.z),age=w.life,spread=(.4+age*.35)*camera.scale;ctx.save();ctx.translate(p.x,p.y);ctx.rotate(-(w.h||0));ctx.globalAlpha=(1-age/6)*.5;ctx.fillStyle='#d5edcd';for(let side of[-1,1])ctx.fillRect(Math.round(side*spread),Math.round(age*camera.scale*.4),Math.max(2,4-age*.5),1);ctx.restore();}
+    const x=state.boatX??HARBOR.boatX,z=state.boatZ??HARBOR.boatZ,profile=wakeProfile(state.speed);
+    const distance=lastBoat?Math.hypot(lastBoat.x-x,lastBoat.z-z):0;
+    if(dt>0&&profile.active&&distance>=profile.spacing&&distance<12){
+      const count=Math.min(12,Math.floor(distance/profile.spacing));
+      for(let i=1;i<=count;i++){const t=i/count,origin=wakeOrigin(lastBoat.x+(x-lastBoat.x)*t,lastBoat.z+(z-lastBoat.z)*t,state.heading||0,state.speed);wakes.push({...origin,h:state.heading||0,life:0,...profile});}
+      lastBoat={x,z};
+    }else if(!lastBoat||!profile.active||distance>=12)lastBoat={x,z};
+    for(let i=wakes.length-1;i>=0;i--){
+      const w=wakes[i];w.life+=dt;if(w.life>w.duration){wakes.splice(i,1);continue;}
+      const p=point(w.x,w.z),age=w.life,spread=(w.width+age*w.expansion)*camera.scale;
+      ctx.save();ctx.translate(p.x,p.y);ctx.rotate(-w.h);ctx.globalAlpha=(1-age/w.duration)**1.5*w.opacity;ctx.fillStyle='#d5edcd';
+      for(const side of[-1,1])ctx.fillRect(Math.round(side*spread),0,Math.max(1,w.foam*camera.scale*(1-age/w.duration)),Math.max(1,w.foam*camera.scale*.45));
+      ctx.restore();
+    }
   }
   function boat(state,pose=boatRenderPose(state,HARBOR)){
     const g=skiffGeometry(pose),x=pose.x,z=pose.z,p=point(x,z),heading=pose.heading,scale=g.scale,bob=g.screenY-p.y;
@@ -164,7 +179,7 @@ export function createPixelWorld(canvas,{sprites={},conditions={}}={}){
     const rod=occupied&&(fishActive||mounted||readied)?getRodCurve(state,{origin:{x:g.screenX,y:g.screenY},scale,heading,bodyX,bodyY}):null;
     // A stored boat has only its dry deck shadow. A raised hull's shadow stays
     // on the surface below, while the hull follows the crane's actual pose.
-    ctx.save();ctx.translate(p.x,p.y+(pose.afloat?bob:0));ctx.rotate(-heading);smallShadow(4,6,42*scale,73*scale,pose.afloat?.25:.16);ctx.restore();
+    ctx.save();ctx.translate(p.x,p.y+(pose.afloat?bob:0));ctx.rotate(-heading);ctx.translate(4,6);ctx.scale(scale,scale);hullShadow(SKIFF_HULL_OUTLINE.map(([x,y])=>[x-24,y-44]),pose.afloat?.25:.16);ctx.restore();
     ctx.save();ctx.translate(g.screenX,g.screenY);ctx.rotate(-heading);
     if(typeof sprites.drawBoat==='function')sprites.drawBoat(ctx,0,0,{scale,occupied,pose:occupantPose,time:clock,tiller:state.tiller||0,reeling:state.reeling,castPower:state.castPower||0,fishState:state.fishState});
     else{
@@ -256,7 +271,7 @@ export function createPixelWorld(canvas,{sprites={},conditions={}}={}){
     const patrol=state.inspection;if(!patrol||!Number.isFinite(patrol.x)||!Number.isFinite(patrol.z)||!visible(patrol.x,patrol.z,100))return;
     const p=point(patrol.x,patrol.z),scale=clamp(camera.scale*.19,.8,1.3),moving=patrol.phase==='approaching'||patrol.phase==='departing';
     ctx.save();ctx.translate(p.x,p.y+Math.round(Math.sin(clock*1.4)*.6));ctx.rotate(-(patrol.heading||0));ctx.scale(scale,scale);
-    smallShadow(4,6,32,68,.2);
+    ctx.save();ctx.translate(4,6);hullShadow([[0,-36],[8,-29],[15,-13],[16,27],[12,34],[-12,34],[-16,27],[-15,-13],[-8,-29]],.2);ctx.restore();
     if(moving){ctx.globalAlpha=.55;for(let i=0;i<5;i++){ctx.fillStyle='#d8ead3';ctx.fillRect(-8-i*2,32+i*5+(clock*8)%5,3,1);ctx.fillRect(7+i*2,32+i*5+(clock*8)%5,3,1);}ctx.globalAlpha=1;}
     ctx.fillStyle='#244c68';ctx.beginPath();ctx.moveTo(0,-36);ctx.lineTo(8,-29);ctx.lineTo(15,-13);ctx.lineTo(16,27);ctx.lineTo(12,34);ctx.lineTo(-12,34);ctx.lineTo(-16,27);ctx.lineTo(-15,-13);ctx.lineTo(-8,-29);ctx.closePath();ctx.fill();
     ctx.fillStyle='#efeed7';ctx.beginPath();ctx.moveTo(0,-33);ctx.lineTo(7,-26);ctx.lineTo(12,-12);ctx.lineTo(13,26);ctx.lineTo(10,30);ctx.lineTo(-10,30);ctx.lineTo(-13,26);ctx.lineTo(-12,-12);ctx.lineTo(-7,-26);ctx.closePath();ctx.fill();
