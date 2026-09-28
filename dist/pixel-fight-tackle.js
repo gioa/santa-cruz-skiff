@@ -37,7 +37,7 @@ export function drawCloseTackle(ctx,g,{line,ellipse,rect,spoolAngle}){
  // A compact conventional spool, flanked by two side plates. Its overall
  // diameter is close to a palm rather than larger than both hands together.
  const x=reel.x,y=reel.y,rk=k*1.65;
- line({x:base.x,y:base.y+3*rk},{x,y:y+8*rk},'#263c3e',4*rk);
+ line(g.reelSeat,{x,y:y+8*rk},'#263c3e',4*rk);
  ellipse(x-9*rk,y,5*rk,9*rk,'#1d393e');ellipse(x-9*rk,y,3.6*rk,7.5*rk,'#a6bbb1');
  rect(x-9*rk,y-7*rk,17*rk,14*rk,'#baa370');
  for(let i=0;i<8;i++)rect(x-8*rk+i*2*rk,y-6*rk,k,12*rk,i%2?'#e4d0a1':'#8f815c');

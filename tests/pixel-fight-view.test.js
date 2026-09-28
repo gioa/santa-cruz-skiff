@@ -8,7 +8,7 @@ const state=(overrides={})=>({fishState:'fight',fish:{length:30,latin:'Sebastes 
 test('rear grip stays behind the reel seat and boat occupies only the lower edge',()=>{
  for(const [w,h] of [[320,568],[390,844],[844,390]])for(const elevation of[5,45,85]){
   const g=fightViewGeometry(w,h,state({rodElevation:elevation}),{bottomInset:180});
-  assert.ok(g.grip.y>g.reel.y,'support hand is below the reel, never on the foregrip');
+  assert.ok((g.reelSeat.x-g.grip.x)*(g.base.x-g.butt.x)+(g.reelSeat.y-g.grip.y)*(g.base.y-g.butt.y)>0,'support hand stays behind the reel seat along the rod axis, including low sideways poses');
   assert.ok(g.railY>=h*.84,'low gunwale matches the approved close view');
   assert.ok(Math.hypot(g.grip.x-g.butt.x,g.grip.y-g.butt.y)<Math.hypot(g.base.x-g.butt.x,g.base.y-g.butt.y));
   assert.ok(g.knob.x<w&&g.knob.y<h);
@@ -142,7 +142,19 @@ test('close tackle matches the approved portrait scale and crank hit target trac
   const canvas=recordingCanvas(),view=createFightView(canvas);view.resize(w,h);view.draw(state(),0,{active:true});
   const shot=view.snapshot(),distance=Math.hypot(shot.reelKnob.x-shot.reelCenter.x,shot.reelKnob.y-shot.reelCenter.y);
   assert.ok(distance<shot.reelTouchRadius);
-  assert.ok(shot.rearGrip.y>shot.reelCenter.y);
+  if(w<h)assert.ok(shot.rearGrip.y>shot.reelCenter.y);
   if(w<h){assert.ok(shot.rearGrip.y>h*.83&&shot.rearGrip.y<h*.96);assert.ok(shot.reelTouchRadius>w*.16);}
+ }
+});
+
+
+test('handle, reel seat and lower blank share one straight axis at every pose and load',()=>{
+ for(const [w,h] of [[320,568],[390,844],[844,390]])for(const rodMount of ['hand','port','starboard'])for(const rodElevation of [5,45,85])for(const rodAzimuth of [-110,0,70,110])for(const rodBend of [0,.5,1]){
+  const g=fightViewGeometry(w,h,state({rodMount,rodElevation,rodAzimuth,rodBend,rodTipMotion:{x:4,y:-6}}));
+  const dx=g.base.x-g.butt.x,dy=g.base.y-g.butt.y,length=Math.hypot(dx,dy);
+  for(const p of [g.grip,...g.points.slice(0,4)]){
+   const perpendicular=Math.abs(dx*(p.y-g.butt.y)-dy*(p.x-g.butt.x))/length;
+   assert.ok(perpendicular<1e-8,`${w}x${h} ${rodElevation}/${rodAzimuth}: handle-to-blank has no corner`);
+  }
  }
 });

@@ -1,10 +1,10 @@
-import {drawCloseTackle} from './pixel-fight-tackle.js?v=20260927-pixel-v49';
-import {fishBodyPose,drawFishBody} from './pixel-fish-motion.js?v=20260927-pixel-v49';
-import {rodFlexPoint} from './pixel-rod-response.js?v=20260927-pixel-v49';
+import {drawCloseTackle} from './pixel-fight-tackle.js?v=20260927-pixel-v50';
+import {fishBodyPose,drawFishBody} from './pixel-fish-motion.js?v=20260927-pixel-v50';
+import {rodFlexPoint} from './pixel-rod-response.js?v=20260927-pixel-v50';
 // First-person artwork uses the same rod pose, load, surface intersection and
 // crank speed as the simulation. It is a camera change, never another fight.
-import {reelMotion} from './pixel-fishing-feedback.js?v=20260927-pixel-v49';
-import {fishSpriteKind,fishSpriteBounds} from './pixel-fish-art.js?v=20260927-pixel-v49';
+import {reelMotion} from './pixel-fishing-feedback.js?v=20260927-pixel-v50';
+import {fishSpriteKind,fishSpriteBounds} from './pixel-fish-art.js?v=20260927-pixel-v50';
 const TAU=Math.PI*2;
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 const finite=(n,f=0)=>Number.isFinite(n)?n:f;
@@ -42,10 +42,13 @@ export function fightViewGeometry(width,height,state={},options={}){
  // some of that span for the loaded tip so full left/right sweeps never clip.
  const span=azimuth<0?base.x-w*.06:w*.94-base.x,dx=span*(azimuth/110)*.80,dy=-length*(.34+.74*Math.sin(e));
  const flexX=span*(azimuth/110)*.18*bend,flexY=bend*Math.min(length*.50,-dy*.90);
- const points=[];for(let i=0;i<=28;i++){const t=i/28,motion=rodFlexPoint(state,t,length),flex=motion.shape;points.push({x:clamp(base.x+dx*t+flexX*flex+motion.x,w*.06,w*.94),y:base.y+dy*t+flexY*flex+motion.y});}
- const tip=points.at(-1),norm=Math.hypot(dx,dy)||1,ux=dx/norm*.7,uy=-Math.sqrt(1-ux*ux);
+ // The grip and first three blank segments are rigid and collinear. Flex
+ // starts smoothly beyond the foregrip, with zero slope at that junction.
+ const points=[];for(let i=0;i<=28;i++){const t=i/28,motion=rodFlexPoint(state,Math.max(0,(t-3/28)/(1-3/28)),length),flex=motion.shape;points.push({x:clamp(base.x+dx*t+flexX*flex+motion.x,w*.06,w*.94),y:base.y+dy*t+flexY*flex+motion.y});}
+ const tip=points.at(-1),norm=Math.hypot(dx,dy)||1,ux=dx/norm,uy=dy/norm;
  const butt={x:base.x-ux*87*scale,y:base.y-uy*87*scale};
- const reel={x:base.x-uy*26*scale-ux*35*scale,y:base.y+ux*26*scale-uy*35*scale};
+ const reelSeat={x:base.x-ux*35*scale,y:base.y-uy*35*scale};
+ const reel={x:reelSeat.x-uy*26*scale,y:reelSeat.y+ux*26*scale};
  const grip={x:base.x-ux*66*scale,y:base.y-uy*66*scale};
  const reelHub={x:reel.x+13.2*scale,y:reel.y+3.3*scale};
  const angle=finite(options.crankAngle),knob={x:reelHub.x+Math.cos(angle)*36*scale,y:reelHub.y+Math.sin(angle)*23*scale};
@@ -66,7 +69,7 @@ export function fightViewGeometry(width,height,state={},options={}){
  const control={x:mix(tip.x,hookPoint.x,.5),y:mix(tip.y,hookPoint.y,.5)+slack};
  const line=[];for(let i=0;i<=18;i++){const t=i/18,u=1-t;line.push({x:u*u*tip.x+2*u*t*control.x+t*t*hookPoint.x,y:u*u*tip.y+2*u*t*control.y+t*t*hookPoint.y});}
  line[0]=tip;line[line.length-1]=hookPoint;
- return{width:w,height:h,landscape,horizon,railY,bottom,scale,mount,mounted,elevation,azimuth,bend,base,butt,grip,reel,reelHub,knob,tip,points,line,waterEntry,hookPoint,heave,
+ return{width:w,height:h,landscape,horizon,railY,bottom,scale,mount,mounted,elevation,azimuth,bend,base,butt,grip,reelSeat,reel,reelHub,knob,tip,points,line,waterEntry,hookPoint,heave,
   showFloat:state.rig==='float'&&Boolean(state.floatPosition)&&state.fishState!=='landed',
   surfaceFish:Boolean(fishProjection),fishProjection,
   lineVisible:['bite','fight'].includes(state.fishState)};

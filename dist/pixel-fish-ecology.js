@@ -3,8 +3,8 @@
  * measured bite percentages. Seasons describe availability, never legality.
  * Every species uses the same unnormalised weight for both encounter timing
  * and conditional selection; poor presentations therefore mean fewer bites. */
-import {getRigProfile,rigSpeciesKey} from './fishing-rigs.js?v=20260927-pixel-v49';
-import {USABLE_CONDITION} from './pixel-consumables.js?v=20260927-pixel-v49';
+import {getRigProfile,rigSpeciesKey} from './fishing-rigs.js?v=20260927-pixel-v50';
+import {USABLE_CONDITION} from './pixel-consumables.js?v=20260927-pixel-v50';
 
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const finite=(v,f=0)=>Number.isFinite(v)?v:f;
