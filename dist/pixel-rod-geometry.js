@@ -1,3 +1,4 @@
+import {rodFlexPoint} from './pixel-rod-response.js?v=20260927-pixel-v30';
 // Shared presentation geometry. The model supplies angles, mount and actual
 // load-derived bend; rendering never invents fish pulls or changes line length.
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
@@ -29,12 +30,12 @@ export function getRodCurve(state,{origin={x:0,y:0},scale=1,heading=finite(state
   const baseHeight=mounted?9:12;
   let tipGround,tipHeight;
   for(let i=0;i<=segments;i++){
-    const t=i/segments,flex=t*t*t,horizontal=length*Math.cos(e)*t+bend*length*.10*flex;
+    const t=i/segments,tipMotion=rodFlexPoint(state,t,length),flex=tipMotion.shape,horizontal=length*Math.cos(e)*t+bend*length*.10*flex;
     // Flexible upper third bends down under the model's tension. The butt and
     // grip remain exactly anchored, and the curve cannot flip through the water.
     const rise=length*Math.sin(e)*t-bend*length*.62*flex;
     const height=Math.max(2,baseHeight+rise*.67),lift=height-baseHeight;
-    points.push({x:base.x+dx*horizontal*scale,y:base.y+dy*horizontal*scale-lift*scale});
+    points.push({x:base.x+(dx*horizontal+tipMotion.x)*scale,y:base.y+(dy*horizontal-lift+tipMotion.y)*scale});
     if(i===segments){tipGround={x:base.x+dx*horizontal*scale,y:base.y+dy*horizontal*scale+baseHeight*scale};tipHeight=height;}
   }
   const tip=points.at(-1),tangent=points[1],norm=Math.hypot(tangent.x-base.x,tangent.y-base.y)||1,ux=(tangent.x-base.x)/norm,uy=(tangent.y-base.y)/norm;

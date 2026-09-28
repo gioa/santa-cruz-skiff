@@ -1,8 +1,8 @@
-import {starterConsumables,ensureConsumables,suppliesWeight} from './pixel-consumables.js?v=20260927-pixel-v29';
+import {starterConsumables,ensureConsumables,suppliesWeight} from './pixel-consumables.js?v=20260927-pixel-v30';
 // Virtual credits and simulation tuning. These are not retail prices or harvest rules.
 export const GEAR_CATALOG=[
  {id:'pfd',slot:'safety',name:'救生衣',price:0,kg:.7,desc:'穿在身上 · 落水时提供浮力',icon:'◈'},
- {id:'rod',slot:'rod',name:'通用船竿与绕线轮',price:0,kg:.65,desc:'7 ft 通用竿 · 初始免费，可应对所有鱼种',icon:'╱',strength:1,retrieve:1,sensitivity:1},
+ {id:'rod',slot:'rod',name:'通用船竿与绕线轮',price:0,kg:.65,desc:'7 ft 中快调通用竿 · 初始免费，可应对所有鱼种',icon:'╱',strength:1,retrieve:1,sensitivity:1},
  {id:'tackle',slot:'rig',name:'基础钓组盒',price:12,starter:true,kg:.9,desc:'预组装单钩沉底组 · 每次补购 1 套，开局赠送 2 套备用',icon:'▦',rig:'bottom',hooks:1},
  {id:'bait',slot:'bait',name:'基础鱼饵盒',price:12,starter:true,kg:.45,desc:'鱿鱼条 · 每次补购 12 份，开局赠送 12 份备用',icon:'≋',bait:'squid',quantity:12},
  {id:'cooler',slot:'cooler',name:'基础冷藏箱',price:0,kg:3.5,desc:'17.6 lb 虚拟鱼获容量 · 含冰袋',icon:'▱',capacity:8},
@@ -10,8 +10,8 @@ export const GEAR_CATALOG=[
  {id:'descending_device',slot:'tool',name:'降鱼器',price:0,kg:.35,desc:'将需要减压放流的岩鱼送回水下',icon:'↧'},
  {id:'water',slot:'supply',name:'饮水、防晒与头灯',price:0,kg:1.5,desc:'饮水、帽子、防晒和夜间照明',icon:'◒'},
  {id:'safety',slot:'safety',name:'通讯与应急包',price:0,kg:1.1,desc:'VHF、急救包、哨子 · 救援始终免费',icon:'⊞'},
- {id:'rod_light',slot:'rod',name:'轻型敏感船竿',price:85,kg:.46,desc:'细微鱼讯更清晰；大鱼搏斗更考验泄力',strength:.84,retrieve:1.02,sensitivity:1.3},
- {id:'rod_boat',slot:'rod',name:'强韧船竿',price:160,kg:.81,desc:'持续负荷更稳；竿身较重、竿尖较迟钝',strength:1.16,retrieve:1.08,sensitivity:.88},
+ {id:'rod_light',slot:'rod',name:'轻型敏感船竿',price:85,kg:.46,desc:'快调轻型竿 · 竿尖点动清晰、回弹快；大鱼搏斗更考验泄力',strength:.84,retrieve:1.02,sensitivity:1.3},
+ {id:'rod_boat',slot:'rod',name:'强韧船竿',price:160,kg:.81,desc:'中调强力竿 · 弯曲延伸至竿身，回弹较缓、细小鱼讯较弱',strength:1.16,retrieve:1.08,sensitivity:.88},
  {id:'rod_electric',slot:'rod',name:'电轮船竿套装',price:320,kg:1.25,desc:'预组装船竿与电动渔轮，含一体电源 · 可持续电动收线',strength:1,retrieve:1,sensitivity:1,electricRetrieve:true},
  {id:'reel_smooth',slot:'reel',name:'顺滑泄力轮',price:145,kg:.34,desc:'减小泄力启动冲击；不增加鱼种解锁',smooth:.86},
  {id:'line_braid',slot:'line',name:'30 lb 拉力编织主线',price:70,kg:.1,desc:'传递鱼讯更直接；低延展需要温和提竿',strength:1.14},

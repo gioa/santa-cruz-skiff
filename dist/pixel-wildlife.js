@@ -11,6 +11,7 @@
  * illustrative game tuning, NOT measured encounter probabilities or forecasts.
  * Birds and cetaceans never change catches, stock, credits or fishing RNG.
  */
+import {createBaitSchool,followerPosition} from './pixel-bait-schools.js?v=20260927-pixel-v30';
 const TAU=Math.PI*2,clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
 const finite=(x,f=0)=>Number.isFinite(x)?x:f;
 export const WILDLIFE_SOURCES=Object.freeze([
@@ -55,8 +56,8 @@ export function createWildlife({seed=defaultSeed(),month=currentMonth(),habitat=
     }
     if(!p)return false;
     const nearbyBait=events.find(e=>e.type==='bait'&&Math.hypot(e.x-p.x,e.z-p.z)<55);
-    let species,name,members,speed,duration;
-    if(type==='bait'){species='anchovy-school';name='饵鱼群与觅食海鸟';members=5+Math.floor(random()*6);speed=.12+random()*.11;duration=50+random()*55;}
+    let species,name,members,speed,duration,school=null;
+    if(type==='bait'){school=createBaitSchool(random,{depth:env.depth,month:conditions.month||month,waterTemp:finite(conditions.waterTemp,14)});species=school.species;name='饵鱼群与觅食海鸟';members=Math.max(1,Math.round(1+school.density*school.radius*.5));speed=.12+random()*.11;duration=50+random()*55;}
     if(type==='dolphins'){species=random()<.55?'pacific-white-sided-dolphin':'common-dolphin';name=species==='common-dolphin'?'普通海豚群':'太平洋斑纹海豚群';members=3+Math.floor(random()*5);speed=1.25+random()*.9;duration=65+random()*35;}
     if(type==='whale'){
       const weights=[['humpback','座头鲸',season.humpback],['gray','灰鲸',season.gray],['blue','蓝鲸',env.depth>55&&env.distanceFromHarbor>1250?season.blue:0]],total=weights.reduce((sum,e)=>sum+e[2],0);
@@ -66,7 +67,7 @@ export function createWildlife({seed=defaultSeed(),month=currentMonth(),habitat=
     // Pods cross the sector independently. They do not chase or attach to boats.
     let heading=Math.atan2(p.x-observer.x,-(p.z-observer.z))+(random()>.5?Math.PI/2:-Math.PI/2);
     if(nearbyBait&&type==='dolphins')heading=Math.atan2(-(nearbyBait.x-p.x),-(nearbyBait.z-p.z));
-    const event={id:++serial,type,species,name,x:p.x,z:p.z,heading,age:0,duration,members,speed,phase:random()*TAU,seed:Math.floor(random()*0xffffffff),linkedBaitId:nearbyBait?.id||null};
+    const event={...school,id:++serial,type,species,name,x:p.x,z:p.z,heading,age:0,duration,members,speed,phase:random()*TAU,seed:Math.floor(random()*0xffffffff),linkedBaitId:nearbyBait?.id||null};
     events.push(event);history.unshift({id:event.id,type,species,name,elapsed:Math.round(elapsed)});history.splice(20);
     return true;
   }
@@ -101,7 +102,7 @@ export function createWildlife({seed=defaultSeed(),month=currentMonth(),habitat=
     }
     return events;
   }
-  return {update,get events(){return events;},get history(){return history.map(e=>({...e}));},get seed(){return seed>>>0;},snapshot(){return events.map(e=>({id:e.id,type:e.type,species:e.species,name:e.name,x:Math.round(e.x),z:Math.round(e.z),age:Math.round(e.age),members:e.members}));}};
+  return {update,get events(){return events;},get history(){return history.map(e=>({...e}));},get seed(){return seed>>>0;},snapshot(){return events.map(e=>({id:e.id,type:e.type,species:e.species,name:e.name,x:Math.round(e.x),z:Math.round(e.z),age:Math.round(e.age),members:e.members,...(e.type==='bait'?{radius:e.radius,density:e.density,depth:e.depth,thickness:e.thickness,visualFishCount:e.visualFishCount,followers:e.followers.map(f=>({...f}))}:{})}));}};
 }
 
 // All marks land on whole pixels. project() is supplied by the world renderer,
@@ -117,11 +118,17 @@ export function drawWildlife(ctx,events,{project,scale=5,sprites={},layer='water
     if(p.x<-220||p.x>ctx.canvas.width+220||p.y<-220||p.y>ctx.canvas.height+220)continue;
     if(e.type==='bait'){
       if(layer==='water'){
-        ctx.globalAlpha=.38*fade;oval(p.x,p.y,18*s,7*s,'#367e88');
-        for(let i=0;i<23;i++){const a=i*2.399+e.age*.5,r=Math.sqrt((i+.5)/23)*19*s,x=p.x+Math.cos(a)*r,y=p.y+Math.sin(a)*r*.43;rect(x,y,3,1,i%4?'#a9d2c4':'#e1e8bf');}
-        ctx.globalAlpha=1;for(let i=0;i<3;i++)ripple(p.x+(i-1)*9*s,p.y+Math.sin(e.age+i)*3,5+(e.age*5+i*4)%10,.32*fade);
+        const edge=project(e.x+finite(e.radius,8),e.z),edgeZ=project(e.x,e.z+finite(e.radius,8)),rx=Math.max(3,Math.hypot(edge.x-p.x,edge.y-p.y)),ry=Math.max(2,Math.hypot(edgeZ.x-p.x,edgeZ.y-p.y)*.7),density=finite(e.density,.5),count=Math.min(160,finite(e.visualFishCount,23));
+        ctx.globalAlpha=(.12+.22*density)*fade;oval(p.x,p.y,rx,ry,'#367e88');
+        ctx.globalAlpha=(.32+.45*density)*fade;
+        for(let i=0;i<count;i++){const a=i*2.399+e.age*.35,r=Math.sqrt((i+.5)/count),x=p.x+Math.cos(a)*r*rx,y=p.y+Math.sin(a)*r*ry;rect(x,y,2+(i%3===0?1:0),1,i%4?'#a9d2c4':'#e1e8bf');}
+        ctx.globalAlpha=1;for(let i=0;i<Math.ceil(density*5);i++)ripple(p.x+Math.sin(i*4.2)*rx*.7,p.y+Math.cos(i*3.7)*ry*.6,3+(e.age*5+i*4)%8,.32*fade);
+        // Brief subsurface silhouettes at the school edge; never labels or a
+        // promise of a bite. Fish artwork uses actual length in world metres.
+        for(const f of e.followers||[]){const pos=followerPosition(e,f);if(!pos.visible)continue;const q=project(pos.x,pos.z),length=Math.max(2,finite(f.lengthCm,65)/100*scale);ctx.save();ctx.globalAlpha=.38*fade;ctx.translate(q.x,q.y);ctx.rotate(pos.heading);oval(0,0,length*.52,length*.14,'#215768');line(-length*.42,0,-length*.7,-length*.17,'#215768');line(-length*.42,0,-length*.7,length*.17,'#215768');ctx.restore();}
+
       }else{
-        for(let i=0;i<e.members;i++){const a=e.age*.34+i*TAU/e.members+e.phase,r=(13+(i%3)*7)*s,dive=Math.max(0,Math.sin(e.age*.9+i*1.7))**12,x=p.x+Math.cos(a)*r,y=p.y+Math.sin(a)*r*.45-(15-dive*13)*s,asset=sprites[(Math.sin(e.age*5+i)>0)?'gull':'gull2'];ctx.globalAlpha=fade;if(asset)ctx.drawImage(asset,Math.round(x-7*s),Math.round(y-4*s),Math.round(14*s),Math.round(8*s));else{line(x-5,y+Math.sin(e.age*5+i)*2,x,y,'#f2ecd4');line(x,y,x+5,y+Math.sin(e.age*5+i)*2,'#f2ecd4');}if(dive>.8)ripple(x,y+3,3+3*dive,.7*fade);}
+        for(let i=0;i<e.members;i++){const a=e.age*.34+i*TAU/e.members+e.phase,r=(finite(e.radius,8)*2+(i%3)*7)*s,dive=Math.max(0,Math.sin(e.age*.9+i*1.7))**12,x=p.x+Math.cos(a)*r,y=p.y+Math.sin(a)*r*.45-(15-dive*13)*s,asset=sprites[(Math.sin(e.age*5+i)>0)?'gull':'gull2'];ctx.globalAlpha=fade;if(asset)ctx.drawImage(asset,Math.round(x-7*s),Math.round(y-4*s),Math.round(14*s),Math.round(8*s));else{line(x-5,y+Math.sin(e.age*5+i)*2,x,y,'#f2ecd4');line(x,y,x+5,y+Math.sin(e.age*5+i)*2,'#f2ecd4');}if(dive>.8)ripple(x,y+3,3+3*dive,.7*fade);}
         ctx.globalAlpha=1;
       }
       continue;

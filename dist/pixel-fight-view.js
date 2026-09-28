@@ -1,7 +1,8 @@
+import {rodFlexPoint} from './pixel-rod-response.js?v=20260927-pixel-v30';
 // First-person artwork uses the same rod pose, load, surface intersection and
 // crank speed as the simulation. It is a camera change, never another fight.
-import {reelMotion} from './pixel-fishing-feedback.js?v=20260927-pixel-v29';
-import {fishSpriteKind,fishSpriteBounds} from './pixel-fish-art.js?v=20260927-pixel-v29';
+import {reelMotion} from './pixel-fishing-feedback.js?v=20260927-pixel-v30';
+import {fishSpriteKind,fishSpriteBounds} from './pixel-fish-art.js?v=20260927-pixel-v30';
 const TAU=Math.PI*2;
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 const finite=(n,f=0)=>Number.isFinite(n)?n:f;
@@ -38,7 +39,7 @@ export function fightViewGeometry(width,height,state={},options={}){
  // some of that span for the loaded tip so full left/right sweeps never clip.
  const span=azimuth<0?base.x-w*.06:w*.94-base.x,dx=span*(azimuth/110)*.80,dy=-length*(.34+.74*Math.sin(e));
  const flexX=span*(azimuth/110)*.18*bend,flexY=bend*Math.min(length*.50,-dy*.90);
- const points=[];for(let i=0;i<=28;i++){const t=i/28,flex=t*t*t;points.push({x:base.x+dx*t+flexX*flex,y:base.y+dy*t+flexY*flex});}
+ const points=[];for(let i=0;i<=28;i++){const t=i/28,motion=rodFlexPoint(state,t,length),flex=motion.shape;points.push({x:clamp(base.x+dx*t+flexX*flex+motion.x,w*.06,w*.94),y:base.y+dy*t+flexY*flex+motion.y});}
  const tip=points.at(-1),norm=Math.hypot(dx,dy)||1,ux=dx/norm,uy=dy/norm;
  const butt={x:base.x-ux*29*scale,y:base.y-uy*29*scale};
  const reel={x:base.x-uy*11*scale-ux*10*scale,y:base.y+ux*11*scale-uy*10*scale};

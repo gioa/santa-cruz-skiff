@@ -1,0 +1,29 @@
+{
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "rodBefore": {
+    "phase": "fight",
+    "tip": {
+      "x": 281,
+      "y": 478
+    },
+    "bend": 1,
+    "motion": 0.267,
+    "range": 3.154
+  },
+  "rodPaused": {
+    "phase": "fight",
+    "tip": {
+      "x": 281,
+      "y": 477
+    },
+    "bend": 1,
+    "motion": -0.018,
+    "range": 3.154
+  },
+  "pauseFrozen": true,
+  "schools": "半径 16.1m · 密度 0.49 · 跟随 无\n半径 6.7m · 密度 0.46 · 跟随 seabass,seabass",
+  "consoleErrors": []
+}

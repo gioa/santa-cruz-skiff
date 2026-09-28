@@ -1,29 +1,29 @@
-import {RETIRED_PIXEL_GEAR,PIXEL_LEGACY_SLOTS,pixelGearAvailable} from './pixel-gear-availability.js?v=20260927-pixel-v29';
-import {fishCommonName,fishDisplayName} from './pixel-fish-names.js?v=20260927-pixel-v29';
-import {fishSpriteKind,drawFishArt} from './pixel-fish-art.js?v=20260927-pixel-v29';
-import {rigHookLabel,rigHookSize} from './pixel-hook-label.js?v=20260927-pixel-v29';
-import {formatWind,formatSpeed,formatDepth,formatLength,formatWeight,formatDistance,formatTemperature,formatNumber,cmToInches,kgToPounds,formatLegacyCatchNote} from './units.js?v=20260927-pixel-v29';
-import {fishingFeedback} from './pixel-fishing-feedback.js?v=20260927-pixel-v29';
-import {createFightView} from './pixel-fight-view.js?v=20260927-pixel-v29';
-import {isFishingFocus} from './pixel-fight-focus.js?v=20260927-pixel-v29';
-import {bindFocusRod} from './pixel-focus-input.js?v=20260927-pixel-v29';
-import {boatActions} from './pixel-boat-actions.js?v=20260927-pixel-v29';
-import {mountFishingConsole} from './pixel-fishing-ui.js?v=20260927-pixel-v29';
-import {mountHelm} from './pixel-helm-ui.js?v=20260927-pixel-v29';
-import {mountRodWorkbench} from './pixel-rod-ui.js?v=20260927-pixel-v29';
-import {layoutWorldAction} from './pixel-action-layout.js?v=20260927-pixel-v29';
-import {PixelSimulation,GEAR_CATALOG,FISHING_SPOTS,HARBOR,BOAT_RENTAL_PRICE,hasSavedBoatRental} from './pixel-sim.js?v=20260927-pixel-v29';
-import {createPixelSprites} from './pixel-sprites.js?v=20260927-pixel-v29';
-import {createPixelWorld} from './pixel-world.js?v=20260927-pixel-v29';
-import {bindPointer,ActionSources} from './input.js?v=20260927-pixel-v29';
-import {PixelAudio} from './pixel-audio.js?v=20260927-pixel-v29';
-import {inventorySlots,moveInventorySlot} from './pixel-inventory.js?v=20260927-pixel-v29';
-import {drawItemIcon} from './pixel-item-icons.js?v=20260927-pixel-v29';
-import {sea,marineSummary,updateSea} from './marine.js?v=20260927-pixel-v29';
-import {seafloorAt} from './pixel-seafloor.js?v=20260927-pixel-v29';
-import {depthInfoAt} from './bathymetry.js?v=20260927-pixel-v29';
-import {compressedDistance} from './pixel-navigation-scale.js?v=20260927-pixel-v29';
-import {landPolygons,pierRings,bearingDegrees} from './pixel-geography.js?v=20260927-pixel-v29';
+import {RETIRED_PIXEL_GEAR,PIXEL_LEGACY_SLOTS,pixelGearAvailable} from './pixel-gear-availability.js?v=20260927-pixel-v30';
+import {fishCommonName,fishDisplayName} from './pixel-fish-names.js?v=20260927-pixel-v30';
+import {fishSpriteKind,drawFishArt} from './pixel-fish-art.js?v=20260927-pixel-v30';
+import {rigHookLabel,rigHookSize} from './pixel-hook-label.js?v=20260927-pixel-v30';
+import {formatWind,formatSpeed,formatDepth,formatLength,formatWeight,formatDistance,formatTemperature,formatNumber,cmToInches,kgToPounds,formatLegacyCatchNote} from './units.js?v=20260927-pixel-v30';
+import {fishingFeedback} from './pixel-fishing-feedback.js?v=20260927-pixel-v30';
+import {createFightView} from './pixel-fight-view.js?v=20260927-pixel-v30';
+import {isFishingFocus} from './pixel-fight-focus.js?v=20260927-pixel-v30';
+import {bindFocusRod} from './pixel-focus-input.js?v=20260927-pixel-v30';
+import {boatActions} from './pixel-boat-actions.js?v=20260927-pixel-v30';
+import {mountFishingConsole} from './pixel-fishing-ui.js?v=20260927-pixel-v30';
+import {mountHelm} from './pixel-helm-ui.js?v=20260927-pixel-v30';
+import {mountRodWorkbench} from './pixel-rod-ui.js?v=20260927-pixel-v30';
+import {layoutWorldAction} from './pixel-action-layout.js?v=20260927-pixel-v30';
+import {PixelSimulation,GEAR_CATALOG,FISHING_SPOTS,HARBOR,BOAT_RENTAL_PRICE,hasSavedBoatRental} from './pixel-sim.js?v=20260927-pixel-v30';
+import {createPixelSprites} from './pixel-sprites.js?v=20260927-pixel-v30';
+import {createPixelWorld} from './pixel-world.js?v=20260927-pixel-v30';
+import {bindPointer,ActionSources} from './input.js?v=20260927-pixel-v30';
+import {PixelAudio} from './pixel-audio.js?v=20260927-pixel-v30';
+import {inventorySlots,moveInventorySlot} from './pixel-inventory.js?v=20260927-pixel-v30';
+import {drawItemIcon} from './pixel-item-icons.js?v=20260927-pixel-v30';
+import {sea,marineSummary,updateSea} from './marine.js?v=20260927-pixel-v30';
+import {seafloorAt} from './pixel-seafloor.js?v=20260927-pixel-v30';
+import {depthInfoAt} from './bathymetry.js?v=20260927-pixel-v30';
+import {compressedDistance} from './pixel-navigation-scale.js?v=20260927-pixel-v30';
+import {landPolygons,pierRings,bearingDegrees} from './pixel-geography.js?v=20260927-pixel-v30';
 const $=id=>document.getElementById(id),show=(id,value)=>{$(id).hidden=!value;},txt=(id,v)=>{if($(id).textContent!==String(v))$(id).textContent=v;};
 const SAVE='santa-cruz-pixel-v1',esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let saved=null;try{saved=JSON.parse(localStorage.getItem(SAVE)||'null');}catch{}
@@ -163,9 +163,9 @@ function updateUI(){const s=sim.state;syncFishingFocus();if(s.engine&&!lastEngin
  show('fish-status',['bite','fight'].includes(fish));txt('fish-title',({sinking:'鱼饵正在下沉',waiting:'等一尾鱼',bite:'咬钩了！',fight:fishingFeedback(s).cue})[fish]||'');txt('fish-distance','');txt('fish-detail',fish==='fight'?'':fish==='bite'?(s.rodMount==='hand'?'稳收鱼线':'取竿'):fish==='waiting'?(s.rigPresentation?.bottomContact?'铅坠触底':'留意鱼线的动静'):fish==='sinking'?(nav.sounder?`钓组深度 ${formatDepth(s.lureDepth)}`:(s.reelMode==='free'?'鱼线缓缓放出':'留意竿尖')):'');
  if(focusActive){$('toast').style.bottom='';}else if(sailing&&!$('boat-console').hidden){const inset=innerHeight-$('boat-console').getBoundingClientRect().top+10;world.setBottomInset?.(inset);$('toast').style.bottom=`${inset+10}px`;}else{world.setBottomInset?.(18);$('toast').style.bottom='24px';}
  if(s.toastId!==lastToastId){lastToastId=s.toastId;toast(s.toast);}if(fish==='bite'&&lastFishState!=='bite'){stopWinding();helm.reset();boatPanel='tackle';audio.event('bite');if(navigator.vibrate)navigator.vibrate([70,60,70]);}if(['idle','flight'].includes(lastFishState)&&['sinking','waiting'].includes(fish))audio.event('plop');const newlyLanded=fish==='landed'&&lastFishState!=='landed';lastFishState=fish;if(newlyLanded){audio.event('catch');openCatch();}
- $('game-state').textContent=JSON.stringify({...sim.publicState(),view:focusActive?'first-person':'overhead',focusView:fightView.snapshot(),helm:helm.snapshot(),availableActions:getBoatActions(),camera:world.publicState().camera,audio:audio.publicState(),boats:world.publicState().boats,ecology:world.publicState().wildlife,menu,rendererFPS:Math.round(fps),viewport:{width:innerWidth,height:innerHeight},build:'20260927-pixel-v29'});
+ $('game-state').textContent=JSON.stringify({...sim.publicState(),view:focusActive?'first-person':'overhead',focusView:fightView.snapshot(),helm:helm.snapshot(),availableActions:getBoatActions(),camera:world.publicState().camera,audio:audio.publicState(),boats:world.publicState().boats,ecology:world.publicState().wildlife,menu,rendererFPS:Math.round(fps),viewport:{width:innerWidth,height:innerHeight},build:'20260927-pixel-v30'});
 }
-function frame(now){const dt=Math.min(.1,Math.max(0,(now-lastFrame)/1000));lastFrame=now;sim.step(dt,input(dt));syncFishingFocus();world.draw(sim.state,dt);fightView.draw(sim.state,dt,{active:focusActive,conditions:sim.conditions,paused:sim.state.paused,reducedMotion:reducedMotion.matches,bottomInset:innerHeight<500?120:180,landed:sim.state.fishState==='landed'});fishing.draw(dt);updateWorldActions();audio.update(sim.state.time,sim.state.engine&&!sim.state.paused,sim.state.throttle,sim.state.walking&&!sim.state.paused,{speed:Math.abs(sim.state.speed),wave:sea.waveHeight,underwater:false,roll:sim.state.roll,paused:sim.state.paused,fishState:sim.state.fishState,reelMode:sim.state.reelMode,payoutRate:sim.state.payoutRate,retrieveRate:sim.state.retrieveRate,crankRate:sim.state.crankRate,rodLoadN:sim.state.rodLoadN,dragThresholdN:sim.state.dragThresholdN,lineSlackMeters:sim.state.lineSlackMeters});uiElapsed+=dt;saveElapsed+=dt;fpsTimer+=dt;frames++;if(fpsTimer>1){fps=frames/fpsTimer;frames=0;fpsTimer=0;}if(uiElapsed>.1){uiElapsed=0;updateUI();}if(saveElapsed>10){saveElapsed=0;persist();}requestAnimationFrame(frame);}
+function frame(now){const dt=Math.min(.1,Math.max(0,(now-lastFrame)/1000));lastFrame=now;sim.setBaitSchools(world.wildlife.events);sim.step(dt,input(dt));syncFishingFocus();world.draw(sim.state,dt);fightView.draw(sim.state,dt,{active:focusActive,conditions:sim.conditions,paused:sim.state.paused,reducedMotion:reducedMotion.matches,bottomInset:innerHeight<500?120:180,landed:sim.state.fishState==='landed'});fishing.draw(dt);updateWorldActions();audio.update(sim.state.time,sim.state.engine&&!sim.state.paused,sim.state.throttle,sim.state.walking&&!sim.state.paused,{speed:Math.abs(sim.state.speed),wave:sea.waveHeight,underwater:false,roll:sim.state.roll,paused:sim.state.paused,fishState:sim.state.fishState,reelMode:sim.state.reelMode,payoutRate:sim.state.payoutRate,retrieveRate:sim.state.retrieveRate,crankRate:sim.state.crankRate,rodLoadN:sim.state.rodLoadN,dragThresholdN:sim.state.dragThresholdN,lineSlackMeters:sim.state.lineSlackMeters});uiElapsed+=dt;saveElapsed+=dt;fpsTimer+=dt;frames++;if(fpsTimer>1){fps=frames/fpsTimer;frames=0;fpsTimer=0;}if(uiElapsed>.1){uiElapsed=0;updateUI();}if(saveElapsed>10){saveElapsed=0;persist();}requestAnimationFrame(frame);}
 // Page-scoped tools expose the same validated player actions as the controls.
 // There is deliberately no time skip, teleport, forced bite, or fish injection.
 const mcp=document.modelContext;if(mcp?.registerTool){const ctl=new AbortController(),reg=tool=>{try{Promise.resolve(mcp.registerTool(tool,{signal:ctl.signal})).catch(()=>{});}catch{}};reg({name:'read_pixel_fishing_state',title:'读取像素海钓状态',description:'Read current trip state, active real-time seconds, and controls. No changes.',inputSchema:{type:'object',properties:{},additionalProperties:false},annotations:{readOnlyHint:true},execute:()=>({...sim.publicState(),view:focusActive?'first-person':'overhead',focusView:fightView.snapshot(),helm:helm.snapshot(),availableActions:getBoatActions(),camera:world.publicState().camera,audio:audio.publicState(),boats:world.publicState().boats,ecology:world.publicState().wildlife,menu,fps:Math.round(fps)})});reg({name:'pixel_fishing_action',title:'像素海钓操作',description:'Perform the same validated player action as the visible game controls, without advancing time. Menus pause the game.',inputSchema:{type:'object',properties:{action:{type:'string',enum:['start','resume','close','walk_counter','walk_boarding','interact','pack','launch','engine','lower','spool_free','spool_brake','mount_hand','mount_port','mount_starboard','hook','retrieve','reel_on','reel_off','keep','release','trade']},destination:{type:'string'}},required:['action'],additionalProperties:false},execute:({action})=>{let result;if(action==='start'||action==='resume'){start(action==='resume');return sim.publicState();}if(action==='close'){closeModal();return sim.publicState();}if(['pack','trade'].includes(action)){result=action==='pack'?sim.packStarter():sim.trade();}else if(['keep','release'].includes(action)){result=action==='keep'?sim.keepCatch():sim.releaseCatch();if(result.ok)closeModal();}else{if(menu)throw Error('Close the current menu first.');const actions={walk_counter:()=>sim.walkTo('counter'),walk_boarding:()=>sim.walkTo('boarding'),interact:()=>sim.interact(),launch:()=>sim.launchBoat(),engine:()=>sim.toggleEngine(),lower:()=>sim.lowerRig(),spool_free:()=>sim.setReelMode('free'),spool_brake:()=>sim.setReelMode('brake'),mount_hand:()=>{if(!getBoatActions().take)return{ok:false,message:'当前不能拿起鱼竿'};stopWinding();helm.reset();return sim.setRodMount('hand');},mount_port:()=>{if(!getBoatActions().mount)return{ok:false};stopWinding();return sim.setRodMount('port');},mount_starboard:()=>{if(!getBoatActions().mount)return{ok:false};stopWinding();return sim.setRodMount('starboard');},hook:()=>sim.hook(),retrieve:()=>{if(!getBoatActions().retrieve)return{ok:false,message:'当前不能电动收线。'};stopWinding();autoRetrieve=true;return sim.setReelMode('brake');},reel_on:()=>{if(!getBoatActions().reel)return{ok:false};sources.set('reel','webmcp',true);return{ok:true};},reel_off:()=>{stopWinding();return{ok:true};}};result=actions[action]?.();}feedback(result);persist();return{result,...sim.publicState()};}});reg({name:'set_pixel_fishing_waypoint',title:'选择像素海钓航向',description:'Choose a chart fishing spot or the return dock. Real-time boating physics and collision rules apply.',inputSchema:{type:'object',properties:{destination:{type:'string',enum:['0','1','2','3','dock']}},required:['destination'],additionalProperties:false},execute:({destination})=>{if(menu)throw Error('Close chart/menu first.');helm.reset();const result=feedback(sim.selectWaypoint(destination==='dock'?'dock':FISHING_SPOTS[Number(destination)]));return{result,...sim.publicState()};}});window.addEventListener('pagehide',()=>ctl.abort(),{once:true});}

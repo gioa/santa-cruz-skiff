@@ -3,8 +3,8 @@
  * measured bite percentages. Seasons describe availability, never legality.
  * Every species uses the same unnormalised weight for both encounter timing
  * and conditional selection; poor presentations therefore mean fewer bites. */
-import {getRigProfile,rigSpeciesKey} from './fishing-rigs.js?v=20260927-pixel-v29';
-import {USABLE_CONDITION} from './pixel-consumables.js?v=20260927-pixel-v29';
+import {getRigProfile,rigSpeciesKey} from './fishing-rigs.js?v=20260927-pixel-v30';
+import {USABLE_CONDITION} from './pixel-consumables.js?v=20260927-pixel-v30';
 
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const finite=(v,f=0)=>Number.isFinite(v)?v:f;
@@ -152,7 +152,7 @@ export function fishEncounter(fishes,options={}){
   const seasonal=monthlyAvailability(key,e.month),waterTemp=finite(options.waterTemp,14);
   const temperature=key==='bonito'?.06+.94*clamp((waterTemp-11)/6,0,1):key==='mackerel'?.2+.8*clamp((waterTemp-9)/5,0,1):1;
   const rarity=Math.max(0,finite(fish?.rarity,s.rarity??1));
-  const weight=s.density*rarity*habitat*depthAffinity(e.bottom,s.depth)*layerAffinity(key,e)*presentationAffinity(key,e)*tipAffinity(key,e)*seasonal*temperature*freshness;
+  const weight=s.density*rarity*habitat*depthAffinity(e.bottom,s.depth)*layerAffinity(key,e)*presentationAffinity(key,e)*tipAffinity(key,e)*seasonal*temperature*freshness*clamp(finite(options.schoolInfluence?.[key],1),1,8);
   return Math.max(0,weight);
  });
  const totalWeight=weights.reduce((a,b)=>a+b,0);

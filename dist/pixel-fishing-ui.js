@@ -1,9 +1,10 @@
-import {rigHookSize} from './pixel-hook-label.js?v=20260927-pixel-v29';
-import {formatDepth,metersToFeet} from './units.js?v=20260927-pixel-v29';
-import {getRigProfile} from './fishing-rigs.js?v=20260927-pixel-v29';
-import {bindPointer} from './input.js?v=20260927-pixel-v29';
-import {rodPoseFromDrag,clockwiseTurns,createCrankInput} from './pixel-fishing-input.js?v=20260927-pixel-v29';
-import {fishingFeedback,reelMotion} from './pixel-fishing-feedback.js?v=20260927-pixel-v29';
+import {rodFlexPoint} from './pixel-rod-response.js?v=20260927-pixel-v30';
+import {rigHookSize} from './pixel-hook-label.js?v=20260927-pixel-v30';
+import {formatDepth,metersToFeet} from './units.js?v=20260927-pixel-v30';
+import {getRigProfile} from './fishing-rigs.js?v=20260927-pixel-v30';
+import {bindPointer} from './input.js?v=20260927-pixel-v30';
+import {rodPoseFromDrag,clockwiseTurns,createCrankInput} from './pixel-fishing-input.js?v=20260927-pixel-v30';
+import {fishingFeedback,reelMotion} from './pixel-fishing-feedback.js?v=20260927-pixel-v30';
 
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const rigNames={bottom:'沉底组',dropper:'双支线',slider:'滑铅组',jig:'软饵组',float:'浮漂组',sabiki:'羽毛组',feather40:'双支羽毛'};
@@ -52,7 +53,7 @@ export function mountFishingConsole(root,{sim,getActions,isRetrieving=()=>false,
   c.strokeStyle='#a6ae8b';c.lineWidth=1;for(let x=0;x<w;x+=24){c.beginPath();c.moveTo(x,0);c.lineTo(x,h);c.stroke();}
   const by=compact?h*.82:h*.83,length=compact?w*.43:Math.min(w*.43,h*.85),side=azimuth<0?-1:1,dx=Math.cos(elevation)*length*azimuth,dy=-Math.sin(elevation)*length;
   const baseX=w*.5,points=[];
-  for(let i=0;i<=18;i++){const t=i/18;points.push({x:baseX+dx*t,y:by+dy*t+bend*length*.48*t*t*t});}
+  for(let i=0;i<=18;i++){const t=i/18,motion=rodFlexPoint(s,t,length);points.push({x:baseX+dx*t+motion.x,y:by+dy*t+bend*length*.48*motion.shape+motion.y});}
   c.lineCap='round';for(let i=1;i<points.length;i++){c.strokeStyle=i<5?'#354c42':i<11?'#415b4b':'#9a8050';c.lineWidth=i<4?6:i<9?3:1.7;c.beginPath();c.moveTo(points[i-1].x,points[i-1].y);c.lineTo(points[i].x,points[i].y);c.stroke();}
   c.strokeStyle='#e5eed2';c.lineWidth=1;c.beginPath();points.forEach((p,i)=>c[i?'lineTo':'moveTo'](p.x+side*2,p.y+2));const tip=points.at(-1),entry={x:tip.x+azimuth*8,y:h+4},slack=clamp(s.lineSlackMeters||0,0,6)*4;
   c.quadraticCurveTo((tip.x+entry.x)*.5+slack,(tip.y+entry.y)*.5+slack,entry.x,entry.y);c.stroke();
