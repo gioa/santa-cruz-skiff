@@ -94,7 +94,7 @@ function ensurePicker() {
     cards.append(card);
   }
   picker.append(header, description, cards,
-    element('p', 'location-picker-note', '每个钓场各自记录进度，下次回来接着钓。'));
+    element('p', 'location-picker-note', '切换钓场会保存当前行程，下次回来接着钓。'));
   picker.addEventListener('click', event => {
     if (event.target !== picker) return;
     const bounds = picker.getBoundingClientRect();
@@ -155,10 +155,10 @@ export function mountLocationPicker() {
       openLocationPicker(trigger);
     });
   }
-  // Santa Cruz's controller does not yet consume the pause event. Its live
-  // navigation is therefore a regular link, with no overlay over running play.
+  // Both scene controllers pause through the location-picker event, so the
+  // destination control has the same behavior in every scene.
   const tools = document.querySelector('.hud-tools');
-  if (current.id === 'santa-cruz' && tools && !tools.querySelector('.location-hud-link')) {
+  if (tools && !tools.querySelector('.location-hud-link')) {
     const next = LOCATIONS.find(location => location.id !== current.id);
     if (next) {
       const link = element('a', 'location-hud-link', '⌖');
@@ -166,7 +166,7 @@ export function mountLocationPicker() {
       link.title = `切换钓场 · ${next.name}`;
       link.setAttribute('aria-label', `切换钓场，前往 ${next.name}`);
       link.addEventListener('click', event => {
-        if (document.querySelector('#app')?.classList.contains('is-intro')) {
+        if (document.querySelector('#app')) {
           event.preventDefault();
           openLocationPicker(link);
         }

@@ -193,7 +193,7 @@ export class PacificaSimulation {
     s.lastCatch = {...fish, kept: Boolean(keep)};
     if (keep) {s.catches.push(fish); s.stats.kept++;} else s.stats.released++;
     this.clearLine();
-    return this.result(true, keep ? `${fish.name}已放入鱼袋，回店出售可得 ${fish.value} 贝币。` : `${fish.name}游回浪里了。`, {fish});
+    return this.result(true, keep ? `${fish.name}已放入鱼袋，回店出售可得 ${fish.value} 潮汐点。` : `${fish.name}游回浪里了。`, {fish});
   }
 
   equipBait(id) {
@@ -210,7 +210,7 @@ export class PacificaSimulation {
     if (!item) return this.result(false, '店里没有这件物品。');
     if (s.upgrades.includes(id)) return this.result(false, '这件装备已经买过并装配好了。');
     if (item.kind === 'free' && baitIds.some(id => s.inventory[id] > 0)) return this.result(false, '还有鱼饵可以使用；全部用完后再领取应急沙蟹。');
-    if (s.credits < item.price) return this.result(false, '贝币不够。可以先带鱼回来出售。');
+    if (s.credits < item.price) return this.result(false, '潮汐点不够。可以先带鱼回来出售。');
     if (item.kind === 'bait' && s.inventory[id] + item.quantity > 999) return this.result(false, '鱼饵盒已经装满了。');
     s.credits -= item.price;
     if (item.kind === 'bait') s.inventory[id] += item.quantity;
@@ -224,7 +224,7 @@ export class PacificaSimulation {
     if (!this.nearShop) return this.result(false, '带着鱼走回商店门口再出售。');
     const count = s.catches.length, total = s.catches.reduce((sum, fish) => sum + fish.value, 0);
     s.catches = []; s.credits += total; s.stats.sold += count;
-    return this.result(true, count ? `出售 ${count} 条鱼，获得 ${total} 贝币。` : '鱼袋还是空的，先去浪线试试手气。', {count, total});
+    return this.result(true, count ? `出售 ${count} 条鱼，获得 ${total} 潮汐点。` : '鱼袋还是空的，先去浪线试试手气。', {count, total});
   }
 
   update(dt, input = {}) {
