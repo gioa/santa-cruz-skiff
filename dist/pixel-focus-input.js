@@ -1,4 +1,4 @@
-import {bindPointer} from './input.js?v=20260928-pixel-v75';
+import {bindPointer} from './input.js?v=20260928-pixel-v76';
 
 // One held contact lifts; a deliberate release recovers. Drag distance never
 // steers the rod. Cancellation/blur must not count as a release-to-wind.

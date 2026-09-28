@@ -22,19 +22,25 @@ test('spool length depends on three-dimensional tackle position, not horizontal 
  const paid=s.paidLineMeters;s.reelMode='brake';for(let i=0;i<100;i++)Object.assign(s,stepFishingLine(s,{dt:.05,environment:{bottomDepth:40}}));assert.equal(s.paidLineMeters,paid);assert.ok(dist(s.rodTip,s.bobber)<=paid+1e-6);
  for(let i=0;i<80;i++){s.crankRate=1.2;Object.assign(s,stepFishingLine(s,{dt:.05,environment:{bottomDepth:40}}));}assert.ok(s.paidLineMeters<paid-2);
 });
-test('out-of-range taps are rejected without substituting a boat-side endpoint or consuming tackle',()=>{
+test('out-of-range taps cast to maximum reach in the chosen direction and pay only actual line',()=>{
  const sim=ready(),s=sim.state;
  for(const rig of ['bottom','slider','jig','float','dropper','sabiki','feather40']){
   const state={...s,rig,rigWeightGrams:undefined},range=castRange(state);
-  for(const distance of [range+.01,range*2,1000]){
-   const p=planCast(state,{x:s.boatX-distance,z:s.boatZ});assert.equal(p.ok,false);assert.equal(p.reason,'out-of-range');assert.equal(p.flight,undefined);assert.match(p.message,/抛投范围/);
+  for(const distance of [range+.01,range*2,1000])for(const angle of [0,.7,2.3,4.8]){
+   const dx=Math.cos(angle),dz=Math.sin(angle),p=planCast(state,{x:s.boatX+distance*dx,z:s.boatZ+distance*dz});assert.ok(p.ok);
+   assert.ok(Math.abs(p.flight.end.x-s.boatX-range*dx)<1e-9);assert.ok(Math.abs(p.flight.end.z-s.boatZ-range*dz)<1e-9);
   }
   const exact=planCast(state,{x:s.boatX-range,z:s.boatZ});assert.ok(exact.ok);assert.equal(exact.flight.end.x,s.boatX-range);
  }
- const stock=structuredClone(s.profile.stock),bait=structuredClone(s.baitOnHook),before=s.casts;
- assert.equal(sim.castTo({x:s.boatX-60,z:s.boatZ}).ok,false);
- assert.equal(s.fishState,'idle');assert.equal(s.casts,before);assert.equal(s.castFlight,null);assert.equal(s.bobber,null);assert.equal(s.paidLineMeters,0);assert.deepEqual(s.profile.stock,stock);assert.deepEqual(s.baitOnHook,bait);
+ const stock=structuredClone(s.profile.stock),before=s.casts,range=castRange(s),target={x:s.boatX-60,z:s.boatZ+80};
+ assert.ok(sim.castTo(target).ok);assert.equal(s.fishState,'flight');assert.equal(s.casts,before+1);assert.ok(s.paidLineMeters<1);
+ const end={...s.castFlight.end};assert.ok(Math.abs(end.x-s.boatX+range*.6)<1e-9);assert.ok(Math.abs(end.z-s.boatZ-range*.8)<1e-9);
+ splash(sim);assert.deepEqual(s.bobber,end);assert.ok(s.paidLineMeters<range+3);assert.deepEqual(s.profile.stock,stock);
  assert.ok(castRange({...s,rig:'jig',rigWeightGrams:42})>castRange({...s,rig:'feather40',rigWeightGrams:113}));
+});
+test('range-adjusted casts still reject land at the landing point or in the flight corridor',()=>{
+ const state={...ready().state,boatX:0,boatZ:0},target={x:100,z:0},range=castRange(state);
+ for(const isWater of [x=>x<range-.1||x>range+.1,x=>x<2||x>4])assert.equal(planCast(state,target,{isWater}).ok,false);
 });
 test('land, pier corridors, invalid and inside-hull taps do not deploy a rig',()=>{
  const sim=ready(),s=sim.state,before=s.casts;for(const target of [null,{x:NaN,z:0},{x:s.boatX,z:s.boatZ},{x:0,z:0}])assert.equal(sim.castTo(target).ok,false);assert.equal(s.fishState,'idle');assert.equal(s.casts,before);

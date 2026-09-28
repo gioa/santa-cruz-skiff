@@ -1,6 +1,5 @@
-import {rodTipPosition,MAX_PAID_LINE_METERS} from './pixel-fishing-physics.js?v=20260928-pixel-v75';
-import {formatDepth} from './units.js?v=20260928-pixel-v75';
-import {getRigProfile} from './fishing-rigs.js?v=20260928-pixel-v75';
+import {rodTipPosition,MAX_PAID_LINE_METERS} from './pixel-fishing-physics.js?v=20260928-pixel-v76';
+import {getRigProfile} from './fishing-rigs.js?v=20260928-pixel-v76';
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 const distance=(a,b)=>Math.hypot(a.x-b.x,a.z-b.z,(a.height||0)-(b.height||0));
 // Short, controlled boat casts. These ranges are gameplay calibration, not
@@ -17,10 +16,10 @@ export function planCast(s,target,{isWater=()=>true}={}){
  if(requested<3)return{ok:false,message:'船边可直接下放钓组。'};
  if(!isWater(target.x,target.z))return{ok:false,message:'请选择水面。'};
  const range=castRange(s);
- // A tap is a destination, not a direction. Never silently substitute a
- // shorter endpoint: on the enlarged hull that looked like a boat-side drop.
- if(requested>range+1e-8)return{ok:false,reason:'out-of-range',range,message:`超出这套钓组的抛投范围（约 ${formatDepth(range,0)}），请点近一些。`};
- const travel=requested,end={x:target.x,z:target.z,height:0};
+ // Preserve the tap direction; shorten only the distance when it exceeds
+ // this rig's range. In-range taps retain their exact water coordinates.
+ const travel=Math.min(requested,range),scale=travel/requested;
+ const end={x:requested<=range?target.x:s.boatX+dx*scale,z:requested<=range?target.z:s.boatZ+dz*scale,height:0};
  // Check the full flight corridor, not just the endpoint: no casts across
  // the pier/buildings or another stretch of shoreline.
  for(let d=.5;d<=travel+.5;d+=.5){const u=Math.min(1,d/travel);if(!isWater(s.boatX+(end.x-s.boatX)*u,s.boatZ+(end.z-s.boatZ)*u))return{ok:false,message:'这条抛投路线被岸边挡住了。'};}
