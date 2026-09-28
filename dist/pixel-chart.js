@@ -1,7 +1,7 @@
-import {bathymetry,elevationAtGPS} from './bathymetry.js?v=20260928-pixel-v60';
-import {seafloor,seafloorAtGPS} from './pixel-seafloor.js?v=20260928-pixel-v60';
-import {landPolygons,pierRings,toGPS,FISHING_SPOTS} from './pixel-geography.js?v=20260928-pixel-v60';
-import {CHART_HOME,BED_COLORS,BED_LABELS,FEET_PER_METER,chartMeters,chartProjection,zoomChart,chartSample,depthContours,depthColor} from './pixel-chart-data.js?v=20260928-pixel-v60';
+import {bathymetry,elevationAtGPS} from './bathymetry.js?v=20260928-pixel-v62';
+import {seafloor,seafloorAtGPS} from './pixel-seafloor.js?v=20260928-pixel-v62';
+import {landPolygons,pierRings,toGPS,FISHING_SPOTS} from './pixel-geography.js?v=20260928-pixel-v62';
+import {CHART_HOME,BED_COLORS,BED_LABELS,FEET_PER_METER,chartMeters,chartProjection,zoomChart,chartSample,depthContours,depthColor} from './pixel-chart-data.js?v=20260928-pixel-v62';
 let layers=null,contours=null;
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 function makeLayers(){
@@ -26,7 +26,7 @@ function makeLayers(){
  return layers;
 }
 export function chartMarkup(){return`<div class="chart-controls"><div role="group" aria-label="海图图层"><button id="chart-bottom" aria-pressed="true">底质</button><button id="chart-depth" aria-pressed="false">水深</button></div><div role="group" aria-label="海图缩放"><button id="chart-out" aria-label="缩小海图">−</button><button id="chart-locate" aria-label="定位当前位置">⌖</button><button id="chart-home" aria-label="海图全览">全览</button><button id="chart-in" aria-label="放大海图">＋</button></div></div><div class="chart-frame"><canvas id="chart" tabindex="0" role="img" aria-label="Santa Cruz 海底地形图；北向上，拖动平移，双指缩放，轻点标记目的地并查看底质与参考水深"></canvas><span class="chart-hint">拖动 · 双指缩放 · 点选</span></div><div id="chart-reading" class="chart-reading" aria-live="polite">轻点海面查看底质与参考水深</div><div class="chart-destination"><span id="chart-route-status" aria-live="polite">蓝色箭头 · 当前位置</span><button id="chart-navigate" class="primary" disabled>前往标点</button></div><div id="chart-legend" class="chart-legend"></div><p class="chart-datum">等深线与水深：ft · 历史 MHW 基准</p>`;}
-export function mountChart(root,{gpsPosition=null,heading=0,waypoint=null,planDestination=()=>({ok:false,message:'先登船。'}),onNavigate=()=>{}}={}){
+export function mountChart(root,{gpsPosition=null,canNavigate=false,heading=0,waypoint=null,planDestination=()=>({ok:false,message:'先登船。'}),onNavigate=()=>{}}={}){
  makeLayers();
  const canvas=root.querySelector('#chart'),ctx=canvas.getContext('2d'),reading=root.querySelector('#chart-reading'),legend=root.querySelector('#chart-legend'),abort=new AbortController(),signal=abort.signal;
  let W=0,H=0,view=null,layer='bottom',selection=waypoint,plan=null,frame=0,gesture=null;
@@ -37,8 +37,8 @@ export function mountChart(root,{gpsPosition=null,heading=0,waypoint=null,planDe
  function schedule(){if(!frame)frame=requestAnimationFrame(()=>{frame=0;draw();});}
  function updateReading(){
   go.disabled=true;plan=null;
-  if(!selection){reading.textContent='轻点海面标记目的地';routeStatus.textContent='蓝色箭头 · 当前位置';delete canvas.dataset.destination;return;}
-  plan=planDestination(selection);go.disabled=!plan.ok;
+  if(!selection){reading.textContent='轻点海面查看底质与参考水深';routeStatus.textContent=gpsPosition?(canNavigate?'轻点海面选择航点':'蓝色箭头 · 当前位置；自动航行需要电推马达'):'纸质海图 · 不提供实时定位';delete canvas.dataset.destination;return;}
+  plan=canNavigate?planDestination(selection):{ok:false,message:gpsPosition?'GPS 显示当前位置；自动航行需要电推马达。':'纸质海图只提供海域资料。'};go.disabled=!plan.ok;
   routeStatus.textContent=plan.ok?'航线已规划 · 蓝色箭头为当前位置':plan.message;
   canvas.dataset.destination=JSON.stringify(selection);
   const s=chartSample(selection.lon,selection.lat);
@@ -91,7 +91,7 @@ export function mountChart(root,{gpsPosition=null,heading=0,waypoint=null,planDe
  function zoom(factor,point={x:W/2,y:H/2}){view=zoomChart(view,factor,point,W,H);schedule();}
  function bind(id,fn){root.querySelector(id).addEventListener('click',fn,{signal});}
  bind('#chart-locate',()=>{if(gpsPosition){view={...chartMeters(gpsPosition.lon,gpsPosition.lat),mpp:Math.min(view.mpp,5)};schedule();}});
- root.querySelector('#chart-locate').disabled=!gpsPosition;
+ root.querySelector('#chart-locate').disabled=!gpsPosition;root.querySelector('#chart-locate').hidden=!gpsPosition;go.hidden=!canNavigate;
  bind('#chart-navigate',()=>{if(selection&&plan?.ok)onNavigate({...selection});});
  bind('#chart-in',()=>zoom(.5));bind('#chart-out',()=>zoom(2));bind('#chart-home',home);
  for(const kind of ['bottom','depth'])bind(`#chart-${kind}`,()=>{layer=kind;updateLegend();schedule();});

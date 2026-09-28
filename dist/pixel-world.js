@@ -1,13 +1,13 @@
-import {pierRings,landPolygons,coastLines,buildingFootprints,FISHING_SPOTS,onLand,onPier} from './pixel-geography.js?v=20260928-pixel-v60';
-import {FISHING_SCENE_SCALE,fishingProjector,fishingPhysicalPoint} from './pixel-fishing-projection.js?v=20260928-pixel-v60';
-import {HARBOR,harborWaterBlocked} from './harbor-layout.js?v=20260928-pixel-v60';
-import {depthInfoAt} from './bathymetry.js?v=20260928-pixel-v60';
-import {createWildlife,drawWildlife} from './pixel-wildlife.js?v=20260928-pixel-v60';
-import {cameraOffset,projectPixel,unprojectPixel,stepDeadzoneCamera,cameraDeadzone,cameraPlayfield,fitCameraBounds,zoomCameraAt,rectilinearOutline} from './pixel-camera.js?v=20260928-pixel-v60';
-import {ladderPoint} from './swimming.js?v=20260928-pixel-v60';
-import {SKIFF_HULL_OUTLINE,SKIFF_RACKS,boatRenderPose,parkedSkiffPoses,skiffScreenPose,hitSkiff,outboardPose,skiffDavitGeometry} from './pixel-boat-geometry.js?v=20260928-pixel-v60';
-import {createWakeTrail,crestPoints,foamPoint} from './pixel-wake.js?v=20260928-pixel-v60';
-import {getRodCurve,getReelPose,getFishingLine,getFishingPresentation} from './pixel-rod-geometry.js?v=20260928-pixel-v60';
+import {pierRings,landPolygons,coastLines,buildingFootprints,FISHING_SPOTS,onLand,onPier} from './pixel-geography.js?v=20260928-pixel-v62';
+import {FISHING_SCENE_SCALE,fishingProjector,fishingPhysicalPoint} from './pixel-fishing-projection.js?v=20260928-pixel-v62';
+import {HARBOR,harborWaterBlocked} from './harbor-layout.js?v=20260928-pixel-v62';
+import {depthInfoAt} from './bathymetry.js?v=20260928-pixel-v62';
+import {createWildlife,drawWildlife} from './pixel-wildlife.js?v=20260928-pixel-v62';
+import {cameraOffset,projectPixel,unprojectPixel,stepDeadzoneCamera,cameraDeadzone,cameraPlayfield,fitCameraBounds,zoomCameraAt,rectilinearOutline} from './pixel-camera.js?v=20260928-pixel-v62';
+import {ladderPoint} from './swimming.js?v=20260928-pixel-v62';
+import {SKIFF_HULL_OUTLINE,SKIFF_RACKS,boatRenderPose,parkedSkiffPoses,skiffScreenPose,hitSkiff,outboardPose,skiffDavitGeometry} from './pixel-boat-geometry.js?v=20260928-pixel-v62';
+import {createWakeTrail,crestPoints,foamPoint} from './pixel-wake.js?v=20260928-pixel-v62';
+import {getRodCurve,getReelPose,getFishingLine,getFishingPresentation} from './pixel-rod-geometry.js?v=20260928-pixel-v62';
 
 // Boat and wharf art retain readable proportions. Fishing and visible fish
 // share the same geographic projection as the seabed.
@@ -214,6 +214,7 @@ export function createPixelWorld(canvas,{sprites={},conditions={}}={}){
         if(occupantPose==='driving'){pixelLine(6,-3,9,9,'#e1b58e',4);pixelLine(9,9,3,23,'#343f43',3);ctx.fillStyle='#d6aa86';ctx.fillRect(7,7,4,4);}else if(occupantPose!=='fishing'){ctx.fillStyle='#d9ae83';ctx.fillRect(-10,-3,3,8);ctx.fillRect(8,-3,3,8);}ctx.restore();
       }
     }
+    if(occupied&&state.trollingMotorInstalled){ctx.save();ctx.scale(scale,scale);ctx.translate(-9,-30);ctx.fillStyle='#b7bca3';ctx.fillRect(-2,-8,4,14);ctx.fillStyle='#263e42';ctx.fillRect(-5,-10,10,5);if(state.motorMode!=='off'){ctx.rotate(heading-(state.motorAngle||0));ctx.fillStyle='#a9d3cf';ctx.fillRect(-1,-17,2,7);ctx.fillStyle='#547b76';ctx.fillRect(-4,-15,8,2);}ctx.restore();}
     // Three bright rungs at the port stern make the reboarding target visible.
     pixelLine(-19*scale,22*scale,-25*scale,22*scale,'#c4d5c6',1);pixelLine(-19*scale,31*scale,-25*scale,31*scale,'#93b0b1',1);pixelLine(-25*scale,22*scale,-25*scale,31*scale,'#c4d5c6',1);pixelLine(-21*scale,25*scale,-25*scale,25*scale,'#dce3ca',1);pixelLine(-21*scale,28*scale,-25*scale,28*scale,'#dce3ca',1);
     ctx.restore();

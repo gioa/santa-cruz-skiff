@@ -10,19 +10,19 @@ const {syncVessel}=await import('../dist/vessel-physics.js');
 const {clearWaterSegment}=await import('../dist/pixel-navigation.js');
 function afloat(){
  const sim=new PixelSimulation({rng:()=>.99,patrolRng:()=>.99});sim.start();
- sim.state.profile.owned.push('nautical_chart');sim.state.packed.push('nautical_chart');
+ sim.state.profile.owned.push('gps','trolling_motor');sim.state.packed.push('gps','trolling_motor');
  const {x,z}=FISHING_SPOTS[1];Object.assign(sim.state,{mode:'boat',rentalPaid:true,launchStage:'afloat',loaded:true,moored:false,boatX:x,boatZ:z});syncVessel(sim.vessel,{x,z,heading:0,clearMotion:true});return sim;
 }
 for(const owned of [['gps'],['nautical_chart'],['gps','nautical_chart']])for(const enabled of [false,true])test(`legacy ${owned.join('+')} / enabled ${enabled}: one device, both features, no charge`,()=>{
- const sim=afloat(),save=sim.snapshot();save.profile.credits=73;save.profile.owned=save.profile.owned.filter(id=>id!=='nautical_chart').concat(owned);save.packed=save.packed.filter(id=>id!=='nautical_chart').concat(enabled?owned:[]);save.profile.inventorySlots={pack:[null,...owned,'rod']};
+ const sim=afloat(),save=sim.snapshot();save.profile.credits=73;delete save.profile.navigationVersion;save.profile.owned=save.profile.owned.filter(id=>!['nautical_chart','gps','trolling_motor'].includes(id)).concat(owned);save.packed=save.packed.filter(id=>!['nautical_chart','gps','trolling_motor'].includes(id)).concat(enabled?owned:[]);save.profile.inventorySlots={pack:[null,...owned,'rod']};
  const restored=new PixelSimulation({saved:save});restored.start(true);
- assert.equal(restored.state.profile.credits,73);assert.equal(restored.state.profile.owned.filter(id=>id==='nautical_chart').length,1);assert.ok(!restored.state.profile.owned.includes('gps'));
+ assert.equal(restored.state.profile.credits,73);assert.equal(restored.state.profile.owned.filter(id=>id==='gps').length,1);assert.ok(!restored.state.profile.owned.includes('nautical_chart'));assert.ok(!restored.hasGear('trolling_motor'));
  assert.equal(restored.navigationInstruments().chart,enabled);assert.equal(restored.navigationInstruments().gps,enabled);assert.equal(restored.stats.hasGPS,enabled);assert.equal(restored.stats.hasChart,enabled);
- const slots=inventorySlots(restored.state.profile).pack;assert.equal(slots[1],'nautical_chart');assert.equal(slots.filter(id=>id==='nautical_chart').length,1);assert.ok(!slots.includes('gps'));
+ const slots=inventorySlots(restored.state.profile).pack;assert.equal(slots[1],'gps');assert.equal(slots.filter(id=>id==='gps').length,1);assert.ok(!slots.includes('nautical_chart'));
  const again=new PixelSimulation({saved:restored.snapshot()});again.start(true);assert.deepEqual(again.state.packed,restored.state.packed);assert.equal(again.state.profile.credits,73);
 });
-test('one shop item supplies chart and GPS; starter does not own it and sounder stays independent',()=>{
- assert.equal(GEAR_CATALOG.filter(g=>g.id==='gps').length,0);assert.equal(GEAR_CATALOG.filter(g=>g.id==='nautical_chart').length,1);assert.ok(!createProfile().owned.includes('nautical_chart'));
+test('GPS includes chart, paper remains separate; starter does not own it and sounder stays independent',()=>{
+ assert.equal(GEAR_CATALOG.filter(g=>g.id==='gps').length,1);assert.equal(GEAR_CATALOG.filter(g=>g.id==='nautical_chart').length,1);assert.ok(!createProfile().owned.includes('nautical_chart'));
  const sim=afloat();assert.ok(sim.navigationInstruments().gpsPosition);assert.equal(sim.navigationInstruments().sounder,false);assert.equal(sim.navigationInstruments().depth,null);
 });
 test('chart GPS pin follows real physics all the way to arbitrary open-water destination',()=>{

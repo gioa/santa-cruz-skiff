@@ -1,4 +1,4 @@
-import {formatSpeed} from './units.js?v=20260928-pixel-v60';
+import {formatSpeed} from './units.js?v=20260928-pixel-v62';
 /** One retained push/pull lever: ahead above the detent, neutral in the centre,
  * astern below it. Pointer release intentionally does not change its position.
  * Reversals must pass through neutral and require a fresh command at low speed;

@@ -1,4 +1,4 @@
-import {SKIFF_DISPLAY_METERS_PER_PIXEL} from './skiff-dimensions.js?v=20260928-pixel-v60';
+import {SKIFF_DISPLAY_METERS_PER_PIXEL} from './skiff-dimensions.js?v=20260928-pixel-v62';
 // Metres / seconds, using measured hull speed rather than throttle demand.
 // Each emitted crest keeps its own strength while the vessel accelerates.
 export function wakeProfile(speed=0){

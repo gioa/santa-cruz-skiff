@@ -8,10 +8,10 @@ const {boatActions}=await import('../dist/pixel-boat-actions.js');
 const run=(sim,seconds,input={})=>{for(let t=0;t<seconds-1e-8;t+=.1)sim.step(Math.min(.1,seconds-t),input);};
 function ready(){
  const sim=new PixelSimulation({rng:()=>.05,patrolRng:()=>.9,profile:{version:2,credits:500}});sim.start();Object.assign(sim.state,{playerX:HARBOR.counterX,playerZ:HARBOR.counterZ});
- for(const item of['nautical_chart']){assert.ok(sim.buyGear(item).ok);assert.ok(sim.equip(item).ok);}
+ for(const item of['gps','trolling_motor']){assert.ok(sim.buyGear(item).ok);assert.ok(sim.equip(item).ok);}
  assert.ok(sim.launchBoat().ok);run(sim,24.1);Object.assign(sim.state,{playerX:HARBOR.boardingX,playerZ:HARBOR.boardingZ});assert.ok(sim.board().ok);assert.equal(sim.state.moored,false);return sim;
 }
-function actions(sim,options={}){return boatActions(sim.state,{hasRod:sim.stats.hasRod,hasAnchor:sim.hasGear('anchor'),hasChart:sim.hasGear('nautical_chart'),canLower:sim.fishingReadiness().ok,nearDock:false,...options});}
+function actions(sim,options={}){return boatActions(sim.state,{hasRod:sim.stats.hasRod,hasAnchor:sim.hasGear('anchor'),hasChart:sim.navigationInstruments().autopilot,canLower:sim.fishingReadiness().ok,nearDock:false,...options});}
 const actionKeys=['unmoor','dock','switchPanel','anchor','adjustPose','reel','spool','drag','lower','cast','hook','catch','retrieve','mount','take','assemble','return'];
 const offered=a=>actionKeys.filter(key=>a[key]).sort();
 
@@ -76,7 +76,7 @@ test('legacy standing flags cannot trap rod controls and a landed fish offers on
 
 test('chart routes remain equipment-gated while retired anchor and fuel never block boat controls',()=>{
  const sim=ready();assert.equal(actions(sim).dock,false);assert.equal(actions(sim,{nearDock:true}).dock,true);sim.state.speed=.85;assert.equal(actions(sim,{nearDock:true}).dock,false);sim.state.speed=0;
- assert.equal(actions(sim).anchor,false);assert.equal(sim.toggleAnchor().ok,false);assert.equal(actions(sim).switchPanel,true);assert.equal(actions(sim).return,true);assert.ok(sim.equip('nautical_chart').ok);assert.equal(actions(sim).return,false);
+ assert.equal(actions(sim).anchor,false);assert.equal(sim.toggleAnchor().ok,false);assert.equal(actions(sim).switchPanel,true);assert.equal(actions(sim).return,true);assert.ok(sim.equip('gps').ok);assert.equal(actions(sim).return,false);
  Object.assign(sim.state,{fuel:0,anchor:true,moored:true});assert.equal(actions(sim).switchPanel,true);assert.equal(actions(sim).anchor,false);assert.equal(actions(sim).unmoor,false);sim.state.engine=true;assert.equal(actions(sim,{panel:'helm'}).switchPanel,true);
 });
 

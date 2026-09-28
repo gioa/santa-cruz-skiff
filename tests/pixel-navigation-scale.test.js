@@ -70,7 +70,7 @@ function depart(sim,dt){
   // Optional navigation hardware is bought and carried if this edition gates
   // chart assistance. Keep the physical voyage comparison independent of price.
   sim.state.profile.credits=10000;
-  for(const item of GEAR_CATALOG.filter(g=>['chart','gps','compass','navigation'].includes(g.slot)||/^(chart|gps|compass)(_|$)/.test(g.id))){
+  for(const item of GEAR_CATALOG.filter(g=>g.id==='trolling_motor'||['chart','gps','compass','navigation'].includes(g.slot)||/^(chart|gps|compass)(_|$)/.test(g.id))){
     if(!sim.state.profile.owned.includes(item.id))assert.equal(sim.buyGear(item.id).ok,true);
     if(!sim.state.packed.includes(item.id))assert.equal(sim.equip(item.id).ok,true);
   }
@@ -89,15 +89,15 @@ function voyage(compressed,dt){
     prior={x:sim.state.boatX,z:sim.state.boatZ};
   };
   assert.equal(sim.selectWaypoint(FISHING_SPOTS[0]).ok,true);
-  const out=until(sim,()=>sim.state.arrival==='fishing',dt,800,observe);
+  const out=until(sim,()=>sim.state.arrival==='fishing',dt,1600,observe);
   assert.ok(Math.abs(sim.state.speed)<1.1);
-  assert.equal(sim.state.engine,false);
+  assert.equal(sim.state.motorMode,'hold');
   assert.equal(sim.selectWaypoint('dock').ok,true);
-  const back=until(sim,()=>sim.state.arrival==='dock',dt,800,observe);
+  const back=until(sim,()=>sim.state.arrival==='dock',dt,1600,observe);
   assert.ok(Math.abs(sim.state.speed)<1.1);
   assert.ok(Math.abs(sim.state.elapsed-departureElapsed-out-back)<1e-6,'QA active time must use unscaled wall time');
   assert.equal(sim.state.walked,departureWalked);
-  assert.ok(maxSpeed>2&&maxSpeed<4);
+  assert.ok(maxSpeed>.8&&maxSpeed<2);
   assert.ok(maxStep<=maxSpeed*dt*(compressed?2:1)+.01,'no route teleport or inflated position jump');
   return{out,back,maxSpeed,departureElapsed,departureWalked};
 }
