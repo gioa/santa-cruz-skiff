@@ -5,8 +5,8 @@
  * pay line out, while turning the handle takes it in. Rod movement never
  * manufactures more line. This module has no inventory, UI or random events.
  */
-import {getRigProfile,stepRigLure} from './fishing-rigs.js?v=20260928-pixel-v71';
-import {rigHydrodynamics} from './pixel-rig-hydrodynamics.js?v=20260928-pixel-v71';
+import {getRigProfile,stepRigLure} from './fishing-rigs.js?v=20260928-pixel-v72';
+import {rigHydrodynamics} from './pixel-rig-hydrodynamics.js?v=20260928-pixel-v72';
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 const finite=(n,f=0)=>Number.isFinite(n)?n:f;
 export const MAX_PAID_LINE_METERS=120;
@@ -65,7 +65,9 @@ export function stepFishingLine(s,{dt,environment={},current={x:0,z:0},velocity=
  const oldTip=rodTipPosition(s),oldPump=clamp(finite(s.pumpHeight),0,.8),pumpHeight=s.pumping?Math.min(.8,oldPump+dt*Math.min(.95,maxLiftSpeed)):Math.max(0,oldPump-dt*.6);
  // A fighting angler moves through a finite stroke, even after a fast swipe.
  const approach=(value,target,speed)=>value+clamp(finite(target,value)-value,-speed*dt,speed*dt);
- const rodElevation=s.fishState==='fight'?approach(finite(s.rodElevation,45),s.rodTargetElevation,finite(s.rodTargetElevation,45)>finite(s.rodElevation,45)?raiseDegrees:50):finite(s.rodElevation,45);
+ const controlledPump=['lift','recover'].includes(s.fightPumpPhase)&&s.rodMount==='hand';
+ const lowerDegrees=controlledPump?18:50;
+ const rodElevation=(s.fishState==='fight'||controlledPump)?approach(finite(s.rodElevation,45),s.rodTargetElevation,finite(s.rodTargetElevation,45)>finite(s.rodElevation,45)?raiseDegrees:lowerDegrees):finite(s.rodElevation,45);
  const rodAzimuth=s.fishState==='fight'?approach(finite(s.rodAzimuth,70),s.rodTargetAzimuth,90):finite(s.rodAzimuth,70);
  const tip=rodTipPosition({...s,pumpHeight,rodElevation,rodAzimuth}),lure={...(s.bobber||{x:tip.x,z:tip.z,height:0})};
  let paid=clamp(finite(s.paidLineMeters),0,MAX_PAID_LINE_METERS),payoutRate=0,retrieveRate=crankRate*.65*Math.max(.2,retrieve),load=0,snagStretchMeters=0;

@@ -10,13 +10,13 @@ test('slack take-up during lowering winds more easily than hauling a taut flatfi
 test('pump cycles conserve line and are stable across phone frame rates',()=>{const results=[];for(const dt of[1/60,.05,.1]){const s=start(),initial=s.lureDepth;for(let cycle=0;cycle<3;cycle++){move(s,4,{dt});move(s,2,{target:20,crank:1.2,dt});}assert.ok(initial-s.lureDepth>2);results.push(s.lureDepth);}assert.ok(Math.max(...results)-Math.min(...results)<.3);});
 test('upstroke work tires a loaded fish while holding the same high rod does not add fictitious work',()=>{const fish={fightKind:'halibut',kg:4},f=createFishFight(fish),base={dt:.1,time:6,rodLoadN:10,lineSlackMeters:0,retrieveRate:0,payoutRate:0};const lifted=stepFishFight(fish,f,{...base,rodStrokeMps:.5}),held=stepFishFight(fish,f,base);assert.ok(lifted.fight.workJ>held.fight.workJ);assert.ok(lifted.fight.energy<held.fight.energy);});
 
-test('simulation rod controls target a finite fight stroke and clear it on pause or mounting',async()=>{
+test('simulation rejects free fight pose changes and clears stroke on pause or mounting',async()=>{
  const {readFile}=await import('node:fs/promises'),previousFetch=globalThis.fetch;
  globalThis.fetch=async url=>new Response(await readFile(url));
  try{
   const {PixelSimulation}=await import('../dist/pixel-sim.js');
   const sim=new PixelSimulation();sim.start();Object.assign(sim.state,start(),{mode:'boat',paused:false});
-  assert.equal(sim.setRodPose({elevation:65}).ok,true);assert.equal(sim.state.rodElevation,20);assert.equal(sim.state.rodTargetElevation,65);
+  assert.equal(sim.setRodPose({elevation:65,azimuth:-90}).ok,false);assert.equal(sim.state.rodElevation,20);assert.equal(sim.state.rodAzimuth,70);sim.state.rodTargetElevation=65;
   Object.assign(sim.state,stepFishingLine(sim.state,{...options,dt:.05}));assert.ok(sim.state.rodElevation>20&&sim.state.rodElevation<25);
   sim.pause(true);assert.equal(sim.state.rodTargetElevation,null);assert.equal(sim.state.rodStrokeMps,0);
   const stopped=sim.state.rodElevation;assert.equal(sim.setRodPose({elevation:80}).ok,false);assert.equal(sim.state.rodElevation,stopped);

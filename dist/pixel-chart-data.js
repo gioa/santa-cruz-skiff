@@ -1,6 +1,6 @@
-import {bathymetry,elevationAtGPS} from './bathymetry.js?v=20260928-pixel-v71';
-import {seafloorAtGPS} from './pixel-seafloor.js?v=20260928-pixel-v71';
-import {fromGPS,onLand,onPier} from './pixel-geography.js?v=20260928-pixel-v71';
+import {bathymetry,elevationAtGPS} from './bathymetry.js?v=20260928-pixel-v72';
+import {seafloorAtGPS} from './pixel-seafloor.js?v=20260928-pixel-v72';
+import {fromGPS,onLand,onPier} from './pixel-geography.js?v=20260928-pixel-v72';
 export const CHART_HOME=Object.freeze({lon:-122.015,lat:36.946,spanMeters:6000});
 const EAST=111320*Math.cos(CHART_HOME.lat*Math.PI/180),NORTH=111132;
 export const FEET_PER_METER=1/.3048;

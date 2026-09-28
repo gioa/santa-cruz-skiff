@@ -1,4 +1,4 @@
-import {HARBOR} from './harbor-layout.js?v=20260928-pixel-v71';
+import {HARBOR} from './harbor-layout.js?v=20260928-pixel-v72';
 
 /**
  * Offshore navigation uses a 1:2 game-distance scale. Geographic coordinates,

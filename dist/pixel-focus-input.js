@@ -1,20 +1,19 @@
-import {bindPointer} from './input.js?v=20260928-pixel-v71';
-import {focusRodPoseFromDrag} from './pixel-fight-focus.js?v=20260928-pixel-v71';
+import {bindPointer} from './input.js?v=20260928-pixel-v72';
 
-// The view itself is the rod control. Relative movement avoids a jump when
-// touching the water; switching view, pausing or losing capture releases it.
-export function bindFocusRod(canvas,{enabled,getPose,onPose}){
- let gesture=null;
+// One held contact lifts; a deliberate release recovers. Drag distance never
+// steers the rod. Cancellation/blur must not count as a release-to-wind.
+export function bindFocusRod(canvas,{enabled}){
+ let phase='idle',keyboard=false;
+ const release=()=>{if(phase==='lift')phase='recover';};
  const pointer=bindPointer(canvas,{
-  start:e=>{if(!enabled())return false;const r=canvas.getBoundingClientRect();gesture={...getPose(),x:e.clientX,y:e.clientY,width:r.width,height:r.height};},
-  move:e=>{if(!enabled()){reset();return;}if(gesture)onPose(focusRodPoseFromDrag(gesture,e.clientX-gesture.x,e.clientY-gesture.y,gesture));},
-  end:()=>{gesture=null;},cancel:()=>{gesture=null;}
+  start:()=>{if(!enabled())return false;phase='lift';},
+  move:()=>{if(!enabled())reset();},
+  end:()=>{if(enabled())release();else reset();},cancel:()=>{phase='idle';}
  });
- function reset(){gesture=null;pointer.reset();}
- canvas.addEventListener('keydown',e=>{
-  if(!enabled()||!['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Home'].includes(e.key))return;
-  e.preventDefault();e.stopPropagation();const p=getPose();
-  onPose({elevation:e.key==='Home'?45:p.elevation+(e.key==='ArrowUp'?5:e.key==='ArrowDown'?-5:0),azimuth:e.key==='Home'?70:p.azimuth+(e.key==='ArrowRight'?10:e.key==='ArrowLeft'?-10:0)});
- });
- return{reset,update(){if(!enabled())reset();}};
+ function reset(){phase='idle';keyboard=false;pointer.reset();}
+ function setHeld(held){if(!enabled()){reset();return;}if(held)phase='lift';else release();}
+ canvas.addEventListener('keydown',e=>{if(!enabled()||![' ','Enter'].includes(e.key))return;e.preventDefault();e.stopPropagation();keyboard=true;setHeld(true);});
+ canvas.addEventListener('keyup',e=>{if(!keyboard||![' ','Enter'].includes(e.key))return;e.preventDefault();e.stopPropagation();keyboard=false;setHeld(false);});
+ canvas.addEventListener('blur',reset);
+ return{reset,setHeld,input(){if(!enabled())reset();return phase;},update(){if(!enabled())reset();}};
 }
