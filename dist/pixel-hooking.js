@@ -1,5 +1,5 @@
-import {fishFightKind} from './pixel-fish-fight.js?v=20260927-pixel-v55';
-import {hookSizeFit} from './pixel-hook-size.js?v=20260927-pixel-v55';
+import {fishFightKind} from './pixel-fish-fight.js?v=20260927-pixel-v56';
+import {hookSizeFit} from './pixel-hook-size.js?v=20260927-pixel-v56';
 
 /** Hook-seat and retention approximation, in active real seconds.
  * EVERY force threshold, duration and hazard below is gameplay calibration,

@@ -32,3 +32,49 @@ structure zones from [Ken Jones's first-hand wharf account](https://www.pierfish
 Their boundaries are game approximations, not surveyed debris coordinates.
 They do not fill the chart or claim to be USGS-mapped cells. Elsewhere absent
 coverage remains unknown and uses conservative incidental encounter weights.
+
+## Interactive chart — 2026-09-27, v56
+
+The old 540×240 thumbnail displayed categorical substrate alone and stretched
+its game-axis bounds independently on X/Y. It never drew the existing depth
+field. The replacement chart uses a local east/north geographic projection,
+with equal metres per screen pixel and true north up. It does not alter the
+requested straight playable wharf or game travel compression.
+
+- Bottom view preserves all six class identities, with distinct colors, a
+  visible legend and hatching for absent substrate evidence. Nearest-neighbor
+  raster rendering prevents artificial blends of categorical classes.
+- Depth view uses the existing NOAA Monterey 2012 MHW DEM (catalog 3545), at
+  approximately 20.7 m game sampling. Twenty-foot color bands, restrained relief
+  shading and 20 ft overview / 10 ft close-up contours reveal shoals, depressions
+  and slopes. Contour vertices are linearly interpolated on native grid edges;
+  cells touching NoData are skipped. This is a visualization of the DEM, not
+  newly surveyed depth, nor live sea-level-corrected depth.
+- Point inspection calls the same `elevationAtGPS` and `seafloorAtGPS` used by
+  the simulation. It never calls `depthAt`'s internal 12 m fallback. Land/pier
+  clicks say shore/pier, not zero-depth fishing water. A bottom-data gap can
+  legitimately have a known reference depth and vice versa.
+- Zoom (+/−, wheel, pinch), drag pan, keyboard arrows and home reset; waypoint
+  inspection zooms without setting a sailing route. Separate 'go' controls keep
+  existing validated navigation. Navigation remains unavailable ashore.
+- Paper-chart purchase/equip gating is unchanged. Only an equipped GPS adds
+  the player marker and distance readout; buying a chart does not grant sonar.
+- Map scale is geographic feet; the 1:2 travel compression does not halve depth.
+  All values display in US customary units, with MHW labelled explicitly.
+- Layers/contours are built once and reused. ResizeObserver and pointer/event
+  handlers are disconnected on modal close or replacement.
+
+Reference confirmations:
+[USGS seafloor classification metadata](https://cmgds.marine.usgs.gov/data/csmp/OffshoreSantaCruz/metadata/SeafloorCharacter_OffshoreSantaCruz_metadata.html)
+and [NOAA DEM 3545 metadata](https://www.ncei.noaa.gov/access/metadata/landing-page/bin/iso?id=gov.noaa.ngdc.mgg.dem%3A3545).
+The two sources have different coverage and dates. There is no claim of
+unobserved kelp, wrecks, individual boulders, or high-resolution survey accuracy
+below the shipped grid spacing. Near-wharf contextual fishing habitat remains
+separate from measured chart substrate.
+
+Validation: synthetic east/north planar contour tests, feet/metres conversion,
+NoData and saddle-cell tests; sampled real contour vertices reproduce the NOAA
+interpolator within 0.001 ft (numerical consistency, not survey accuracy);
+reef/sand/unknown reference locations agree with gameplay/sounder sampling;
+mobile canvas inspection, layer toggle, zoom, pan, waypoint preview and modal
+reopening checked in the browser. See `tests/pixel-chart.test.js`.

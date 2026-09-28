@@ -477,3 +477,26 @@ html,body,#app,#app *,#app *::before,#app *::after{-webkit-user-select:none;user
  #app:not(.is-fishing-focus) #boat-fishing .fishing-instruments{grid-column:1;grid-row:3;width:144px;height:144px;justify-self:center}
  #app:not(.is-fishing-focus) #boat-fishing .fishing-toolbar{grid-column:1;grid-row:4}
 }
+/* North-up, equal-scale chart. */
+.chart-controls{display:flex;justify-content:space-between;gap:8px;margin:12px 0 8px}
+.chart-controls>div{display:flex;gap:4px}
+.chart-controls button{min-width:44px;min-height:44px;padding:8px 10px;background:#eadcba;font-size:12px}
+.chart-controls button[aria-pressed=true]{background:#315a55;color:#fff1cc}
+.chart-frame{position:relative;border:2px solid #315a55;overflow:hidden;background:#b1c5c4}
+#chart{display:block;width:100%;height:390px;touch-action:none;cursor:crosshair;outline-offset:-4px}
+.chart-hint{position:absolute;top:8px;left:8px;background:#fff3d8de;padding:4px 6px;font-size:10px;color:#375b57;pointer-events:none}
+.chart-reading{min-height:44px;display:flex;align-items:center;padding:8px 10px;background:#ded5b5;color:#234b4a;font-size:12px;font-weight:600}
+.chart-legend{display:flex;flex-wrap:wrap;gap:7px 12px;margin:10px 0;font-size:10px;color:#3e5852}
+.chart-legend span{display:flex;align-items:center;gap:4px}
+.chart-legend i{width:13px;height:13px;border:1px solid #355a5550}
+.chart-legend i.no-data{background-image:repeating-linear-gradient(45deg,transparent,transparent 3px,#587c7466 3px,#587c7466 4px)!important}
+.chart-datum{font-size:10px;color:#60736a;margin:6px 0}
+.chart-spot{display:flex;gap:5px;align-items:stretch}
+.chart-spot .spot-button{flex:1;min-width:0;text-align:left;gap:8px}
+.chart-spot .spot-button small{line-height:1.6}
+.chart-go{min-width:66px;max-width:90px;background:#e5d3a9;padding:8px;font-size:10px}
+.chart-go:disabled{opacity:.45}
+.chart-sources{font-size:10px;line-height:1.8;color:#617267;margin-top:14px}
+.chart-sources summary{min-height:44px;padding:10px 0;cursor:pointer}
+@media(max-width:560px){#chart{height:min(360px,80vw,45dvh)}.chart-controls button{padding:8px;font-size:11px}}
+@media(max-height:500px) and (orientation:landscape){#chart{height:240px}}
