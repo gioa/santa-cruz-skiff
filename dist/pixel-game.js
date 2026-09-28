@@ -1,29 +1,30 @@
-import {RETIRED_PIXEL_GEAR,PIXEL_LEGACY_SLOTS,pixelGearAvailable} from './pixel-gear-availability.js?v=20260927-pixel-v43';
-import {fishCommonName,fishDisplayName} from './pixel-fish-names.js?v=20260927-pixel-v43';
-import {fishSpriteKind,drawFishArt} from './pixel-fish-art.js?v=20260927-pixel-v43';
-import {rigHookLabel,rigHookSize} from './pixel-hook-label.js?v=20260927-pixel-v43';
-import {formatWind,formatSpeed,formatDepth,formatLength,formatWeight,formatDistance,formatTemperature,formatNumber,cmToInches,kgToPounds,formatLegacyCatchNote} from './units.js?v=20260927-pixel-v43';
-import {fishingFeedback} from './pixel-fishing-feedback.js?v=20260927-pixel-v43';
-import {createFightView} from './pixel-fight-view.js?v=20260927-pixel-v43';
-import {isFishingFocus} from './pixel-fight-focus.js?v=20260927-pixel-v43';
-import {bindFocusRod} from './pixel-focus-input.js?v=20260927-pixel-v43';
-import {boatActions} from './pixel-boat-actions.js?v=20260927-pixel-v43';
-import {mountFishingConsole} from './pixel-fishing-ui.js?v=20260927-pixel-v43';
-import {mountHelm} from './pixel-helm-ui.js?v=20260927-pixel-v43';
-import {mountRodWorkbench} from './pixel-rod-ui.js?v=20260927-pixel-v43';
-import {layoutWorldAction} from './pixel-action-layout.js?v=20260927-pixel-v43';
-import {PixelSimulation,GEAR_CATALOG,FISHING_SPOTS,HARBOR,BOAT_RENTAL_PRICE,hasSavedBoatRental} from './pixel-sim.js?v=20260927-pixel-v43';
-import {createPixelSprites} from './pixel-sprites.js?v=20260927-pixel-v43';
-import {createPixelWorld} from './pixel-world.js?v=20260927-pixel-v43';
-import {bindPointer,ActionSources} from './input.js?v=20260927-pixel-v43';
-import {PixelAudio} from './pixel-audio.js?v=20260927-pixel-v43';
-import {inventorySlots,moveInventorySlot} from './pixel-inventory.js?v=20260927-pixel-v43';
-import {drawItemIcon} from './pixel-item-icons.js?v=20260927-pixel-v43';
-import {sea,marineSummary,updateSea} from './marine.js?v=20260927-pixel-v43';
-import {seafloorAt} from './pixel-seafloor.js?v=20260927-pixel-v43';
-import {depthInfoAt} from './bathymetry.js?v=20260927-pixel-v43';
-import {compressedDistance} from './pixel-navigation-scale.js?v=20260927-pixel-v43';
-import {landPolygons,pierRings,bearingDegrees} from './pixel-geography.js?v=20260927-pixel-v43';
+import {RETIRED_PIXEL_GEAR,PIXEL_LEGACY_SLOTS,pixelGearAvailable} from './pixel-gear-availability.js?v=20260927-pixel-v44';
+import {fishCommonName,fishDisplayName} from './pixel-fish-names.js?v=20260927-pixel-v44';
+import {fishSpriteKind,drawFishArt} from './pixel-fish-art.js?v=20260927-pixel-v44';
+import {rigHookLabel,rigHookSize} from './pixel-hook-label.js?v=20260927-pixel-v44';
+import {formatWind,formatSpeed,formatDepth,formatLength,formatWeight,formatDistance,formatTemperature,formatNumber,cmToInches,kgToPounds,formatLegacyCatchNote} from './units.js?v=20260927-pixel-v44';
+import {fishingFeedback} from './pixel-fishing-feedback.js?v=20260927-pixel-v44';
+import {createFightView} from './pixel-fight-view.js?v=20260927-pixel-v44';
+import {isFishingFocus} from './pixel-fight-focus.js?v=20260927-pixel-v44';
+import {bindFocusRod} from './pixel-focus-input.js?v=20260927-pixel-v44';
+import {boatActions} from './pixel-boat-actions.js?v=20260927-pixel-v44';
+import {mountFishingConsole} from './pixel-fishing-ui.js?v=20260927-pixel-v44';
+import {mountHelm} from './pixel-helm-ui.js?v=20260927-pixel-v44';
+import {mountRodWorkbench} from './pixel-rod-ui.js?v=20260927-pixel-v44';
+import {layoutWorldAction} from './pixel-action-layout.js?v=20260927-pixel-v44';
+import {PixelSimulation,GEAR_CATALOG,FISHING_SPOTS,HARBOR,BOAT_RENTAL_PRICE,hasSavedBoatRental} from './pixel-sim.js?v=20260927-pixel-v44';
+import {createPixelSprites} from './pixel-sprites.js?v=20260927-pixel-v44';
+import {createPixelWorld} from './pixel-world.js?v=20260927-pixel-v44';
+import {bindPointer,ActionSources} from './input.js?v=20260927-pixel-v44';
+import {bindAudioLifecycle} from './pixel-audio-lifecycle.js?v=20260927-pixel-v44';
+import {PixelAudio} from './pixel-audio.js?v=20260927-pixel-v44';
+import {inventorySlots,moveInventorySlot} from './pixel-inventory.js?v=20260927-pixel-v44';
+import {drawItemIcon} from './pixel-item-icons.js?v=20260927-pixel-v44';
+import {sea,marineSummary,updateSea} from './marine.js?v=20260927-pixel-v44';
+import {seafloorAt} from './pixel-seafloor.js?v=20260927-pixel-v44';
+import {depthInfoAt} from './bathymetry.js?v=20260927-pixel-v44';
+import {compressedDistance} from './pixel-navigation-scale.js?v=20260927-pixel-v44';
+import {landPolygons,pierRings,bearingDegrees} from './pixel-geography.js?v=20260927-pixel-v44';
 const $=id=>document.getElementById(id),show=(id,value)=>{$(id).hidden=!value;},txt=(id,v)=>{if($(id).textContent!==String(v))$(id).textContent=v;};
 const SAVE='santa-cruz-pixel-v1',esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let saved=null;try{saved=JSON.parse(localStorage.getItem(SAVE)||'null');}catch{}
@@ -160,7 +161,8 @@ let canvasDown=null;pointers.push(bindPointer($('world'),{
 }));
 window.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal();return;}if(menu){if(e.key==='Tab'){const focusable=[...$('modal').querySelectorAll('button:not(:disabled),select,input,a[href]')].filter(el=>!el.hidden);const first=focusable[0],last=focusable.at(-1);if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}}return;}if(!started||e.target.closest?.('select,input,textarea,[role=slider]'))return;const k=e.key.toLowerCase();if(e.target.closest?.('button')&&[' ','enter'].includes(k))return;if(['w','a','s','d','arrowup','arrowdown','arrowleft','arrowright',' ','f'].includes(k))e.preventDefault();if(e.repeat)return;keys.add(k);if(k===' ')fishingDown('keyboard');if(k==='f'&&getBoatActions().reel)sources.set('reel','keyboard',true);if(k==='e')feedback(sim.interact());if(k==='r'&&getBoatActions().helm)helm.toggleIgnition();if(!focusActive){if(k==='i')openGear();if(k==='m')openMap();if(k==='j')openJournal();if(k==='g')$('guide-btn').click();}});
 window.addEventListener('keyup',e=>{const k=e.key.toLowerCase();keys.delete(k);if(k===' ')fishingUp('keyboard');if(k==='f')sources.set('reel','keyboard',false);if(['w','s','arrowup','arrowdown'].includes(k)&&sim.state.mode==='boat'&&!sim.state.waypoint)sim.setThrottle(0);});
-window.addEventListener('blur',()=>{clearInputs();sim.pause(true);audio.setPaused(true);});window.addEventListener('focus',()=>{audio.setPaused(document.hidden);sim.pause(document.hidden||Boolean(menu));lastFrame=performance.now();});window.addEventListener('resize',()=>{clearInputs();world.resize(innerWidth,innerHeight);fightView.resize(innerWidth,innerHeight);refreshCatchArtwork();});document.addEventListener('visibilitychange',()=>{clearInputs();audio.setPaused(document.hidden);sim.pause(document.hidden||Boolean(menu));lastFrame=performance.now();persist();});window.addEventListener('pagehide',persist);
+bindAudioLifecycle(audio);
+window.addEventListener('blur',()=>{clearInputs();sim.pause(true);});window.addEventListener('focus',()=>{sim.pause(document.hidden||Boolean(menu));lastFrame=performance.now();});window.addEventListener('resize',()=>{clearInputs();world.resize(innerWidth,innerHeight);fightView.resize(innerWidth,innerHeight);refreshCatchArtwork();});document.addEventListener('visibilitychange',()=>{clearInputs();sim.pause(document.hidden||Boolean(menu));lastFrame=performance.now();persist();});window.addEventListener('pagehide',persist);
 function input(dt){if(!getBoatActions().retrieve)autoRetrieve=false;const x=(keys.has('d')||keys.has('arrowright')?1:0)-(keys.has('a')||keys.has('arrowleft')?1:0),z=(keys.has('s')||keys.has('arrowdown')?1:0)-(keys.has('w')||keys.has('arrowup')?1:0),s=sim.state,a=getBoatActions(),rodInput=fishing.input(dt),result={moveX:x,moveZ:z,steer:-x,reel:a.reel?Math.max(rodInput.reel,(autoRetrieve||sources.sources.get('reel')?.size>0)?1.2:0):0,pump:a.reel&&sources.sources.get('pump')?.size>0};if(s.mode==='boat'&&(Math.abs(z)>.05||Math.abs(x)>.05)&&sim.canOperateHelm){result.throttle=Math.max(-.3,-z);keyboardDriving=true;helm.reset();result.throttle=Math.max(-.3,-z);}else if(s.mode==='boat'&&sim.canOperateHelm)Object.assign(result,helm.input());return result;}
 function updateUI(){const s=sim.state;syncFishingFocus();txt('clock',s.clock.slice(0,5));txt('credits',s.profile.credits);txt('weather',`风 ${formatWind(sea.windKnots)}`);if(!started)return;const sailing=s.mode==='boat',fish=s.fishState;const nav=sim.navigationInstruments();txt('place',s.mode==='walk'?'Santa Cruz Wharf':nav.gps&&sim.nearestSpot().d<140?sim.nearestSpot().spot.name:'Monterey Bay');show('speed',nav.gps&&sailing);txt('speed',`${formatSpeed(s.speed)}`);show('depth',nav.sounder&&sailing);txt('depth',`水深 ${formatDepth(nav.depth?.value)}`);show('heading',nav.compass&&sailing);txt('heading',`${Math.round(bearingDegrees(s.heading))}°`);show('navigation',Boolean(s.waypoint||s.autoWalk||s.launchStage==='lowering'||s.docking||s.inspection?.phase==='checking'));txt('navigation',s.inspection?.phase==='checking'?'渔政检查中':s.waypoint?`↗ ${s.waypoint.name}${nav.gps?' · '+formatDepth(compressedDistance({x:s.boatX,z:s.boatZ},s.waypoint),0):''}`:s.launchStage==='lowering'?`吊艇中 ${Math.round(s.launchProgress*100)}%`:s.docking?'正在靠泊':s.autoWalk?'沿栈道步行中':'');
  $('app').classList.toggle('is-aboard',sailing);helm.update();fishing.update();txt('reel-btn',autoRetrieve?'停止':'收线');if(fish==='idle'||fish==='landed')autoRetrieve=false;updateWorldActions();
@@ -168,7 +170,7 @@ function updateUI(){const s=sim.state;syncFishingFocus();txt('clock',s.clock.sli
  show('fish-status',['bite','fight'].includes(fish));txt('fish-title',({sinking:'鱼饵正在下沉',waiting:'等一尾鱼',bite:'咬钩了！',fight:fishingFeedback(s).cue})[fish]||'');txt('fish-distance','');txt('fish-detail',fish==='fight'?'':fish==='bite'?(s.rodMount==='hand'?'稳收鱼线':'取竿'):fish==='waiting'?(s.rigPresentation?.bottomContact?'铅坠触底':'留意鱼线的动静'):fish==='sinking'?(nav.sounder?`钓组深度 ${formatDepth(s.lureDepth)}`:(s.reelMode==='free'?'鱼线缓缓放出':'留意竿尖')):'');
  if(focusActive){$('toast').style.bottom='';}else if(sailing&&!$('boat-console').hidden){const inset=innerHeight-$('boat-console').getBoundingClientRect().top+10;world.setBottomInset?.(inset);$('toast').style.bottom=`${inset+10}px`;}else{world.setBottomInset?.(18);$('toast').style.bottom='24px';}
  if(s.toastId!==lastToastId){lastToastId=s.toastId;toast(s.toast);}if(fish==='bite'&&lastFishState!=='bite'){stopWinding();helm.reset();boatPanel='tackle';audio.event('bite');if(navigator.vibrate)navigator.vibrate([70,60,70]);}if(['idle','flight'].includes(lastFishState)&&['sinking','waiting'].includes(fish))audio.event('plop');const newlyLanded=fish==='landed'&&lastFishState!=='landed';lastFishState=fish;if(newlyLanded){audio.event('catch');openCatch();}
- $('game-state').textContent=JSON.stringify({...sim.publicState(),view:focusActive?'first-person':'overhead',focusView:fightView.snapshot(),helm:helm.snapshot(),availableActions:getBoatActions(),camera:world.publicState().camera,audio:audio.publicState(),boats:world.publicState().boats,ecology:world.publicState().wildlife,menu,rendererFPS:Math.round(fps),viewport:{width:innerWidth,height:innerHeight},build:'20260927-pixel-v43'});
+ $('game-state').textContent=JSON.stringify({...sim.publicState(),view:focusActive?'first-person':'overhead',focusView:fightView.snapshot(),helm:helm.snapshot(),availableActions:getBoatActions(),camera:world.publicState().camera,audio:audio.publicState(),boats:world.publicState().boats,ecology:world.publicState().wildlife,menu,rendererFPS:Math.round(fps),viewport:{width:innerWidth,height:innerHeight},build:'20260927-pixel-v44'});
 }
 function frame(now){const dt=Math.min(.1,Math.max(0,(now-lastFrame)/1000));lastFrame=now;sim.setBaitSchools(world.wildlife.events);sim.step(dt,input(dt));syncFishingFocus();world.draw({...sim.state,controlPanel:boatPanel},dt);fightView.draw(sim.state,dt,{active:focusActive,conditions:sim.conditions,paused:sim.state.paused,reducedMotion:reducedMotion.matches,bottomInset:innerHeight<500?120:180,landed:sim.state.fishState==='landed'});fishing.draw(dt);if(menu==='catch'&&!document.hidden&&document.hasFocus()){catchArtTime+=dt;drawCatchArtwork($('catch-art'),sim.state.fish);}updateWorldActions();audio.update(sim.state.time,sim.state.engine&&!sim.state.paused,sim.state.throttle,sim.state.walking&&!sim.state.paused,{speed:Math.abs(sim.state.speed),wave:sea.waveHeight,underwater:false,roll:sim.state.roll,paused:sim.state.paused,fishState:sim.state.fishState,reelMode:sim.state.reelMode,payoutRate:sim.state.payoutRate,retrieveRate:sim.state.retrieveRate,crankRate:sim.state.crankRate,rodLoadN:sim.state.rodLoadN,dragThresholdN:sim.state.dragThresholdN,lineSlackMeters:sim.state.lineSlackMeters});uiElapsed+=dt;saveElapsed+=dt;fpsTimer+=dt;frames++;if(fpsTimer>1){fps=frames/fpsTimer;frames=0;fpsTimer=0;}if(uiElapsed>.1){uiElapsed=0;updateUI();}if(saveElapsed>10){saveElapsed=0;persist();}requestAnimationFrame(frame);}
 // Page-scoped tools expose the same validated player actions as the controls.

@@ -14,8 +14,8 @@ class Node{
   connect(destination){this.destination=destination;}disconnect(){this.disconnected=true;}
   start(at=0){this.startAt=at;this.context.starts.push(this);}stop(at=this.context.currentTime){this.stopAt=at;}
 }
-class Context{
-  constructor(){this.currentTime=0;this.sampleRate=8000;this.state='running';this.nodes=[];this.starts=[];this.destination={};}
+class Context extends EventTarget{
+  constructor(){super();this.currentTime=0;this.sampleRate=8000;this.state='running';this.nodes=[];this.starts=[];this.destination={};}
   createGain(){return new Node(this,'gain');}createBiquadFilter(){return new Node(this,'filter');}createDynamicsCompressor(){return new Node(this,'compressor');}
   createOscillator(){return new Node(this,'oscillator');}createBufferSource(){return new Node(this,'buffer');}
   createBuffer(_channels,size){return{getChannelData:()=>new Float32Array(size)};}
@@ -172,3 +172,53 @@ test('spool latch plays once on mode change and an open spool never emits drag r
 });
 
 test('airborne casting spools produce feed sound without drag chatter',()=>{const f=reelFeedbackForState({fishState:'flight',reelMode:'free',payoutRate:12,rodLoadN:.2});assert.ok(f.feedVolume>0);assert.equal(f.ratchetHz,0);});
+
+
+test('repeated foreground resume recovers after the first mobile autoplay rejection',async()=>{
+  const audio=create();audio.init();audio.update(0,false,0,false);audio.setPaused(true);
+  const realResume=audio.ctx.resume.bind(audio.ctx);let calls=0;
+  audio.ctx.resume=()=>++calls===1?Promise.reject(new Error('gesture required')):realResume();
+  audio.setPaused(false);await Promise.resolve();assert.equal(audio.ctx.state,'suspended');
+  audio.setPaused(false);await Promise.resolve();audio.update(1,false,0,false);
+  assert.equal(calls,2);assert.equal(audio.ctx.state,'running');assert.ok(audio.publicState().musicVoices>0);
+  audio.dispose();
+});
+
+test('OS interruption without visibility events clears voices and resumes music on update',async()=>{
+  const audio=create();audio.init();audio.update(0,false,0,false,runState);
+  audio.ctx.state='interrupted';audio.ctx.dispatchEvent(new Event('statechange'));
+  assert.equal(audio.publicState().musicVoices,0);assert.equal(audio.publicState().reel.voices,0);
+  assert.equal(audio.event('catch'),false,'no effects queued against a frozen audio clock');
+  const before=audio.publicState().totalMusicNotes;
+  audio.update(60,false,0,false);await Promise.resolve();audio.update(60,false,0,false);
+  assert.equal(audio.ctx.state,'running');assert.ok(audio.publicState().totalMusicNotes>before);
+  assert.ok(audio.publicState().totalMusicNotes-before<12);audio.dispose();
+});
+
+test('a pending resume cannot swallow the next touch and a late completion cannot unmute a background tab',async()=>{
+  const audio=create();audio.init();audio.setPaused(true);
+  let finish;const c=audio.ctx;const realResume=c.resume.bind(c);let calls=0;
+  c.resume=()=>++calls===1?new Promise(resolve=>{finish=()=>{c.state='running';resolve();};}):realResume();
+  audio.setPaused(false);assert.equal(c.state,'suspended');
+  audio.recover();await Promise.resolve();assert.equal(calls,2);assert.equal(c.state,'running');
+  audio.setPaused(true);finish();await Promise.resolve();assert.equal(c.state,'suspended');
+  audio.dispose();
+});
+
+test('failed recovery is rate limited on animation frames but trusted gestures bypass the limit',async()=>{
+  const audio=create();audio.init();audio.ctx.state='interrupted';let calls=0;
+  audio.ctx.resume=()=>{calls++;return Promise.reject(new Error('blocked'));};
+  for(let i=0;i<120;i++)audio.update(i/60,false,0,false,runState);
+  assert.equal(calls,1);assert.equal(audio.publicState().reel.voices,0);
+  audio.recover();assert.equal(calls,2);await Promise.resolve();audio.dispose();
+});
+
+test('recovery preserves master mute, music mute and running score position',async()=>{
+  const audio=create();audio.init();audio.update(0,false,0,false);
+  const state=audio.publicState();for(let i=0;i<10;i++)audio.setPaused(false);
+  assert.equal(audio.publicState().totalMusicNotes,state.totalMusicNotes);assert.equal(audio.publicState().musicVoices,state.musicVoices);
+  audio.toggleMusic();audio.setPaused(true);audio.setPaused(false);await Promise.resolve();audio.update(1,false,0,false);
+  assert.equal(audio.publicState().musicVoices,0);assert.equal(audio.musicEnabled,false);
+  audio.toggle();audio.setPaused(true);audio.setPaused(false);audio.recover();audio.update(2,false,0,false);
+  assert.equal(audio.ctx.state,'suspended');assert.equal(audio.enabled,false);audio.dispose();
+});

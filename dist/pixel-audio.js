@@ -1,4 +1,4 @@
-import {OceanAudio} from './audio.js?v=20260927-pixel-v43';
+import {OceanAudio} from './audio.js?v=20260927-pixel-v44';
 
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 const valid=(n,fallback)=>Number.isFinite(n)?n:fallback;
@@ -90,6 +90,7 @@ export class PixelAudio extends OceanAudio{
   constructor({storage=null}={}){
     super();this.musicEnabled=true;this.musicVolume=.34;this._paused=false;this._disposed=false;
     this._voices=new Set();this._lastEvent=new Map();this._scoreStep=0;this._nextStepAt=null;
+    this._resumeAttemptAt=-Infinity;this._contextState=null;this._onContextState=()=>this._syncContext();
     this._totalMusicNotes=0;this._totalEffects=0;this._lastUpdate=-Infinity;
     this._musicDuck=1;this._reelLoops=new Map();this._reelNextTick=null;this._reelLastMode=null;this._reelFeedback=reelFeedbackForState();this._totalReelTicks=0;this._storage=storage;this._storageKey='santa-cruz-pixel-audio-v1';
     try{this._storage??=globalThis.localStorage;const saved=JSON.parse(this._storage?.getItem(this._storageKey)||'null');if(saved){this.enabled=saved.enabled!==false;this.musicEnabled=saved.musicEnabled!==false;this.musicVolume=clamp(valid(saved.musicVolume,.34),0,1);this.volume=clamp(valid(saved.volume,.55),0,1);}}catch{}
@@ -98,18 +99,35 @@ export class PixelAudio extends OceanAudio{
   init(){
     if(this._disposed)return false;
     const wasRunning=this.ctx?.state==='running';
-    try{if(!this.ctx)super.init();}catch{return false;}
+    try{if(!this.ctx){super.init();this.ctx?.addEventListener?.('statechange',this._onContextState);this._contextState=this.ctx?.state;}}catch{return false;}
     if(!this.ctx)return false;
     if(!this.musicGain){this.musicGain=this.ctx.createGain();this.musicGain.gain.value=this.musicVolume;this.musicGain.connect(this.master);}
     this._applyMix();
     // Settings may call init for every volume-slider input. Preserve the
     // current beat when audio is already running; only a real start/resume
     // needs a fresh scheduling window.
-    if(this.enabled&&!this._paused){if(!wasRunning){this._resume();this._resetSchedule();}}
+    if(this.enabled&&!this._paused){if(!wasRunning){this._resume(true);this._resetSchedule();}}
     else this._suspend();
     return true;
   }
-  _resume(){try{this.ctx?.resume()?.catch?.(()=>{});}catch{}}
+  _syncContext(){
+    const c=this.ctx;if(!c||this._disposed)return;
+    if(!this.enabled||this._paused){if(c.state==='running')this._suspend();return;}
+    if(c.state===this._contextState)return;
+    this._contextState=c.state;
+    this._stopVoices();this._nextStepAt=null;
+    if(c.state==='running'){this._resetSchedule();this._applyMix();}
+  }
+  _resume(force=false){
+    const c=this.ctx;if(!c||this._disposed||!this.enabled||this._paused||c.state==='closed')return;
+    this._syncContext();if(c.state==='running')return;
+    // Use wall time: an interrupted audio clock is frozen. Gestures must be
+    // allowed to retry even if an earlier browser resume promise is pending.
+    const now=performance.now();if(!force&&now-this._resumeAttemptAt<1000)return;
+    this._resumeAttemptAt=now;
+    try{Promise.resolve(c.resume()).then(()=>{if(this.ctx===c)this._syncContext();},()=>{});}catch{}
+  }
+  recover(){this._resume(true);}
   _suspend(){try{this.ctx?.suspend()?.catch?.(()=>{});}catch{}}
   _resetSchedule(){this._nextStepAt=this.ctx?this.ctx.currentTime+.045:null;this._lastUpdate=-Infinity;}
   _applyMix(){
@@ -119,7 +137,7 @@ export class PixelAudio extends OceanAudio{
   }
   toggle(){
     this.enabled=!this.enabled;this._applyMix();
-    if(this.enabled&&!this._paused){this._resume();this._resetSchedule();}else{this._stopVoices();this._suspend();}
+    if(this.enabled&&!this._paused){this._resume(true);this._resetSchedule();}else{this._stopVoices();this._suspend();}
     this._save();return this.enabled;
   }
   toggleMusic(){
@@ -130,12 +148,12 @@ export class PixelAudio extends OceanAudio{
   setMusicVolume(value){this.musicVolume=clamp(valid(Number(value),this.musicVolume),0,1);this._applyMix();if(!this.musicVolume)this._stopVoices('music');this._save();return this.musicVolume;}
   setVolume(value){this.volume=clamp(valid(Number(value),this.volume),0,1);this._applyMix();if(!this.volume)this._stopVoices('reel');this._save();return this.volume;}
   setPaused(value){
-    const paused=Boolean(value);if(paused===this._paused)return;
+    const paused=Boolean(value);if(paused===this._paused){if(!paused)this.recover();return;}
     this._paused=paused;this._applyMix();
     if(paused){this._stopVoices();this._suspend();this._nextStepAt=null;}
-    else if(this.enabled){this._resume();this._resetSchedule();}
+    else if(this.enabled){this._resume(true);this._resetSchedule();}
   }
-  _canPlay(){return Boolean(this.ctx&&this.enabled&&!this._paused&&!this._disposed);}
+  _canPlay(){return Boolean(this.ctx?.state==='running'&&this.enabled&&!this._paused&&!this._disposed);}
   _track(source,nodes,kind,start,end){
     const voice={source,nodes,kind,start,end};this._voices.add(voice);
     const clean=()=>{if(!this._voices.delete(voice))return;for(const node of nodes){try{node.disconnect();}catch{}}};
@@ -252,6 +270,7 @@ export class PixelAudio extends OceanAudio{
     }
   }
   update(t,engine,throttle,walking,options={}){
+    this._resume();
     if(!this._canPlay())return;
     const now=this.ctx.currentTime;
     if(options.paused||!REEL_STATES.has(options.fishState)){if(this._reelLoops.size||this._reelNextTick!==null||this._reelLastMode!==null)this._stopVoices('reel');}
@@ -278,7 +297,7 @@ export class PixelAudio extends OceanAudio{
       reel:{...this._reelFeedback,voices:voices.filter(v=>v.kind==='reel'||v.kind==='reel-tick').length,totalTicks:this._totalReelTicks}};
   }
   dispose(){
-    if(this._disposed)return;this._disposed=true;this._stopVoices();
+    if(this._disposed)return;this._disposed=true;this.ctx?.removeEventListener?.('statechange',this._onContextState);this._stopVoices();
     for(const source of[this.surf,this.engine,this.exhaust])try{source?.stop();source?.disconnect();}catch{}
     try{this.musicGain?.disconnect();this.master?.disconnect();this.ctx?.close()?.catch?.(()=>{});}catch{}
   }

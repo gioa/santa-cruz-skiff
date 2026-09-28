@@ -1,0 +1,17 @@
+<!doctype html><html lang="zh"><meta charset="utf-8"><title>本机音频恢复测试</title><body>
+<h1>本机音频恢复测试（不发布）</h1>
+<button id="start">播放测试音乐</button><button id="away">模拟切走</button><button id="return">模拟返回</button><button id="reject">下一次恢复失败</button><button id="touch">普通触屏操作</button><button id="mute">开关总声音</button><button id="music">开关音乐</button>
+<pre id="status"></pre>
+<script type="module">
+import {PixelAudio} from '../../dist/pixel-audio.js';
+import {bindAudioLifecycle} from '../../dist/pixel-audio-lifecycle.js';
+if(location.hostname!=='localhost')throw Error('Local QA only');
+const audio=new PixelAudio({storage:{getItem:()=>null,setItem:()=>{}}});
+bindAudioLifecycle(audio);const $=id=>document.getElementById(id);
+$('start').onclick=()=>audio.init();
+$('away').onclick=()=>window.dispatchEvent(new Event('blur'));
+$('return').onclick=()=>window.dispatchEvent(new Event('focus'));
+$('reject').onclick=()=>{window.dispatchEvent(new Event('blur'));const original=audio.ctx.resume.bind(audio.ctx);audio.ctx.resume=()=>{audio.ctx.resume=original;return Promise.reject(Error('QA: autoplay rejected'));};window.dispatchEvent(new Event('focus'));};
+$('mute').onclick=()=>audio.toggle();$('music').onclick=()=>audio.toggleMusic();
+function frame(t){audio.update(t/1000,false,0,false);$('status').textContent=JSON.stringify(audio.publicState(),null,2);requestAnimationFrame(frame);}requestAnimationFrame(frame);
+</script></body></html>
