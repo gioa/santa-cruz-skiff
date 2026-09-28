@@ -1,4 +1,4 @@
-import {rodFlexPoint} from './pixel-rod-response.js?v=20260927-pixel-v51';
+import {rodFlexPoint} from './pixel-rod-response.js?v=20260927-pixel-v52';
 // Shared presentation geometry. The model supplies angles, mount and actual
 // load-derived bend; rendering never invents fish pulls or changes line length.
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));

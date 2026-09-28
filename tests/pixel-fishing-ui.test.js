@@ -22,15 +22,15 @@ class Element {
 function fixture(t,fishState='idle',{electric=false,focus=false}={}){
  const priorDocument=globalThis.document;globalThis.document={getElementById:()=>null};
  t.after(()=>{if(priorDocument===undefined)delete globalThis.document;else globalThis.document=priorDocument;});
- const buttons=['drag-knob','spool-toggle','lower-rig','reel-btn','retrieve-rig','take-rod'];
- const ids=['reel-wheel','rod-mount','tackle-name','rod-load','reel-instrument',...buttons];
- const elements=Object.fromEntries(ids.map(id=>[id,new Element(id==='rod-mount'?'SELECT':buttons.includes(id)?'BUTTON':'DIV')]));
+ const buttons=['drag-knob','spool-toggle','lower-rig','reel-btn','retrieve-rig','rod-hand','rod-port','rod-starboard'];
+ const ids=['reel-wheel','rod-mount','tackle-name','rod-load','reel-instrument','reel-actions',...buttons];
+ const elements=Object.fromEntries(ids.map(id=>[id,new Element(buttons.includes(id)?'BUTTON':'DIV')]));
  elements['.fishing-toolbar']=new Element();elements['.fishing-instruments']=new Element();
  const root=new Element();root.querySelector=query=>elements[query.startsWith('#')?query.slice(1):query];
  const state={mode:'boat',rentalPaid:true,launchStage:'afloat',fishState,rodMount:'hand',rodElevation:45,rodAzimuth:70,drag:.5,rig:'bottom',fuel:80,engine:false,paused:false,inspection:null,profile:{owned:['rod',...(electric?['rod_electric']:[])],loadout:{rod:electric?'rod_electric':'rod'}},packed:['rod',...(electric?['rod_electric']:[])]};
  const sim={state,lowerRig:()=>{state.fishState='sinking';return{ok:true};},setRodPose:pose=>{state.rodElevation=pose.elevation;state.rodAzimuth=pose.azimuth;},changeDrag:delta=>{state.drag+=delta;}};
  let retrieveCalls=0;
- const ui=mountFishingConsole(root,{sim,getFocusView:()=>({active:focus}),getActions:()=>boatActions(state,{canLower:true}),onFeedback(){},onMount(){},onRetrieve(){retrieveCalls++;}});
+ const ui=mountFishingConsole(root,{sim,getFocusView:()=>({active:focus}),getActions:()=>boatActions(state,{canLower:true}),onFeedback(){},onMount:value=>{state.rodMount=value;},onRetrieve(){retrieveCalls++;}});
  ui.update();return{state,ui,elements,retrieveCalls:()=>retrieveCalls};
 }
 
@@ -163,4 +163,17 @@ test('focus drag slider uses its actual track for taps and full top-to-bottom tr
  drag.emit('pointermove',{clientY:200});assert.equal(state.drag,.85);
  drag.emit('pointermove',{clientY:264});assert.ok(Math.abs(state.drag-.2)<1e-12);
  drag.emit('pointercancel');drag.emit('pointermove',{clientY:200});assert.ok(Math.abs(state.drag-.2)<1e-12);
+});
+
+
+test('icon placement switches directly between hand and either holder, with one selected state',t=>{
+ const {state,ui,elements}=fixture(t,'waiting');
+ for(const value of ['port','starboard','hand']){
+  elements['rod-'+value].onclick();ui.update();assert.equal(state.rodMount,value);
+  for(const k of ['hand','port','starboard'])assert.equal(elements['rod-'+k].attributes['aria-pressed'],String(k===value));
+ }
+ state.fishState='fight';ui.update();elements['rod-port'].onclick();assert.equal(state.rodMount,'hand');assert.equal(elements['rod-mount'].hidden,true);
+ state.rodMount='port';ui.update();assert.equal(elements['rod-hand'].hidden,false);assert.equal(elements['rod-starboard'].hidden,true);
+ state.speed=2;ui.update();elements['rod-hand'].onclick();assert.equal(state.rodMount,'port');
+ state.speed=0;state.paused=true;elements['rod-starboard'].onclick();assert.equal(state.rodMount,'port');
 });

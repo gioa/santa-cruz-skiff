@@ -1,7 +1,7 @@
-import {fishBodyPose,drawFishBody} from './pixel-fish-motion.js?v=20260927-pixel-v51';
+import {fishBodyPose,drawFishBody} from './pixel-fish-motion.js?v=20260927-pixel-v52';
 // A shared measuring board: a fish never grows to fill its card. The same
 // centimetre-to-pixel scale applies to every species and every catch on a view.
-export const FISH_BOARD_SPAN_CM=152.4; // 60 in / 5 ft
+export const FISH_BOARD_SPAN_CM=121.92; // 48 in
 const boundsCache=new WeakMap();
 
 // Exact identity mapping shared by catch cards, history, cooler and fight view.
@@ -57,17 +57,18 @@ export function fishArtLayout(f={},options={}){
  const padding=compact?3:16,top=compact?3:12,bottom=compact?13:38;
  const pxPerCm=(baseWidth-padding*2)/FISH_BOARD_SPAN_CM;
  const lengthCm=Number.isFinite(Number(f?.length))?Math.max(0,Number(f.length)):0;
- // Older or imported catches may exceed today's species maxima. Extend the
- // board by whole feet; keep the scale rather than shrinking or clipping fish.
- const spanCm=Math.max(FISH_BOARD_SPAN_CM,Math.ceil(lengthCm/30.48)*30.48);
+ // Keep a fixed 48-inch board. Oversize fish retain scale and clip at its end.
+ const spanCm=FISH_BOARD_SPAN_CM;
  const spriteBounds=options.spriteBounds||{width:48,height:24};
  const fishWidth=lengthCm*pxPerCm;
  const fishHeight=spriteBounds.width>0?fishWidth*spriteBounds.height/spriteBounds.width:0;
- const width=spanCm===FISH_BOARD_SPAN_CM?Math.ceil(baseWidth):Math.ceil(spanCm*pxPerCm+padding*2);
+ const width=Math.ceil(baseWidth);
  const height=Math.max(Math.ceil(baseHeight),Math.ceil(top+fishHeight+bottom));
  const rulerY=height-bottom+3;
  return{width,height,baseWidth,compact,padding,pxPerCm,lengthCm,spanCm,spanInches:spanCm/2.54,fishWidth,fishHeight,fishX:padding,fishY:top+(height-bottom-top-fishHeight)/2,rulerY,measurementType:f?.lengthType==='fork'?'fork':'total'};
 }
+
+const lengthWithinBoard=layout=>layout.lengthCm<=layout.spanCm;
 
 export function drawFishArt(canvas,sprite,f={},options={}){
  const bounds=fishSpriteBounds(sprite),layout=fishArtLayout(f,{...options,spriteBounds:bounds});
@@ -80,23 +81,23 @@ export function drawFishArt(canvas,sprite,f={},options={}){
  ctx.fillStyle='#b5c9ad';for(let y=compact?12:32;y<rulerY;y+=compact?12:32)ctx.fillRect(0,y,width,1);
  ctx.fillStyle='#ecdfb9';ctx.fillRect(0,rulerY,width,height-rulerY);
  ctx.fillStyle='#456055';ctx.fillRect(padding,rulerY,width-padding*2,1);
- const tickStep=compact?6:1,labelStep=12;
+ const tickStep=compact?6:1,labelStep=compact?24:12;
  ctx.font=`${compact?7:10}px monospace`;ctx.textBaseline='top';
  for(let inch=0;inch<=spanInches+.001;inch+=tickStep){
   const x=padding+inch*2.54*pxPerCm,major=inch%labelStep===0;
   ctx.fillRect(Math.round(x),rulerY,1,major?(compact?5:11):inch%6===0?7:4);
   if(major){
    ctx.textAlign=inch===0?'left':inch>=spanInches-.001?'right':'center';
-   ctx.fillText(inch===0?'0':compact?`${inch/12}′`:`${inch/12} ft`,x,rulerY+(compact?5:14));
+   ctx.fillText(inch===0?'0':inch===48?'48 in':String(inch),x,rulerY+(compact?5:14));
   }
  }
  if(bounds.width&&bounds.height&&fishWidth>0){
   ctx.fillStyle='#708875';ctx.fillRect(padding,compact?2:7,1,rulerY-(compact?2:7));
   // Source sprites face right. Put the nose at the same ruler zero for all fish.
-  ctx.save();ctx.translate(fishX+fishWidth,fishY);ctx.scale(-1,1);
+  ctx.save();ctx.beginPath();ctx.rect(padding,0,width-padding*2,rulerY);ctx.clip();ctx.translate(fishX+fishWidth,fishY);ctx.scale(-1,1);
   const pose=options.animate?fishBodyPose(fishSpriteKind(f),{time:options.time||0,mass:f.kg,energy:options.energy??.6,landed:true,reducedMotion:options.reducedMotion}):null;
   drawFishBody(ctx,sprite,bounds,{length:fishWidth,height:fishHeight,pose:pose?{...pose,pitch:0}:null});ctx.restore();
-  ctx.fillStyle='#456055';ctx.fillRect(Math.round(fishX+fishWidth),rulerY-(compact?3:5),1,compact?4:6);
+  if(lengthWithinBoard(layout)){ctx.fillStyle='#456055';ctx.fillRect(Math.round(fishX+fishWidth),rulerY-(compact?3:5),1,compact?4:6);}
  }
  return layout;
 }

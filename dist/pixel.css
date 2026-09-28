@@ -456,3 +456,20 @@ html,body,#app,#app *,#app *::before,#app *::after{-webkit-user-select:none;user
  #boat-console #boat-fishing .fishing-instruments,#boat-console #boat-fishing .fishing-toolbar{grid-row:2}
 }
 .is-fishing-focus #boat-fishing .rod-identity{position:absolute;left:12px;top:calc(55px + env(safe-area-inset-top));max-width:calc(100vw - 24px);color:#244c46}
+
+/* Paired line controls and direct, icon-only rod placement. */
+#boat-fishing .reel-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));height:44px;gap:0}
+#boat-fishing .reel-actions:has(>button[hidden]){grid-template-columns:minmax(0,1fr)}
+#boat-fishing .reel-instrument .reel-actions #reel-btn,#boat-fishing .reel-instrument .reel-actions #spool-toggle{position:static;transform:none;width:100%;height:44px;min-height:44px;margin:0;border:0;border-top:2px solid #8d9d79;padding:4px;box-shadow:none;font-size:11px}
+#boat-fishing .reel-instrument .reel-actions #reel-btn{border-left:1px solid #8d9d79}
+#app #controls #boat-fishing .fishing-toolbar #rod-mount{display:flex;flex:1 1 140px;min-width:140px;width:auto;gap:4px;padding:0;align-items:center;appearance:none;height:44px}
+#app #controls #boat-fishing #rod-mount button{flex:1 1 44px;min-width:44px;width:44px;height:44px;min-height:44px;padding:8px;display:grid;place-items:center}
+#boat-fishing #rod-mount svg{width:24px;height:24px;pointer-events:none}
+#app #controls #boat-fishing #rod-mount button[aria-pressed=true]{opacity:1;background:#315a55;color:#fff1cc;border-color:#234841;box-shadow:inset 0 -3px #d6b06b}
+.is-fishing-focus #boat-fishing .reel-actions{display:none}
+@media(max-height:500px) and (orientation:landscape){#boat-console #boat-fishing{grid-template-columns:minmax(0,1fr) 144px}}
+@media(max-width:389px) and (orientation:portrait){
+ #app:not(.is-fishing-focus) #boat-console #boat-fishing{grid-template-columns:minmax(0,1fr)}
+ #app:not(.is-fishing-focus) #boat-fishing .fishing-instruments{grid-column:1;grid-row:3;width:144px;height:144px;justify-self:center}
+ #app:not(.is-fishing-focus) #boat-fishing .fishing-toolbar{grid-column:1;grid-row:4}
+}

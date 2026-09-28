@@ -8,7 +8,7 @@ function sprite(width,height,opaque){
  return{width,height,reads:()=>reads,getContext:()=>({getImageData:()=>{reads++;return{data};}})};
 }
 function canvas(){
- const calls=[];const ctx={fillRect(...args){calls.push(['fillRect',...args]);},fillText(...args){calls.push(['fillText',...args]);},save(){},restore(){},translate(...args){calls.push(['translate',...args]);},scale(...args){calls.push(['scale',...args]);},drawImage(...args){calls.push(['drawImage',...args]);}};
+ const calls=[];const ctx={fillRect(...args){calls.push(['fillRect',...args]);},fillText(...args){calls.push(['fillText',...args]);},beginPath(){},rect(...args){calls.push(['clipRect',...args]);},clip(){calls.push(['clip']);},save(){},restore(){},translate(...args){calls.push(['translate',...args]);},scale(...args){calls.push(['scale',...args]);},drawImage(...args){calls.push(['drawImage',...args]);}};
  return{width:0,height:0,ctx,calls,getContext:()=>ctx};
 }
 
@@ -20,18 +20,20 @@ test('all fish lengths use one linear board scale, including small catches',()=>
   assert.equal(small.spanCm,FISH_BOARD_SPAN_CM);assert.equal(large.spanCm,FISH_BOARD_SPAN_CM);
   assert.equal(small.width,large.width);assert.equal(small.fishX,large.fishX);
   assert.equal(small.width,options.width,'floating point roundoff must not add horizontal overflow');
-  assert.ok(small.fishWidth<small.width*.15,'a small fish must remain small on the board');
+  assert.ok(small.fishWidth<small.width*.17,'a small fish must remain small on the board');
  }
  for(const width of[250,337,351,365,390,415])assert.equal(fishArtLayout({length:53},{width}).width,width);
 });
 
-test('large historical fish extend the board without changing scale or truncating length',()=>{
+test('oversize catches keep the same scale on a fixed 48-inch clipped board',()=>{
  const normal=fishArtLayout({length:100},{width:300,height:180});
  const large=fishArtLayout({length:250},{width:300,height:180});
- assert.equal(large.pxPerCm,normal.pxPerCm);
- assert.ok(large.width>normal.width);assert.equal(large.fishWidth,normal.fishWidth*2.5);
- assert.ok(large.fishX+large.fishWidth<=large.width-large.padding);
- assert.ok(large.fishY+large.fishHeight<large.rulerY);
+ assert.equal(large.pxPerCm,normal.pxPerCm);assert.equal(large.width,normal.width);
+ assert.equal(large.spanInches,48);assert.equal(large.lengthCm,250);
+ assert.equal(large.fishWidth,normal.fishWidth*2.5);assert.ok(large.fishX+large.fishWidth>large.width);
+ const board=canvas();drawFishArt(board,sprite(48,24,[[0,0],[47,23]]),{length:250},{width:300});
+ assert.ok(board.calls.some(c=>c[0]==='clipRect'&&c[1]===16&&c[3]===268));
+ assert.ok(board.calls.some(c=>c[0]==='clip'));
 });
 
 test('opaque sprite bounds exclude transparent margins once and include both endpoints',()=>{
@@ -50,7 +52,7 @@ test('drawing crops transparent borders, preserves species aspect, and puts the 
  assert.ok(board.calls.some(c=>c[0]==='scale'&&c[1]===-1&&c[2]===1));
  const translate=board.calls.find(c=>c[0]==='translate');assert.equal(translate[1]-layout.fishWidth,layout.padding);
  assert.equal(board.width,layout.width);assert.equal(board.height,layout.height);assert.equal(board.ctx.imageSmoothingEnabled,false);
- assert.ok(board.calls.some(c=>c[0]==='fillText'&&c[1]==='5 ft'));
+ assert.ok(board.calls.some(c=>c[0]==='fillText'&&c[1]==='48 in'));
 });
 
 test('same measured length has the same silhouette width across sprites with different padding',()=>{
