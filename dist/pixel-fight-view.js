@@ -1,11 +1,11 @@
-import {drawWeatherOverlay} from './pixel-daily-weather.js?v=20260928-pixel-v65';
-import {drawCloseTackle} from './pixel-fight-tackle.js?v=20260928-pixel-v65';
-import {fishBodyPose,drawFishBody} from './pixel-fish-motion.js?v=20260928-pixel-v65';
-import {rodFlexPoint} from './pixel-rod-response.js?v=20260928-pixel-v65';
+import {drawWeatherOverlay} from './pixel-daily-weather.js?v=20260928-pixel-v66';
+import {drawCloseTackle} from './pixel-fight-tackle.js?v=20260928-pixel-v66';
+import {fishBodyPose,drawFishBody} from './pixel-fish-motion.js?v=20260928-pixel-v66';
+import {rodFlexPoint} from './pixel-rod-response.js?v=20260928-pixel-v66';
 // First-person artwork uses the same rod pose, load, surface intersection and
 // crank speed as the simulation. It is a camera change, never another fight.
-import {reelMotion} from './pixel-fishing-feedback.js?v=20260928-pixel-v65';
-import {fishSpriteKind,fishSpriteBounds} from './pixel-fish-art.js?v=20260928-pixel-v65';
+import {reelMotion} from './pixel-fishing-feedback.js?v=20260928-pixel-v66';
+import {fishSpriteKind,fishSpriteBounds} from './pixel-fish-art.js?v=20260928-pixel-v66';
 const TAU=Math.PI*2;
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 const finite=(n,f=0)=>Number.isFinite(n)?n:f;
@@ -177,7 +177,7 @@ export function createFightView(canvas,{sprites}={}){
   const advance=!paused&&!state.paused?clamp(finite(dt),0,.1):0;
   clock+=advance;if(advance){crankAngle=(crankAngle+Math.max(0,finite(state.crankRate))*TAU*advance)%TAU;spoolAngle=(spoolAngle+reelMotion(state).spoolRadiansPerSecond*advance)%TAU;}
   const g=fightViewGeometry(canvas.width,canvas.height,state,{bottomInset:bottomInset*canvas.height/cssHeight,clock,crankAngle,reducedMotion});lastGeometry=g;lastPhase=state.fishState;
-  sky(g,conditions);ocean(g,reducedMotion,conditions);surfaceFish(g,state,reducedMotion);waterContact(g,state,reducedMotion);skiff(g);tackle(g,state);drawWeatherOverlay(c,canvas.width,canvas.height,conditions,clock);
+  sky(g,conditions);ocean(g,reducedMotion,conditions);surfaceFish(g,state,reducedMotion);waterContact(g,state,reducedMotion);drawWeatherOverlay(c,canvas.width,canvas.height,conditions,clock,{layer:'atmosphere'});skiff(g);tackle(g,state);drawWeatherOverlay(c,canvas.width,canvas.height,conditions,clock,{layer:'rain'});
  }
  function snapshot(){
   if(!lastGeometry)return{active,view:'first-person',phase:lastPhase,width:cssWidth,height:cssHeight};

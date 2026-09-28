@@ -1,7 +1,7 @@
-import {GEAR_CATALOG} from './equipment.js?v=20260928-pixel-v65';
-import {RIG_PROFILES} from './fishing-rigs.js?v=20260928-pixel-v65';
-import {ensureConsumables,installBait,installRig,USABLE_CONDITION} from './pixel-consumables.js?v=20260928-pixel-v65';
-import {formatDepth} from './units.js?v=20260928-pixel-v65';
+import {GEAR_CATALOG} from './equipment.js?v=20260928-pixel-v66';
+import {RIG_PROFILES} from './fishing-rigs.js?v=20260928-pixel-v66';
+import {ensureConsumables,installBait,installRig,USABLE_CONDITION} from './pixel-consumables.js?v=20260928-pixel-v66';
+import {formatDepth} from './units.js?v=20260928-pixel-v66';
 
 /** Rod hardware is a premade set. Legacy mounted upgrades are preserved but
  * cannot be edited. Terminal rigs and bait are finite separate supplies. */

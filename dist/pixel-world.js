@@ -1,14 +1,14 @@
-import {sampleDailyWater,drawWeatherOverlay} from './pixel-daily-weather.js?v=20260928-pixel-v65';
-import {pierRings,landPolygons,coastLines,buildingFootprints,FISHING_SPOTS,onLand,onPier} from './pixel-geography.js?v=20260928-pixel-v65';
-import {FISHING_SCENE_SCALE,fishingProjector,fishingPhysicalPoint} from './pixel-fishing-projection.js?v=20260928-pixel-v65';
-import {HARBOR,harborWaterBlocked} from './harbor-layout.js?v=20260928-pixel-v65';
-import {depthInfoAt} from './bathymetry.js?v=20260928-pixel-v65';
-import {createWildlife,drawWildlife} from './pixel-wildlife.js?v=20260928-pixel-v65';
-import {cameraOffset,projectPixel,unprojectPixel,stepDeadzoneCamera,cameraDeadzone,cameraPlayfield,fitCameraBounds,zoomCameraAt,rectilinearOutline} from './pixel-camera.js?v=20260928-pixel-v65';
-import {ladderPoint} from './swimming.js?v=20260928-pixel-v65';
-import {SKIFF_HULL_OUTLINE,SKIFF_RACKS,boatRenderPose,parkedSkiffPoses,skiffScreenPose,hitSkiff,outboardPose,skiffDavitGeometry} from './pixel-boat-geometry.js?v=20260928-pixel-v65';
-import {createWakeTrail,crestPoints,foamPoint} from './pixel-wake.js?v=20260928-pixel-v65';
-import {getRodCurve,getReelPose,getFishingLine,getFishingPresentation} from './pixel-rod-geometry.js?v=20260928-pixel-v65';
+import {sampleDailyWater,drawWeatherOverlay} from './pixel-daily-weather.js?v=20260928-pixel-v66';
+import {pierRings,landPolygons,coastLines,buildingFootprints,FISHING_SPOTS,onLand,onPier} from './pixel-geography.js?v=20260928-pixel-v66';
+import {FISHING_SCENE_SCALE,fishingProjector,fishingPhysicalPoint} from './pixel-fishing-projection.js?v=20260928-pixel-v66';
+import {HARBOR,harborWaterBlocked} from './harbor-layout.js?v=20260928-pixel-v66';
+import {depthInfoAt} from './bathymetry.js?v=20260928-pixel-v66';
+import {createWildlife,drawWildlife} from './pixel-wildlife.js?v=20260928-pixel-v66';
+import {cameraOffset,projectPixel,unprojectPixel,stepDeadzoneCamera,cameraDeadzone,cameraPlayfield,fitCameraBounds,zoomCameraAt,rectilinearOutline} from './pixel-camera.js?v=20260928-pixel-v66';
+import {ladderPoint} from './swimming.js?v=20260928-pixel-v66';
+import {SKIFF_HULL_OUTLINE,SKIFF_RACKS,boatRenderPose,parkedSkiffPoses,skiffScreenPose,hitSkiff,outboardPose,skiffDavitGeometry} from './pixel-boat-geometry.js?v=20260928-pixel-v66';
+import {createWakeTrail,crestPoints,foamPoint} from './pixel-wake.js?v=20260928-pixel-v66';
+import {getRodCurve,getReelPose,getFishingLine,getFishingPresentation} from './pixel-rod-geometry.js?v=20260928-pixel-v66';
 
 // Boat and wharf art retain readable proportions. Fishing and visible fish
 // share the same geographic projection as the seabed.
@@ -363,13 +363,13 @@ export function createPixelWorld(canvas,{sprites={},conditions={}}={}){
     }
     cameraResized=false;lastMode=mode;pixelOffset=cameraOffset(camera);
     const nature=ecology.update(state,dt,seaConditions);
-    ctx.imageSmoothingEnabled=false;ocean();drawWildlife(ctx,nature,{project:point,scale:camera.scale,sprites,layer:'water'});terrain();drawWake(state,dt);routeMarker(state);buildings();davit(state);dockLife();boat(state);davit(state,true);patrol(state);
+    ctx.imageSmoothingEnabled=false;ocean();drawWildlife(ctx,nature,{project:point,scale:camera.scale,sprites,layer:'water'});terrain();drawWake(state,dt);routeMarker(state);buildings();davit(state);dockLife();drawWeatherOverlay(ctx,canvas.width,canvas.height,seaConditions,clock,{layer:'atmosphere'});boat(state);davit(state,true);patrol(state);
     if(mode==='walk'||mode==='intro')person(focus.x,focus.z,{walking:state.walking,heading:state.yaw||0});
     if(mode==='swim'){
       const p=point(focus.x,focus.z);ctx.strokeStyle='#c5e4c4';ctx.strokeRect(p.x-12,p.y+2,24,5);ctx.fillStyle='#e3b78d';ctx.fillRect(p.x-4,p.y-8,9,9);ctx.fillStyle='#365762';ctx.fillRect(p.x-5,p.y-11,11,4);ctx.fillStyle=state.pfd===false?'#57827d':'#e99b50';ctx.fillRect(p.x-7,p.y,14,5);pixelLine(p.x-8,p.y+1,p.x-14,p.y+Math.sin(clock*6)*3,'#e2b68d',3);pixelLine(p.x+8,p.y+1,p.x+14,p.y-Math.sin(clock*6)*3,'#e2b68d',3);
     }
     wildlife();drawWildlife(ctx,nature,{project:point,scale:camera.scale,sprites,layer:'air'});
-    drawWeatherOverlay(ctx,canvas.width,canvas.height,seaConditions,clock);
+    drawWeatherOverlay(ctx,canvas.width,canvas.height,seaConditions,clock,{layer:'rain'});
     // Subtle warm morning light is baked into the palette, never a dark filter.
     // Dawn therefore remains readable on a phone in daylight.
     return {camera,rodVisible:fishing,wildlife:ecology.snapshot()};

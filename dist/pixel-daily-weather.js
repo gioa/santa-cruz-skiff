@@ -17,9 +17,10 @@ export function sampleDailyWater(x,z,time,c={}){
  return wave(c.swellHeight??c.waveHeight,c.period,c.waveDirection)+wave(c.windWaveHeight,c.windWavePeriod,c.windDirection,1.7);
 }
 // Pixel weather accents share the same conditions as the hull and line solver.
-export function drawWeatherOverlay(ctx,width,height,c={},time=0){
- ctx.save();if(c.cloudCover){ctx.fillStyle=`rgba(35,55,71,${c.cloudCover*.1})`;ctx.fillRect(0,0,width,height);}
- if(c.daylight<.55){ctx.fillStyle=`rgba(200,118,69,${(.55-c.daylight)*.23})`;ctx.fillRect(0,0,width,height);}
- if(c.fog){ctx.fillStyle=`rgba(216,227,216,${c.fog*.42})`;ctx.fillRect(0,0,width,height);for(let i=0;i<5;i++){ctx.fillStyle=`rgba(227,234,224,${c.fog*.075})`;ctx.fillRect(((time*3+i*width*.31)%(width*1.4))-width*.4,height*(i*.18),width*.8,28);}}
- if(c.rain){const a=(134-c.windDirection)*Math.PI/180,dx=Math.sin(a)*c.windKnots*.16;ctx.strokeStyle=`rgba(207,231,220,${.2+c.rain*.2})`;ctx.lineWidth=1;ctx.beginPath();for(let i=0;i<Math.round(70*c.rain);i++){const x=((i*97+time*dx*6)%width+width)%width,y=(i*53+time*160)%height;ctx.moveTo(Math.round(x),Math.round(y));ctx.lineTo(Math.round(x+dx),Math.round(y+6));}ctx.stroke();}ctx.restore();
+export function drawWeatherOverlay(ctx,width,height,c={},time=0,{layer='all'}={}){
+ const atmosphere=layer!=='rain',precipitation=layer!=='atmosphere';
+ ctx.save();if(atmosphere&&c.cloudCover){ctx.fillStyle=`rgba(35,55,71,${c.cloudCover*.1})`;ctx.fillRect(0,0,width,height);}
+ if(atmosphere&&c.daylight<.55){ctx.fillStyle=`rgba(200,118,69,${(.55-c.daylight)*.23})`;ctx.fillRect(0,0,width,height);}
+ if(atmosphere&&c.fog){ctx.fillStyle=`rgba(216,227,216,${c.fog*.42})`;ctx.fillRect(0,0,width,height);for(let i=0;i<5;i++){ctx.fillStyle=`rgba(227,234,224,${c.fog*.075})`;ctx.fillRect(((time*3+i*width*.31)%(width*1.4))-width*.4,height*(i*.18),width*.8,28);}}
+ if(precipitation&&c.rain){const a=(134-c.windDirection)*Math.PI/180,dx=Math.sin(a)*c.windKnots*.16;ctx.strokeStyle=`rgba(207,231,220,${.2+c.rain*.2})`;ctx.lineWidth=1;ctx.beginPath();for(let i=0;i<Math.round(70*c.rain);i++){const x=((i*97+time*dx*6)%width+width)%width,y=(i*53+time*160)%height;ctx.moveTo(Math.round(x),Math.round(y));ctx.lineTo(Math.round(x+dx),Math.round(y+6));}ctx.stroke();}ctx.restore();
 }
