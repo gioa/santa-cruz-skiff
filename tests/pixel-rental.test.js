@@ -55,12 +55,12 @@ test('version-five floating flags without payment recover ashore and all propuls
 });
 
 test('starting a new trip from a paid save needs a new rental while continuing that save does not',()=>{
- const sim=begin();counter(sim);sim.launchBoat();run(sim,24.1);const saved=sim.snapshot();const continued=new PixelSimulation({saved,now});continued.start(true);assert.equal(continued.state.rentalPaid,true);assert.equal(continued.state.launchStage,'afloat');assert.equal(continued.state.profile.credits,85);
+ const sim=begin();counter(sim);sim.launchBoat();run(sim,24.1);const saved=sim.snapshot();delete saved.dayCycleVersion;const continued=new PixelSimulation({saved,now});continued.start(true);assert.equal(continued.state.rentalPaid,true);assert.equal(continued.state.launchStage,'afloat');assert.equal(continued.state.profile.credits,85);
  const fresh=new PixelSimulation({saved,now});fresh.start(false);assert.equal(fresh.state.rentalPaid,false);assert.equal(fresh.state.launchStage,'stored');assert.equal(fresh.state.profile.credits,85);counter(fresh);fresh.launchBoat();assert.equal(fresh.state.profile.credits,70);assert.equal(rentalTransactions(fresh).length,2);
 });
 
 test('a poor player cannot overwrite a usable paid voyage by starting an unaffordable new trip',()=>{
- const original=begin(0).snapshot();
+ const original=begin(0).snapshot();delete original.dayCycleVersion;
  for(const previous of[{version:5,rentalPaid:true,mode:'walk',launchStage:'afloat'},{version:4,mode:'boat',launchStage:'afloat'},{version:4,mode:'walk',launchStage:'lowering',launchProgress:.6}]){
   const saved={...original,...previous},before=JSON.stringify(saved),sim=new PixelSimulation({saved,now});assert.equal(hasSavedBoatRental(saved),true);const result=sim.start(false);assert.equal(result.ok,false);assert.match(result.message,/继续上次已租航程/);assert.equal(sim.state.mode,'intro');assert.equal(sim.state.profile.credits,0);assert.equal(JSON.stringify(saved),before,'failed new trip preserves the old save');
   assert.equal(sim.start(true).ok,true);assert.equal(sim.state.rentalPaid,true);assert.equal(sim.state.profile.credits,0);assert.equal(sim.state.launchStage,previous.launchStage);if(previous.launchStage==='lowering')assert.equal(sim.state.launchProgress,.6);

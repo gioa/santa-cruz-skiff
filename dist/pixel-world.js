@@ -1,13 +1,14 @@
-import {pierRings,landPolygons,coastLines,buildingFootprints,FISHING_SPOTS,onLand,onPier} from './pixel-geography.js?v=20260928-pixel-v62';
-import {FISHING_SCENE_SCALE,fishingProjector,fishingPhysicalPoint} from './pixel-fishing-projection.js?v=20260928-pixel-v62';
-import {HARBOR,harborWaterBlocked} from './harbor-layout.js?v=20260928-pixel-v62';
-import {depthInfoAt} from './bathymetry.js?v=20260928-pixel-v62';
-import {createWildlife,drawWildlife} from './pixel-wildlife.js?v=20260928-pixel-v62';
-import {cameraOffset,projectPixel,unprojectPixel,stepDeadzoneCamera,cameraDeadzone,cameraPlayfield,fitCameraBounds,zoomCameraAt,rectilinearOutline} from './pixel-camera.js?v=20260928-pixel-v62';
-import {ladderPoint} from './swimming.js?v=20260928-pixel-v62';
-import {SKIFF_HULL_OUTLINE,SKIFF_RACKS,boatRenderPose,parkedSkiffPoses,skiffScreenPose,hitSkiff,outboardPose,skiffDavitGeometry} from './pixel-boat-geometry.js?v=20260928-pixel-v62';
-import {createWakeTrail,crestPoints,foamPoint} from './pixel-wake.js?v=20260928-pixel-v62';
-import {getRodCurve,getReelPose,getFishingLine,getFishingPresentation} from './pixel-rod-geometry.js?v=20260928-pixel-v62';
+import {sampleDailyWater,drawWeatherOverlay} from './pixel-daily-weather.js?v=20260928-pixel-v63';
+import {pierRings,landPolygons,coastLines,buildingFootprints,FISHING_SPOTS,onLand,onPier} from './pixel-geography.js?v=20260928-pixel-v63';
+import {FISHING_SCENE_SCALE,fishingProjector,fishingPhysicalPoint} from './pixel-fishing-projection.js?v=20260928-pixel-v63';
+import {HARBOR,harborWaterBlocked} from './harbor-layout.js?v=20260928-pixel-v63';
+import {depthInfoAt} from './bathymetry.js?v=20260928-pixel-v63';
+import {createWildlife,drawWildlife} from './pixel-wildlife.js?v=20260928-pixel-v63';
+import {cameraOffset,projectPixel,unprojectPixel,stepDeadzoneCamera,cameraDeadzone,cameraPlayfield,fitCameraBounds,zoomCameraAt,rectilinearOutline} from './pixel-camera.js?v=20260928-pixel-v63';
+import {ladderPoint} from './swimming.js?v=20260928-pixel-v63';
+import {SKIFF_HULL_OUTLINE,SKIFF_RACKS,boatRenderPose,parkedSkiffPoses,skiffScreenPose,hitSkiff,outboardPose,skiffDavitGeometry} from './pixel-boat-geometry.js?v=20260928-pixel-v63';
+import {createWakeTrail,crestPoints,foamPoint} from './pixel-wake.js?v=20260928-pixel-v63';
+import {getRodCurve,getReelPose,getFishingLine,getFishingPresentation} from './pixel-rod-geometry.js?v=20260928-pixel-v63';
 
 // Boat and wharf art retain readable proportions. Fishing and visible fish
 // share the same geographic projection as the seabed.
@@ -59,7 +60,7 @@ export function createPixelWorld(canvas,{sprites={},conditions={}}={}){
   }
   function fishingWorldToScreen(x,z,state){const p=fishingProjector(state,point)(x,z);return{x:p.x*cssWidth/canvas.width,y:p.y*cssHeight/canvas.height};}
   function cssWorldToScreen(x,z){const p=point(x,z);return{x:p.x*cssWidth/canvas.width,y:p.y*cssHeight/canvas.height,visible:p.x>=0&&p.x<=canvas.width&&p.y>=0&&p.y<=canvas.height};}
-  const skiffGeometry=pose=>skiffScreenPose(pose,{cameraScale:camera.scale,project:point,time:clock});
+  const skiffGeometry=pose=>{const g=skiffScreenPose(pose,{cameraScale:camera.scale,project:point,time:clock});if(pose.afloat&&seaConditions.mode==='daily'){const player=lastDrawState?.mode==='boat'&&Math.hypot(pose.x-lastDrawState.boatX,pose.z-lastDrawState.boatZ)<.01,height=player?(lastDrawState.heave||0):sampleDailyWater(pose.x,pose.z,clock,seaConditions),bob=Math.round(height*camera.scale*.65)+Math.round(Math.sin(clock*1.8)*.8*pose.bobWeight);g.screenY-=bob;g.bounds.top-=bob;g.bounds.bottom-=bob;}return g;};
   function path(points,dx=0,dy=0){ctx.beginPath();for(let i=0;i<points.length;i++){const p=point(points[i].x,points[i].z);i?ctx.lineTo(p.x+dx,p.y+dy):ctx.moveTo(p.x+dx,p.y+dy);}ctx.closePath();}
   function pixelLine(x1,y1,x2,y2,color,width=1){x1=Math.round(x1);y1=Math.round(y1);x2=Math.round(x2);y2=Math.round(y2);const dx=Math.abs(x2-x1),sx=x1<x2?1:-1,dy=-Math.abs(y2-y1),sy=y1<y2?1:-1,w=Math.max(1,Math.round(width));let error=dx+dy;ctx.fillStyle=color;for(let i=0;i<3000;i++){ctx.fillRect(x1-Math.floor(w/2),y1-Math.floor(w/2),w,w);if(x1===x2&&y1===y2)break;const e=2*error;if(e>=dy){error+=dy;x1+=sx;}if(e<=dx){error+=dx;y1+=sy;}}}
   function worldLine(a,b,color,width=1){const p=point(a.x,a.z),q=point(b.x,b.z);pixelLine(p.x,p.y,q.x,q.y,color,width);}
@@ -85,9 +86,9 @@ export function createPixelWorld(canvas,{sprites={},conditions={}}={}){
     // Coastline bath of shallow turquoise; geometry itself comes from OSM.
     for(const ring of artCoastLines){ctx.beginPath();for(let i=0;i<ring.length;i++){const p=point(ring[i].x,ring[i].z);i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y);}ctx.strokeStyle='#4fb8b1';ctx.lineWidth=Math.max(10,42*s);ctx.lineJoin='miter';ctx.stroke();ctx.strokeStyle='#72c9ba';ctx.lineWidth=Math.max(5,15*s);ctx.stroke();}
     for(let z=Math.floor(z0/7)*7;z<z1;z+=7)for(let x=Math.floor(x0/9)*9;x<x1;x+=9){
-      const n=hash(x+17,z-61),p=point(x+n*5+Math.sin(clock*.2+n*8)*.45,z+n*3);const phase=(clock*.21+n*4)%1;
-      ctx.globalAlpha=.2+Math.sin(phase*Math.PI)*.3;ctx.fillStyle=n>.7?'#b7e8d3':'#76c7c1';
-      const w=Math.max(3,Math.round((.5+n*1.2)*s));ctx.fillRect(p.x,p.y,w,1);if(n>.75){ctx.fillRect(p.x+2,p.y+1,w-4,1);ctx.fillRect(p.x+w,p.y-1,2,1);}
+      const n=hash(x+17,z-61),wdir=(134-(seaConditions.waveDirection||300))*Math.PI/180,drift=clock*(seaConditions.period||9)*.12,p=point(x+n*5+Math.sin(wdir)*drift%7,z+n*3+Math.cos(wdir)*drift%7);const phase=(clock/Math.max(2,seaConditions.period||9)+n*4)%1;
+      ctx.globalAlpha=Math.min(.8,.15+Math.sin(phase*Math.PI)*(.2+(seaConditions.waveHeight||0)*.17));ctx.fillStyle=n>.7?'#b7e8d3':'#76c7c1';
+      const w=Math.max(3,Math.round((.5+n*1.2+Math.min(2,seaConditions.waveHeight||0)*.6)*s));ctx.fillRect(p.x,p.y,w,1);if(n>.75){ctx.fillRect(p.x+2,p.y+1,w-4,1);ctx.fillRect(p.x+w,p.y-1,2,1);}
     }ctx.globalAlpha=1;
     // The wharf's submerged pilings and calm pool remain visible through the
     // water; their darker colour also makes the left boarding landing clear.
@@ -182,7 +183,7 @@ export function createPixelWorld(canvas,{sprites={},conditions={}}={}){
     // A stored boat has only its dry deck shadow. A raised hull's shadow stays
     // on the surface below, while the hull follows the crane's actual pose.
     ctx.save();ctx.translate(p.x,p.y+(pose.afloat?bob:0));ctx.rotate(-heading);ctx.translate(4,6);ctx.scale(scale,scale);hullShadow(SKIFF_HULL_OUTLINE.map(([x,y])=>[x-24,y-44]),pose.afloat?.25:.16);ctx.restore();
-    ctx.save();ctx.translate(g.screenX,g.screenY);ctx.rotate(-heading);
+    ctx.save();ctx.translate(g.screenX,g.screenY);ctx.rotate(-heading);if(occupied)ctx.scale(1-Math.min(.08,Math.abs(state.roll||0)*.3),1-Math.min(.05,Math.abs(state.pitch||0)*.2));
     if(typeof sprites.drawBoat==='function')sprites.drawBoat(ctx,0,0,{scale,occupied,pose:occupantPose,time:clock,tiller:state.tiller||0,reeling:state.reeling,castPower:state.castPower||0,fishState:state.fishState});
     else{
       const hull=sprites.boatHull||sprites.boat,asset=hull?.image||hull?.canvas||hull;
@@ -334,7 +335,7 @@ export function createPixelWorld(canvas,{sprites={},conditions={}}={}){
     return wanted;
   }
   function draw(state,dt=1/60){
-    dt=clamp(Number.isFinite(dt)?dt:1/60,0,.1);clock+=dt;lastDrawState=state;
+    dt=clamp(Number.isFinite(dt)?dt:1/60,0,.1);clock=Number.isFinite(state.time)?state.time:clock+dt;lastDrawState=state;
     if(state.reeling&&!state.paused)reelTurns=(reelTurns+Math.max(0,state.crankRate||0)*dt)%1;
     const mode=state.mode||'intro',swim=state.swim||{},focus=mode==='boat'?{x:state.boatX,z:state.boatZ}:mode==='swim'?{x:swim.x??state.playerX,z:swim.z??state.playerZ}:{x:state.playerX??HARBOR.spawnX,z:state.playerZ??HARBOR.spawnZ};
     const fishing=mode==='boat'&&!['idle','landed'].includes(state.fishState||'idle'),nearDock=Math.hypot(focus.x-HARBOR.spawnX,focus.z-HARBOR.spawnZ)<70;
@@ -351,6 +352,13 @@ export function createPixelWorld(canvas,{sprites={},conditions={}}={}){
     // when resuming a boat trip on a short phone above the fixed console.
     Object.assign(camera,stepDeadzoneCamera(camera,focus,{mode}));
     if(mode==='boat'){const frame=boatFrame(state);Object.assign(camera,fitCameraBounds(camera,frame.all,{primaryBounds:frame.primary}));lastFrameBounds=boatFrame(state);}else lastFrameBounds=null;
+    if(state.dayTransition?.harborReady){
+      // Frame the entire hoist corridor above the caption, not the boarding character.
+      const poses=Array.from({length:21},(_,i)=>boatRenderPose({...state,launchStage:'lowering',launchProgress:i/20},HARBOR));
+      const boundsAt=view=>{const project=(x,z)=>projectPixel(view,x,z),bounds=poses.flatMap(p=>[skiffScreenPose(p,{cameraScale:view.scale,project,time:0}).bounds,skiffDavitGeometry(p,{harbor:HARBOR,cameraScale:view.scale,project,time:0}).bounds]);return{left:Math.min(...bounds.map(b=>b.left))-8,right:Math.max(...bounds.map(b=>b.right))+8,top:Math.min(...bounds.map(b=>b.top))-8,bottom:Math.max(...bounds.map(b=>b.bottom))+8};};
+      const view={...camera,viewport:{...camera.viewport,bottom:cssHeight*.3}};for(let scale=6;scale>=2;scale--){view.scale=scale;const b=boundsAt(view),f=cameraPlayfield(view);if((b.right-b.left<=f.right-f.left&&b.bottom-b.top<=f.bottom-f.top)||scale===2)break;}
+      const fitted=fitCameraBounds(view,boundsAt(view));camera.x=fitted.x;camera.z=fitted.z;camera.scale=fitted.scale;
+    }
     cameraResized=false;lastMode=mode;pixelOffset=cameraOffset(camera);
     const nature=ecology.update(state,dt,seaConditions);
     ctx.imageSmoothingEnabled=false;ocean();drawWildlife(ctx,nature,{project:point,scale:camera.scale,sprites,layer:'water'});terrain();drawWake(state,dt);routeMarker(state);buildings();davit(state);dockLife();boat(state);davit(state,true);patrol(state);
@@ -359,6 +367,7 @@ export function createPixelWorld(canvas,{sprites={},conditions={}}={}){
       const p=point(focus.x,focus.z);ctx.strokeStyle='#c5e4c4';ctx.strokeRect(p.x-12,p.y+2,24,5);ctx.fillStyle='#e3b78d';ctx.fillRect(p.x-4,p.y-8,9,9);ctx.fillStyle='#365762';ctx.fillRect(p.x-5,p.y-11,11,4);ctx.fillStyle=state.pfd===false?'#57827d':'#e99b50';ctx.fillRect(p.x-7,p.y,14,5);pixelLine(p.x-8,p.y+1,p.x-14,p.y+Math.sin(clock*6)*3,'#e2b68d',3);pixelLine(p.x+8,p.y+1,p.x+14,p.y-Math.sin(clock*6)*3,'#e2b68d',3);
     }
     wildlife();drawWildlife(ctx,nature,{project:point,scale:camera.scale,sprites,layer:'air'});
+    drawWeatherOverlay(ctx,canvas.width,canvas.height,seaConditions,clock);
     // Subtle warm morning light is baked into the palette, never a dark filter.
     // Dawn therefore remains readable on a phone in daylight.
     return {camera,rodVisible:fishing,wildlife:ecology.snapshot()};

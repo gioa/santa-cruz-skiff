@@ -1,35 +1,10 @@
-import test from 'node:test';
-import assert from 'node:assert/strict';
-import {readFile} from 'node:fs/promises';
+import test from 'node:test';import assert from 'node:assert/strict';import {readFile} from 'node:fs/promises';
 globalThis.fetch=async url=>new Response(await readFile(url));
 const {PixelSimulation,GAME_TIME_SCALE,HARBOR}=await import('../dist/pixel-sim.js');
-const {NAVIGATION_COMPRESSION}=await import('../dist/pixel-navigation-scale.js');
-const {assessCatch}=await import('../dist/fishing-regulations.js');
-const now=()=>new Date('2026-09-27T21:00:00Z');
-const run=(sim,seconds,dt=.25)=>{for(let t=0;t<seconds-1e-7;t+=dt)sim.step(Math.min(dt,seconds-t));};
-const begin=options=>{const sim=new PixelSimulation({now,patrolRng:()=>.9,...options});sim.start();return sim;};
-
-test('half-scale map advances the clock and capture timestamp two minutes per actual minute',()=>{
- assert.equal(GAME_TIME_SCALE,1/NAVIGATION_COMPRESSION);const sim=begin(),start=Date.parse(sim.captureTimestamp());run(sim,60,.1);
- assert.equal(sim.state.clock,'06:02:00');assert.equal(sim.state.timeScale,2);assert.ok(Math.abs(sim.state.elapsed-60)<1e-7);assert.ok(Math.abs(sim.state.time-60)<1e-7,'animation clock remains real time');assert.ok(Math.abs(sim.state.gameElapsed-120)<1e-7);assert.equal(Date.parse(sim.captureTimestamp())-start,120000);
- assert.equal(sim.publicState().activeSeconds,60);assert.equal(sim.publicState().gameSeconds,120);assert.equal(sim.publicState().timeScale,2);
-});
-
-test('time compression applies while walking and moored independently of navigation assistance, and pause freezes both clocks',()=>{
- const sim=begin();run(sim,15);Object.assign(sim.state,{mode:'boat',boatX:HARBOR.boatX,boatZ:HARBOR.boatZ,moored:true,launchStage:'afloat'});run(sim,15);assert.equal(sim.state.navigationScale,1);assert.equal(sim.state.clock,'06:01:00');
- const before={active:sim.state.elapsed,game:sim.state.gameElapsed,animation:sim.state.time,stamp:sim.captureTimestamp()};sim.pause(true);run(sim,20);assert.deepEqual({active:sim.state.elapsed,game:sim.state.gameElapsed,animation:sim.state.time,stamp:sim.captureTimestamp()},before);sim.pause(false);run(sim,1);assert.equal(sim.state.clock,'06:01:02');
-});
-
-test('clock midnight and legal capture date advance together in Pacific local time',()=>{
- const sim=begin();sim.state.gameElapsed=18*3600-.5;sim.state.elapsed=sim.state.gameElapsed/GAME_TIME_SCALE;sim.state.time=sim.state.elapsed;sim.state.clock=sim.clock();assert.equal(sim.state.clock,'23:59:59');sim.step(.25);assert.equal(sim.state.clock,'00:00:00');assert.equal(sim.captureTimestamp(),'2026-09-28T07:00:00.000Z');
- const result=assessCatch({speciesId:'pacific_mackerel',caughtAt:sim.captureTimestamp(),caughtGPS:{lat:36.9505,lon:-122.0288},landingNetDiameterInches:20});assert.equal(result.date,'2026-09-28');
-});
-
-test('Pacific daylight-saving transition keeps clock and capture instant consistent',()=>{
- const sim=begin({now:()=>new Date('2026-10-31T20:00:00Z')});sim.state.gameElapsed=20*3600-1;sim.state.elapsed=sim.state.gameElapsed/GAME_TIME_SCALE;sim.state.time=sim.state.elapsed;assert.equal(sim.clock(),'01:59:59');run(sim,1);assert.equal(sim.state.clock,'01:00:01');assert.equal(sim.captureTimestamp(),'2026-11-01T09:00:01.000Z');
-});
-
-test('new and legacy saves restart both clocks at today six-am without rewriting historical catch timestamps',()=>{
- const sim=begin();run(sim,30);sim.state.catches.push({catchId:'historical',name:'蓝岩鱼',caughtAt:'2026-09-27T13:00:15.000Z',kept:true});const modern=sim.snapshot(),legacy=structuredClone(modern);delete legacy.gameElapsed;delete legacy.timeScale;legacy.version=3;
- for(const saved of[modern,legacy]){const restored=new PixelSimulation({saved,now:()=>new Date('2026-12-01T04:00:00Z')});restored.start(true);assert.equal(restored.state.clock,'06:00:00');assert.equal(restored.state.dayStartAt,'2026-11-30T14:00:00.000Z');assert.equal(restored.state.elapsed,0);assert.equal(restored.state.time,0);assert.equal(restored.state.gameElapsed,0);assert.equal(restored.state.timeScale,2);assert.equal(restored.state.catches[0].caughtAt,'2026-09-27T13:00:15.000Z');run(restored,1);assert.equal(restored.state.clock,'06:00:02');}
-});
+const {DAY_LENGTH_SECONDS}=await import('../dist/pixel-day-cycle.js');
+const run=(sim,seconds)=>{for(let t=0;t<seconds-1e-7;t+=.1)sim.step(Math.min(.1,seconds-t));};
+const begin=options=>{const s=new PixelSimulation({now:()=>new Date('2026-09-27T21:00:00Z'),patrolRng:()=>.9,...options});s.start();return s;};
+test('five-times clock advances five game minutes per real minute independent of map compression',()=>{const s=begin(),stamp=Date.parse(s.captureTimestamp());run(s,60);assert.equal(GAME_TIME_SCALE,5);assert.equal(s.state.clock,'06:05:00');assert.equal(s.publicState().gameSeconds,300);assert.equal(s.publicState().activeSeconds,60);assert.equal(Date.parse(s.captureTimestamp())-stamp,300000);});
+test('walking, afloat and pause share the clock while physical animation seconds stay real',()=>{const s=begin();run(s,15);Object.assign(s.state,{mode:'boat',boatX:HARBOR.boatX,boatZ:HARBOR.boatZ});run(s,15);assert.equal(s.state.clock,'06:02:30');s.pause(true);const before=s.snapshot();run(s,20);assert.equal(s.state.gameElapsed,before.gameElapsed);assert.equal(s.state.time,before.time);s.pause(false);run(s,1);assert.equal(s.state.clock,'06:02:35');});
+test('each next morning uses the next Pacific date across both daylight-saving changes',()=>{for(const [date,next] of [['2026-10-31T20:00:00Z','2026-11-01T14:00:00.000Z'],['2026-03-07T20:00:00Z','2026-03-08T13:00:00.000Z']]){const s=begin({now:()=>new Date(date)});s.state.gameElapsed=DAY_LENGTH_SECONDS-1;s.step(.25);run(s,10.1);assert.equal(s.state.dayStartAt,next);assert.equal(s.state.clock,'06:00:00');assert.equal(s.state.dayNumber,2);}});
+test('modern saves preserve same-day clock/weather; legacy saves begin at six without rewriting catch dates',()=>{const s=begin({dailyWeather:true,weatherSeed:39});run(s,30);s.state.catches.push({catchId:'old',caughtAt:'2026-09-27T13:00:15.000Z'});const saved=s.snapshot();for(const resume of[false,true]){const r=new PixelSimulation({saved,now:()=>new Date('2026-12-01T04:00:00Z')});r.start(resume);assert.equal(r.state.dayStartAt,s.state.dayStartAt);assert.equal(r.state.gameElapsed,s.state.gameElapsed);assert.deepEqual(r.state.dailyWeather,s.state.dailyWeather);assert.equal(r.state.catches[0].caughtAt,saved.catches[0].caughtAt);}delete saved.dayCycleVersion;const legacy=new PixelSimulation({saved,now:()=>new Date('2026-12-01T04:00:00Z')});legacy.start(true);assert.equal(legacy.state.dayStartAt,'2026-11-30T14:00:00.000Z');assert.equal(legacy.state.clock,'06:00:00');});

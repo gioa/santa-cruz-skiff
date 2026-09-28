@@ -1,7 +1,7 @@
-import {bathymetry,elevationAtGPS} from './bathymetry.js?v=20260928-pixel-v62';
-import {seafloor,seafloorAtGPS} from './pixel-seafloor.js?v=20260928-pixel-v62';
-import {landPolygons,pierRings,toGPS,FISHING_SPOTS} from './pixel-geography.js?v=20260928-pixel-v62';
-import {CHART_HOME,BED_COLORS,BED_LABELS,FEET_PER_METER,chartMeters,chartProjection,zoomChart,chartSample,depthContours,depthColor} from './pixel-chart-data.js?v=20260928-pixel-v62';
+import {bathymetry,elevationAtGPS} from './bathymetry.js?v=20260928-pixel-v63';
+import {seafloor,seafloorAtGPS} from './pixel-seafloor.js?v=20260928-pixel-v63';
+import {landPolygons,pierRings,toGPS,FISHING_SPOTS} from './pixel-geography.js?v=20260928-pixel-v63';
+import {CHART_HOME,BED_COLORS,BED_LABELS,FEET_PER_METER,chartMeters,chartProjection,zoomChart,chartSample,depthContours,depthColor} from './pixel-chart-data.js?v=20260928-pixel-v63';
 let layers=null,contours=null;
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 function makeLayers(){

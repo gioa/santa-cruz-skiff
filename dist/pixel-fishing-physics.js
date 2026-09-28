@@ -5,8 +5,8 @@
  * pay line out, while turning the handle takes it in. Rod movement never
  * manufactures more line. This module has no inventory, UI or random events.
  */
-import {getRigProfile,stepRigLure} from './fishing-rigs.js?v=20260928-pixel-v62';
-import {rigHydrodynamics} from './pixel-rig-hydrodynamics.js?v=20260928-pixel-v62';
+import {getRigProfile,stepRigLure} from './fishing-rigs.js?v=20260928-pixel-v63';
+import {rigHydrodynamics} from './pixel-rig-hydrodynamics.js?v=20260928-pixel-v63';
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 const finite=(n,f=0)=>Number.isFinite(n)?n:f;
 export const MAX_PAID_LINE_METERS=120;
@@ -23,7 +23,7 @@ export function rodTipPosition(s){
  const angle=heading-azimuth,horizontal=ROD_LENGTH_METERS*Math.cos(elevation);
  return{x:finite(s.boatX)+side*Math.cos(heading)+fore*Math.sin(heading)-Math.sin(angle)*horizontal,
   z:finite(s.boatZ)-side*Math.sin(heading)+fore*Math.cos(heading)-Math.cos(angle)*horizontal,
-  height:baseHeight+ROD_LENGTH_METERS*Math.sin(elevation)+clamp(finite(s.pumpHeight),0,.8)};
+  height:baseHeight+clamp(finite(s.heave),-1.2,1.2)+ROD_LENGTH_METERS*Math.sin(elevation)+clamp(finite(s.pumpHeight),0,.8)};
 }
 
 /** Conditions use a world-space vector when supplied; otherwise no inferred current. */

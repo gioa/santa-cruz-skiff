@@ -68,7 +68,7 @@ test('hook stamps Pacific six-am date, capture position and actual carried tackl
 });
 
 test('new/resumed game dates use real Pacific date at 06:00, including winter offset, and preserve original catch evidence',()=>{
- const sim=prepared();sim.state.catches.push(stored('lingcod'));const saved=sim.snapshot(),resumed=new PixelSimulation({saved,now:()=>new Date('2026-12-01T04:00:00Z')});resumed.start(true);assert.equal(resumed.state.dayStartAt,'2026-11-30T14:00:00.000Z');assert.equal(resumed.state.clock,'06:00:00');assert.equal(resumed.state.catches[0].caughtAt,'2026-09-27T13:00:00Z');assert.equal(resumed.captureTimestamp(),'2026-11-30T14:00:00.000Z');
+ const sim=prepared();sim.state.catches.push(stored('lingcod'));const saved=sim.snapshot();delete saved.dayCycleVersion;const resumed=new PixelSimulation({saved,now:()=>new Date('2026-12-01T04:00:00Z')});resumed.start(true);assert.equal(resumed.state.dayStartAt,'2026-11-30T14:00:00.000Z');assert.equal(resumed.state.clock,'06:00:00');assert.equal(resumed.state.catches[0].caughtAt,'2026-09-27T13:00:00Z');assert.equal(resumed.captureTimestamp(),'2026-11-30T14:00:00.000Z');
 });
 
 test('patrol randomness is independent of fishing RNG and never reveals an inspection result before checking ends',()=>{

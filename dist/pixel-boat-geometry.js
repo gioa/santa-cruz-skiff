@@ -1,4 +1,4 @@
-import {SKIFF_LENGTH_METERS,SKIFF_HULL_PIXELS,SKIFF_METERS_PER_PIXEL,SKIFF_DISPLAY_METERS_PER_PIXEL} from './skiff-dimensions.js?v=20260928-pixel-v62';
+import {SKIFF_LENGTH_METERS,SKIFF_HULL_PIXELS,SKIFF_METERS_PER_PIXEL,SKIFF_DISPLAY_METERS_PER_PIXEL} from './skiff-dimensions.js?v=20260928-pixel-v63';
 export {SKIFF_LENGTH_METERS,SKIFF_HULL_PIXELS,SKIFF_METERS_PER_PIXEL,SKIFF_DISPLAY_METERS_PER_PIXEL};
 // Presentation only: the simulation retains the surveyed boarding point and
 // water coordinates. Every rental uses the same hull and sprite dimensions.
@@ -24,6 +24,7 @@ export function outboardPose(tiller=0){
 }
 
 export function boatRenderPose(state,harbor){
+  if(state.launchStage==='raising'){const pose=boatRenderPose({...state,launchStage:'lowering',launchProgress:1-clamp(state.launchProgress||0,0,1)},harbor);return{...pose,stage:'raising'};}
   const stage=state.launchStage||'afloat',rack=SKIFF_RACKS[0];
   const water={x:state.boatX??harbor.boatX,z:state.boatZ??harbor.boatZ};
   const base={stage,lift:0,afloat:false,rigged:false,stored:false,bobWeight:0};

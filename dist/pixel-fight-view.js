@@ -1,10 +1,11 @@
-import {drawCloseTackle} from './pixel-fight-tackle.js?v=20260928-pixel-v62';
-import {fishBodyPose,drawFishBody} from './pixel-fish-motion.js?v=20260928-pixel-v62';
-import {rodFlexPoint} from './pixel-rod-response.js?v=20260928-pixel-v62';
+import {drawWeatherOverlay} from './pixel-daily-weather.js?v=20260928-pixel-v63';
+import {drawCloseTackle} from './pixel-fight-tackle.js?v=20260928-pixel-v63';
+import {fishBodyPose,drawFishBody} from './pixel-fish-motion.js?v=20260928-pixel-v63';
+import {rodFlexPoint} from './pixel-rod-response.js?v=20260928-pixel-v63';
 // First-person artwork uses the same rod pose, load, surface intersection and
 // crank speed as the simulation. It is a camera change, never another fight.
-import {reelMotion} from './pixel-fishing-feedback.js?v=20260928-pixel-v62';
-import {fishSpriteKind,fishSpriteBounds} from './pixel-fish-art.js?v=20260928-pixel-v62';
+import {reelMotion} from './pixel-fishing-feedback.js?v=20260928-pixel-v63';
+import {fishSpriteKind,fishSpriteBounds} from './pixel-fish-art.js?v=20260928-pixel-v63';
 const TAU=Math.PI*2;
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 const finite=(n,f=0)=>Number.isFinite(n)?n:f;
@@ -93,7 +94,7 @@ export function createFightView(canvas,{sprites}={}){
   if(canvas.width!==w||canvas.height!==h){canvas.width=w;canvas.height=h;}
   c.imageSmoothingEnabled=false;
  }
- function sky(g){
+ function sky(g,conditions={}){
   const {width:w,height:h,horizon:y}=g;
   rect(0,0,w,y,'#82afb7');rect(0,y*.23,w,y*.32,'#a9c5c0');rect(0,y*.55,w,y*.25,'#ccd4bd');rect(0,y*.80,w,y*.20+1,'#e5d4b0');
   // Long broken cloud banks give depth without a busy screen or text overlays.
@@ -102,21 +103,21 @@ export function createFightView(canvas,{sprites}={}){
    rect(x,cy+ch,cw,ch*.5,'#acc1bb');rect(x+cw*.08,cy+2,cw*.84,ch,'#e8ddc0');rect(x+cw*.26,cy-1,cw*.51,ch,'#eee4ca');rect(x+cw*.55,cy-3,cw*.24,ch,'#f2e9d1');
   }
   const sunX=w*.76,sunY=y-3,r=Math.max(5,Math.min(w*.038,y*.13));
-  ellipse(sunX,sunY,r+3,r+3,'#e8d3a8');ellipse(sunX,sunY,r,r,'#f6e6b7');
+  if((conditions.cloudCover||0)<.7&&(conditions.rain||0)<.15){ellipse(sunX,sunY,r+3,r+3,'#e8d3a8');ellipse(sunX,sunY,r,r,'#f6e6b7');}
   rect(0,y-1,w,2,'#d4d5ba');
   // An open horizon avoids inventing a shoreline in whichever direction the
   // angler faces; the navigation map remains the geographic authority.
   // The last sky band is intentionally bright enough to read at the 06:00 start.
   void h;
  }
- function ocean(g,reducedMotion){
+ function ocean(g,reducedMotion,conditions={}){
   const {width:w,height:h,horizon:y}=g,seaH=h-y;
   const bands=['#598e9b','#4b8d99','#438c97','#398b92','#32898d','#328b88','#3c918b'];
   for(let i=0;i<bands.length;i++)rect(0,y+seaH*i/bands.length,w,seaH/bands.length+1,bands[i]);
   rect(0,y,w,2,'#7fa9aa');
-  const tick=reducedMotion?0:clock;
+  const tick=reducedMotion?0:clock*9/Math.max(2,conditions.period||9),rough=Math.min(2,conditions.waveHeight||0);
   for(let row=0;row<26;row++){
-   const p=(row+.5)/26,yy=y+3+(seaH-3)*p*p,span=4+p*24;
+   const p=(row+.5)/26,yy=y+3+(seaH-3)*p*p+Math.sin(tick*.7+row)*rough*p*2,span=4+p*24;
    for(let i=-1;i<Math.ceil(w/(span*2))+1;i++){
     const seed=row*83+i+327,phase=hash(seed)*TAU,x=i*span*2+hash(seed+39)*span+(Math.sin(tick*.32+phase)*p*3),ww=span*(.36+hash(seed+1)*.8);
     if(hash(seed+42)>.32){rect(x,yy+1,ww+2,1,p>.5?'#267b7e':'#387f8e');rect(x+2,yy,ww,1,p>.5?'#64aca0':'#83b3b0');if(p>.56&&hash(seed+2)>.54)rect(x+ww*.3,yy-1,ww*.32,1,'#8fbcac');}
@@ -171,12 +172,12 @@ export function createFightView(canvas,{sprites}={}){
    if(s.rig!=='float'&&!(g.fishProjection?.airHeight>0))line(g.waterEntry,{x:g.waterEntry.x+1,y:g.waterEntry.y+4},'#669e92',1);
   }
  }
- function draw(state,dt,{active:visible=true,paused=false,reducedMotion=false,bottomInset=0}={}){
+ function draw(state,dt,{active:visible=true,paused=false,reducedMotion=false,bottomInset=0,conditions={}}={}){
   active=Boolean(visible);if(!active){fishVisible=false;return;}
   const advance=!paused&&!state.paused?clamp(finite(dt),0,.1):0;
   clock+=advance;if(advance){crankAngle=(crankAngle+Math.max(0,finite(state.crankRate))*TAU*advance)%TAU;spoolAngle=(spoolAngle+reelMotion(state).spoolRadiansPerSecond*advance)%TAU;}
   const g=fightViewGeometry(canvas.width,canvas.height,state,{bottomInset:bottomInset*canvas.height/cssHeight,clock,crankAngle,reducedMotion});lastGeometry=g;lastPhase=state.fishState;
-  sky(g);ocean(g,reducedMotion);surfaceFish(g,state,reducedMotion);waterContact(g,state,reducedMotion);skiff(g);tackle(g,state);
+  sky(g,conditions);ocean(g,reducedMotion,conditions);surfaceFish(g,state,reducedMotion);waterContact(g,state,reducedMotion);skiff(g);tackle(g,state);drawWeatherOverlay(c,canvas.width,canvas.height,conditions,clock);
  }
  function snapshot(){
   if(!lastGeometry)return{active,view:'first-person',phase:lastPhase,width:cssWidth,height:cssHeight};

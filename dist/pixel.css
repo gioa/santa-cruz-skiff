@@ -526,3 +526,7 @@ html,body,#app,#app *,#app *::before,#app *::after{-webkit-user-select:none;user
 #app:not(.is-fishing-focus) #boat-console #boat-fishing.no-tools .fishing-instruments{grid-column:1;width:112px;justify-self:center}
 
 #boat-panel-tabs .mode-icon{display:block;width:32px;height:32px;pointer-events:none}
+
+#day-transition{position:fixed;inset:0;z-index:100;display:grid;place-items:end center;touch-action:none;background:rgba(10,23,41,var(--night,0));pointer-events:all}#day-transition[hidden]{display:none}.day-caption{margin-bottom:max(11vh,50px);padding:18px 28px;text-align:center;color:#fff2d7;background:#173c48d9;border:2px solid #b5c4ad;box-shadow:5px 5px #12303a60}.day-caption small{letter-spacing:.25em}.day-caption h2{margin:10px 0;font-size:25px}.day-caption p{font-size:12px;margin:8px 0}.day-sky{position:absolute;inset:0;pointer-events:none;opacity:0;background:radial-gradient(circle at 73% 23%,#f7e9be 0 12px,transparent 13px),radial-gradient(circle at 22% 18%,#e8efdc 0 1px,transparent 2px),radial-gradient(circle at 40% 37%,#e8efdc 0 1px,transparent 2px),radial-gradient(circle at 82% 41%,#e8efdc 0 1px,transparent 2px)}.night .day-sky{opacity:1}.day-changing #controls,.day-changing #trip-tools,.day-changing #toast,.day-changing #fish-status{visibility:hidden}@media(max-height:500px){.day-caption{margin-bottom:18px;padding:10px 24px}.day-caption h2{font-size:20px;margin:4px 0}}
+
+.day-changing #world-actions{visibility:hidden}
