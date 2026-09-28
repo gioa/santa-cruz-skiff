@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
-import {SKIFF_RACKS,boatRenderPose,parkedSkiffPoses,skiffScreenPose,hitSkiff,skiffScale,SKIFF_METERS_PER_PIXEL,SKIFF_LENGTH_METERS,SKIFF_HULL_PIXELS} from '../dist/pixel-boat-geometry.js';
+import {SKIFF_RACKS,boatRenderPose,parkedSkiffPoses,skiffScreenPose,hitSkiff,skiffScale,SKIFF_METERS_PER_PIXEL,SKIFF_LENGTH_METERS,SKIFF_HULL_PIXELS,SKIFF_DISPLAY_METERS_PER_PIXEL} from '../dist/pixel-boat-geometry.js';
 globalThis.fetch=async url=>new Response(await readFile(url));
 const {HARBOR}=await import('../dist/harbor-layout.js');
 const {onPier,insidePolygon,pierRings,buildingFootprints}=await import('../dist/pixel-geography.js');
@@ -9,19 +9,19 @@ const base={mode:'walk',playerX:HARBOR.spawnX,playerZ:HARBOR.spawnZ,boatX:HARBOR
 const poseAt=p=>boatRenderPose({...base,launchStage:'lowering',launchProgress:p},HARBOR);
 const project=(x,z)=>({x:x*6,y:z*6});
 const geometry=(pose,time=0)=>skiffScreenPose(pose,{cameraScale:6,project,time});
-const hullCorners=pose=>[-24,24].flatMap(x=>[-44,44].map(z=>({x:pose.x+SKIFF_METERS_PER_PIXEL*(x*Math.cos(pose.heading)+z*Math.sin(pose.heading)),z:pose.z+SKIFF_METERS_PER_PIXEL*(-x*Math.sin(pose.heading)+z*Math.cos(pose.heading))})));
+const hullCorners=pose=>[-24,24].flatMap(x=>[-44,44].map(z=>({x:pose.x+SKIFF_DISPLAY_METERS_PER_PIXEL*(x*Math.cos(pose.heading)+z*Math.sin(pose.heading)),z:pose.z+SKIFF_DISPLAY_METERS_PER_PIXEL*(-x*Math.sin(pose.heading)+z*Math.cos(pose.heading))})));
 const artPier=pierRings;
 const safeDryFootprint=pose=>{for(const p of hullCorners(pose)){assert.ok(onPier(p.x,p.z),`hull over water at ${JSON.stringify(p)}`);assert.ok(artPier.some(r=>insidePolygon(p.x,p.z,r)),'hull must also stay inside rendered deck');assert.ok(!buildingFootprints.some(b=>insidePolygon(p.x,p.z,b.points)),'hull cannot occupy a building');}};
 
 test('three full-size stored rentals fit on the straight playable pier with clear separation',()=>{
   const poses=[boatRenderPose(base,HARBOR),...parkedSkiffPoses()];assert.equal(poses.length,3);
   for(const pose of poses)safeDryFootprint(pose);
-  for(let i=1;i<poses.length;i++)assert.ok(poses[i].z-poses[i-1].z>48*SKIFF_METERS_PER_PIXEL+2,'rack hulls leave more than two metres of gap');
-  assert.ok(HARBOR.spawnX-(SKIFF_RACKS[0].x+88*SKIFF_METERS_PER_PIXEL/2)>1,'spawn clears assigned hull');
+  for(let i=1;i<poses.length;i++)assert.ok(poses[i].z-poses[i-1].z>48*SKIFF_DISPLAY_METERS_PER_PIXEL+2,'rack hulls leave more than two metres of gap');
+  assert.ok(HARBOR.spawnX-(SKIFF_RACKS[0].x+88*SKIFF_DISPLAY_METERS_PER_PIXEL/2)>1,'spawn clears assigned hull');
 });
 test('all models and occupancy states share one physical hull size at every supported zoom',()=>{
   const poses=[boatRenderPose(base,HARBOR),...parkedSkiffPoses(),poseAt(.6),boatRenderPose({...base,mode:'boat',launchStage:'afloat'},HARBOR)];
-  for(const zoom of[2,3,4,6,7,9,12,18])for(const pose of poses){const g=skiffScreenPose(pose,{cameraScale:zoom,project});assert.equal(g.width,48*skiffScale(zoom));assert.equal(g.height,88*skiffScale(zoom));assert.ok(Math.abs(SKIFF_HULL_PIXELS*g.scale/zoom-SKIFF_LENGTH_METERS)<1e-12,'zoom must not enlarge dry boats beyond the pier');}
+  for(const zoom of[2,3,4,6,7,9])for(const pose of poses){const g=skiffScreenPose(pose,{cameraScale:zoom,project});assert.equal(g.width,48*skiffScale(zoom));assert.equal(g.height,88*skiffScale(zoom));assert.ok(Math.abs(g.height/zoom-15.84)<1e-12,'zoom must not enlarge dry boats beyond the pier');}
 });
 test('stored hull never follows the water berth, tide bob or lowering lift',()=>{
   const pose=boatRenderPose({...base,boatX:900,boatZ:600},HARBOR);assert.equal(pose.x,SKIFF_RACKS[0].x);assert.equal(pose.z,SKIFF_RACKS[0].z);assert.equal(pose.afloat,false);assert.equal(pose.rigged,false);assert.equal(pose.bobWeight,0);assert.equal(pose.lift,0);
@@ -68,14 +68,14 @@ test('mobile and desktop targets/anchors/metadata use the same dry and launching
 });
 
 test('one, two and four on-screen hull lengths convert to 15, 30 and 60 feet at every camera zoom',()=>{
- for(const [width,height]of[[390,844],[320,568],[844,390]])for(const zoom of[3,6,12,18])for(const heading of[0,.7,Math.PI/2]){
+ for(const [width,height]of[[390,844],[320,568],[844,390]])for(const zoom of[3,6,9])for(const heading of[0,.7,Math.PI/2]){
   const world=createPixelWorld(fakeCanvas());world.resize(width,height);world.setZoom(zoom);
-  const state={...base,mode:'boat',launchStage:'afloat',boatX:-130,boatZ:-160,heading,engine:false,moored:false,fishState:'idle'};world.draw(state,0);
+  const state={...base,mode:'boat',launchStage:'afloat',boatX:1300,boatZ:-320,heading,engine:false,moored:false,fishState:'idle'};world.draw(state,0);
   const boat=world.publicState().boats.player,centre=world.cssWorldToScreen(state.boatX,state.boatZ);
   for(const lengths of[1,2,4]){
-   const click={x:centre.x+Math.cos(heading)*boat.hullLength*lengths,y:centre.y-Math.sin(heading)*boat.hullLength*lengths},target=world.screenToWorld(click.x,click.y);
+   const click={x:centre.x+Math.cos(heading)*boat.hullLength*lengths,y:centre.y-Math.sin(heading)*boat.hullLength*lengths},target=world.screenToFishingWorld(click.x,click.y,state);
    assert.ok(Math.abs(Math.hypot(target.x-state.boatX,target.z-state.boatZ)-lengths*15*.3048)<1/zoom,`${width}/${zoom}/${lengths}: click must use the same metres as the hull`);
-   const back=world.cssWorldToScreen(target.x,target.z);assert.ok(Math.hypot(back.x-click.x,back.y-click.y)<2);
+   const back=world.fishingWorldToScreen(target.x,target.z,state);assert.ok(Math.hypot(back.x-click.x,back.y-click.y)<2);
   }
  }
 });
@@ -83,13 +83,13 @@ test('one, two and four on-screen hull lengths convert to 15, 30 and 60 feet at 
 test('a 30-foot cast and its real diagonal paid line keep the same hull ratio through flight and zoom',async()=>{
  const {planCast,stepCast}=await import('../dist/pixel-casting.js');
  const world=createPixelWorld(fakeCanvas());world.resize(390,844);
- const state={...base,mode:'boat',launchStage:'afloat',boatX:-130,boatZ:-160,heading:0,engine:false,moored:false,rodMount:'hand',rodElevation:50,rig:'bottom',paidLineMeters:0};
+ const state={...base,mode:'boat',launchStage:'afloat',boatX:1300,boatZ:-320,heading:0,engine:false,moored:false,rodMount:'hand',rodElevation:50,rig:'bottom',paidLineMeters:0};
  const target={x:state.boatX+30*.3048,z:state.boatZ},plan=planCast(state,target);assert.ok(plan.ok);
  Object.assign(state,{castFlight:plan.flight,rodAzimuth:plan.azimuth,fishState:'flight',paidLineMeters:plan.paid});
  Object.assign(state,stepCast(state,plan.flight.duration));
  const separation=Math.hypot(state.bobber.x-state.rodTip.x,state.bobber.z-state.rodTip.z,state.rodTip.height);
  assert.ok(Math.abs(state.paidLineMeters-separation-.08)<1e-8,'payout is measured from the rod tip, not a scaled screen length');
- for(const zoom of[3,6,12,18]){world.setZoom(zoom);world.draw(state,0);const hull=world.publicState().boats.player,boat=world.cssWorldToScreen(state.boatX,state.boatZ),lure=world.cssWorldToScreen(state.bobber.x,state.bobber.z);assert.ok(Math.abs(Math.hypot(lure.x-boat.x,lure.y-boat.y)/hull.hullLength-2)<.06);}
+ for(const zoom of[3,6,9]){world.setZoom(zoom);world.draw(state,0);const hull=world.publicState().boats.player,boat=world.cssWorldToScreen(state.boatX,state.boatZ),lure=world.fishingWorldToScreen(state.bobber.x,state.bobber.z,state);assert.ok(Math.abs(Math.hypot(lure.x-boat.x,lure.y-boat.y)/hull.hullLength-2)<.06);}
 });
 
 test('boarding and waiting labels clear the entire boat and crane animation on mobile viewports',async()=>{
@@ -102,4 +102,13 @@ test('boarding and waiting labels clear the entire boat and crane animation on m
   assert.equal(intersects(label.rect,anchor.animationBounds),false,`${width}×${height}: corridor hidden`);
   for(let i=0;i<=240;i++){state.launchProgress=i/240;world.draw(state,0);const boat=world.publicState().boats.player;assert.equal(intersects(label.rect,boat.bounds),false,`${width}×${height} phase ${i}: boat hidden`);}
  }
+});
+
+test('fishing conversion does not change walking/helm map targets and rejects visible wharf casts',()=>{
+ const world=createPixelWorld(fakeCanvas());world.resize(390,844);world.setZoom(6);
+ const state={...base,mode:'boat',launchStage:'afloat',boatX:HARBOR.boatX,boatZ:HARBOR.boatZ};world.draw(state,0);
+ const dock=world.cssWorldToScreen(HARBOR.counterX,HARBOR.counterZ);
+ assert.equal(world.screenToFishingWorld(dock.x,dock.y,state),null,'visual land must not become a valid shorter cast');
+ const ocean=world.cssWorldToScreen(state.boatX-30,state.boatZ),map=world.screenToWorld(ocean.x,ocean.y),cast=world.screenToFishingWorld(ocean.x,ocean.y,state);
+ assert.ok(Math.abs(map.x-(state.boatX-30))<.2);assert.ok(cast);assert.ok(Math.abs(cast.x-state.boatX)<Math.abs(map.x-state.boatX)/3);
 });

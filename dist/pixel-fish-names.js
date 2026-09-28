@@ -1,4 +1,4 @@
-import {identifyRegulatedSpecies} from './fishing-regulations.js?v=20260927-pixel-v38';
+import {identifyRegulatedSpecies} from './fishing-regulations.js?v=20260927-pixel-v39';
 
 // Resolve old catches too, without changing the Chinese identity used by saves,
 // rewards and species rules. The species catalogue supplies the common names.

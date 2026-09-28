@@ -67,7 +67,7 @@ test('short-phone HUD and tackle console never cover the rendered hull or raised
     for(let i=0;i<12;i++)world.draw(state,1/60);
     const frame=world.publicState().camera.framing;
     assert.ok(frame.primary.top>=top+8,`${width}×${height}: rod/hull top ${frame.primary.top} behind HUD`);assert.ok(frame.primary.bottom<=height-bottom-8,`${width}×${height}: hull bottom ${frame.primary.bottom} under console`);
-    assert.ok(world.camera.scale>=2&&world.camera.scale<=18);
+    assert.ok(world.camera.scale>=2&&world.camera.scale<=6);
     const first={...world.camera};for(let i=0;i<12;i++)world.draw(state,0);assert.deepEqual(world.camera,first,'unchanged rod pose keeps camera still');
   }
 });

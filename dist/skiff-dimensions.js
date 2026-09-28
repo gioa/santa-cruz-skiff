@@ -3,3 +3,7 @@
 export const SKIFF_LENGTH_METERS=15*.3048;
 export const SKIFF_HULL_PIXELS=77;
 export const SKIFF_METERS_PER_PIXEL=SKIFF_LENGTH_METERS/SKIFF_HULL_PIXELS;
+// Established map artwork size: preserve the dock/boat composition.
+// Fishing alone converts between the readable art and real tackle metres.
+export const SKIFF_DISPLAY_METERS_PER_PIXEL=.18;
+export const FISHING_SCENE_SCALE=SKIFF_DISPLAY_METERS_PER_PIXEL/SKIFF_METERS_PER_PIXEL;

@@ -1,5 +1,5 @@
-import {SKIFF_LENGTH_METERS,SKIFF_HULL_PIXELS,SKIFF_METERS_PER_PIXEL} from './skiff-dimensions.js?v=20260927-pixel-v38';
-export {SKIFF_LENGTH_METERS,SKIFF_HULL_PIXELS,SKIFF_METERS_PER_PIXEL};
+import {SKIFF_LENGTH_METERS,SKIFF_HULL_PIXELS,SKIFF_METERS_PER_PIXEL,SKIFF_DISPLAY_METERS_PER_PIXEL} from './skiff-dimensions.js?v=20260927-pixel-v39';
+export {SKIFF_LENGTH_METERS,SKIFF_HULL_PIXELS,SKIFF_METERS_PER_PIXEL,SKIFF_DISPLAY_METERS_PER_PIXEL};
 // Presentation only: the simulation retains the surveyed boarding point and
 // water coordinates. Every rental uses the same hull and sprite dimensions.
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
@@ -12,7 +12,7 @@ export const SKIFF_RACKS=Object.freeze([
 ].map(Object.freeze));
 // Keep hulls the same size in metres even when casting zooms the camera out.
 // A minimum screen size would let dry boats grow beyond their rack/pier.
-export const skiffScale=scale=>Math.max(0,scale)*SKIFF_METERS_PER_PIXEL;
+export const skiffScale=scale=>Math.max(0,scale)*SKIFF_DISPLAY_METERS_PER_PIXEL;
 
 // Canvas-local, bow-up coordinates. Match stepVessel's actual propeller
 // deflection (±0.5 rad): the forward tiller moves toward the stern's thrust,
