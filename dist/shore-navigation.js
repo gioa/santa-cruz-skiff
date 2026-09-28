@@ -1,23 +1,19 @@
+import {knownShoreZones,ANGLERS} from './shore-lore.js?v=coast-5';
 import {inspectionReportMarkup} from './pixel-inspection-report.js?v=20260928-pixel-v80';
-import {sampleShore,shoreProfile} from './shore-data.js?v=coast-4';
 const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 export const habitatName=id=>({swash:'近岸浪脚',bar:'浅沙坝',trough:'深沙槽',channel:'沙坝缺口',offshore:'外侧深水',surf:'浪区'}[id]||'浪区');
 export function createShoreNavigation({scene,sim,openDialog,closeDialog,feedback,walkTo}){
  const $=id=>document.getElementById(id);
  function openMap(){
-  const s=sim.state,current=s.shoreSample||sampleShore(scene,s.player.x,scene.shoreY(s.player.x)-90,s.elapsed);
-  openDialog('map',`<div class="eyebrow">READ THE WATER</div><h2 id="modal-title">${esc(scene.shortName)} · 沿岸地图</h2><p class="modal-desc">选择钓位后沿沙滩走过去。每个位置的沙坝、沙槽和水流都不同。</p><canvas id="shore-chart" role="img" aria-label="沿岸示意图：白色表示破浪浅坝，深色表示水槽，圆点表示你的位置"></canvas><div class="shore-chart-legend"><span>白沫 · 浅坝破浪</span><span>暗带 · 槽与缺口</span><span>● 你的位置</span></div><p class="credits-note">当前：${esc(current.zoneName)} · ${habitatName(current.habitat)} · ${current.tideLabel}<br>看白浪之间的暗带，短抛可以落进内槽；并非越远越容易中鱼。</p><div class="gear-grid shore-destinations">${scene.zones.map((z,i)=>`<article class="gear-card"><strong>${i+1}. ${esc(z.name)}</strong><p>${esc(z.description)}</p><button data-zone="${esc(z.id)}" ${s.phase!=='walk'?'disabled':''}>${z.id==='pier'?'走到栈桥入口':'沿岸走到这里'}</button></article>`).join('')}</div><p class="credits-note">岸线为缩尺呈现，沙槽是合理生成的地形；不是实时海况图。${s.phase!=='walk'?'先收回钓组，再移动。':''}</p>`);
-  const canvas=$('shore-chart'),g=canvas.getContext('2d');canvas.width=720;canvas.height=236;g.imageSmoothingEnabled=false;
-  const scale=canvas.width/scene.width,coast=158;
-  for(let px=0;px<canvas.width;px+=3){const x=px/scale;
-   for(let py=0;py<coast;py+=3){const q=sampleShore(scene,x,scene.shoreY(x)-(coast-py)*2.2,s.elapsed);g.fillStyle=q.breakStrength>.15?'#dee8d1':q.depth>2.1?'#37677a':'#78a69f';g.fillRect(px,py,3,3);}
-  }
-  g.fillStyle=scene.palette.wet;g.fillRect(0,coast,720,12);g.fillStyle=scene.palette.dry;g.fillRect(0,coast+12,720,66);
-  if(scene.pier){const x=scene.pier.x*scale;g.fillStyle='#c4c5b8';g.fillRect(x-3,17,6,coast-4);g.fillRect(x-3,17,20,6);g.fillStyle='#c18051';g.fillRect(x-5,coast+4,10,4);}
-  g.font='bold 13px monospace';g.textAlign='center';scene.zones.forEach((z,i)=>{const x=Math.max(12,Math.min(708,z.x*scale));g.fillStyle='#173f46';g.fillRect(x-10,coast+33,20,21);g.fillStyle='#fff0ca';g.fillText(String(i+1),x,coast+48);});
-  g.fillStyle='#f7d27f';g.beginPath();g.arc(s.player.x*scale,coast+21,5,0,Math.PI*2);g.fill();g.strokeStyle='#183e45';g.lineWidth=2;g.stroke();
-  $('modal-content').querySelectorAll('[data-zone]').forEach(button=>button.onclick=()=>{const z=scene.zones.find(z=>z.id===button.dataset.zone);closeDialog();const p=z.id==='pier'&&scene.pier?scene.pier.gate:{x:z.x,y:scene.shoreY(z.x)+57};walkTo(p.x,p.y);});
+  const s=sim.state,notes=s.shoreLore.notes,zones=knownShoreZones(scene,s.shoreLore);
+  if(!notes.length){openDialog('map',`<div class="eyebrow">WORDS BY THE WATER</div><h2 id="modal-title">沿岸手记</h2><p class="journal-empty">还没有记下钓点。<br>沿海走走，偶遇愿意聊天的老钓友时，听听他们的经验。</p>`);return;}
+  openDialog('map',`<div class="eyebrow">WORDS BY THE WATER</div><h2 id="modal-title">${esc(scene.shortName)} · 沿岸手记</h2><p class="modal-desc">只记下听来的片段。空白处还没有打听到，浪线仍要自己观察。</p><canvas id="shore-chart" role="img" aria-label="沿岸手绘草图：仅标出已听说的局部，空白区域未知"></canvas><div class="gear-grid shore-destinations">${zones.map(z=>`<article class="gear-card"><strong>${esc(z.name)}</strong>${notes.filter(n=>n.zoneId===z.id).map(n=>`<p><b>${esc(n.title)}</b><br>${esc(n.text)}<br><small>听${esc(ANGLERS[n.angler].name)}说</small></p>`).join('')}<button data-zone="${esc(z.id)}" ${s.phase!=='walk'?'disabled':''}>沿岸去看看</button></article>`).join('')}</div><p class="credits-note">钓友的草图与经验只供找水，不提供实时水深或定位。</p>`);
+  const canvas=$('shore-chart'),g=canvas.getContext('2d');canvas.width=720;canvas.height=200;g.fillStyle='#eadfbd';g.fillRect(0,0,720,200);g.font='22px monospace';g.textAlign='center';
+  for(const z of zones){const x=z.x/scene.width*680+20;g.fillStyle='#708b82';g.fillRect(x-20,100,40,3);g.fillStyle='#3c6262';g.fillRect(x-3,96,6,9);g.fillText(z.name,Math.max(70,Math.min(630,x)),142,190);if(notes.some(n=>n.zoneId===z.id&&n.topic==='terrain')){g.fillStyle='#7caaa6';g.fillRect(x-22,70,44,20);g.fillStyle='#dce3c9';g.fillRect(x-18,72,35,2);}}
+  $('modal-content').querySelectorAll('[data-zone]').forEach(button=>button.onclick=()=>{const z=zones.find(z=>z.id===button.dataset.zone);if(!z)return;closeDialog();const p=z.id==='pier'&&scene.pier?scene.pier.gate:{x:z.x,y:scene.shoreY(z.x)+57};walkTo(p.x,p.y);});
  }
+ function openConversation(id){const result=sim.talkAngler(id);if(!result.ok){feedback(result);return;}openDialog('conversation',`<div class="eyebrow">A WORD ON THE BEACH</div><h2 id="modal-title">${esc(result.name)}</h2><div class="staff-banner"><p>「${esc(result.text)}」</p></div>${result.fresh?'<p class="credits-note">这一条，记进沿岸手记了。</p>':result.known?'<p class="credits-note">这段经验已经记过了。</p>':''}<div class="button-row"><button id="angler-goodbye" class="primary">谢谢，祝你上鱼</button></div>`);$('angler-goodbye').onclick=closeDialog;}
+
  function openPier(){
   if(!scene.pier)return;
   if(!sim.nearPier){feedback({message:'先走到栈桥入口。'});walkTo(scene.pier.gate.x,scene.pier.gate.y);return;}
@@ -29,5 +25,5 @@ export function createShoreNavigation({scene,sim,openDialog,closeDialog,feedback
   openDialog('inspection',`<div class="eyebrow">PIER PATROL</div><h2 id="modal-title">鱼警巡查</h2>${inspectionReportMarkup({...i,debt:sim.state.fineDebt})}<div class="button-row"><button id="inspection-ok" class="primary">回到沙滩</button></div>`);
   $('inspection-ok').onclick=closeDialog;
  }
- return{openMap,openPier,openInspection};
+ return{openMap,openPier,openInspection,openConversation};
 }

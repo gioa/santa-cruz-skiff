@@ -1,11 +1,11 @@
-import {PacificaSimulation,BAITS} from './pacifica-sim.js?v=coast-4';
-import {createPacificaWorld} from './pacifica-world.js?v=coast-4';
-import {createPacificaMenus} from './pacifica-menus.js?v=coast-4';
+import {PacificaSimulation,BAITS} from './pacifica-sim.js?v=coast-5';
+import {createPacificaWorld} from './pacifica-world.js?v=coast-5';
+import {createPacificaMenus} from './pacifica-menus.js?v=coast-5';
 import {createPixelSprites} from './pixel-sprites.js?v=20260928-pixel-v80';
 
-import {getShoreScene,sampleShore,onPier} from './shore-data.js?v=coast-4';
+import {getShoreScene,sampleShore,onPier} from './shore-data.js?v=coast-5';
 
-import {createShoreNavigation,habitatName} from './shore-navigation.js?v=coast-4';
+import {createShoreNavigation,habitatName} from './shore-navigation.js?v=coast-5';
 
 const $=id=>document.getElementById(id), show=(id,value)=>{$(id).hidden=!value;};
 const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -17,7 +17,7 @@ const sprites=createPixelSprites();
 for(const el of document.querySelectorAll('[data-icon]')){const asset=sprites.icons[el.dataset.icon];if(asset){el.width=asset.width;el.height=asset.height;el.getContext('2d').drawImage(asset,0,0);}}
 let lastFocus=null,lastConsoleHeight=-1;
 let started=false,focused=true,last=performance.now(),lastSave=0,lastPhase=sim.state.phase,lastMessage='',chargeStart=0,reeling=false,shopOnArrival=false,scenePickerOpen=false,inspectionId=null,toastTimer,modalType='',sound=null,soundEnabled=false;
-let aim=0,afterPierWalk=null;
+let aim=0,afterPierWalk=null,anglerOnArrival=null;
 function persist(){try{localStorage.setItem(SAVE_KEY,JSON.stringify(sim.snapshot()));}catch{}}
 function feedback(result){if(result?.message)toast(result.message);persist();updateUI();return result;}
 function toast(message){$('toast').textContent=String(message).replaceAll('贝币','潮汐点');$('toast').classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').classList.remove('show'),3300);}
@@ -37,7 +37,7 @@ function createSound(){
 }
 $('audio-btn').onclick=()=>{sound??=createSound();if(!sound){toast('当前浏览器不支持海浪声音');return;}soundEnabled=!soundEnabled;sound.ctx.resume();$('audio-btn').textContent=soundEnabled?'♪':'♩';$('audio-btn').setAttribute('aria-label',soundEnabled?'关闭海浪声音':'开启海浪声音');};
 
-function start(){closeDialog();started=true;$('app').classList.remove('is-intro');for(const id of ['intro','intro-location'])show(id,false);for(const id of ['controls','trip-tools','trip-info'])show(id,true);last=performance.now();toast(saved?`欢迎回到 ${scene.name}，继续今天的岸钓。`:'轻点沙地行走，从沿岸地图选择钓位。');if(sim.state.inspection)openInspection();else if(sim.state.phase==='landed')openCatch();updateUI();resize();}
+function start(){closeDialog();started=true;$('app').classList.remove('is-intro');for(const id of ['intro','intro-location'])show(id,false);for(const id of ['controls','trip-tools','trip-info'])show(id,true);last=performance.now();persist();toast(saved?`欢迎回到 ${scene.name}，继续今天的岸钓。`:'轻点沙地行走，沿浪线找找机会。');if(sim.state.inspection)openInspection();else if(sim.state.phase==='landed')openCatch();updateUI();resize();}
 $('start-btn').onclick=start;
 $('resume-btn').onclick=start;
 show('resume-btn',false);
@@ -48,6 +48,7 @@ function walkShop(){if(sim.state.phase!=='walk'){toast('先收回钓组，再回
 $('walk-surf').onclick=walkSurf;$('walk-shop').onclick=walkShop;
 $('world').addEventListener('pointerdown',e=>{
   if(paused()||e.button>0)return;const p=world.screenToWorld(e.clientX,e.clientY);if(!p)return;
+  const angler=sim.state.shoreLore.encounter;if(angler&&Math.hypot(p.x-angler.x,p.y-(angler.y-18))<40){approachAngler();return;}
   if(scene.pier&&onPier(scene,p.x,p.y)){if(sim.onPier)feedback(sim.walkTo(p.x,p.y));else if(sim.nearPier)openPier();else feedback(sim.walkTo(scene.pier.gate.x,scene.pier.gate.y));return;}
   if(p.x>=SHOP.x-20&&p.x<=SHOP.x+SHOP.width+20&&p.y>=SHOP.y-65&&p.y<=SHOP.door.y+30){walkShop();return;}
   if(p.y<WORLD.shoreY(p.x)){if(sim.state.phase==='bite'){feedback(sim.strike());return;}aim=Math.max(-1,Math.min(1,(p.x-sim.state.player.x)/Math.max(100,sim.state.player.y-p.y)));toast('方向已调整，按住抛竿蓄力，松手抛出。');updateUI();return;}
@@ -69,8 +70,10 @@ $('beach-reel').addEventListener('keyup',()=>setReel(false));
 $('beach-reel').addEventListener('blur',()=>setReel(false));
 $('beach-retrieve').onclick=()=>feedback(sim.retrieve());
 
-function walkTo(x,y){shopOnArrival=false;if(sim.onPier&&!onPier(scene,x,y)){afterPierWalk={x,y};feedback(sim.leavePier());return;}afterPierWalk=null;feedback(sim.walkTo(x,y));}
+function walkTo(x,y){anglerOnArrival=null;shopOnArrival=false;if(sim.onPier&&!onPier(scene,x,y)){afterPierWalk={x,y};feedback(sim.leavePier());return;}afterPierWalk=null;feedback(sim.walkTo(x,y));}
 const coastMenus=createShoreNavigation({scene,sim,openDialog,closeDialog,feedback,walkTo});
+function approachAngler(){const e=sim.state.shoreLore.encounter;if(!e)return;if(sim.state.phase!=='walk'){toast('先收好钓竿再打招呼。');return;}if(Math.hypot(e.x-sim.state.player.x,e.y-sim.state.player.y)<=65){coastMenus.openConversation(e.id);return;}walkTo(e.x,e.y+30);anglerOnArrival=e.id;}
+$('angler-talk').onclick=approachAngler;
 const openMap=()=>coastMenus.openMap(),openPier=()=>coastMenus.openPier();
 function openInspection(){afterPierWalk=null;shopOnArrival=false;inspectionId=sim.state.inspection?.id;coastMenus.openInspection();}
 const menus=createPacificaMenus({sim,scene,openDialog,closeDialog,feedback,walkShop,walkSurf});
@@ -81,11 +84,12 @@ $('gear-btn').onclick=openBag;$('journal-btn').onclick=openJournal;$('credits-bt
 
 function updateUI(){
   const s=sim.state,bait=BAITS.find(b=>b.id===s.bait),atShore=sim.onPier||s.player.y-WORLD.shoreY(s.player.x)<=130,fishing=atShore||s.phase!=='walk';
-  $('credits').textContent=Math.floor(s.credits);
+  $('credits').textContent=Math.floor(s.credits);show('map-btn',s.shoreLore.notes.length>0);
+  const e=s.shoreLore.encounter,ep=e?world.worldToScreen(e):null,near=e&&Math.hypot(e.x-s.player.x,e.y-s.player.y)<480;const talkVisible=started&&!modalType&&!scenePickerOpen&&s.phase==='walk'&&!s.onPier&&near&&ep.x>36&&ep.x<innerWidth-36&&ep.y>(innerHeight<500?110:190)&&ep.y<innerHeight-$('boat-console').offsetHeight-50;show('angler-talk',Boolean(talkVisible));if(talkVisible){$('angler-talk').style.left=`${Math.max(64,Math.min(innerWidth-64,ep.x))}px`;$('angler-talk').style.top=`${ep.y-68}px`;const label=e.talked?'再聊两句':'打个招呼';if($('angler-talk').textContent!==label)$('angler-talk').textContent=label;}
   const minutes=360+Math.floor(s.elapsed/30);$('clock').textContent=String(Math.floor(minutes/60)%24).padStart(2,'0')+':'+String(minutes%60).padStart(2,'0');
   $('active-rod-name').textContent=s.upgrades.includes('surf_rod')?'长节沙滩竿':'岸钓竿';
   $('tackle-name').textContent=`${s.rig==='fishfinder'?'滑铅组':'Carolina'} · ${bait?.name||'鱼饵'} × ${s.inventory[s.bait]||0}`;
-  const shore=s.shoreSample||sampleShore(scene,s.player.x,WORLD.shoreY(s.player.x)-90,s.elapsed);$('place').textContent=scene.shortName+' · '+(sim.onPier?'封闭栈桥':shore.zoneName);$('speed').textContent=sim.nearShop?'钓具小店':sim.onPier?'越栏进入 · 巡查风险':atShore?'沙滩岸钓':'沙滩步道';$('weather').textContent=shore.tideLabel+' · 晨雾';$('shore-rig-summary').textContent=sim.onPier?'':habitatName(shore.habitat);show('pier-btn',Boolean(scene.pier)&&(sim.nearPier||sim.onPier));$('pier-btn').textContent=sim.onPier?'离开栈桥':'封闭栈桥';$('pier-btn').disabled=s.phase!=='walk';$('walk-surf').textContent=sim.onPier?'走向桥端':'前往浪线';
+  const shore=s.shoreSample||sampleShore(scene,s.player.x,WORLD.shoreY(s.player.x)-90,s.elapsed);$('place').textContent=scene.shortName+(sim.onPier?' · 封闭栈桥':s.shoreLore.notes.some(n=>n.zoneId===shore.zoneId)?' · '+shore.zoneName:'');$('speed').textContent=sim.nearShop?'钓具小店':sim.onPier?'越栏进入 · 巡查风险':atShore?'沙滩岸钓':'沙滩步道';$('weather').textContent=shore.tideLabel+' · 晨雾';show('shore-rig-summary',false);show('pier-btn',Boolean(scene.pier)&&(sim.nearPier||sim.onPier));$('pier-btn').textContent=sim.onPier?'离开栈桥':'封闭栈桥';$('pier-btn').disabled=s.phase!=='walk';$('walk-surf').textContent=sim.onPier?'走向桥端':'前往浪线';
   const states={walk:'准备抛竿',casting:'钓组落水',waiting:'等待鱼讯',bite:'鱼咬钩了 · 现在扬竿',fighting:'中鱼 · 控制张力收线',landed:'鱼已上岸'};
   $('fish-title').textContent=states[s.phase];$('fish-distance').textContent=Math.round(s.lineDistance*3.28084)+' ft';
   const hints={walk:!s.inventory[s.bait]?'鱼饵用完，打开背包换饵。':atShore?'轻点海面瞄准 · 按住抛竿蓄力':sim.nearShop?'轻点小店补给，或前往浪线。':'轻点沙地行走 · WASD',casting:'钓组飞向浪外…',waiting:`已放线 ${Math.round(s.lineDistance*3.28084)} ft · 留意竿尖`,bite:'现在扬竿 / 空格',fighting:'按住收线 · 高张力时松手',landed:'留下或放流'};
@@ -115,7 +119,7 @@ function resize(){world.resize(innerWidth,innerHeight);syncInsets();resetInput()
 window.addEventListener('resize',resize);resize();
 function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;if(!paused()){
   const x=Number(keys.has('d')||keys.has('arrowright'))-Number(keys.has('a')||keys.has('arrowleft')),y=Number(keys.has('s')||keys.has('arrowdown'))-Number(keys.has('w')||keys.has('arrowup'));
-  if(x||y)afterPierWalk=null;sim.update(dt,{x,y,reel:reeling});if(afterPierWalk&&!sim.onPier&&!sim.state.walkTarget&&!sim.state.inspection){const p=afterPierWalk;afterPierWalk=null;feedback(sim.walkTo(p.x,p.y));}if(sim.state.inspection&&sim.state.inspection.id!==inspectionId)openInspection();if(shopOnArrival&&sim.nearShop)openShop();
+  if(x||y){afterPierWalk=null;anglerOnArrival=null;}sim.update(dt,{x,y,reel:reeling});if(afterPierWalk&&!sim.onPier&&!sim.state.walkTarget&&!sim.state.inspection){const p=afterPierWalk;afterPierWalk=null;feedback(sim.walkTo(p.x,p.y));}if(anglerOnArrival){const e=sim.state.shoreLore.encounter;if(!e||e.id!==anglerOnArrival)anglerOnArrival=null;else if(sim.state.phase==='walk'&&Math.hypot(e.x-sim.state.player.x,e.y-sim.state.player.y)<=60){const id=anglerOnArrival;anglerOnArrival=null;sim.state.walkTarget=null;sim.state.walkRoute=[];coastMenus.openConversation(id);}}if(sim.state.inspection&&sim.state.inspection.id!==inspectionId)openInspection();if(shopOnArrival&&sim.nearShop)openShop();
   if(sim.state.phase!==lastPhase){if(sim.state.phase==='landed'){persist();openCatch();}if(sim.state.phase==='bite'){toast('竿尖一沉——现在扬竿！');if(navigator.vibrate)navigator.vibrate([70,70,100]);}lastPhase=sim.state.phase;syncInsets();}
   if(sim.state.message!==lastMessage){lastMessage=sim.state.message;if(lastMessage)toast(lastMessage);}
   if(now-lastSave>5000){persist();lastSave=now;}

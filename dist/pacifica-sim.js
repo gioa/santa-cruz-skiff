@@ -1,6 +1,7 @@
+import {createShoreLore,stepShoreLore,talkShoreAngler} from './shore-lore.js?v=coast-5';
 // Shared shore-fishing simulation. Geometry and habitats are scene specific;
 // prices, bite rates, inspection odds and fines are authored game tuning.
-import {getShoreScene, sampleShore, onPier} from './shore-data.js?v=coast-4';
+import {getShoreScene, sampleShore, onPier} from './shore-data.js?v=coast-5';
 export const SAVE_KEY = 'pacifica-surf-save-v1';
 export const WORLD = getShoreScene('pacifica').world;
 export const SHOP = getShoreScene('pacifica').shop;
@@ -87,7 +88,7 @@ function safeFish(raw) {
 }
 
 export class PacificaSimulation {
-  constructor({sceneId = 'pacifica', saved, rng = Math.random} = {}) {
+  constructor({sceneId = 'pacifica', saved, rng = Math.random, loreSeed} = {}) {
     this.scene = getShoreScene(sceneId);
     this.world = this.scene.world;
     this.shop = this.scene.shop;
@@ -109,8 +110,11 @@ export class PacificaSimulation {
       shoreSample: null,
     };
     if (saved?.scene === this.scene.id && [1, 2].includes(saved.version)) this.restore(saved);
+    this.state.shoreLore=createShoreLore(this.scene,saved?.scene===this.scene.id?saved.shoreLore:null,this.state.elapsed,loreSeed);
     this.refreshSample();
   }
+
+  talkAngler(id){return talkShoreAngler(this,id);}
 
   random() { return clamp(finite(this.rng(), .5), 0, .999999); }
 
@@ -371,6 +375,7 @@ export class PacificaSimulation {
     const s = this.state;
     if (s.inspection) return;
     s.elapsed += dt;
+    stepShoreLore(this);
     if (this.checkPier(dt)) return;
     if (s.phase === 'walk') {this.move(dt, input); this.refreshSample(); return;}
     s.player.walking = false;
@@ -451,7 +456,7 @@ export class PacificaSimulation {
       stats: s.stats, nextCatchId: s.nextCatchId, player: {x: s.player.x, y: s.player.y},
       pendingCatch: s.phase === 'landed' ? s.fish : null,
       onPier: s.onPier, pierExposure: s.pierExposure, inspectionCount: s.inspectionCount,
-      inspection: s.inspection, fineDebt: s.fineDebt,
+      inspection: s.inspection, fineDebt: s.fineDebt, shoreLore:s.shoreLore,
     }));
   }
 

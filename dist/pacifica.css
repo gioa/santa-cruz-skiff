@@ -32,3 +32,8 @@
  #app[data-shore-scene] #boat-action-bar button{flex:1;min-width:45px;padding:4px;font-size:9px}
  #app[data-shore-scene] #boat-fishing{flex:1;min-width:0}
 }
+
+.shore-angler-talk{position:fixed;z-index:12;transform:translate(-50%,-100%);min-height:44px;padding:8px 12px;font-size:12px;max-width:140px;touch-action:manipulation}.shore-angler-talk:after{content:"";position:absolute;bottom:-8px;left:calc(50% - 5px);width:8px;height:8px;background:var(--cream,#fff0ce);border-right:2px solid var(--ink);border-bottom:2px solid var(--ink);transform:rotate(45deg)}
+
+.shore-destinations{grid-template-columns:1fr}.shore-destinations .gear-card p{font-size:13px;line-height:1.75}.shore-destinations .gear-card small{font-size:11px}
+.shore-angler-talk:active{transform:translate(-50%,calc(-100% + 2px))}
