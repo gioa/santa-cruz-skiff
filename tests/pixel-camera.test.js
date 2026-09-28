@@ -72,7 +72,7 @@ test('southbound boats stop above the fixed CSS console on tall, short and lands
       focus.z+=2.2/60;camera=stepDeadzoneCamera(camera,focus,{mode:'boat',dt:1/60});const p=projectPixel(camera,focus.x,focus.z);
       assert.ok(p.y>=previous,'southbound boat must not bounce back toward the top');previous=p.y;if(frame>1500)steady.push(p.y);
     }
-    const box=cameraDeadzone(camera,'boat'),spriteBottomCss=(previous+54*1.08)*cssHeight/height;
+    const box=cameraDeadzone(camera,'boat'),spriteBottomCss=(previous+54*skiffScale(camera.scale))*cssHeight/height;
     assert.deepEqual([...new Set(steady)],[box.bottom]);assert.ok(spriteBottomCss<=cssHeight-consoleHeight-9,`${cssWidth}×${cssHeight}: boat overlaps console`);assert.ok(box.top<=box.bottom);
     assert.equal(box.top,Math.round(height*.31),'normal northbound framing is unchanged');
     assert.equal(cameraDeadzone(camera,'walk').bottom,Math.round(height*.76),'walking keeps its broad deadzone');

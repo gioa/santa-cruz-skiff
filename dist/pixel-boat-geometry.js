@@ -1,3 +1,5 @@
+import {SKIFF_LENGTH_METERS,SKIFF_HULL_PIXELS,SKIFF_METERS_PER_PIXEL} from './skiff-dimensions.js?v=20260927-pixel-v36';
+export {SKIFF_LENGTH_METERS,SKIFF_HULL_PIXELS,SKIFF_METERS_PER_PIXEL};
 // Presentation only: the simulation retains the surveyed boarding point and
 // water coordinates. Every rental uses the same hull and sprite dimensions.
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
@@ -10,7 +12,7 @@ export const SKIFF_RACKS=Object.freeze([
 ].map(Object.freeze));
 // Keep hulls the same size in metres even when casting zooms the camera out.
 // A minimum screen size would let dry boats grow beyond their rack/pier.
-export const skiffScale=scale=>Math.max(0,scale)*.18;
+export const skiffScale=scale=>Math.max(0,scale)*SKIFF_METERS_PER_PIXEL;
 
 // Canvas-local, bow-up coordinates. Match stepVessel's actual propeller
 // deflection (±0.5 rad): the forward tiller moves toward the stern's thrust,
@@ -38,7 +40,7 @@ export function parkedSkiffPoses(){return SKIFF_RACKS.slice(1).map(rack=>({...ra
 export function skiffScreenPose(pose,{cameraScale,project,time=0}){
   const scale=skiffScale(cameraScale),p=project(pose.x,pose.z),screenX=p.x,screenY=p.y-Math.round(pose.lift*scale)+Math.round(Math.sin(time*1.8)*.8*pose.bobWeight),width=48*scale,height=88*scale;
   const c=Math.abs(Math.cos(pose.heading)),s=Math.abs(Math.sin(pose.heading)),rx=(width*c+height*s)/2,ry=(width*s+height*c)/2;
-  return{...pose,scale,width,height,screenX,screenY,bounds:{left:screenX-rx,top:screenY-ry,right:screenX+rx,bottom:screenY+ry}};
+  return{...pose,scale,width,height,hullLength:SKIFF_HULL_PIXELS*scale,hullLengthMeters:SKIFF_LENGTH_METERS,screenX,screenY,bounds:{left:screenX-rx,top:screenY-ry,right:screenX+rx,bottom:screenY+ry}};
 }
 export function hitSkiff(x,y,geometry,{minimum=44}={}){
   const dx=x-geometry.screenX,dy=y-geometry.screenY,c=Math.cos(geometry.heading),s=Math.sin(geometry.heading);

@@ -1,4 +1,6 @@
-import {rodFlexPoint} from './pixel-rod-response.js?v=20260927-pixel-v35';
+import {SKIFF_METERS_PER_PIXEL} from './skiff-dimensions.js?v=20260927-pixel-v36';
+import {ROD_LENGTH_METERS} from './pixel-fishing-physics.js?v=20260927-pixel-v36';
+import {rodFlexPoint} from './pixel-rod-response.js?v=20260927-pixel-v36';
 // Shared presentation geometry. The model supplies angles, mount and actual
 // load-derived bend; rendering never invents fish pulls or changes line length.
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
@@ -26,7 +28,7 @@ export function getRodCurve(state,{origin={x:0,y:0},scale=1,heading=finite(state
   const elevation=clamp(finite(state.rodElevation,45),5,85),azimuth=clamp(finite(state.rodAzimuth,mount==='port'?-70:70),-180,180),bend=clamp(finite(state.rodBend,0),0,1);
   const localBase=mounted?{x:mount==='port'?-17:17,y:7}:{x:bodyX+4,y:bodyY+7};
   const rotate=(x,y)=>({x:origin.x+scale*(x*Math.cos(heading)+y*Math.sin(heading)),y:origin.y+scale*(-x*Math.sin(heading)+y*Math.cos(heading))});
-  const base=rotate(localBase.x,localBase.y),a=heading-radians(azimuth),dx=-Math.sin(a),dy=-Math.cos(a),e=radians(elevation),length=52,points=[];
+  const base=rotate(localBase.x,localBase.y),a=heading-radians(azimuth),dx=-Math.sin(a),dy=-Math.cos(a),e=radians(elevation),length=ROD_LENGTH_METERS/SKIFF_METERS_PER_PIXEL,points=[];
   const baseHeight=mounted?9:12;
   let tipGround,tipHeight;
   for(let i=0;i<=segments;i++){
@@ -45,7 +47,7 @@ export function getRodCurve(state,{origin={x:0,y:0},scale=1,heading=finite(state
   const side=mount==='port'?-1:mount==='starboard'?1:Math.sin(radians(azimuth))<0?-1:1;
   const localGround={x:localBase.x+Math.sin(radians(azimuth))*(length*Math.cos(e)+bend*length*.10),y:localBase.y-Math.cos(radians(azimuth))*(length*Math.cos(e)+bend*length*.10)};
   const waterBase=rotate(side*Math.max(27,Math.abs(localGround.x)),localGround.y);waterBase.y+=baseHeight*scale;
-  return{points,base,tip,butt,rearGrip,reel,tipGround,waterBase,tipHeightMeters:tipHeight/24,mount,mounted,elevation,azimuth,bend,scale,
+  return{points,base,tip,butt,rearGrip,reel,tipGround,waterBase,tipHeightMeters:tipHeight*SKIFF_METERS_PER_PIXEL,mount,mounted,elevation,azimuth,bend,scale,
     shoulders:[rotate(bodyX-5,bodyY+5),rotate(bodyX+5,bodyY+4)],socket:rotate(localBase.x,localBase.y+5)};
 }
 

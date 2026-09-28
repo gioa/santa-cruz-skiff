@@ -1,4 +1,4 @@
-import {OceanAudio} from './audio.js?v=20260927-pixel-v35';
+import {OceanAudio} from './audio.js?v=20260927-pixel-v36';
 
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 const valid=(n,fallback)=>Number.isFinite(n)?n:fallback;
