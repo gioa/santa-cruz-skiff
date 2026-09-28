@@ -13,11 +13,20 @@ export const LOCATIONS = Object.freeze([
   Object.freeze({
     id: 'pacifica',
     name: 'Pacifica Beach',
-    subtitle: 'Linda Mar · 沙滩与浪花',
-    detail: '逛逛饵料渔具店，沿沙滩找钓位，向浪里抛一竿。',
+    subtitle: 'Sharp Park · 黑沙与封闭栈桥',
+    detail: '读懂长滩的沙槽与白浪，或越栏登上旧栈桥承担巡查风险。',
     tag: '沙滩钓',
     href: './pacifica.html',
     art: 'pacifica',
+  }),
+  Object.freeze({
+    id: 'half-moon-bay',
+    name: 'Half Moon Bay',
+    subtitle: 'Francis · Venice · Dunes',
+    detail: '沿浅色沙滩走过沙丘与溪口，在不同浪区寻找鱼讯。',
+    tag: '沙滩钓',
+    href: './half-moon-bay.html',
+    art: 'half-moon-bay',
   }),
 ]);
 
@@ -45,7 +54,7 @@ function makeArt(location) {
   for (const part of ['sun', 'headland', 'ocean', 'beach', 'foam', 'pier', 'boat', 'shop', 'rod']) {
     art.append(element('i', `location-art-${part}`));
   }
-  art.append(element('span', 'location-art-caption', location.art === 'pacifica' ? 'LINDA MAR' : 'MONTEREY BAY'));
+  art.append(element('span', 'location-art-caption', location.art === 'pacifica' ? 'SHARP PARK' : location.art==='half-moon-bay'?'HALF MOON BAY':'MONTEREY BAY'));
   return art;
 }
 
@@ -141,7 +150,7 @@ export function mountLocationPicker() {
     trigger.type = 'button';
     trigger.dataset.scenePicker = '';
     const text = element('span');
-    text.append(element('strong', '', '选择钓场'), element('small', '', 'Santa Cruz · Pacifica'));
+    text.append(element('strong', '', '选择钓场'), element('small', '', 'Santa Cruz · Pacifica · Half Moon Bay'));
     trigger.append(text, element('span', 'location-intro-arrow', '↗'));
     intro.insertBefore(trigger, intro.querySelector('.intro-foot'));
   }

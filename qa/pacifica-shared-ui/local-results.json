@@ -1,0 +1,618 @@
+{
+  "comparisons": [
+    {
+      "name": "desktop",
+      "width": 1440,
+      "height": 1000,
+      "sc": {
+        ".hud": {
+          "x": 28,
+          "y": 23,
+          "width": 1384,
+          "height": 44,
+          "font": "\"Noto Sans SC\", sans-serif",
+          "radius": "0px",
+          "border": "0px"
+        },
+        ".brand": {
+          "x": 28,
+          "y": 23,
+          "width": 190.96875,
+          "height": 42,
+          "font": "\"Noto Sans SC\", sans-serif",
+          "radius": "0px",
+          "border": "0px"
+        },
+        ".day-card": {
+          "x": 613.453125,
+          "y": 23,
+          "width": 213.09375,
+          "height": 55,
+          "font": "\"Noto Sans SC\", sans-serif",
+          "radius": "0px",
+          "border": "3px"
+        },
+        "#settings-btn": {
+          "x": 1317,
+          "y": 23,
+          "width": 44,
+          "height": 44,
+          "font": "\"Noto Sans SC\", sans-serif",
+          "radius": "0px",
+          "border": "2px"
+        },
+        "#intro": {
+          "x": 115.1875,
+          "y": 285.10076904296875,
+          "width": 350,
+          "height": 499.765625,
+          "font": "\"Noto Sans SC\", sans-serif",
+          "radius": "0px",
+          "border": "3px"
+        },
+        "#trip-tools": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "font": "\"Noto Sans SC\", sans-serif",
+          "radius": "0px",
+          "border": "0px"
+        },
+        "#trip-info": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "font": "\"Noto Sans SC\", sans-serif",
+          "radius": "0px",
+          "border": "0px"
+        }
+      },
+      "pc": {
+        ".hud": {
+          "x": 28,
+          "y": 23,
+          "width": 1384,
+          "height": 44,
+          "font": "\"Noto Sans SC\", sans-serif",
+          "radius": "0px",
+          "border": "0px"
+        },
+        ".brand": {
+          "x": 28,
+          "y": 23,
+          "width": 178.96875,
+          "height": 42,
+          "font": "\"Noto Sans SC\", sans-serif",
+          "radius": "0px",
+          "border": "0px"
+        },
+        ".day-card": {
+          "x": 632.953125,
+          "y": 23,
+          "width": 174.09375,
+          "height": 55,
+          "font": "\"Noto Sans SC\", sans-serif",
+          "radius": "0px",
+          "border": "3px"
+        },
+        "#settings-btn": {
+          "x": 1317,
+          "y": 23,
+          "width": 44,
+          "height": 44,
+          "font": "\"Noto Sans SC\", sans-serif",
+          "radius": "0px",
+          "border": "2px"
+        },
+        "#intro": {
+          "x": 115.1875,
+          "y": 285.10076904296875,
+          "width": 350,
+          "height": 499.765625,
+          "font": "\"Noto Sans SC\", sans-serif",
+          "radius": "0px",
+          "border": "3px"
+        },
+        "#trip-tools": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "font": "\"Noto Sans SC\", sans-serif",
+          "radius": "0px",
+          "border": "0px"
+        },
+        "#trip-info": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "font": "\"Noto Sans SC\", sans-serif",
+          "radius": "0px",
+          "border": "0px"
+        }
+      }
+    },
+    {
+      "name": "phone",
+      "width": 390,
+      "height": 844,
+      "sc": {
+        ".hud": {
+          "x": 14,
+          "y": 13,
+          "width": 362,
+          "height": 44,
+          "font": "\"Noto Sans SC\", sans-serif",
+          "radius": "0px",
+          "border": "0px"
+        },
+        ".brand": {
+          "x": 14,
+          "y": 13,
+          "width": 75.734375,
+          "height": 25,
+          "font": "\"Noto Sans SC\", sans-serif",
+          "radius": "0px",
+          "border": "0px"
+        },
+        ".day-card": {
+          "x": 185.15625,
+          "y": 13,
+          "width": 87.84375,
+          "height": 36,
+          "font": "\"Noto Sans SC\", sans-serif",
+          "radius": "0px",
+          "border": "2px"
+        },
+        "#settings-btn": {
+          "x": 283,
+          "y": 13,
+          "width": 44,
+          "height": 44,
+          "font": "\"Noto Sans SC\", sans-serif",
+          "radius": "0px",
+          "border": "2px"
+        },
+        "#intro": {
+          "x": 20,
+          "y": 384.40625,
+          "width": 340,
+          "height": 431.59375,
+          "font": "\"Noto Sans SC\", sans-serif",
+          "radius": "0px",
+          "border": "3px"
+        },
+        "#trip-tools": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "font": "\"Noto Sans SC\", sans-serif",
+          "radius": "0px",
+          "border": "0px"
+        },
+        "#trip-info": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "font": "\"Noto Sans SC\", sans-serif",
+          "radius": "0px",
+          "border": "0px"
+        }
+      },
+      "pc": {
+        ".hud": {
+          "x": 14,
+          "y": 13,
+          "width": 362,
+          "height": 44,
+          "font": "\"Noto Sans SC\", sans-serif",
+          "radius": "0px",
+          "border": "0px"
+        },
+        ".brand": {
+          "x": 14,
+          "y": 13,
+          "width": 75.734375,
+          "height": 25,
+          "font": "\"Noto Sans SC\", sans-serif",
+          "radius": "0px",
+          "border": "0px"
+        },
+        ".day-card": {
+          "x": 185.15625,
+          "y": 13,
+          "width": 87.84375,
+          "height": 36,
+          "font": "\"Noto Sans SC\", sans-serif",
+          "radius": "0px",
+          "border": "2px"
+        },
+        "#settings-btn": {
+          "x": 283,
+          "y": 13,
+          "width": 44,
+          "height": 44,
+          "font": "\"Noto Sans SC\", sans-serif",
+          "radius": "0px",
+          "border": "2px"
+        },
+        "#intro": {
+          "x": 20,
+          "y": 384.40625,
+          "width": 340,
+          "height": 431.59375,
+          "font": "\"Noto Sans SC\", sans-serif",
+          "radius": "0px",
+          "border": "3px"
+        },
+        "#trip-tools": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "font": "\"Noto Sans SC\", sans-serif",
+          "radius": "0px",
+          "border": "0px"
+        },
+        "#trip-info": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "font": "\"Noto Sans SC\", sans-serif",
+          "radius": "0px",
+          "border": "0px"
+        }
+      }
+    },
+    {
+      "name": "small-phone",
+      "width": 320,
+      "height": 568,
+      "sc": {
+        ".hud": {
+          "x": 14,
+          "y": 13,
+          "width": 292,
+          "height": 44,
+          "font": "\"Noto Sans SC\", sans-serif",
+          "radius": "0px",
+          "border": "0px"
+        },
+        ".brand": {
+          "x": 14,
+          "y": 13,
+          "width": 75.734375,
+          "height": 25,
+          "font": "\"Noto Sans SC\", sans-serif",
+          "radius": "0px",
+          "border": "0px"
+        },
+        ".day-card": {
+          "x": 115.15625,
+          "y": 13,
+          "width": 87.84375,
+          "height": 36,
+          "font": "\"Noto Sans SC\", sans-serif",
+          "radius": "0px",
+          "border": "2px"
+        },
+        "#settings-btn": {
+          "x": 213,
+          "y": 13,
+          "width": 44,
+          "height": 44,
+          "font": "\"Noto Sans SC\", sans-serif",
+          "radius": "0px",
+          "border": "2px"
+        },
+        "#intro": {
+          "x": 20,
+          "y": 120.40625,
+          "width": 280,
+          "height": 431.59375,
+          "font": "\"Noto Sans SC\", sans-serif",
+          "radius": "0px",
+          "border": "3px"
+        },
+        "#trip-tools": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "font": "\"Noto Sans SC\", sans-serif",
+          "radius": "0px",
+          "border": "0px"
+        },
+        "#trip-info": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "font": "\"Noto Sans SC\", sans-serif",
+          "radius": "0px",
+          "border": "0px"
+        }
+      },
+      "pc": {
+        ".hud": {
+          "x": 14,
+          "y": 13,
+          "width": 292,
+          "height": 44,
+          "font": "\"Noto Sans SC\", sans-serif",
+          "radius": "0px",
+          "border": "0px"
+        },
+        ".brand": {
+          "x": 14,
+          "y": 13,
+          "width": 75.734375,
+          "height": 25,
+          "font": "\"Noto Sans SC\", sans-serif",
+          "radius": "0px",
+          "border": "0px"
+        },
+        ".day-card": {
+          "x": 115.15625,
+          "y": 13,
+          "width": 87.84375,
+          "height": 36,
+          "font": "\"Noto Sans SC\", sans-serif",
+          "radius": "0px",
+          "border": "2px"
+        },
+        "#settings-btn": {
+          "x": 213,
+          "y": 13,
+          "width": 44,
+          "height": 44,
+          "font": "\"Noto Sans SC\", sans-serif",
+          "radius": "0px",
+          "border": "2px"
+        },
+        "#intro": {
+          "x": 20,
+          "y": 120.40625,
+          "width": 280,
+          "height": 431.59375,
+          "font": "\"Noto Sans SC\", sans-serif",
+          "radius": "0px",
+          "border": "3px"
+        },
+        "#trip-tools": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "font": "\"Noto Sans SC\", sans-serif",
+          "radius": "0px",
+          "border": "0px"
+        },
+        "#trip-info": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "font": "\"Noto Sans SC\", sans-serif",
+          "radius": "0px",
+          "border": "0px"
+        }
+      }
+    },
+    {
+      "name": "landscape",
+      "width": 844,
+      "height": 390,
+      "sc": {
+        ".hud": {
+          "x": 15,
+          "y": 8,
+          "width": 814,
+          "height": 44,
+          "font": "\"Noto Sans SC\", sans-serif",
+          "radius": "0px",
+          "border": "0px"
+        },
+        ".brand": {
+          "x": 15,
+          "y": 8,
+          "width": 95.0625,
+          "height": 42,
+          "font": "\"Noto Sans SC\", sans-serif",
+          "radius": "0px",
+          "border": "0px"
+        },
+        ".day-card": {
+          "x": 330.109375,
+          "y": 8,
+          "width": 183.78125,
+          "height": 34,
+          "font": "\"Noto Sans SC\", sans-serif",
+          "radius": "0px",
+          "border": "3px"
+        },
+        "#settings-btn": {
+          "x": 785,
+          "y": 8,
+          "width": 44,
+          "height": 44,
+          "font": "\"Noto Sans SC\", sans-serif",
+          "radius": "0px",
+          "border": "2px"
+        },
+        "#intro": {
+          "x": 42.1875,
+          "y": 60,
+          "width": 310,
+          "height": 320,
+          "font": "\"Noto Sans SC\", sans-serif",
+          "radius": "0px",
+          "border": "3px"
+        },
+        "#trip-tools": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "font": "\"Noto Sans SC\", sans-serif",
+          "radius": "0px",
+          "border": "0px"
+        },
+        "#trip-info": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "font": "\"Noto Sans SC\", sans-serif",
+          "radius": "0px",
+          "border": "0px"
+        }
+      },
+      "pc": {
+        ".hud": {
+          "x": 15,
+          "y": 8,
+          "width": 814,
+          "height": 44,
+          "font": "\"Noto Sans SC\", sans-serif",
+          "radius": "0px",
+          "border": "0px"
+        },
+        ".brand": {
+          "x": 15,
+          "y": 8,
+          "width": 95.0625,
+          "height": 42,
+          "font": "\"Noto Sans SC\", sans-serif",
+          "radius": "0px",
+          "border": "0px"
+        },
+        ".day-card": {
+          "x": 349.609375,
+          "y": 8,
+          "width": 144.78125,
+          "height": 34,
+          "font": "\"Noto Sans SC\", sans-serif",
+          "radius": "0px",
+          "border": "3px"
+        },
+        "#settings-btn": {
+          "x": 785,
+          "y": 8,
+          "width": 44,
+          "height": 44,
+          "font": "\"Noto Sans SC\", sans-serif",
+          "radius": "0px",
+          "border": "2px"
+        },
+        "#intro": {
+          "x": 42.1875,
+          "y": 60,
+          "width": 310,
+          "height": 320,
+          "font": "\"Noto Sans SC\", sans-serif",
+          "radius": "0px",
+          "border": "3px"
+        },
+        "#trip-tools": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "font": "\"Noto Sans SC\", sans-serif",
+          "radius": "0px",
+          "border": "0px"
+        },
+        "#trip-info": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "font": "\"Noto Sans SC\", sans-serif",
+          "radius": "0px",
+          "border": "0px"
+        }
+      }
+    }
+  ],
+  "errors": [],
+  "state": {
+    "scene": "pacifica",
+    "started": true,
+    "paused": false,
+    "player": {
+      "x": 832.5563686772342,
+      "y": 470.1535399599972,
+      "facing": -1,
+      "walking": false
+    },
+    "phase": "walk",
+    "elapsed": 97.06750000000173,
+    "credits": 40,
+    "inventory": {
+      "sandcrab": 12,
+      "squid": 27,
+      "anchovy": 0
+    },
+    "bait": "squid",
+    "rig": "carolina",
+    "upgrades": [],
+    "catches": [
+      {
+        "id": "striped_bass",
+        "name": "条纹鲈",
+        "nameEn": "Striped bass",
+        "color": "#b9d2cc",
+        "catchId": 1,
+        "weightKg": 1.29,
+        "value": 40,
+        "strength": 1.05,
+        "stamina": 0,
+        "run": 0
+      }
+    ],
+    "lastCatch": null,
+    "stats": {
+      "caught": 1,
+      "kept": 1,
+      "released": 0,
+      "sold": 0,
+      "casts": 5,
+      "missed": 0
+    },
+    "cast": null,
+    "lineDistance": 0,
+    "tension": 0,
+    "fish": null,
+    "biteRemaining": 0,
+    "waitRemaining": 0,
+    "fightElapsed": 0,
+    "lineStress": 0,
+    "slackTime": 0,
+    "walkTarget": null,
+    "walkRoute": [],
+    "message": "欢迎回到 Pacifica。装备和渔获已恢复，沿浪线继续沙滩钓吧。",
+    "nextCatchId": 2,
+    "canCast": true,
+    "nearShop": false
+  },
+  "checks": [
+    "same HUD/clock/settings/intro geometry",
+    "same fonts and source CSS",
+    "30-slot shared inventory",
+    "background inert and focus trap",
+    "menus pause simulation",
+    "shop charges correct price",
+    "bait equip from item detail",
+    "pointer cast and retrieve",
+    "audio via settings",
+    "natural bite and fight to catch",
+    "catch journal and reload"
+  ]
+}

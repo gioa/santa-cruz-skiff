@@ -1,18 +1,18 @@
-// Original canvas pixel art for the Pacifica / Linda Mar shore scene.
-// Coordinates are shared with pacifica-sim; no image downloads are needed.
+// Shared pixel-art shoreline renderer. Fixed bathymetry, animated surf and
+// game collision geometry all use shore-data; the camera follows a long coast.
+import {getShoreScene, sampleShore, shoreProfile, onPier} from './shore-data.js?v=coast-3';
 const TAU=Math.PI*2;
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
-const shoreY=x=>420+18*Math.sin(x/240)+9*Math.sin(x/87);
 const noise=(x,y=0)=>{let n=Math.imul(x|0,374761393)+Math.imul(y|0,668265263);n=Math.imul(n^(n>>>13),1274126177);return((n^(n>>>16))>>>0)/4294967295;};
-const C={deep:'#3d7d88',sea:'#4d969b',shallow:'#7bb6b0',foam:'#e6eed1',sand:'#e7cea0',dry:'#f0dcb0',wet:'#c2bc99',ink:'#314e51',grass:'#788a61',darkGrass:'#536f5d',coral:'#c97459'};
 const FONT={A:['01110','10001','10001','11111','10001','10001','10001'],B:['11110','10001','10001','11110','10001','10001','11110'],C:['01111','10000','10000','10000','10000','10000','01111'],D:['11110','10001','10001','10001','10001','10001','11110'],E:['11111','10000','10000','11110','10000','10000','11111'],F:['11111','10000','10000','11110','10000','10000','10000'],G:['01111','10000','10000','10111','10001','10001','01111'],H:['10001','10001','10001','11111','10001','10001','10001'],I:['111','010','010','010','010','010','111'],J:['00111','00010','00010','00010','10010','10010','01100'],K:['10001','10010','10100','11000','10100','10010','10001'],L:['10000','10000','10000','10000','10000','10000','11111'],M:['10001','11011','10101','10101','10001','10001','10001'],N:['10001','11001','10101','10011','10001','10001','10001'],O:['01110','10001','10001','10001','10001','10001','01110'],P:['11110','10001','10001','11110','10000','10000','10000'],Q:['01110','10001','10001','10001','10101','10010','01101'],R:['11110','10001','10001','11110','10100','10010','10001'],S:['01111','10000','10000','01110','00001','00001','11110'],T:['11111','00100','00100','00100','00100','00100','00100'],U:['10001','10001','10001','10001','10001','10001','01110'],V:['10001','10001','10001','10001','10001','01010','00100'],W:['10001','10001','10001','10101','10101','10101','01010'],X:['10001','10001','01010','00100','01010','10001','10001'],Y:['10001','10001','01010','00100','00100','00100','00100'],Z:['11111','00001','00010','00100','01000','10000','11111'],'&':['01100','10010','10100','01000','10101','10010','01101'],'/':['00001','00001','00010','00100','01000','10000','10000'],'-':['00000','00000','00000','11111','00000','00000','00000'],' ':['000'],0:['01110','10001','10011','10101','11001','10001','01110'],1:['010','110','010','010','010','010','111'],2:['01110','10001','00001','00110','01000','10000','11111'],3:['11110','00001','00001','01110','00001','00001','11110'],4:['10010','10010','10010','11111','00010','00010','00010'],5:['11111','10000','10000','11110','00001','00001','11110']};
 
-export function createPacificaWorld(canvas){
+export function createPacificaWorld(canvas,{sceneId='pacifica'}={}){
+  const scene=getShoreScene(sceneId),hmb=scene.id==='half-moon-bay';
+  const C={ink:'#314e51',darkGrass:'#536f5d',coral:'#c97459',...scene.palette};
   const ctx=canvas.getContext('2d',{alpha:false});
-  const camera={x:740,y:590,scale:.65,width:900,height:600};
-  let cssWidth=900,cssHeight=600,insets={top:90,bottom:200},now=0,lastTime=null,lastState=null,manualFocus=null,initialized=false;
-  const cache=document.createElement('canvas');cache.width=2040;cache.height=1640;
-  const b=cache.getContext('2d');b.translate(320,200);
+  const camera={x:scene.spawn.x,y:scene.spawn.y-150,scale:.65,width:900,height:600};
+  let cssWidth=900,cssHeight=600,insets={top:90,bottom:200},now=0,lastTime=null,lastState=null,manualFocus=null,initialized=false,b=null;
+  const chunkSize=512,chunks=new Map();let deepTile=null;
   const R=(g,x,y,w,h,c)=>{g.fillStyle=c;g.fillRect(Math.round(x),Math.round(y),Math.round(w),Math.round(h));};
   function poly(g,pts,c){g.fillStyle=c;g.beginPath();pts.forEach(([x,y],i)=>i?g.lineTo(Math.round(x),Math.round(y)):g.moveTo(Math.round(x),Math.round(y)));g.closePath();g.fill();}
   function line(g,x0,y0,x1,y1,c,w=2){x0=Math.round(x0);y0=Math.round(y0);x1=Math.round(x1);y1=Math.round(y1);const dx=Math.abs(x1-x0),sx=x0<x1?1:-1,dy=-Math.abs(y1-y0),sy=y0<y1?1:-1;let err=dx+dy;for(let i=0;i<4000;i++){R(g,x0,y0,w,w,c);if(x0===x1&&y0===y1)break;const e=err*2;if(e>=dy){err+=dy;x0+=sx;}if(e<=dx){err+=dx;y0+=sy;}}}
@@ -33,18 +33,6 @@ export function createPacificaWorld(canvas){
     R(g,x+w-24,y-9,10,18,'#be9270');R(g,x+w-27,y-10,15,3,'#e4c59b');
     for(const xx of[x+12,x+w-32]){R(g,xx,y+41,21,20,'#ede1b9');R(g,xx+3,y+44,15,14,'#507f86');R(g,xx+10,y+44,2,14,'#efe4bd');R(g,xx+3,y+50,15,2,'#efe4bd');R(g,xx-2,y+61,25,3,'#688b73');}
     R(g,x+w/2-10,y+43,20,30,'#49686a');R(g,x+w/2-7,y+47,14,14,'#87b5ab');R(g,x+w/2+4,y+64,2,2,'#e8c786');R(g,x+w/2-15,y+73,30,5,'#c3ad85');
-  }
-  function headlands(){
-    // The stepped coastal bluffs frame the open sweep of Linda Mar Beach.
-    poly(b,[[-320,64],[-60,64],[-60,93],[19,93],[19,132],[65,132],[65,174],[96,174],[96,215],[130,215],[130,267],[155,267],[155,318],[184,318],[184,360],[213,360],[213,402],[-320,438]],'#658679');
-    poly(b,[[-320,63],[-55,63],[-55,96],[17,96],[17,139],[57,139],[57,181],[86,181],[86,225],[119,225],[119,279],[143,279],[143,326],[175,326],[175,375],[-320,401]],'#83997b');
-    poly(b,[[-150,106],[-40,106],[-40,142],[12,142],[12,201],[50,201],[50,266],[82,266],[82,328],[-70,346]],'#9cab82');
-    poly(b,[[1720,95],[1500,95],[1500,142],[1450,142],[1450,202],[1415,202],[1415,246],[1375,246],[1375,280],[1335,280],[1335,317],[1295,317],[1295,356],[1265,356],[1265,408],[1720,450]],'#607d70');
-    poly(b,[[1720,96],[1500,96],[1500,149],[1460,149],[1460,211],[1425,211],[1425,256],[1390,256],[1390,292],[1350,292],[1350,330],[1310,330],[1310,372],[1720,415]],'#8c9e7d');
-    for(let i=0;i<58;i++){const side=i%2===0,x=side?-80+noise(i,9)*245:1320+noise(i,10)*240,y=150+noise(i,11)*235;if((side&&x<y*.46-12)||(!side&&x>1490-y*.45))R(b,x,y,10+noise(i,12)*28,4,'#758d71');}
-    for(let i=0;i<13;i++)rock(b,i<7?40+i*25:1270+(i-7)*24,365+noise(i,88)*55,20+noise(i,20)*28,12+noise(i,22)*15);
-    // Distant mist masks the back edge of the hills without flattening the surf.
-    b.globalAlpha=.17;R(b,-320,77,2040,13,'#c2d5c0');R(b,-320,104,2040,7,'#dce3cc');b.globalAlpha=1;
   }
   function shop(){
     const x=1050,y=670,w=160;
@@ -73,40 +61,136 @@ export function createPacificaWorld(canvas){
     // Shop bell and wind pennant.
     R(b,x+w+24,y+22,3,72,'#657d70');poly(b,[[x+w+27,y+25],[x+w+54,y+30],[x+w+27,y+37]],'#d38a63');R(b,x+w+23,y+20,5,5,'#e4c995');
   }
-  function terrain(){
-    R(b,-320,-200,2040,1640,C.sea);
-    for(let y=-200;y<510;y+=26){const t=clamp((y+150)/680,0,1);const colors=['#397886','#3e838e','#448d95','#509a9e','#59a3a5','#65aaa9','#76b6af'];R(b,-320,y,2040,27,colors[Math.min(6,Math.floor(t*7))]);}
-    for(let i=0;i<300;i++){const x=-300+noise(i,1)*2000,y=-150+noise(i,2)*590;R(b,x,y,14+noise(i,3)*50,2,i%3?'#78b7b1':'#8fc5b9');}
-    const coast=[];for(let x=-320;x<=1730;x+=10)coast.push([x,Math.round(shoreY(x)/4)*4]);
-    poly(b,[...coast,[1730,1440],[-320,1440]],C.wet);
-    poly(b,[...coast.map(([x,y])=>[x,y+22]),[1730,1440],[-320,1440]],'#dbcca5');
-    poly(b,[...coast.map(([x,y])=>[x,y+43]),[1730,1440],[-320,1440]],C.sand);
-    poly(b,[...coast.map(([x,y])=>[x,y+100+6*Math.sin(x/140)]),[1730,1440],[-320,1440]],C.dry);
-    for(let i=0;i<2100;i++){const x=-300+noise(i,19)*2020,y=shoreY(x)+33+noise(i,31)*985;R(b,x,y,i%5===0?5:2,i%8===0?2:1,i%3?'#d9c297':'#f8e8c4');}
-    // Broad dune banks at the back, leaving the wet sand unobstructed.
-    for(let i=0;i<32;i++){const x=-200+i*65,y=948+Math.sin(i*.8)*21;poly(b,[[x-40,y+20],[x-25,y],[x+15,y],[x+15,y-9],[x+66,y-9],[x+66,y],[x+100,y],[x+122,y+45],[x+125,1440],[x-40,1440]],i%2?'#d8c796':'#dfcea0');}
-    for(let i=0;i<195;i++){const x=-270+noise(i,41)*1950,y=948+noise(i,42)*440;grass(b,x,y,.7+noise(i,43)*.5,i%3?C.grass:'#929969');}
-    // Soft winding beach access tracks, with an elevated plank walk to the shop.
-    for(let x=865;x<1510;x+=8){const y=916-Math.sin((x-800)/680)*63;R(b,x,y,10,36,'#ddc699');R(b,x,y+4,10,27,'#e8d4a9');}
-    poly(b,[[1214,812],[1510,858],[1510,902],[1205,846],[1101,846],[1101,813]],'#a48d68');
-    for(let x=1110;x<1510;x+=10){const y=x<1220?815:815+(x-1220)*.16;R(b,x,y,8,30,'#c5aa7a');R(b,x,y+2,7,2,'#e1c594');R(b,x+7,y,2,30,'#8e7e61');}
-    for(let x=1220;x<1500;x+=42){const y=822+(x-1220)*.16;R(b,x,y-9,4,43,'#8c8265');R(b,x-1,y-12,6,5,'#ddd0a0');}
-    line(b,1220,816,1500,861,'#ae9d78',3);
-    // Seaside cottages peek over the dune, with space between each silhouette.
-    cottage(b,80,889,100,'#d6ad8d');cottage(b,241,920,89,'#d1c5a0');cottage(b,435,949,105,'#a9b4a0');cottage(b,1373,721,115,'#d5b590');
-    for(let i=0;i<28;i++){const x=35+i*18,y=988+Math.sin(i*.15)*7;R(b,x,y-18,4,22,'#a19471');R(b,x-1,y-21,6,4,'#e0d0a6');if(i<27)line(b,x,y-13,x+19,y-12,'#c5b38a',2);}
-    headlands();
-    // A driftwood seat, washed-up kelp, shells and a solitary beach umbrella.
-    line(b,519,713,610,722,'#b69a72',11);line(b,525,710,607,718,'#d4b88a',4);line(b,548,714,538,730,'#9d8561',5);line(b,589,721,601,733,'#9d8561',5);
-    for(let i=0;i<24;i++){const x=245+noise(i,68)*880,y=shoreY(x)+55+noise(i,69)*38;R(b,x,y,3,2,'#b29569');if(i%4===0){R(b,x-3,y-1,8,2,'#f9e8c6');R(b,x-1,y-3,4,2,'#ead0a8');}}
-    for(const[x,y]of[[357,566],[732,617],[899,740]]){R(b,x,y,19,3,'#9b9e71');R(b,x+8,y-4,18,2,'#a8a879');R(b,x+18,y-2,2,8,'#979969');}
-    shadow(b,386,832,66,13,.13);R(b,382,781,3,55,'#9e8864');poly(b,[[350,785],[360,772],[375,765],[393,765],[408,772],[416,785]],'#d48a67');poly(b,[[350,785],[375,765],[370,785]],'#edce9a');poly(b,[[390,785],[393,765],[416,785]],'#f4d9a8');R(b,350,785,66,4,'#bf765c');R(b,405,824,30,5,'#6e9184');R(b,404,829,4,10,'#8e8567');R(b,429,829,4,10,'#8e8567');
-    // Coastal wayfinding is readable artwork, separate from the game HUD.
-    R(b,945,791,6,63,'#8a7957');R(b,1006,791,6,63,'#8a7957');R(b,933,780,91,45,'#416b68');R(b,930,777,97,5,'#c3b184');R(b,934,781,89,2,'#739587');text(b,'PACIFICA',978,790,1.7,'#f2dfb3');text(b,'LINDA MAR',978,809,1.2,'#bad0b1');
-    for(const[x,y]of[[913,841],[1009,862],[1254,880],[870,943],[625,965],[736,995],[1330,721],[1256,685]])grass(b,x,y,1.3);
-    shop();
+
+  function beachSign(g,label,sub,x,y){
+    const width=Math.max(86,label.length*7+16);
+    R(g,x-width/2+8,y+14,5,49,'#82765d');R(g,x+width/2-13,y+14,5,49,'#82765d');
+    R(g,x-width/2,y-2,width,40,'#355d60');R(g,x-width/2-3,y-5,width+6,5,'#c6bc99');
+    R(g,x-width/2+3,y,width-6,2,'#809e91');text(g,label,x,y+7,1.5,'#f1e3bf');
+    if(sub)text(g,sub,x,y+24,1,'#c7d5bd');
   }
-  terrain();
+  function creekX(creek,y){return creek.x+Math.sin((y-460)/155)*43+Math.sin(y/63)*9;}
+  function terrainChunk(cx,cy){
+    const cache=document.createElement('canvas');cache.width=chunkSize;cache.height=chunkSize;
+    b=cache.getContext('2d',{alpha:false});b.translate(-cx,-cy);
+    R(b,cx,cy,chunkSize,chunkSize,C.dry);
+    // Submerged bars are pale; deeper troughs and channel cuts remain dark.
+    // This is sampled once per cached tile, not painted as a repeating texture.
+    const waterTones=hmb?['#93b9aa','#81ada4','#70a09e','#5a8d96','#477d8c','#3c7183']:
+      ['#83a59a','#709b96','#5a8b90','#487d86','#3d6d7e','#315d70'];
+    for(let x=cx;x<cx+chunkSize;x+=16){
+      const sy=scene.shoreY(x+8);
+      for(let y=cy;y<Math.min(cy+chunkSize,sy+16);y+=16){
+        const bed=sampleShore(scene,x+8,y+8,0),idx=Math.min(5,Math.floor(bed.depth/1.05));
+        R(b,x,y,16,16,waterTones[idx]);
+        if(noise(x/16,y/16)>.72)R(b,x+2,y+3,10,1,idx<2?C.shallow:C.sea);
+      }
+    }
+    const coast=[];for(let x=cx-8;x<=cx+chunkSize+8;x+=8)coast.push([x,Math.round(scene.shoreY(x)/2)*2]);
+    const bottom=cy+chunkSize+2;
+    for(const[dy,color]of[[0,C.wet],[28,hmb?'#b7b6a2':'#686c66'],[58,C.sand],[118,C.dry]]){
+      if(bottom>Math.min(...coast.map(p=>p[1]))+dy)poly(b,[...coast.map(([x,y])=>[x,y+dy]),[cx+chunkSize+8,bottom],[cx-8,bottom]],color);
+    }
+    // Coordinate-seeded grains continue across tile boundaries and do not swim.
+    for(let gx=Math.floor(cx/18)*18;gx<cx+chunkSize;gx+=18)for(let gy=Math.floor(cy/19)*19;gy<cy+chunkSize;gy+=19){
+      const x=gx+noise(gx,gy)*15,y=gy+noise(gy,gx)*16,shore=scene.shoreY(x),off=y-shore;
+      if(off<8||off>660)continue;
+      R(b,x,y,noise(gx+1,gy)>.83?4:2,noise(gx+2,gy)>.9?2:1,noise(gx,gy+1)>.5?C.grain:C.grainDark);
+      if(!hmb&&off<63&&noise(gx+7,gy)>.56){R(b,x,y,4,3,'#333d41');R(b,x,y,3,1,'#82857b');}
+      if(!hmb&&off>30&&off<110&&noise(Math.floor(x/95),Math.floor(y/19))>.77){R(b,x-4,y,13,2,'#4b5353');R(b,x,y+3,9,1,'#59605b');}
+    }
+    if(hmb){
+      // A low vegetated dune ridge, with the two creek mouths cutting across it.
+      for(let x=Math.floor(cx/70)*70-70;x<cx+chunkSize+70;x+=70){
+        const y=902+Math.sin(x/380)*25+Math.sin(x/89)*11;
+        poly(b,[[x-30,y+42],[x-9,y+8],[x+22,y-10],[x+55,y-10],[x+87,y+23],[x+111,y+70],[x+111,1400],[x-30,1400]],'#c4c1a3');
+        poly(b,[[x-9,y+8],[x+22,y-10],[x+55,y-10],[x+75,y+14],[x+17,y+20]],'#d5d0b2');
+      }
+      for(let x=Math.floor(cx/31)*31;x<cx+chunkSize+31;x+=31){const y=954+noise(x,73)*250;if(y>cy-30&&y<cy+chunkSize+35)grass(b,x,y,.65+noise(x,31)*.65,noise(x,99)>.45?C.grass:'#747f66');}
+      for(const creek of scene.creeks||[]){
+        if(Math.abs(creek.x-(cx+256))>360)continue;
+        for(let y=Math.max(cy-16,scene.shoreY(creek.x)+3);y<cy+chunkSize+16;y+=8){
+          const x=creekX(creek,y),w=19+15*Math.sin(y/213)**2+4*Math.sin(y/29);
+          R(b,x-w-13,y,w*2+26,9,'#a4ac9c');R(b,x-w,y,w*2,9,'#67948e');if(noise(creek.x,y)>.77)R(b,x-w+6+noise(y,creek.x)*12,y+1,5+noise(y,17)*10,1,'#93b2a1');
+        }
+      }
+      // Francis Beach has a campground behind the dune, not enclosing cliffs.
+      for(let x=5550;x<7330;x+=175){const y=1055+Math.sin(x/87)*29;if(x>cx-140&&x<cx+chunkSize+140&&y>cy-120&&y<cy+chunkSize+80){
+        shadow(b,x,y+20,99,16,.12);poly(b,[[x-40,y+16],[x-5,y-26],[x+37,y+16]],noise(x,81)>.5?'#92a599':'#c59770');
+        poly(b,[[x-5,y-26],[x+8,y+16],[x+37,y+16]],'#627e76');R(b,x-27,y+15,66,4,'#5d756c');
+        line(b,x+48,y+7,x+96,y+7,'#a08e6c',6);line(b,x+55,y+7,x+54,y+23,'#766c55',4);line(b,x+89,y+7,x+90,y+23,'#766c55',4);
+      }}
+    }else{
+      // Sharp Park's long levee and promenade run behind the dark beach.
+      for(let x=Math.floor(cx/16)*16;x<cx+chunkSize+16;x+=16){const y=899+Math.sin(x/820)*8;
+        R(b,x,y,17,60,'#797e71');R(b,x,y+7,17,7,'#8e9281');R(b,x,y+42,17,27,'#b3af94');R(b,x,y+46,17,3,'#d2c7a9');
+        if(noise(x,133)>.42)rock(b,x,y+27,13+noise(x,134)*12,8+noise(x,135)*9);
+      }
+      for(let x=Math.floor(cx/60)*60;x<cx+chunkSize+60;x+=60){const y=1000+noise(x,321)*95;if(y>cy-35&&y<cy+chunkSize+35)grass(b,x,y,.8+noise(x,113)*.8);}
+      if(cy+chunkSize>950&&cy<1150)for(let x=80;x<5350;x+=297)if(x>cx-120&&x<cx+chunkSize)cottage(b,x,1030+noise(x,64)*25,88+noise(x,94)*17,noise(x,81)>.5?'#c0b69e':'#a6afa0');
+      // Mori Point occurs only at the south end; the north coast stays open.
+      if(cx+chunkSize>5860){
+        poly(b,[[5905,1040],[5950,892],[6010,821],[6070,667],[6130,575],[6180,429],[6240,368],[6285,238],[6360,152],[6530,146],[6750,208],[6750,1400],[5905,1400]],'#616f61');
+        poly(b,[[5960,1010],[6000,891],[6070,812],[6120,653],[6180,565],[6224,428],[6283,368],[6320,250],[6390,193],[6650,200],[6750,1400],[5990,1400]],'#8b9470');
+        poly(b,[[6224,428],[6283,368],[6320,250],[6390,193],[6650,200],[6650,343],[6380,322],[6330,420],[6250,486]],'#9ca17a');
+        for(let i=0;i<31;i++){const x=6020+noise(i,614)*440,y=630+noise(i,615)*590;grass(b,x,y,1+noise(i,616),i%3?'#6e7d60':'#a3a77e');}
+        for(let i=0;i<17;i++)rock(b,6040+noise(i,712)*230,410+noise(i,713)*240,25+noise(i,714)*34,19+noise(i,715)*25);
+      }
+    }
+    // Sparse driftwood, kelp and shells add scale without filling every beach tile.
+    for(let x=Math.floor(cx/240)*240;x<cx+chunkSize+240;x+=240){
+      const sy=scene.shoreY(x),y=sy+139+noise(x,32)*135;
+      if(y>cy-35&&y<cy+chunkSize+35&&noise(x,17)>.42){line(b,x,y,x+46,y+6,'#918972',6);line(b,x+2,y-1,x+43,y+4,'#b4aa8c',2);line(b,x+19,y+2,x+27,y-6,'#918972',3);}
+      if(sy+55>cy-30&&sy+55<cy+chunkSize+30){R(b,x+45,sy+68,17,2,'#757c56');R(b,x+51,sy+65,9,2,'#7e845b');R(b,x+58,sy+68,2,8,'#727653');}
+    }
+    if(cx<1300&&cx+chunkSize>970&&cy<870&&cy+chunkSize>640)shop();
+    if(cx<1070&&cx+chunkSize>900&&cy<850&&cy+chunkSize>760)beachSign(b,hmb?'HALF MOON BAY':'PACIFICA',hmb?'DUNES / VENICE':'SHARP PARK',974,781);
+    const labels=hmb?['DUNES','FRENCHMANS','VENICE','PILARCITOS','FRANCIS','SOUTH BEACH']:['NORTH BEACH','PIER CLOSED','SAND TROUGH','BAR GAP','SOUTH BEACH','MORI POINT'];
+    scene.zones.forEach((zone,i)=>{if(zone.x>cx-100&&zone.x<cx+chunkSize+100&&cy<885&&cy+chunkSize>770)beachSign(b,labels[i]||'BEACH','COAST TRAIL',zone.x,805);});
+    b=null;return cache;
+  }
+  function bounds(pad=0){return{left:camera.x-canvas.width/(2*camera.scale)-pad,right:camera.x+canvas.width/(2*camera.scale)+pad,top:camera.y-offset.y/camera.scale-pad,bottom:camera.y+(canvas.height-offset.y)/camera.scale+pad};}
+  function offshoreTile(){
+    if(deepTile)return deepTile;deepTile=document.createElement('canvas');deepTile.width=chunkSize;deepTile.height=chunkSize;const g=deepTile.getContext('2d',{alpha:false});R(g,0,0,chunkSize,chunkSize,C.deep);
+    for(let i=0;i<190;i++){const x=noise(i,918)*chunkSize,y=noise(i,919)*chunkSize;g.globalAlpha=.22;R(g,x,y,5+noise(i,920)*11,1,C.sea);}g.globalAlpha=1;return deepTile;
+  }
+  function drawTerrain(){
+    const v=bounds(12),firstX=Math.floor(v.left/chunkSize),lastX=Math.floor(v.right/chunkSize),firstY=Math.floor(v.top/chunkSize),lastY=Math.floor(v.bottom/chunkSize);
+    for(let tx=firstX;tx<=lastX;tx++)for(let ty=firstY;ty<=lastY;ty++){
+      const key=tx+','+ty,farOffshore=(ty+1)*chunkSize<=-512;let tile=farOffshore?offshoreTile():chunks.get(key);
+      if(!tile){tile=terrainChunk(tx*chunkSize,ty*chunkSize);chunks.set(key,tile);}
+      else if(!farOffshore){chunks.delete(key);chunks.set(key,tile);}
+      // Snap shared edges in screen pixels so scaled tiles cannot show seams.
+      const a=project(tx*chunkSize,ty*chunkSize),z=project((tx+1)*chunkSize,(ty+1)*chunkSize);
+      ctx.save();ctx.setTransform(1,0,0,1,0,0);ctx.drawImage(tile,a.x,a.y,z.x-a.x,z.y-a.y);ctx.restore();
+    }
+    // Bounded LRU: a long walk does not retain a canvas for the entire coastline.
+    const visibleLandRows=Math.max(0,lastY-Math.max(firstY,-1)+1),tileBudget=Math.max(54,(lastX-firstX+1)*visibleLandRows+4);
+    while(chunks.size>tileBudget)chunks.delete(chunks.keys().next().value);
+  }
+  function pier(){
+    const p=scene.pier;if(!p)return;
+    const v=bounds(70);if(v.right<p.x-60||v.left>p.x+220||v.bottom<p.top-40||v.top>p.bottom+100)return;
+    // Piles and cast shadows are below the continuous concrete deck.
+    for(let y=p.top+16;y<p.bottom;y+=89){
+      if(y<v.top-100||y>v.bottom+100)continue;
+      for(const x of[p.x-20,p.x+20]){R(ctx,x+6,y+9,10,27,'#3b666d');R(ctx,x-3,y,7,31,'#737b71');R(ctx,x-2,y+1,2,21,'#a2a18c');}
+    }
+    for(const d of p.deck){R(ctx,d.left+10,d.top+12,d.right-d.left,d.bottom-d.top,'#3e6870');R(ctx,d.left,d.top,d.right-d.left,d.bottom-d.top,'#858d83');R(ctx,d.left+4,d.top+4,d.right-d.left-8,d.bottom-d.top-8,'#b6b7a4');}
+    // Seams, aggregate and shallow spalling weather the deck without gaps in it.
+    for(let y=Math.max(p.top+4,Math.floor(v.top/19)*19);y<Math.min(p.bottom,v.bottom+30);y+=19){
+      R(ctx,p.x-22,y,44,1,'#999f90');if(noise(y,349)>.57){R(ctx,p.x-19+noise(y,351)*29,y+8,7,2,'#7b857d');R(ctx,p.x-17+noise(y,352)*29,y+10,4,1,'#d0cfb6');}
+    }
+    function rail(x0,y0,x1,y1){line(ctx,x0,y0-15,x1,y1-15,'#d0cdb3',2);line(ctx,x0,y0-6,x1,y1-6,'#8b9789',1);const dist=Math.hypot(x1-x0,y1-y0),n=Math.ceil(dist/24);for(let i=0;i<=n;i++){const x=x0+(x1-x0)*i/n,y=y0+(y1-y0)*i/n;if(!visible(x,y,50))continue;R(ctx,x-1,y-19,3,24,'#6e7b74');R(ctx,x,y-18,1,15,'#c1c2ac');if(i%7===3)R(ctx,x-1,y-7,2,5,'#8f7862');}}
+    rail(p.x-27,p.top,p.x+190,p.top);rail(p.x-27,p.top,p.x-27,p.bottom);rail(p.x+27,p.top+60,p.x+27,p.bottom);rail(p.x+190,p.top,p.x+190,p.top+60);rail(p.x+27,p.top+60,p.x+190,p.top+60);
+    for(let y=p.top+130;y<p.bottom-70;y+=254){if(!visible(p.x,y,100))continue;R(ctx,p.x-19,y-13,15,6,'#6a7e76');R(ctx,p.x-18,y-6,3,7,'#727f74');R(ctx,p.x-7,y-6,3,7,'#727f74');}
+    // The locked work fence is an explicit game boundary. No bypass is drawn.
+    const gy=p.gate.y;R(ctx,p.x-39,gy-43,3,57,'#566d69');R(ctx,p.x+37,gy-43,3,57,'#566d69');
+    line(ctx,p.x-38,gy-42,p.x+38,gy-42,'#aeb9a8',3);line(ctx,p.x-38,gy+5,p.x+38,gy+5,'#7c9286',2);
+    for(let dx=-38;dx<=38;dx+=8){line(ctx,p.x+dx,gy-40,p.x+Math.min(38,dx+26),gy+2,'#92a799',1);line(ctx,p.x+dx,gy+2,p.x+Math.min(38,dx+26),gy-40,'#849c91',1);}
+    R(ctx,p.x-27,gy-33,54,27,'#cf8c5b');R(ctx,p.x-25,gy-31,50,23,'#ead7a8');text(ctx,'CLOSED',p.x,gy-28,1,'#664f40');text(ctx,'REPAIR',p.x,gy-17,1,'#775c43');
+    for(const x of[p.x-47,p.x+48]){R(ctx,x-7,gy+16,14,3,'#725f48');poly(ctx,[[x-5,gy+15],[x-2,gy-4],[x+2,gy-4],[x+6,gy+15]],'#c77f4f');R(ctx,x-4,gy+5,8,4,'#eadbb8');}
+  }
 
   function resize(width,height){
     cssWidth=Math.max(1,width);cssHeight=Math.max(1,height);
@@ -115,16 +199,16 @@ export function createPacificaWorld(canvas){
   }
   function viewport(){const s=canvas.height/cssHeight;return{top:Math.min(insets.top*s,canvas.height*.3),bottom:Math.min(insets.bottom*s,canvas.height*.5)};}
   function cameraTarget(state){
-    const compact=cssWidth<720||cssHeight<520,pl=state.player||{x:1100,y:865},v=viewport(),available=canvas.height-v.top-v.bottom;
-    let scale=compact?Math.min(.86,canvas.width/510,available/310):Math.max(.4,Math.min(.73,canvas.width/1460,available/720));
+    const compact=cssWidth<720||cssHeight<520,pl=state.player||scene.spawn,v=viewport(),available=Math.max(100,canvas.height-v.top-v.bottom);
+    let scale=compact?Math.min(.86,canvas.width/510,available/365):Math.min(.76,canvas.width/1150,available/680);
+    scale=Math.max(.25,scale);
     const centerY=v.top+available*.5;
-    let target=manualFocus||{x:compact?clamp(pl.x,210,1190):clamp(pl.x*.17+595,670,800),y:compact?pl.y-115:560};
+    let target=manualFocus||{x:pl.x,y:pl.y-(compact?140:180)};
     if(!manualFocus&&state.cast&&!['walk','landed'].includes(state.phase)){
       const cast=state.cast,ratio=state.phase==='fighting'?clamp((state.lineDistance||cast.distance)/(cast.distance||1),.08,1.5):1;
-      const fishX=cast.origin.x+(cast.target.x-cast.origin.x)*ratio,fishY=Math.min(cast.origin.y+(cast.target.y-cast.origin.y)*ratio,shoreY(fishX)-5);
-      const minY=Math.min(fishY,cast.target.y)-55,maxY=pl.y+25,minX=Math.min(pl.x-35,fishX)-30,maxX=Math.max(pl.x+35,fishX)+30;
-      scale=Math.min(scale,available/(maxY-minY),canvas.width/(maxX-minX));
-      target={x:(minX+maxX)/2,y:(minY+maxY)/2};
+      const fishX=cast.origin.x+(cast.target.x-cast.origin.x)*ratio,fishY=cast.origin.y+(cast.target.y-cast.origin.y)*ratio;
+      const minY=Math.min(fishY,cast.target.y)-65,maxY=pl.y+36,minX=Math.min(pl.x-40,fishX)-45,maxX=Math.max(pl.x+40,fishX)+45;
+      scale=Math.min(scale,available/(maxY-minY),canvas.width/(maxX-minX));target={x:(minX+maxX)/2,y:(minY+maxY)/2};
     }
     return{x:target.x,y:target.y,scale,screenY:centerY};
   }
@@ -133,35 +217,68 @@ export function createPacificaWorld(canvas){
   function screenToWorld(clientX,clientY){const r=canvas.getBoundingClientRect();const x=(clientX-r.left)*canvas.width/r.width,y=(clientY-r.top)*canvas.height/r.height;return{x:camera.x+(x-canvas.width/2)/camera.scale,y:camera.y+(y-offset.y)/camera.scale};}
   function worldToScreen(x,y){const p=typeof x==='object'?project(x.x,x.y):project(x,y),r=canvas.getBoundingClientRect();return{x:p.x*r.width/canvas.width,y:p.y*r.height/canvas.height,clientX:r.left+p.x*r.width/canvas.width,clientY:r.top+p.y*r.height/canvas.height,visible:p.x>=0&&p.x<=canvas.width&&p.y>=0&&p.y<=canvas.height};}
   function visible(x,y,pad=80){const p=project(x,y);return p.x>-pad&&p.x<canvas.width+pad&&p.y>-pad&&p.y<canvas.height+pad;}
+  function moriLand(x,y){
+    if(hmb||x<5905)return false;
+    const edge=[[5905,1040],[5950,892],[6010,821],[6070,667],[6130,575],[6180,429],[6240,368],[6285,238],[6360,152],[6530,146],[6750,208]];
+    for(let i=1;i<edge.length;i++){const a=edge[i-1],z=edge[i];if(x<=z[0])return y>=a[1]+(z[1]-a[1])*(x-a[0])/(z[0]-a[0]);}return true;
+  }
   function waves(){
-    // Uneven broken crests travel onto the sand and recede together.
-    for(let band=0;band<5;band++){
-      const progress=(now*.1+band*.21)%1,dist=26+(1-progress)*226,alpha=Math.sin(progress*Math.PI)*.7;
-      ctx.globalAlpha=alpha;
-      for(let x=170;x<1300;x+=9){const n=noise(Math.floor(x/45),band);if(n<.12&&progress<.78)continue;const y=shoreY(x)-dist+Math.sin(x/43+band)*4;
-        R(ctx,x,y,10,band<2?3:2,band%2?'#cee4c7':'#ebefd3');if(n>.56)R(ctx,x+2,y+4,7,2,'#a6d0ba');if(n>.81)R(ctx,x-2,y+8,3,2,'#c7e2c5');
+    const v=bounds(30),left=Math.floor(v.left/12)*12,right=v.right;
+    // Moving crests shoal over each authored bar; deep channels make real gaps.
+    // Every crest samples the same depth/break field used by the fish simulation.
+    for(let x=left;x<right;x+=12){
+      const profile=shoreProfile(scene,x,now),sy=scene.shoreY(x);
+      if(sy<v.top-50||sy-720>v.bottom)continue;
+      const set=.66+.34*Math.sin(now/8+x/940)**2;
+      for(let band=0;band<6;band++){
+        const cycle=(now*.087+band/6)%1,dist=8+(1-cycle)*(profile.barDistance*3.2+205);
+        const y=sy-dist+Math.sin(x/66+band)*2;if(y<v.top-8||y>v.bottom+8||moriLand(x,y))continue;
+        const water=sampleShore(scene,x,y,now),breakage=water.breakStrength;
+        const crest=clamp(breakage*1.5+water.barStrength*.16*(1-profile.gap),0,1)*set;
+        if(crest<.035)continue;
+        const n=noise(Math.floor(x/24),band);
+        if(n>crest+.2&&cycle<.88)continue;
+        ctx.globalAlpha=clamp(.16+crest*.82,0,.9);
+        R(ctx,x,y,13,crest>.6?3:2,C.foam);
+        if(crest>.3&&n>.37){R(ctx,x+2,y+5,7,2,'#b7d0bd');if(n>.71)R(ctx,x+4,y+9,3,2,C.foam);}
+      }
+      // Backwash is a delicate broken edge against wet, nearly black sand.
+      if(sy>v.top-30&&sy<v.bottom+30&&!moriLand(x,sy)){
+        const runup=5+Math.sin(now*.87+x/200)*7+Math.sin(x/47)*2;
+        ctx.globalAlpha=.56+.21*Math.sin(now*.7+x/70)**2;R(ctx,x,sy+runup,13,2,C.foam);
+        if(noise(x,74)>.55)R(ctx,x+3,sy+runup+4,5,1,C.foam);
+      }
+    }
+    // Short foam streaks advect with the model's longshore and outgoing currents.
+    for(let gx=Math.floor(v.left/52)*52;gx<v.right+52;gx+=52){
+      const sy=scene.shoreY(gx);
+      for(let band=0;band<6;band++){
+        const seed=noise(gx,band+944),by=sy-28-band*54-seed*38;
+        if(by<v.top-70||by>v.bottom+70)continue;
+        const water=sampleShore(scene,gx,by,now),age=(now*.22+seed*9)%6;
+        const x=gx+water.currentX*age*22,y=by+water.currentY*age*22;if(moriLand(x,y))continue;
+        ctx.globalAlpha=(.15+.17*water.breakStrength)*Math.sin(age/6*Math.PI);
+        R(ctx,x,y,6+seed*11,1,C.foam);
+        if(water.channelStrength>.4)R(ctx,x+3,y-4,2,5,C.foam);
       }
     }
     ctx.globalAlpha=1;
-    const runup=10+Math.sin(now*.84)*8;
-    for(let x=174;x<1280;x+=8){const y=shoreY(x)+runup+Math.sin(x/21+now*.6)*3;R(ctx,x,y,9,3,'#eff0d4');if(noise(x,74)>.5)R(ctx,x+2,y+4,4,2,'#e3e7c8');}
-    for(let i=0;i<35;i++){const x=230+noise(i,47)*990,y=shoreY(x)-36-noise(i,48)*248;ctx.globalAlpha=.2+.15*Math.sin(now+i);R(ctx,x+Math.sin(now*.5+i)*4,y,8+noise(i,49)*17,2,'#dfebd2');}ctx.globalAlpha=1;
   }
   function gull(x,y,flight=false,variant=0){
     if(flight){const wing=Math.sin(now*4+variant)>0?7:-3;line(ctx,x,y,x-8,y-wing,'#edf0db',2);line(ctx,x,y,x+8,y-wing,'#edf0db',2);R(ctx,x-2,y,4,3,'#4e6e70');R(ctx,x+8,y-wing,3,2,'#617e7d');return;}
     shadow(ctx,x,y+4,12,4,.13);R(ctx,x-6,y-3,11,6,'#e9ead6');R(ctx,x-1,y-7,6,7,'#f6eed7');R(ctx,x-6,y-1,6,3,'#7e9490');R(ctx,x+5,y-5,4,2,'#cfa46b');R(ctx,x+2,y-6,1,1,'#3c5659');R(ctx,x-2,y+3,1,4,'#a19169');R(ctx,x+2,y+3,1,4,'#a19169');
   }
-  function person(x,y,{staff=false,walking=false,fishing=false,facing='up',small=false}={}){
+  function person(x,y,{staff=false,warden=false,walking=false,fishing=false,facing='up',small=false}={}){
     if(!visible(x,y))return;const t=walking?Math.sin(now*11):0,leg=Math.round(t*3),s=small?.85:1;
     shadow(ctx,x+2,y+1,25*s,8*s,.22);ctx.save();ctx.translate(Math.round(x),Math.round(y));ctx.scale(s,s);const bob=walking?-Math.abs(Math.round(t)):0;ctx.translate(0,bob);
     R(ctx,-7,-10+leg,6,10-leg,'#405a58');R(ctx,2,-10-leg,6,10+leg,'#405a58');R(ctx,-8,-3+leg,8,4,'#2d494d');R(ctx,2,-3-leg,8,4,'#2d494d');
-    R(ctx,-10,-26,20,18,staff?'#658c82':'#b76e50');R(ctx,-7,-25,14,17,staff?'#7fa395':'#d38f61');R(ctx,-7,-24,4,12,staff?'#d9cba0':'#e7ad72');R(ctx,5,-22,3,12,staff?'#425e5b':'#9f624f');
+    R(ctx,-10,-26,20,18,warden?'#526553':staff?'#658c82':'#b76e50');R(ctx,-7,-25,14,17,warden?'#7f8768':staff?'#7fa395':'#d38f61');R(ctx,-7,-24,4,12,staff?'#d9cba0':'#e7ad72');R(ctx,5,-22,3,12,staff?'#425e5b':'#9f624f');
     if(!staff){R(ctx,-5,-22,10,13,'#827f59');R(ctx,-4,-21,8,2,'#b6a576');R(ctx,-4,-11,8,2,'#4c6457');}
     R(ctx,-6,-36,13,11,'#d6aa81');R(ctx,-7,-35,3,7,'#b68664');
-    R(ctx,-8,-40,15,7,staff?'#718376':'#476767');R(ctx,-10,-35,21,3,staff?'#c4b58b':'#e0c292');R(ctx,-6,-40,12,2,staff?'#9baa8b':'#78988a');
-    const front=staff||facing===2||facing==='down'||facing==='south';if(front){R(ctx,3,-30,2,2,'#394e4d');R(ctx,2,-27,4,1,'#b58164');}else R(ctx,-5,-31,11,3,'#644f45');
+    R(ctx,-8,-40,15,7,warden?'#536853':staff?'#718376':'#476767');R(ctx,-10,-35,21,3,staff?'#c4b58b':'#e0c292');R(ctx,-6,-40,12,2,staff?'#9baa8b':'#78988a');
+    const front=staff||warden||facing===2||facing==='down'||facing==='south';if(front){R(ctx,3,-30,2,2,'#394e4d');R(ctx,2,-27,4,1,'#b58164');}else R(ctx,-5,-31,11,3,'#644f45');
     if(fishing){line(ctx,-10,-23,-13,-28,'#dcad81',4);line(ctx,9,-23,4,-27,'#e8bb8d',4);R(ctx,-14,-29,6,4,'#edc99b');}else{R(ctx,-13,-24,4,12+leg,'#dfb289');R(ctx,10,-24,4,12-leg,'#e7bb8d');}
-    if(staff){R(ctx,-5,-19,11,9,'#4b6b64');R(ctx,-2,-24,4,4,'#e6d2a2');}ctx.restore();
+    if(warden){R(ctx,3,-23,4,5,'#e3c276');R(ctx,-11,-12,23,3,'#394f46');R(ctx,10,-24,12,14,'#e6d9b2');R(ctx,12,-22,7,2,'#778073');R(ctx,12,-18,5,1,'#778073');}if(staff){R(ctx,-5,-19,11,9,'#4b6b64');R(ctx,-2,-24,4,4,'#e6d2a2');}ctx.restore();
   }
   function ring(x,y,r,color,alpha=1){ctx.globalAlpha=alpha;const points=[];for(let i=0;i<20;i++){const a=i/20*TAU;points.push([x+Math.cos(a)*r,y+Math.sin(a)*r*.42]);}for(let i=0;i<points.length;i++){const p=points[i],q=points[(i+1)%points.length];line(ctx,p[0],p[1],q[0],q[1],color,2);}ctx.globalAlpha=1;}
   function fishing(state){
@@ -172,7 +289,7 @@ export function createPacificaWorld(canvas){
       const ratio=fight?clamp((state.lineDistance||cast.distance)/(cast.distance||1),.08,1.5):1;
       const tx=cast.origin.x+(cast.target.x-cast.origin.x)*ratio,ty=cast.origin.y+(cast.target.y-cast.origin.y)*ratio;
       const target={x:p.x+(tx-p.x)*f+(fight?Math.sin(now*3)*7:0),y:p.y+(ty-p.y)*f-Math.sin(f*Math.PI)*115};
-      if(fight)target.y=Math.min(target.y,shoreY(target.x)-5);
+      if(fight)target.y=Math.min(target.y,scene.shoreY(target.x)-5);
       const bend=fight?12*(state.tension||0):0;
       const rodTip={x:tip.x+bend,y:tip.y+bend*.7};
       const mid={x:(rodTip.x+target.x)/2,y:(rodTip.y+target.y)/2+(fight?3:17)};
@@ -190,32 +307,30 @@ export function createPacificaWorld(canvas){
     }
     line(ctx,p.x+11,p.y-19,p.x+21,p.y-65,'#3e5656',2);R(ctx,p.x+10,p.y-20,3,10,'#c1a071');R(ctx,p.x+8,p.y-23,6,5,'#aab3a0');return null;
   }
+
   function draw(state={},time=0){
     lastState=state;now=Number.isFinite(state.elapsed)?state.elapsed:time;const raw=Number.isFinite(time)?time:now,dt=lastTime===null?.016:clamp(raw-lastTime,0,.1);lastTime=raw;
-    const target=cameraTarget(state),fitImmediately=state.phase==='casting',ease=initialized&&!fitImmediately?1-Math.exp(-dt*6):1;camera.x+=(target.x-camera.x)*ease;camera.y+=(target.y-camera.y)*ease;camera.scale+=(target.scale-camera.scale)*ease;offset.y=target.screenY;initialized=true;
-    ctx.setTransform(1,0,0,1,0,0);ctx.imageSmoothingEnabled=false;R(ctx,0,0,canvas.width,canvas.height,C.dry);
+    const target=cameraTarget(state),fitImmediately=state.phase==='casting'||Boolean(state.inspection),ease=initialized&&!fitImmediately?1-Math.exp(-dt*6):1;camera.x+=(target.x-camera.x)*ease;camera.y+=(target.y-camera.y)*ease;camera.scale+=(target.scale-camera.scale)*ease;offset.y=target.screenY;initialized=true;
+    ctx.setTransform(1,0,0,1,0,0);ctx.imageSmoothingEnabled=false;R(ctx,0,0,canvas.width,canvas.height,C.deep);
     const origin=project(0,0);ctx.setTransform(camera.scale,0,0,camera.scale,origin.x,origin.y);
-    R(ctx,-10000,-10000,20000,10440,C.sea);R(ctx,-10000,440,20000,10000,C.dry);
-    // Continue the authored edge colors outside the compact map when a wide
-    // viewport zooms out to frame a long surf cast.
-    ctx.drawImage(cache,0,0,1,cache.height,-10000,-200,9680,1640);
-    ctx.drawImage(cache,cache.width-1,0,1,cache.height,1720,-200,10000,1640);
-    ctx.drawImage(cache,-320,-200);waves();
-    for(let i=0;i<3;i++){const x=430+i*270+Math.sin(now*.07+i)*125,y=197+Math.sin(now*.11+i*2)*43;gull(x,y,true,i);}
-    gull(648,572);gull(673,580);gull(719,561);gull(1297,719);
-    // Sand footprints are ephemeral and always stay behind the walking angler.
-    const p=state.player||{x:1100,y:865};if(state.walkTarget){const dx=state.walkTarget.x-p.x,dy=state.walkTarget.y-p.y,d=Math.hypot(dx,dy)||1;if(p.y>shoreY(p.x)+35)for(let i=1;i<5;i++){const xx=p.x-dx/d*i*13+(i%2?3:-3),yy=p.y-dy/d*i*13;R(ctx,xx,yy,3,5,'#cbb88f');}}
-    if(state.walkTarget&&Math.hypot(state.walkTarget.x-p.x,state.walkTarget.y-p.y)>18){ring(state.walkTarget.x,state.walkTarget.y,11,'#f9efcc',.8);R(ctx,state.walkTarget.x-2,state.walkTarget.y-2,4,3,'#a59471');}
-    // A local surf angler and the shopkeeper bring scale and life to the beach.
-    person(462,shoreY(462)+64,{small:true,fishing:true});line(ctx,451,shoreY(462)+38,441,shoreY(462)+3,'#496463',2);bucket(ctx,484,shoreY(462)+70);
-    person(1197,813,{staff:true,small:true,facing:'down'});
+    drawTerrain();waves();pier();
+    const v=bounds(80);
+    for(let i=Math.floor(v.left/430);i<Math.ceil(v.right/430);i++){const x=i*430+Math.sin(now*.07+i)*68,y=scene.shoreY(x)-160+Math.sin(now*.11+i*2)*43;if(visible(x,y))gull(x,y,true,i);}
+    for(let x=Math.floor(v.left/575)*575;x<v.right;x+=575){const y=scene.shoreY(x)+87;if(visible(x,y)){gull(x+13,y);if(noise(x,71)>.5)gull(x+34,y+10);}}
+    const p=state.player||scene.spawn,onDeck=onPier(scene,p.x,p.y);
+    if(state.walkTarget&&!onDeck){const dx=state.walkTarget.x-p.x,dy=state.walkTarget.y-p.y,d=Math.hypot(dx,dy)||1;if(p.y>scene.shoreY(p.x)+35)for(let i=1;i<5;i++){const xx=p.x-dx/d*i*13+(i%2?3:-3),yy=p.y-dy/d*i*13;R(ctx,xx,yy,3,5,hmb?'#b8b19c':'#696e66');}}
+    if(state.walkTarget&&Math.hypot(state.walkTarget.x-p.x,state.walkTarget.y-p.y)>18&&visible(state.walkTarget.x,state.walkTarget.y)){ring(state.walkTarget.x,state.walkTarget.y,11,'#eee7bf',.8);R(ctx,state.walkTarget.x-2,state.walkTarget.y-2,4,3,'#859178');}
+    for(const x of[hmb?650:465,hmb?3670:2620,hmb?6040:4420])if(visible(x,scene.shoreY(x)+61)){person(x,scene.shoreY(x)+61,{small:true,fishing:true});line(ctx,x-11,scene.shoreY(x)+35,x-21,scene.shoreY(x),'#496463',2);bucket(ctx,x+22,scene.shoreY(x)+65);}
+    person(scene.shop.x+147,scene.shop.door.y-2,{staff:true,small:true,facing:'down'});
     person(p.x,p.y,{walking:state.player?.walking,facing:state.player?.facing,fishing:!!state.cast&&!['walk','landed'].includes(state.phase)});
     const castTarget=fishing(state);
+    if(state.inspection){
+      const inspection=state.inspection,ix=inspection.x??inspection.position?.x??p.x+15,iy=inspection.y??inspection.position?.y??p.y+28;
+      person(ix,iy,{warden:true,facing:'down'});R(ctx,ix-13,iy-57,29,12,'#e6d7ae');text(ctx,'CHECK',ix+1,iy-55,1,'#4b6357');
+    }
     if(state.phase==='landed'){ring(p.x,p.y+2,23,'#f0d292',.5);if(state.fish){R(ctx,p.x+21,p.y-25,18,7,'#8caa91');poly(ctx,[[p.x+38,p.y-22],[p.x+44,p.y-29],[p.x+44,p.y-16]],'#607f74');R(ctx,p.x+22,p.y-25,2,2,'#34595d');}}
-    // Subtle salt haze over far water; no screen-sized translucent overlay.
-    ctx.globalAlpha=.1;R(ctx,210,128,980,6,'#eff1d5');R(ctx,368,141,560,3,'#eff1d5');ctx.globalAlpha=1;
     ctx.setTransform(1,0,0,1,0,0);
-    return{player:worldToScreen(p),shop:worldToScreen(1130,815),castTarget:castTarget?worldToScreen(castTarget):null,camera:{...camera}};
+    return{player:worldToScreen(p),shop:worldToScreen(scene.shop.door),pier:scene.pier?worldToScreen(scene.pier.gate):null,castTarget:castTarget?worldToScreen(castTarget):null,camera:{...camera}};
   }
-  return{resize,draw,screenToWorld,worldToScreen,focus(x,y){manualFocus=typeof x==='object'?{x:x.x,y:x.y}:{x,y};if(x==null)manualFocus=null;initialized=false;},setInsets(value={}){insets={...insets,...value};initialized=false;},get camera(){return{...camera};},get state(){return lastState;}};
+  return{resize,draw,screenToWorld,worldToScreen,focus(x,y){manualFocus=typeof x==='object'&&x?{x:x.x,y:x.y}:{x,y};if(x==null)manualFocus=null;initialized=false;},setInsets(value={}){insets={...insets,...value};initialized=false;},get camera(){return{...camera};},get state(){return lastState;}};
 }

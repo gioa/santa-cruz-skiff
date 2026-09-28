@@ -1,29 +1,26 @@
-# Pacifica Beach / Linda Mar
+# Pacifica / Sharp Park and Half Moon Bay
 
-The second destination in 潮汐之间 is a playable, original pixel-art surf-fishing scene at `pacifica.html`. `pixel-locations.js` is the destination registry and provides the entry-page picker and in-game travel links. Santa Cruz's existing boat trip and equipment stay intact; each destination saves its own trip.
+The shore destinations in 潮汐之间 share Santa Cruz's `pixel.css` HUD, opening card, equipment icons, inventory grid, modal, and shop components. `pixel-locations.js` exposes all three destinations from the opening page and the in-game location control. The picker pauses every controller, including across focus and visibility changes.
 
-## The visit
+## Coastline and play
 
-Start at the beachside Bait & Tackle shop with a free shore outfit, twelve sand crabs, and 120 game credits. Walk to the surf by tapping the sand, using WASD/arrow keys, or selecting **去浪线**. Walking routes around the shop building and stays on the beach.
+Pacifica is now **Sharp Park Beach**, the dark-sand beach with Pacifica Municipal Pier, rather than Linda Mar. It has a long charcoal-gray strand, pebble bands, a rear seawall/promenade, the southern Mori Point headland, and an L-shaped concrete pier. Half Moon Bay is a compressed continuous **Dunes–Venice–Francis** coast with pale fine sand, low dunes, two creek channels, and a southern campground. Both maps scroll with the player; the coast is not squeezed into one screen.
 
-Set cast direction with the slider or a tap on the sea. Hold the cast button or Space to charge; release to cast. A cast consumes one selected bait. Watch for the bite, strike within its window, then hold the reel button or F to retrieve. Release during high tension and resume before the line goes slack. A successful catch may be kept or released; retained fish earn credits only after physically returning to the shop.
+Use **地图 / M** to inspect six coastal positions and walk to one. A shared continuous seabed model defines an inner trough, shifting alongshore bar distances, fixed channel gaps, gradual tide, and wave exposure. The same field determines visible dark water and breaking foam, tackle drift, bite timing, species weights, and fight load. Different distances and positions produce different fishing conditions.
 
-The shop sells three baits, a longer surf rod, a sealed spinning reel, and a fish-finder rig. Upgrades change distance, retrieval/tension, or encounter timing. If all bait is exhausted, the shop provides three free emergency sand crabs, avoiding a progression dead end. Menus and window/background interruptions pause play. Inventory, purchases, fish, and the player's position persist; reloading safely retrieves a deployed rig without refunding its bait. An undecided landed fish is preserved.
+Start with a shore outfit, twelve sand crabs and 120 game points. Visit Bait & Tackle for bait and upgrades. Tap the water to aim, hold the cast button or Space to charge, strike during a bite, and manage reel tension with the reel button or F. Keep or release catches; return to the store to exchange retained fish. If every bait is exhausted, the shop gives emergency sand crabs.
 
-## Implementation
+Pacifica's pier has a closed gate. At the gate, choose **翻越围栏进入**, then walk the deck or **走向桥端**. This is an explicit fictional game choice. Every 30 active seconds spent inside carries a 35% chance of inspection. A check retrieves the line, returns the player to the gate, and charges 80 points; insufficient points become debt. Leaving or reloading preserves accumulated exposure and debt. Catches sold at the shop repay debt first. These probabilities, amounts and enforcement are game rules, not statements of actual law.
 
-- `pacifica-sim.js`: DOM-free movement, cast/bite/fight state machine, inventory, economy, and validated save data. Uses `pacifica-surf-save-v1`, separate from Santa Cruz.
-- `pacifica-world.js`: original procedural Canvas pixel art, shore surf animation, headlands, gulls, dune vegetation, cottages, shop, angler, and fishing line. Responsive camera and screen/world projection.
-- `pacifica-game.js`, `pacifica.html`, `pacifica.css`: pointer/keyboard controls, interface, shop, bag, catches, audio, pause and persistence.
-- `pixel-locations.js`, `pixel-locations.css`: expandable scene registry and destination selection.
-- `tests/pacifica-sim.test.js`: ten deterministic tests including actual walking/casting/fighting/landing/trading progression, no duplicate rewards, missed bites, line failures, free bait, shop collision, and save validation.
+## Files and persistence
 
-The original Santa Cruz controller and boat simulation are not modified by this scene. The entry page only loads the scene-picker module and stylesheet.
+- `shore-data.js`: scene registry, coast profiles, pier geometry and shared depth/current sampling.
+- `pacifica-sim.js`: shared shore simulation, trades, pier routes/inspection and validated saves. `PacificaSimulation({sceneId})` supports both shores.
+- `pacifica-world.js`: procedural pixel art, cached terrain chunks, waves and player-following camera.
+- `pacifica-game.js`: shared shore controller and Santa Cruz shell bindings.
+- `pacifica-menus.js`, `shore-navigation.js`: original-style bag, shop, catches, coastal map and gate/patrol dialogs.
+- `pacifica.html`, `half-moon-bay.html`: scene entries. `pacifica.css` contains only shore-specific control and map adjustments; shared appearance stays in `pixel.css`.
 
-## Reference and scope
+Each destination retains its own progress. Pacifica's existing v1 save is upgraded without losing catches, bait, or owned equipment; new saves use version 2 and scene-specific keys. Deployed lines are safely retrieved on reload without refunding bait. Undecided catches and pending inspections persist. Paused menus and background interruptions do not advance the simulation.
 
-[California State Parks describes Pacifica State Beach](https://parks.ca.gov/?page_id=524) as a wide crescent-shaped beach off Highway 1 and lists fishing among its activities. The [City of Pacifica](https://www.cityofpacifica.org/departments/parks-beaches-recreation/parks-and-beaches-locations-maps-safety-guides/pacifica-state-beach) also identifies it as Linda Mar Beach. These informed the setting; the authored map is deliberately compact and stylized rather than a geographic survey.
-
-The Bait & Tackle shop, buildings, characters, weather and tide presentation are fictional. Species, encounters, fights, equipment prices and credits are game tuning. No live conditions or real-world fishing regulations are applied by the Pacifica simulation. UI measurements use feet and pounds; internal distance and mass remain SI.
-
-Browser evidence and responsive screenshots are stored in `qa/pacifica/`.
+See [coastal research and modeling boundaries](coastal-model.md). Tests cover the earned catch/trade loop, scene isolation, sampling and drift, pier collision, inspection accounting and save migration. Browser evidence is in `qa/coastal-scenes/`; older UI comparison evidence is in `qa/pacifica-shared-ui/`.

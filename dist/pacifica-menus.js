@@ -1,10 +1,10 @@
-import {BAITS, SHOP_ITEMS} from './pacifica-sim.js?v=pacifica-shell-2';
-import {drawItemIcon} from './pixel-item-icons.js?v=20260928-pixel-v78';
-import {createPixelSprites} from './pixel-sprites.js?v=20260928-pixel-v78';
+import {BAITS, SHOP_ITEMS} from './pacifica-sim.js?v=coast-3';
+import {drawItemIcon} from './pixel-item-icons.js?v=20260928-pixel-v79';
+import {createPixelSprites} from './pixel-sprites.js?v=20260928-pixel-v79';
 
 // Pacifica uses the game's shared modal, inventory and pixel-art components.
 // These views only call the existing simulation actions; the save format stays
-// unchanged and the inventory reflects the equipment the simulation owns.
+// scene-specific; inventory reflects the equipment the simulation owns.
 const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({'&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'}[char]));
 const heading = (eyebrow, title, description = '') => `<div class="eyebrow">${esc(eyebrow)}</div><h2 id="modal-title">${esc(title)}</h2>${description ? `<p class="modal-desc">${description}</p>` : ''}`;
 const balance = credits => `<span class="balance" aria-label="${Math.floor(credits)} 潮汐点">✦ ${Math.floor(credits)}</span>`;
@@ -12,7 +12,7 @@ const iconIds = {starter_rod:'rod_light', surf_rod:'rod', starter_reel:'reel_smo
 const itemArt = id => `<canvas data-item-art="${iconIds[id] || 'tackle'}" width="32" height="32" aria-hidden="true"></canvas>`;
 const fishWeight = fish => (fish.weightKg * 2.20462).toFixed(2);
 
-export function createPacificaMenus({sim, openDialog, closeDialog, feedback, walkShop, walkSurf}) {
+export function createPacificaMenus({sim, scene, openDialog, closeDialog, feedback, walkShop, walkSurf}) {
   const $ = id => document.getElementById(id);
   const content = () => $('modal-content');
   let selectedId = null;
@@ -54,7 +54,7 @@ export function createPacificaMenus({sim, openDialog, closeDialog, feedback, wal
     if (!sim.nearShop) { closeDialog(); walkShop(); return; }
     const s = sim.state, empty = BAITS.every(item => !s.inventory[item.id]);
     const total = s.catches.reduce((sum, fish) => sum + fish.value, 0);
-    openDialog('shop', balance(s.credits) + heading('PACIFICA BAIT & TACKLE', '沙滩钓具店') +
+    openDialog('shop', balance(s.credits) + heading(scene.name.toUpperCase()+' BAIT & TACKLE', '沙滩钓具店') +
       `<div class="staff-banner"><canvas id="staff-portrait" aria-hidden="true"></canvas><p><b>店主 · Bait & Tackle</b>白浪后的水沟，值得多等一会儿。补齐鱼饵，带上合适的岸钓装备再出发。</p></div>` +
       `<div class="tabs gear-tabs"><button class="active" aria-current="page">兑换装备</button><button id="shop-bag">人物背包</button></div>` +
       `<div class="gear-grid">${SHOP_ITEMS.map(item => {
@@ -64,7 +64,7 @@ export function createPacificaMenus({sim, openDialog, closeDialog, feedback, wal
         const label = owned ? '已装备' : free ? empty ? '领取应急鱼饵' : '鱼饵用完时可领取' : full ? '鱼饵盒已满' : `兑换 · ${item.price} 潮汐点`;
         return `<article class="gear-card">${itemArt(item.id)}<strong>${esc(item.name)}${item.quantity ? ` × ${item.quantity}` : ''}</strong><p>${esc(item.description)}</p><small>${item.kind === 'bait' ? `库存 × ${s.inventory[item.id] || 0}` : owned ? '已拥有 · 自动装配' : free ? '店主的应急补给' : '兑换后自动装配'}</small><button data-buy="${esc(item.id)}" class="${owned ? 'equipped' : ''}" ${disabled ? 'disabled' : ''}>${label}</button></article>`;
       }).join('')}</div>` +
-      `<div class="button-row"><button id="shop-sell" class="primary" ${s.catches.length ? '' : 'disabled'}>兑换鱼获 · ${s.catches.length} 尾${total ? ` · ✦ ${total}` : ''}</button><button id="shop-leave" class="secondary">前往浪线</button></div><p class="credits-note">潮汐点为游戏积分。虚构钓具店 · 鱼获可在这里兑换潮汐点。</p>`);
+      `<div class="button-row"><button id="shop-sell" class="primary" ${s.catches.length ? '' : 'disabled'}>兑换鱼获 · ${s.catches.length} 尾${total ? ` · ✦ ${total}` : ''}</button><button id="shop-leave" class="secondary">前往浪线</button></div><p class="credits-note">潮汐点为游戏积分。虚构钓具店 · 鱼获可在这里兑换潮汐点。${s.fineDebt ? `待缴罚款 ${s.fineDebt} 点，鱼获收入会优先补缴。` : ''}</p>`);
     paintPortrait(); paintItems();
     content().querySelectorAll('[data-buy]').forEach(button => {
       button.onclick = () => { report(sim.buy(button.dataset.buy)); openShop(); };
@@ -90,7 +90,7 @@ export function createPacificaMenus({sim, openDialog, closeDialog, feedback, wal
     const slots = [...items, ...Array(30 - items.length).fill(null)];
     let selected = Math.max(0, slots.findIndex(item => item?.id === preferredId));
     selectedId = slots[selected]?.id || null;
-    openDialog('gear', balance(s.credits) + heading('YOUR TACKLE BOX', '人物背包', `${items.length} 件物品 · Pacifica 岸钓装备`) +
+    openDialog('gear', balance(s.credits) + heading('YOUR TACKLE BOX', '人物背包', `${items.length} 件物品 · ${scene.shortName} 岸钓装备`) +
       `<div class="tabs gear-tabs"><button class="active" aria-current="page">背包</button><button id="bag-shop">${sim.nearShop ? '商店' : '去小店补给'}</button></div>` +
       `<div class="inventory-layout"><div class="inventory-tray"><div class="inventory-toolbar"><span>个人物品</span><small>点击物品查看</small></div><div class="inventory-grid" role="group" aria-label="人物背包格子">${slots.map((item, index) =>
         `<button class="inventory-slot ${item ? 'filled' : ''} ${index === selected ? 'selected' : ''}" data-slot="${index}" aria-label="格子 ${index + 1}：${item ? esc(item.name) : '空'}" aria-pressed="${index === selected}">${item ? `${itemArt(item.id)}<span class="slot-name">${esc(item.name)}</span><span class="slot-count">${item.kind === 'bait' ? `× ${s.inventory[item.id]}` : '✓'}</span>` : '<span class="slot-empty">·</span>'}</button>`
@@ -131,7 +131,7 @@ export function createPacificaMenus({sim, openDialog, closeDialog, feedback, wal
     const s = sim.state, catches = s.catches.slice().reverse();
     openDialog('journal', balance(s.credits) + heading('THE DAYS WE KEEP', '鱼获与行程', `下竿 ${s.stats.casts} 次 · 累计上岸 ${s.stats.caught} 尾 · 放流 ${s.stats.released} 尾`) +
       (catches.length ? catches.map((fish, index) => `<div class="catch-row"><div class="catch-thumbnail"><canvas id="journal-fish-${index}"></canvas></div><div><b>${esc(fish.name)}</b><small>${esc(fish.nameEn)}</small><small>${fishWeight(fish)} lb · ${fish.value} 潮汐点</small></div><span>鱼篓中</span></div>`).join('') : '<p class="journal-empty">鱼篓里还很安静。<br>好故事，总会从第一竿开始。</p>') +
-      `<div class="button-row"><button id="journal-shop" class="primary">去小店兑换鱼获</button></div><p class="credits-note">鱼篓 ${s.catches.length} / 20 尾 · 已交付 ${s.stats.sold} 尾<br>带回小店的鱼获可兑换潮汐点。</p>`);
+      `<div class="button-row"><button id="journal-shop" class="primary">去小店兑换鱼获</button></div><p class="credits-note">鱼篓 ${s.catches.length} / 20 尾 · 已交付 ${s.stats.sold} 尾<br>带回小店的鱼获可兑换潮汐点。${s.fineDebt ? `待缴罚款 ${s.fineDebt} 点。` : ''}</p>`);
     catches.forEach((fish, index) => paintFish($(`journal-fish-${index}`), fish, true));
     $('journal-shop').onclick = () => { closeDialog(); walkShop(); };
   }
@@ -156,7 +156,7 @@ export function createPacificaMenus({sim, openDialog, closeDialog, feedback, wal
 
   function openHelp() {
     openDialog('help', heading('SLOW DOWN, DROP A LINE', '海风与操作') +
-      `<div class="settings-grid"><button id="settings-audio" class="secondary">海浪声音：关</button><button id="help-bag" class="secondary">人物背包 · 查看装备和更换鱼饵</button><button id="help-journal" class="secondary">鱼获与行程 · 查看岸钓收获</button></div><h3>操作</h3><p class="key-list">行走：轻点沙地 / WASD 或方向键<br>前往浪线：点「前往浪线」，自动走到岸钓位置<br>瞄准：轻点海面选择抛投方向<br>抛竿：靠近浪线，按住抛竿 / 空格蓄力，松手投出<br>咬口：出现鱼讯时点扬竿 / 空格挂钩<br>搏鱼：按住收线 / F；张力过高就松手，让鱼跑一小段<br>收回钓组：收回按钮 / R<br>I 背包 · J 鱼获 · E 小店 · Esc 关闭菜单<br>每次抛投消耗一份鱼饵。鱼上岸后可留鱼或放流；在钓具店补饵、兑换装备和鱼获。</p><h3>今天的海</h3><p class="credits-note">菜单与切到后台时暂停。行程自动保存；离开后回来，抛出的钓组会安全收回。</p><p class="credits-note">原创 Canvas 像素美术与合成海浪声。场景参考 <a href="https://parks.ca.gov/?page_id=524" target="_blank" rel="noopener">Pacifica State Beach（Linda Mar）</a>。地形、商店、潮汐、鱼情和天气均为游戏创作，未接入实时海况。鱼获兑换使用游戏潮汐点。</p>`);
+      `<div class="settings-grid"><button id="settings-audio" class="secondary">海浪声音：关</button><button id="help-bag" class="secondary">人物背包 · 查看装备和更换鱼饵</button><button id="help-journal" class="secondary">鱼获与行程 · 查看岸钓收获</button></div><h3>操作</h3><p class="key-list">行走：轻点沙地 / WASD 或方向键<br>前往浪线：点「前往浪线」，自动走到岸钓位置<br>瞄准：轻点海面选择抛投方向<br>抛竿：靠近浪线，按住抛竿 / 空格蓄力，松手投出<br>咬口：出现鱼讯时点扬竿 / 空格挂钩<br>搏鱼：按住收线 / F；张力过高就松手，让鱼跑一小段<br>收回钓组：收回按钮 / R<br>I 背包 · M 沿岸地图 · J 鱼获 · E 小店 · Esc 关闭菜单<br>每次抛投消耗一份鱼饵。鱼上岸后可留鱼或放流；在钓具店补饵、兑换装备和鱼获。</p><h3>今天的海</h3><p class="credits-note">菜单与切到后台时暂停。行程自动保存；离开后回来，抛出的钓组会安全收回。</p><p class="credits-note">原创 Canvas 像素美术与合成海浪声。场景参考 Sharp Park 与 Half Moon Bay State Beach。沙槽按海岸规律生成；浅坝碎浪、深槽暗带与缺口漂流会影响钓组与鱼讯。菜单暂停，自动保存。封闭栈桥的越栏、巡查和罚款均为游戏设定。<a href="./coastal-notes.html" target="_blank" rel="noopener">海岸资料与建模说明 ↗</a></p>`);
     $('help-bag').onclick = () => openBag();
     $('help-journal').onclick = openJournal;
   }

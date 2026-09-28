@@ -169,8 +169,10 @@ The first-person surface fish uses the same species artwork, actual fish length,
 
 Fish cards and catch records show Chinese names and English common names, resolved for old catches as well. Feather rigs accept optional natural or soft-plastic tips: fresh tips affect species encounter weights and wear normally, while bare feathers remain usable. Soft-plastic action bonuses are illustrative simulation parameters, not measured catch-rate data.
 
-## Pacifica Beach — second destination
+## Shore destinations — Pacifica and Half Moon Bay
 
-Choose **选择钓场** on the opening page, or the in-game location link, to visit [Pacifica Beach](https://joyx.design/santa-cruz-skiff/pacifica.html). Walk Linda Mar’s stylized beach, shop at the fictional Bait & Tackle store, charge and aim a surf cast, strike a bite, and manage line tension to bring a fish ashore. Bait, rod/reel/rig upgrades, retained catches, and shop exchange form a complete shore-fishing loop. Both destinations retain independent saved progress.
+Use **选择钓场** or the in-game location button to travel between Santa Cruz, [Pacifica / Sharp Park](https://joyx.design/santa-cruz-skiff/pacifica.html), and [Half Moon Bay](https://joyx.design/santa-cruz-skiff/half-moon-bay.html). All use the same HUD, menu, equipment grid and shop styling. Each destination keeps its saved trip.
 
-See [scene details and reference](docs/pacifica-beach.md) and `qa/pacifica/` for validation.
+Both beaches are long, scrollable coastlines with six map destinations. Their shared seabed model drives troughs, bar gaps, breaking waves, tackle drift and fishing differences. Sharp Park has charcoal sand, a seawall and a closed L-shaped fishing pier with a fictional trespass/inspection mechanic. Half Moon Bay has pale sand, dunes, creek mouths and a campground. Each has a Bait & Tackle shop and a complete cast–strike–fight–keep/release–trade loop.
+
+See [scene and controls](docs/pacifica-beach.md), [research and modeling](docs/coastal-model.md), and `qa/coastal-scenes/` for validation.

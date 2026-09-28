@@ -1,0 +1,25 @@
+{
+  "date": "2026-09-28",
+  "baseCommit": "a38c5391b01c9ddc8862e90ce2205997a8c89e87",
+  "automated": {
+    "command": "npm test",
+    "passed": 753,
+    "failed": 0,
+    "syntax": "node scripts/check.mjs passed"
+  },
+  "browser": [
+    "Santa Cruz native picker pause survives focus/visibility events",
+    "WASD works after closing a focused inventory button",
+    "Two scenes, 30 inventory slots, six destinations per coast",
+    "Shop purchase, actual walking, casting and current drift",
+    "1440x1000, 390x844, 320x568 and 844x390 without overflow or clipped controls",
+    "Pier entry choice, L-deck walking and casting, safe exit",
+    "Exposure survives reload; seeded normal-time patrol charges exactly once",
+    "Half Moon Bay normal-time cast/strike/fight/land/keep; state survives scene travel"
+  ],
+  "evidence": {
+    "local-smoke.json": "UI and drift via visible browser controls",
+    "play-results.json": "End-to-end play; RNG seeded for patrol and Half Moon Bay encounter reproducibility, no clock fast-forward",
+    "final-*.png": "Visual fixtures for coast positions, phone layout and patrol dialog"
+  }
+}

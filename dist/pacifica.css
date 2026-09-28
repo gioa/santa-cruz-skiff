@@ -1,19 +1,34 @@
 /* Pacifica inherits the game's HUD, intro, tools, inventory, shop and modal
    directly from pixel.css. Only shore-specific control contents live here. */
-#app[data-location="pacifica"] #boat-fishing .reel-actions{display:flex;gap:4px;height:46px}
-#app[data-location="pacifica"] #boat-fishing .reel-actions button{flex:1;min-width:0;width:auto;touch-action:none}
-#app[data-location="pacifica"] #boat-fishing #beach-cast,
-#app[data-location="pacifica"] #boat-fishing #beach-reel{background:#527b67;color:#fff0ca}
-#app[data-location="pacifica"] #boat-fishing #beach-reel.active{background:#a8764d}
-#app[data-location="pacifica"] #boat-fishing #beach-retrieve{background:#eee1be}
-#app[data-location="pacifica"] #boat-fishing .shore-tension{padding:6px 8px;background:var(--paper);border:1px solid #9ba588}
+#app[data-shore-scene] #boat-fishing .reel-actions{display:flex;gap:4px;height:46px}
+#app[data-shore-scene] #boat-fishing .reel-actions button{flex:1;min-width:0;width:auto;touch-action:none}
+#app[data-shore-scene] #boat-fishing #beach-cast,
+#app[data-shore-scene] #boat-fishing #beach-reel{background:#527b67;color:#fff0ca}
+#app[data-shore-scene] #boat-fishing #beach-reel.active{background:#a8764d}
+#app[data-shore-scene] #boat-fishing #beach-retrieve{background:#eee1be}
+#app[data-shore-scene] #boat-fishing .shore-tension{padding:6px 8px;background:var(--paper);border:1px solid #9ba588}
 .shore-tension .meter-caption{margin-top:0}.shore-tension small{font-size:9px;color:#6b715f}
-#app[data-location="pacifica"] #boat-fishing .fish-status{grid-column:1/-1;grid-row:auto}
-#app[data-location="pacifica"] #boat-fishing .fishing-toolbar{grid-row:auto!important}
+#app[data-shore-scene] #boat-fishing .fish-status{grid-column:1/-1;grid-row:auto}
+#app[data-shore-scene] #boat-fishing .fishing-toolbar{grid-row:auto!important}
 #cast-charge{position:relative;height:17px;margin:0;flex:none}
 #cast-charge>span{position:absolute;inset:0;text-align:center;font:9px/17px 'Space Mono',monospace;color:var(--ink)}
-#app[data-location="pacifica"]:not(.is-intro) #toast{bottom:calc(var(--shore-console-height,100px) + var(--safe-bottom))}
-#app[data-location="pacifica"] #boat-console.is-bite .fish-status{border-color:#c48249}
+#app[data-shore-scene]:not(.is-intro) #toast{bottom:calc(var(--shore-console-height,100px) + var(--safe-bottom))}
+#app[data-shore-scene] #boat-console.is-bite .fish-status{border-color:#c48249}
 @media(max-height:500px) and (orientation:landscape){
- #app[data-location="pacifica"] #boat-console.fishing-open{width:min(360px,calc(100% - 24px))}
+ #app[data-shore-scene] #boat-console.fishing-open{width:min(360px,calc(100% - 24px))}
+}
+
+/* The shore map and gate actions use the same modal and equipment cards. */
+#shore-chart{display:block;width:100%;height:auto;border:2px solid var(--ink);image-rendering:pixelated;background:#77a69d}
+.shore-chart-legend{display:flex;flex-wrap:wrap;gap:8px 16px;margin:9px 0;font-size:10px;color:#637463}
+.shore-destinations .gear-card{padding-top:14px}.shore-destinations .gear-card strong{font-size:13px}
+#app[data-shore-scene] #boat-action-bar{flex-wrap:wrap;justify-content:center}
+#app[data-shore-scene] #boat-fishing [hidden]{display:none!important}
+#app[data-shore-scene] #boat-console{max-height:calc(100dvh - 170px);overflow:visible}
+@media(max-height:500px) and (orientation:landscape){
+ #app[data-shore-scene] #boat-console{display:flex;align-items:flex-end;gap:6px;bottom:calc(8px + var(--safe-bottom));height:auto;max-height:none}
+ #app[data-shore-scene] #boat-console.fishing-open{width:min(390px,calc(100% - 24px))!important}
+ #app[data-shore-scene] #boat-action-bar{flex:0 0 100px;display:flex;flex-wrap:wrap;gap:4px}
+ #app[data-shore-scene] #boat-action-bar button{flex:1;min-width:45px;padding:4px;font-size:9px}
+ #app[data-shore-scene] #boat-fishing{flex:1;min-width:0}
 }
