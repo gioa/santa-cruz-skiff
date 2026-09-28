@@ -1,6 +1,7 @@
-import {GEAR_CATALOG} from './equipment.js?v=20260927-pixel-v18';
-import {RIG_PROFILES} from './fishing-rigs.js?v=20260927-pixel-v18';
-import {ensureConsumables,installBait,installRig,USABLE_CONDITION} from './pixel-consumables.js?v=20260927-pixel-v18';
+import {GEAR_CATALOG} from './equipment.js?v=20260927-pixel-v19';
+import {RIG_PROFILES} from './fishing-rigs.js?v=20260927-pixel-v19';
+import {ensureConsumables,installBait,installRig,USABLE_CONDITION} from './pixel-consumables.js?v=20260927-pixel-v19';
+import {formatDepth} from './units.js?v=20260927-pixel-v19';
 
 /** Rod hardware is a premade set. Legacy mounted upgrades are preserved but
  * cannot be edited. Terminal rigs and bait are finite separate supplies. */
@@ -14,7 +15,7 @@ export const ROD_ASSEMBLY_SLOTS=Object.freeze([
 const ITEMS=new Map(GEAR_CATALOG.map(g=>[g.id,g]));
 const HARDWARE=['reel','line','leader'];
 const BAITS=Object.freeze({squid:{name:'鱿鱼条',iconId:'bait'},anchovy:{name:'鳀鱼饵',iconId:'bait_anchovy'},shrimp:{name:'虾饵',iconId:'bait_shrimp'},sardine:{name:'沙丁鱼饵',iconId:'bait_sardine'},jig:{name:'软饵',iconId:'bait_soft'}});
-const BASIC_NAMES={reel:'基础绕线轮',line:'9.1 kg 拉力尼龙主线',leader:'6.8 kg 拉力前导线'};
+const BASIC_NAMES={reel:'基础绕线轮',line:'20 lb 拉力尼龙主线',leader:'15 lb 拉力前导线'};
 const clamp=(n,min,max)=>Math.max(min,Math.min(max,n));
 const finite=(n,fallback)=>typeof n==='number'&&Number.isFinite(n)?n:fallback;
 const record=v=>Boolean(v&&typeof v==='object'&&!Array.isArray(v));
@@ -65,7 +66,7 @@ export function setRodAssembly(profile,rodId,patch={},packed){
   next.bait=bait;
  }
  if(Object.hasOwn(patch,'drag')){const drag=patch.drag;if(typeof drag!=='number'||!Number.isFinite(drag)||drag<.2||drag>.85)return fail('泄力设置需要在 20%–85% 之间。');next.drag=drag;}
- if(Object.hasOwn(patch,'fishingDepthMeters')){const depth=patch.fishingDepthMeters,max=next.rig==='float'?40:80;if(depth!==null&&(typeof depth!=='number'||!Number.isFinite(depth)||depth<.25||depth>max))return fail(`饵层需要在 0.25–${max} 米之间。`);next.fishingDepthMeters=depth;}
+ if(Object.hasOwn(patch,'fishingDepthMeters')){const depth=patch.fishingDepthMeters,max=next.rig==='float'?40:80;if(depth!==null&&(typeof depth!=='number'||!Number.isFinite(depth)||depth<.25||depth>max))return fail(`饵层需要在 ${formatDepth(.25)}–${formatDepth(max)} 之间。`);next.fishingDepthMeters=depth;}
  for(const key of ['rodLoadouts','rodLoadoutsVersion','rodSupplies','rigStock','stock','consumablesVersion'])profile[key]=draft[key];
  if(profile.rodLoadouts[profile.loadout?.rod]){const active=profile.rodLoadouts[profile.loadout.rod];Object.assign(profile.loadout,{reel:active.reel,line:active.line,leader:active.leader});}
  return{ok:true,message:'这根船竿的预组装配置已保存。',assembly:{...next},transferred:[]};
@@ -76,7 +77,7 @@ export function rodAssemblyOptions(profile,rodId,slot,packed){
  const add=(id,name,iconId,{stock=null,available=true,selected=assembly[slot]===id,required=null,reason=''}={})=>options.push({id,name,iconId,owned:available,packed:!required||carry(required),selected,available,mountedOn:null,stock,reason});
  if(slot==='rig')for(const rig of Object.values(RIG_PROFILES)){const stock=profile.rigStock[rig.id].length,installed=profile.rodSupplies[rodId]?.rig===rig.id;add(rig.id,rig.name,rig.item,{stock,available:stock>0||installed,selected:installed,required:rig.item,reason:stock||installed?'':'没有备用钓组。'});}
  else if(slot==='bait')for(const [id,bait] of Object.entries(BAITS)){const stock=profile.stock[id]||0;add(id,bait.name,bait.iconId,{stock,available:stock>0,required:'bait',reason:stock?'':'鱼饵已用完。'});}
- else if(slot==='fishingDepthMeters')for(const depth of [null,1,2.5,4,6,10,15,20,30,40,...(assembly.rig==='float'?[]:[60,80])])add(depth,depth===null?'默认饵层':`${depth} 米`,'rig_float');
+ else if(slot==='fishingDepthMeters')for(const depth of [null,1,2.5,4,6,10,15,20,30,40,...(assembly.rig==='float'?[]:[60,80])])add(depth,depth===null?'默认饵层':formatDepth(depth),'rig_float');
  // Readonly legacy values are intentionally not offered as editable options.
  return options;
 }

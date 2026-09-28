@@ -1,3 +1,4 @@
+import {formatSpeed} from './units.js?v=20260927-pixel-v19';
 /** Pure, persistent tiller controls. Normal pointer release does nothing:
  * steering and twist throttle hold their positions through friction. The UI
  * owns pointer capture and calls reset on cancellation, blur or menus.
@@ -26,7 +27,7 @@ export function createTillerControl(){
    if(state.throttle>.08)return result(false,'先将油门收回到怠速，再换挡。');
    if(state.gear!=='N')return result(false,'先经过 N 空挡，再切换前进或倒车。');
    if(typeof speed!=='number'||!Number.isFinite(speed))return result(false,'航速暂不可用，保持空挡。');
-   if(Math.abs(speed)>=.8)return result(false,'等船速低于 0.8 m/s，再挂挡。');
+   if(Math.abs(speed)>=.8)return result(false,`等船速低于 ${formatSpeed(.8)}，再挂挡。`);
    state.gear=gear;state.manual=true;return result();
   },
   reset(){Object.assign(state,{gear:'N',throttle:0,steer:0,manual:false});return result();},

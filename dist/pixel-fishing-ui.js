@@ -1,7 +1,8 @@
-import {getRigProfile} from './fishing-rigs.js?v=20260927-pixel-v18';
-import {bindPointer} from './input.js?v=20260927-pixel-v18';
-import {rodPoseFromDrag,clockwiseTurns,createCrankInput} from './pixel-fishing-input.js?v=20260927-pixel-v18';
-import {fishingFeedback,reelMotion} from './pixel-fishing-feedback.js?v=20260927-pixel-v18';
+import {formatDepth,metersToFeet} from './units.js?v=20260927-pixel-v19';
+import {getRigProfile} from './fishing-rigs.js?v=20260927-pixel-v19';
+import {bindPointer} from './input.js?v=20260927-pixel-v19';
+import {rodPoseFromDrag,clockwiseTurns,createCrankInput} from './pixel-fishing-input.js?v=20260927-pixel-v19';
+import {fishingFeedback,reelMotion} from './pixel-fishing-feedback.js?v=20260927-pixel-v19';
 
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const rigNames={bottom:'沉底组',dropper:'双支线',slider:'滑铅组',jig:'软饵组',float:'浮漂组',sabiki:'羽毛组'};
@@ -64,21 +65,21 @@ export function mountFishingConsole(root,{sim,getActions,isRetrieving=()=>false,
   c.save();c.translate(cx,cy);c.rotate(spoolRotation);c.strokeStyle='#b6c6a3';c.lineWidth=2;for(let i=0;i<8;i++){const a=i/8*TAU;c.beginPath();c.moveTo(Math.cos(a)*8,Math.sin(a)*8);c.lineTo(Math.cos(a)*(r-8),Math.sin(a)*(r-8));c.stroke();}c.restore();
   for(let i=0;i<4;i++){c.strokeStyle='#d8d4a3';c.lineWidth=1.5;c.beginPath();c.arc(cx,cy,10+i*3,0,TAU);c.stroke();}
   const x=cx+Math.cos(rotation)*r*.84,y=cy+Math.sin(rotation)*r*.84;c.strokeStyle='#d5d3ab';c.lineWidth=6;c.beginPath();c.moveTo(cx,cy);c.lineTo(x,y);c.stroke();c.fillStyle='#254a43';c.fillRect(x-7,y-5,14,10);c.fillStyle='#728b71';c.fillRect(x-6,y-5,12,3);c.fillStyle='#deb46d';c.beginPath();c.arc(cx,cy,5,0,TAU);c.fill();
-  c.fillStyle=focus?'#fff0c6':'#355e50';c.font='11px monospace';c.textAlign='left';c.fillText(`${(s.paidLineMeters||0).toFixed(1)} m`,8,15);c.fillStyle=s.reelMode==='free'?'#aa654c':'#4c7261';c.fillRect(w-13,7,6,6);
+  c.fillStyle=focus?'#fff0c6':'#355e50';c.font='11px monospace';c.textAlign='left';c.fillText(formatDepth(s.paidLineMeters||0),8,15);c.fillStyle=s.reelMode==='free'?'#aa654c':'#4c7261';c.fillRect(w-13,7,6,6);
  }
  function update(){
   const s=sim.state,a=cancelUnavailable(actions()),feedback=fishingFeedback(s),show=(el,visible)=>{el.hidden=!visible;if(el.tagName==='BUTTON'||el.tagName==='SELECT')el.disabled=!visible;};
   const supplies=s.fishState==='idle'?sim.rodConsumableStatus?.():null,needsRig=supplies&&(!supplies.rig.present||supplies.rig.condition<=.08),needsBait=supplies&&!needsRig&&supplies.requiresBait!==false&&!(supplies.bait?.condition>.08);
   get('tackle-name').textContent=needsRig?'未装钓组 · 打开鱼竿更换':needsBait?'需要换饵 · 打开鱼竿更换':`${mountNames[s.rodMount]||'手持'} · ${rigNames[s.rig]||'钓组'}`;get('rod-load').textContent=feedback.cue;
   show(pose,a.pose);pose.setAttribute('role',a.adjustPose?'slider':'img');pose.tabIndex=a.adjustPose?0:-1;pose.style.cursor=a.adjustPose?'move':'default';pose.setAttribute('aria-valuenow',String(Math.round(s.rodElevation??45)));pose.setAttribute('aria-valuetext',`抬竿 ${Math.round(s.rodElevation??45)} 度，朝向 ${Math.round(s.rodAzimuth??70)} 度，${feedback.bendLabel}`);pose.removeAttribute('aria-disabled');
-  wheel.setAttribute('role',a.reel?'slider':'img');wheel.tabIndex=a.reel?0:-1;wheel.style.cursor=a.reel?'grab':'default';wheel.setAttribute('aria-valuenow',String(Math.round((s.paidLineMeters||0)*10)/10));wheel.setAttribute('aria-valuetext',`${feedback.cue}，已放线 ${(s.paidLineMeters||0).toFixed(1)} 米`);wheel.removeAttribute('aria-disabled');
+  wheel.setAttribute('role',a.reel?'slider':'img');wheel.tabIndex=a.reel?0:-1;wheel.style.cursor=a.reel?'grab':'default';wheel.setAttribute('aria-valuenow',String(Math.round(metersToFeet(s.paidLineMeters||0)*10)/10));wheel.setAttribute('aria-valuetext',`${feedback.cue}，已放线 ${formatDepth(s.paidLineMeters||0)}`);wheel.removeAttribute('aria-disabled');
   show(get('reel-instrument'),a.reelInstrument);show(hold,a.reel);show(spool,a.spool);spool.textContent=s.reelMode==='free'?'锁住线杯':'打开线杯';spool.setAttribute('aria-pressed',String(s.reelMode==='free'));
   show(lower,a.lower||a.hook||a.catch);lower.textContent=a.hook?(getRigProfile(s.rig).hookStyle==='circle'?'收紧鱼线':'轻提鱼竿'):a.catch?'鱼获':'船边下放';show(cast,a.cast);
   show(mount,a.mount);mount.value='hand';show(take,a.take);show(retrieve,a.retrieve);retrieve.textContent=isRetrieving()?'停止收竿':'收回钓组';retrieve.setAttribute('aria-pressed',String(isRetrieving()));
   show(drag,a.drag);drag.style.setProperty?.('--drag-angle',`${-100+clamp((s.drag-.2)/.65,0,1)*200}deg`);drag.setAttribute('aria-valuenow',String(Math.round(s.drag*100)));drag.setAttribute('aria-valuetext',`泄力${feedback.dragLabel}，向上拧紧，向下放松`);drag.removeAttribute('aria-disabled');
   const tools=a.lower||a.hook||a.catch||a.cast||a.mount||a.take||a.retrieve||a.drag;root.querySelector('.fishing-toolbar').hidden=!tools;root.querySelector('.fishing-instruments').hidden=!a.pose&&!a.reelInstrument;
   root.classList.toggle('rod-only',!a.reelInstrument);root.classList.toggle('no-tools',!tools);root.classList.toggle('has-status',['casting','bite','fight'].includes(s.fishState));
-  const mini=document.getElementById('rod-monitor');if(mini){mini.querySelector('span').textContent=`${mountNames[s.rodMount]||'手持'} · ${(s.paidLineMeters||0).toFixed(1)} m`;mini.querySelector('b').textContent=feedback.cue;}
+  const mini=document.getElementById('rod-monitor');if(mini){mini.querySelector('span').textContent=`${mountNames[s.rodMount]||'手持'} · ${formatDepth(s.paidLineMeters||0)}`;mini.querySelector('b').textContent=feedback.cue;}
  }
  return{input:dt=>{const a=cancelUnavailable(actions());return{reel:a.reel?Math.max(crank.sample(dt),keyboardReel?1.2:0):0};},reset(){for(const p of pointers)p.reset();crank.stop();keyboardReel=false;rodGesture=null;crankAngle=null;dragGesture=null;},update,draw(dt){const s=sim.state,advance=s.paused?0:clamp(Number.isFinite(dt)?dt:0,0,.1);rotation=(rotation+(s.crankRate||0)*TAU*advance)%TAU;spoolRotation=(spoolRotation+reelMotion(s).spoolRadiansPerSecond*advance)%TAU;lastFrame+=dt;if(lastFrame<1/30)return;lastFrame=0;if(!root.hidden){paintRod(pose,s);paintReel(s);}const mini=document.getElementById('rod-monitor');if(mini&&!mini.hidden)paintRod(mini.querySelector('canvas'),s,true);}};
 }

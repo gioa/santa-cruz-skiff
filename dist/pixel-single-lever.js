@@ -1,3 +1,4 @@
+import {formatSpeed} from './units.js?v=20260927-pixel-v19';
 /** One retained push/pull lever: ahead above the detent, neutral in the centre,
  * astern below it. Pointer release intentionally does not change its position.
  * Reversals must pass through neutral and require a fresh command at low speed;
@@ -41,7 +42,7 @@ export function createSingleLeverControl(){
    if(gear==='R'&&!reverseAllowed){neutral();return result(false,'拖钓时保持前进或空挡。');}
    if(state.gear!=='N'&&state.gear!==gear){neutral();return result(false,'已回到空挡，减速后再推动换向。');}
    if(state.gear!==gear&&(!isFiniteNumber(speed)||Math.abs(speed)>=.8)){
-    neutral();return result(false,isFiniteNumber(speed)?'等船速低于 0.8 m/s，再推动挂挡。':'航速暂不可用，保持空挡。');
+    neutral();return result(false,isFiniteNumber(speed)?`等船速低于 ${formatSpeed(.8)}，再推动挂挡。`:'航速暂不可用，保持空挡。');
    }
    const demand=(Math.abs(target)-LEVER_NEUTRAL_DEADBAND)/(1-LEVER_NEUTRAL_DEADBAND);
    const power=Math.min(demand,gear==='F'?clamp(finite(maxForward),0,1):1);

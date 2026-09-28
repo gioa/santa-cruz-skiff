@@ -15,4 +15,4 @@ The pixel edition uses preassembled rod hardware and whole terminal rigs. Player
 
 ## Units
 
-Active pixel UI uses m/cm for length, g/kg for weight and tackle ratings, km/h for boat speed, m/s for wind, and °C for temperature. Conversion occurs at display boundaries. Physics retains SI values; NOAA source wind and legal threshold metadata retain their original precision and units internally.
+Active pixel UI uses US customary units: ft for depth, deployed line and wave height; in for fish length and net openings; mi for distance; lb for fish, cargo and tackle ratings; oz for sinkers; mph for boat speed and wind; and °F for temperature. Conversion occurs only at display boundaries. Physics and saved numerical state retain SI values; NOAA source wind and legal threshold metadata retain their original precision and units internally. Consumable stock, wear and replacement behavior are unchanged by the display conversion.
