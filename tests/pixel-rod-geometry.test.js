@@ -76,3 +76,23 @@ test('small load changes do not alternate camera zoom on a cramped fishing scree
   for(let i=0;i<120;i++){state.rodBend=.2+Math.sin(i*.2)*.015;world.draw(state,1/60);scales.push(world.camera.scale);}
   assert.equal(new Set(scales.slice(20)).size,1,'load oscillation cannot repeatedly zoom in and out');
 });
+
+test('a plumb boat-side drop is directly below the tip at every heading and rod pose',()=>{
+ for(const rodMount of ['hand','port','starboard'])for(const rodElevation of [5,45,66,85])for(const rodAzimuth of [-100,-15,0,70,100])for(const heading of [0,1.3,Math.PI,5.4])for(const rodBend of [0,.2,.8]){
+  const state={...base,rodMount,rodElevation,rodAzimuth,heading,rodBend,rodTip:{x:3.12,z:4.23,height:2},lineEntry:{x:3.12,z:4.23,height:0},bobber:{x:3.12,z:4.23,height:-3},lineSlackMeters:0};
+  const rod=getRodCurve(state,{scale:1.08}),line=getFishingLine(state,rod,{project});
+  assert.ok(Math.abs(line.end.x-rod.tip.x)<1e-10,'no artificial sideways gunwale offset');
+  assert.ok(line.end.y>rod.tip.y);
+  for(const p of line.points)assert.ok(Math.abs(p.x-rod.tip.x)<1e-10);
+ }
+});
+test('small real drift changes line slope smoothly before pixel rasterisation',()=>{
+ const state={...base,rodTip:{x:3.12,z:4.23,height:2},lineEntry:{x:3.12,z:4.23,height:0},bobber:{x:3.12,z:4.23,height:-5}},rod=getRodCurve(state,{scale:1.08}),raster=(x,z)=>({x:Math.round(x*6),y:Math.round(z*6)});
+ let last=null;
+ for(let i=0;i<40;i++){
+  const dx=i*.001,s={...state,lineEntry:{x:3.12+dx,z:4.23-dx,height:0}},line=getFishingLine(s,rod,{project:raster,cameraScale:6});
+  assert.ok(Math.abs(line.end.x-rod.waterBase.x-dx/2*rod.tipHeightPixels)<1e-9);
+  if(last)assert.ok(Math.hypot(line.end.x-last.x,line.end.y-last.y)<.05,'no amplified whole-pixel jumps');
+  last=line.end;
+ }
+});

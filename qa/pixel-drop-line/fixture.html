@@ -1,0 +1,10 @@
+<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><style>body{margin:0;background:#153f49;color:#f5e8bc;font:16px system-ui}h1{font-size:20px;margin:20px}canvas{display:block;width:100%;image-rendering:pixelated}p{margin:20px}</style><h1>船边放线 · 入水点验证</h1><canvas width="780" height="660"></canvas><p>左：修改前　右：修改后<br>静水下线保持竿尖下方；有相对漂移时保留倾角。</p><script type="module">
+import * as old from './qa-before-line.js';import * as fixed from './pixel-rod-geometry.js';
+const c=document.querySelector('canvas').getContext('2d');c.font='18px system-ui';c.lineWidth=2;
+const cases=[['静水 · 抬高鱼竿',85,0],['静水 · 常规角度',45,0],['相对漂移 · 保留真实倾角',45,.7]];
+for(let row=0;row<3;row++)for(let col=0;col<2;col++){
+const [label,elevation,drift]=cases[row],x=col*390,y=row*220;c.fillStyle=col?'#347f87':'#367b81';c.fillRect(x,y,390,220);c.fillStyle='#f5e8bc';c.fillText((col?'修正后':'原显示')+' · '+label,x+12,y+25);
+const api=col?fixed:old,s={fishState:'sinking',rig:'bottom',rodMount:'hand',rodElevation:elevation,rodAzimuth:70,rodBend:.15,lineSlackMeters:0,rodTip:{x:0,z:0,height:2},lineEntry:{x:drift,z:0,height:0},bobber:{x:drift*3,z:0,height:-4}},rod=api.getRodCurve(s,{origin:{x:x+140,y:y+160},scale:1.8}),line=api.getFishingLine(s,rod,{project:(x,z)=>({x:x*6,y:z*6}),cameraScale:6});
+c.strokeStyle='#172f36';c.lineWidth=5;c.beginPath();rod.points.forEach((p,i)=>i?c.lineTo(p.x,p.y):c.moveTo(p.x,p.y));c.stroke();c.strokeStyle='#e8cf92';c.lineWidth=2;c.stroke();c.strokeStyle='#e4f3d9';c.beginPath();line.points.forEach((p,i)=>i?c.lineTo(p.x,p.y):c.moveTo(p.x,p.y));c.stroke();c.fillStyle='#c4e6db';c.fillRect(line.end.x-3,line.end.y-1,6,2);
+}
+</script>

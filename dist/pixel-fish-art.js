@@ -1,4 +1,4 @@
-import {fishBodyPose,drawFishBody} from './pixel-fish-motion.js?v=20260928-pixel-v72';
+import {fishBodyPose,drawFishBody} from './pixel-fish-motion.js?v=20260928-pixel-v73';
 // A shared measuring board: a fish never grows to fill its card. The same
 // centimetre-to-pixel scale applies to every species and every catch on a view.
 export const FISH_BOARD_SPAN_CM=121.92; // 48 in

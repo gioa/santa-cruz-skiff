@@ -1,4 +1,4 @@
-import {rodFlexPoint} from './pixel-rod-response.js?v=20260928-pixel-v72';
+import {rodFlexPoint} from './pixel-rod-response.js?v=20260928-pixel-v73';
 // Shared presentation geometry. The model supplies angles, mount and actual
 // load-derived bend; rendering never invents fish pulls or changes line length.
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
@@ -40,11 +40,10 @@ export function getRodCurve(state,{origin={x:0,y:0},scale=1,heading=finite(state
   }
   const tip=points.at(-1),tangent=points[1],norm=Math.hypot(tangent.x-base.x,tangent.y-base.y)||1,ux=(tangent.x-base.x)/norm,uy=(tangent.y-base.y)/norm;
   const butt={x:base.x-ux*9*scale,y:base.y-uy*9*scale},rearGrip=lerp(butt,base,.45),reel={x:base.x-uy*3*scale-ux*2*scale,y:base.y+ux*3*scale-uy*2*scale};
-  // A near-vertical rod still clears the rail. Its entry point is outboard,
-  // never a line painted across the middle of the open boat.
-  const side=mount==='port'?-1:mount==='starboard'?1:Math.sin(radians(azimuth))<0?-1:1;
-  const localGround={x:localBase.x+Math.sin(radians(azimuth))*(length*Math.cos(e)+bend*length*.10),y:localBase.y-Math.cos(radians(azimuth))*(length*Math.cos(e)+bend*length*.10)};
-  const waterBase=rotate(side*Math.max(27,Math.abs(localGround.x)),localGround.y);waterBase.y+=baseHeight*scale;
+  // A plumb line meets the water directly below the displayed tip. Do not
+  // push its entry sideways to an invented gunwale point: raising the rod
+  // must not manufacture a current or an instant diagonal drop.
+  const waterBase={x:tip.x,y:tip.y+tipHeight*scale};
   return{points,base,tip,butt,rearGrip,reel,tipGround,waterBase,tipHeightPixels:tipHeight*scale,tipHeightMeters:tipHeight/24,mount,mounted,elevation,azimuth,bend,scale,
     shoulders:[rotate(bodyX-5,bodyY+5),rotate(bodyX+5,bodyY+4)],socket:rotate(localBase.x,localBase.y+5)};
 }
@@ -66,7 +65,7 @@ export function getFishingLine(state,rod,{project=(x,z)=>({x,y:z}),cameraScale=6
   if(presentation.kind==='submerged'){
     let underwaterTarget=lure;
     if(Number.isFinite(state.lineEntry?.x)&&Number.isFinite(state.lineEntry?.z)&&Number.isFinite(state.rodTip?.x)&&Number.isFinite(state.rodTip?.z)){
-      const physicalTip=project(state.rodTip.x,state.rodTip.z),physicalEntry=project(state.lineEntry.x,state.lineEntry.z);
+      const physicalEntry=project(state.lineEntry.x,state.lineEntry.z);
       const heightPixels=Math.max(1,rod.tipHeightPixels),heightMeters=Math.max(.01,finite(state.rodTip.height,1)),pixelsPerMeter=Math.max(.01,cameraScale);
       if(state.castLine){
         // A cast hits its world-space target. Intersect the ray from the
@@ -79,8 +78,10 @@ export function getFishingLine(state,rod,{project=(x,z)=>({x,y:z}),cameraScale=6
         // vertical height made a towed line look almost vertical/fixed.
         // Preserve horizontal displacement / height (the physical line
         // slope), in BOTH world axes, on that same artwork scale.
-        const scale=heightPixels/(heightMeters*pixelsPerMeter);
-        end={x:rod.waterBase.x+(physicalEntry.x-physicalTip.x)*scale,y:rod.waterBase.y+(physicalEntry.y-physicalTip.y)*scale};
+        // Compute the displacement before rasterisation. Subtracting two
+        // rounded map points amplified a one-pixel step into a line kink.
+        const scale=heightPixels/heightMeters;
+        end={x:rod.waterBase.x+(state.lineEntry.x-state.rodTip.x)*scale,y:rod.waterBase.y+(state.lineEntry.z-state.rodTip.z)*scale};
         underwaterTarget={x:end.x+(lure.x-physicalEntry.x),y:end.y+(lure.y-physicalEntry.y)};
       }
       entrySource='model';
