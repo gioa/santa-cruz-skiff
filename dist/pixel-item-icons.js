@@ -81,7 +81,7 @@ export function drawItemIcon(canvas,item){
  if(!canvas?.getContext)throw new TypeError('drawItemIcon requires a canvas');
  canvas.width=32;canvas.height=32;if(canvas.style)canvas.style.imageRendering='pixelated';
  const ctx=canvas.getContext('2d');if(!ctx)return canvas;ctx.imageSmoothingEnabled=false;ctx.clearRect(0,0,32,32);
- const id=typeof item==='string'?item:item?.id;(painters[id]||fallback)(raster(ctx));return canvas;
+ const id=typeof item==='string'?item:item?.id;(painters[id]||(id?.startsWith('sinker_')?painters.sinker_heavy:null)||fallback)(raster(ctx));return canvas;
 }
 
 export function createItemIcon(item){

@@ -39,8 +39,8 @@ test('offshore navigation covers about twice the geography while fuel and vessel
 });
 
 test('premade rig weights and suspended depth selection stay distinct and valid',()=>{
- const sim=prepared(['rig_dropper','rig_sabiki','rig_float','rig_jig']);assert.equal(sim.setRig({rig:'dropper'}).ok,true);assert.equal(sim.state.rigWeightGrams,113);assert.equal(sim.publicState().hookCount,2);assert.equal(sim.setRig({weightGrams:170}).ok,false);
- assert.equal(sim.setRig({rig:'float',fishingDepthMeters:4}).ok,true);assert.equal(sim.state.rigWeightGrams,7);assert.equal(sim.state.fishingDepthMeters,4);assert.equal(sim.setRig({rig:'sabiki'}).ok,true);assert.equal(sim.state.rigWeightGrams,28);assert.equal(sim.state.fishingDepthMeters,6);
+ const sim=prepared(['rig_dropper','rig_sabiki','rig_float','rig_jig']);assert.equal(sim.setRig({rig:'dropper'}).ok,true);assert.equal(sim.state.rigWeightGrams,6);assert.equal(sim.publicState().hookCount,2);assert.equal(sim.setRig({weightGrams:170}).ok,false);
+ assert.equal(sim.setRig({rig:'float',fishingDepthMeters:4}).ok,true);assert.equal(sim.state.rigWeightGrams,7);assert.equal(sim.state.fishingDepthMeters,4);assert.equal(sim.setRig({rig:'sabiki'}).ok,true);assert.equal(sim.state.rigWeightGrams,6);assert.equal(sim.state.fishingDepthMeters,6);
  const heavy=prepared(['rig_float','sinker_heavy']);assert.equal(heavy.setRig({weightGrams:170}).ok,false);assert.equal(heavy.setRig({rig:'float',weightGrams:113}).ok,false,'a seven-gram float cannot carry a heavy bottom sinker');assert.equal(heavy.setRig({rig:'float'}).ok,true);
 });
 

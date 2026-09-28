@@ -12,7 +12,7 @@ const copy=value=>JSON.parse(JSON.stringify(value));
 function prepared(){
  const sim=new PixelSimulation({rng:()=>.9,patrolRng:()=>.9});sim.start();
  Object.assign(sim.state,{playerX:HARBOR.counterX,playerZ:HARBOR.counterZ});
- assert.ok(sim.buyGear('rig_feather40').ok);assert.ok(sim.replaceRig(undefined,'feather40').ok);
+ assert.ok(sim.buyGear('rig_feather40').ok);assert.ok(sim.replaceRig(undefined,'feather40').ok);assert.ok(sim.replaceSinker(undefined,4).ok);
  Object.assign(sim.state,{mode:'boat',rentalPaid:true,launchStage:'afloat',moored:false,loaded:true,boatX:-180,boatZ:880});
  return sim;
 }

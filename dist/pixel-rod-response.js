@@ -1,7 +1,7 @@
 /** Fish-driven elastic tip response. Frequencies/compliance are game tuning,
  * not measured species force or blank specifications. Action and power are
  * separate: action controls where the blank flexes, power its compliance. */
-import {fishFightKind,FISH_FIGHT_PROFILES} from './pixel-fish-fight.js?v=20260928-pixel-v74';
+import {fishFightKind,FISH_FIGHT_PROFILES} from './pixel-fish-fight.js?v=20260928-pixel-v75';
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),finite=(v,f=0)=>Number.isFinite(v)?v:f;
 export const ROD_ACTIONS=Object.freeze({
  rod:{action:'moderate-fast',power:1,sensitivity:1,flex:3,hz:4.2,damping:.58},

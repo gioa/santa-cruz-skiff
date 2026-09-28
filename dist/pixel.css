@@ -553,3 +553,7 @@ html,body,#app,#app *,#app *::before,#app *::after{-webkit-user-select:none;user
 #boat-fishing #rod-config-btn:disabled{opacity:.35;cursor:default}
 #rod-config-btn svg{pointer-events:none}
 .is-fishing-focus #boat-fishing .rod-identity{position:absolute}
+
+.weighted-workbench .rod-assembly-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.weighted-workbench .assembly-slot{min-width:0;padding:8px 4px}.weighted-workbench .assembly-slot small{overflow-wrap:anywhere}
+
+.weighted-workbench .assembly-slot small{font-size:9px;line-height:1.4}.weighted-workbench .sinker-options{grid-template-columns:repeat(3,minmax(0,1fr))}.weighted-workbench .sinker-options .rod-part{min-height:92px}

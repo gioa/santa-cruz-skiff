@@ -5,8 +5,8 @@
  * pay line out, while turning the handle takes it in. Rod movement never
  * manufactures more line. This module has no inventory, UI or random events.
  */
-import {getRigProfile,stepRigLure} from './fishing-rigs.js?v=20260928-pixel-v74';
-import {rigHydrodynamics} from './pixel-rig-hydrodynamics.js?v=20260928-pixel-v74';
+import {getRigProfile,stepRigLure} from './fishing-rigs.js?v=20260928-pixel-v75';
+import {rigHydrodynamics} from './pixel-rig-hydrodynamics.js?v=20260928-pixel-v75';
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 const finite=(n,f=0)=>Number.isFinite(n)?n:f;
 export const MAX_PAID_LINE_METERS=120;
@@ -77,6 +77,16 @@ export function stepFishingLine(s,{dt,environment={},current={x:0,z:0},velocity=
  const fullDepth=Math.min(Math.max(0,bottom-rig.baitAboveBottom),rig.layer==='suspended'?finite(s.fishingDepthMeters,rig.defaultFishingDepth):bottom);
  let lineDrag=.5*1025*(finite(environment.lineDiameterMm,.36)*.001*Math.min(paid,35)*.45+rig.dragArea)*flow*flow;
  const startLure={...lure};
+ // Submerged terminal weight also resists lifting. A reel has finite winding
+ // torque; turning its handle cannot force an arbitrarily heavy rig upward.
+ const terminalWeightN=environment.weightGrams*.001*9.81*.91;
+ function loadedWinding(baseForce,verticalK=0){
+  const slack=Math.max(0,paid-separation(tip,lure)),free=dt>0?Math.min(retrieveRate,slack/dt):0,request=Math.max(0,retrieveRate-free);
+  if(request<=0)return 0;
+  const capacity=16*Math.max(.4,strength);let low=0,high=request;
+  for(let i=0;i<16;i++){const rate=(low+high)/2,force=baseForce+verticalK*rate*rate,possible=force>=dragThresholdN?0:request*Math.max(0,1-force/capacity);if(rate>possible)high=rate;else low=rate;}
+  const rate=(low+high)/2;retrieveRate=free+rate;loadedCrankRate=crankRate*retrieveRate/Math.max(.001,free+request);return verticalK*rate*rate;
+ }
  // Only actual rod motion projected along the line does work. Holding a high
  // rod is not repeated pumping; boat translation is excluded from this stroke.
  const rodStrokeMps=dt>0?(separation(tip,lure)-separation(oldTip,lure))/dt:0;
@@ -109,6 +119,7 @@ export function stepFishingLine(s,{dt,environment={},current={x:0,z:0},velocity=
   rigVelocity={vx:water.vx,vz:water.vz};lineDrag=water.lineForce+water.rigForce;
   const gravity=stepRigLure({...environment,dt:0,depth:finite(s.lureDepth),currentMps:flow,boatSpeedMps:0});
   const terminal=lure.height>0?1.47:gravity.sinkRate,weight=environment.weightGrams*.001*9.81*.91,mass=Math.max(.04,environment.weightGrams*.002+paid*.003);
+  const retrieveDrag=loadedWinding(terminalWeightN+lineDrag,terminalWeightN/Math.max(.04,terminal*terminal));
   const response=1-Math.exp(-dt*weight/(mass*Math.max(.05,terminal)));
   const fallSpeed=finite(s.rigFallSpeed,terminal)+(terminal-finite(s.rigFallSpeed,terminal))*response;
   // Feed the line the descending weight actually draws, rather than alternating
@@ -144,7 +155,7 @@ export function stepFishingLine(s,{dt,environment={},current={x:0,z:0},velocity=
   if(dt>0)rigVelocity={vx:water.vx+(lure.x-proposed.x)/dt,vz:water.vz+(lure.z-proposed.z)/dt};
   const depth=Math.max(0,-lure.height),taut=separation(tip,lure)>paid-.45;
   const contact=bottom-depth-rig.baitAboveBottom<=.18;
-  load=(finite(s.rigWeightGrams,rig.defaultWeightGrams)*.001*9.81*.91+lineDrag)*(taut?.95:.15)*(reelMode==='free'?.68:1);
+  load=(terminalWeightN+lineDrag+retrieveDrag)*(taut?.95:.15)*(reelMode==='free'?.68:1);
   if(contact&&retrieveRate===0)load=lineDrag*(taut?.18:.035);
   presentation.depth=depth;presentation.targetDepth=Math.min(fullDepth,Math.max(0,verticalBudget));presentation.bottomContact=contact;presentation.nearBottom=bottom-depth<=Math.max(1.1,rig.baitAboveBottom+.35);presentation.pumpHeight=pumpHeight;presentation.liftVelocity=dt?(tip.height-oldTip.height)/dt:0;
   // Activity and snag factors still receive the real relative flow and actual
@@ -155,7 +166,7 @@ export function stepFishingLine(s,{dt,environment={},current={x:0,z:0},velocity=
  }
  const liftingSpeed=Math.max(0,rodStrokeMps);
  const liftResistance=liftingSpeed*(1.5+Math.sqrt(mass)*1.5)+.5*1025*Math.max(0,finite(fishMotion?.bodyDragArea))*liftingSpeed*liftingSpeed;
- let pull=Math.max(0,finite(fishPullN))+liftResistance;
+ let pull=Math.max(0,finite(fishPullN))+liftResistance+terminalWeightN;
  const bodyArea=Math.max(0,finite(fishMotion?.bodyDragArea)),initialSlack=Math.max(0,paid-separation(tip,lure));
 
  const freeTakeup=dt>0?Math.min(retrieveRate,initialSlack/dt):0,loadedRequest=Math.max(0,retrieveRate-freeTakeup);

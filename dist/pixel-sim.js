@@ -1,36 +1,37 @@
-import {fightPumpControl} from './pixel-fight-pump.js?v=20260928-pixel-v74';
-import {createStability,RESCUE_FEE,HOSPITAL_FEE} from './pixel-stability.js?v=20260928-pixel-v74';
-import {generateDailyWeather,dailyConditions,sampleDailyWater} from './pixel-daily-weather.js?v=20260928-pixel-v74';
-import {DAY_LENGTH_SECONDS,DAY_TRANSITION_SECONDS,TOW_FEE,restoreTripTime} from './pixel-day-cycle.js?v=20260928-pixel-v74';
-import {trollingMotorForce} from './pixel-trolling-motor.js?v=20260928-pixel-v74';
-import {fishMassKg} from './pixel-fish-mass.js?v=20260928-pixel-v74';
-import {stepRodTip,fishTipSignal} from './pixel-rod-response.js?v=20260928-pixel-v74';
-import {baitFishCandidates} from './pixel-small-fish.js?v=20260928-pixel-v74';
-import {baitSchoolInfluence} from './pixel-bait-schools.js?v=20260928-pixel-v74';
-import {planCast,stepCast} from './pixel-casting.js?v=20260928-pixel-v74';
-import {RETIRED_PIXEL_GEAR} from './pixel-gear-availability.js?v=20260928-pixel-v74';
-import {fishCommonName,fishDisplayName} from './pixel-fish-names.js?v=20260928-pixel-v74';
-import {stepBottomSnag,stepSnagAbrasion} from './pixel-snag.js?v=20260928-pixel-v74';
-import {formatLength,formatWeight} from './units.js?v=20260928-pixel-v74';
+import {installSinker} from './pixel-sinkers.js?v=20260928-pixel-v75';
+import {fightPumpControl} from './pixel-fight-pump.js?v=20260928-pixel-v75';
+import {createStability,RESCUE_FEE,HOSPITAL_FEE} from './pixel-stability.js?v=20260928-pixel-v75';
+import {generateDailyWeather,dailyConditions,sampleDailyWater} from './pixel-daily-weather.js?v=20260928-pixel-v75';
+import {DAY_LENGTH_SECONDS,DAY_TRANSITION_SECONDS,TOW_FEE,restoreTripTime} from './pixel-day-cycle.js?v=20260928-pixel-v75';
+import {trollingMotorForce} from './pixel-trolling-motor.js?v=20260928-pixel-v75';
+import {fishMassKg} from './pixel-fish-mass.js?v=20260928-pixel-v75';
+import {stepRodTip,fishTipSignal} from './pixel-rod-response.js?v=20260928-pixel-v75';
+import {baitFishCandidates} from './pixel-small-fish.js?v=20260928-pixel-v75';
+import {baitSchoolInfluence} from './pixel-bait-schools.js?v=20260928-pixel-v75';
+import {planCast,stepCast} from './pixel-casting.js?v=20260928-pixel-v75';
+import {RETIRED_PIXEL_GEAR} from './pixel-gear-availability.js?v=20260928-pixel-v75';
+import {fishCommonName,fishDisplayName} from './pixel-fish-names.js?v=20260928-pixel-v75';
+import {stepBottomSnag,stepSnagAbrasion} from './pixel-snag.js?v=20260928-pixel-v75';
+import {formatLength,formatWeight} from './units.js?v=20260928-pixel-v75';
 /** Pixel gameplay. Offshore travel uses a 1:2 map scale and the calendar clock runs at 5x. Input, fishing and animations use active real seconds. */
-import {GEAR_CATALOG,BASE_GEAR,createProfile,mergeNavigationGear,equipmentStats,cargoWeight,settleFish,buyGear as purchaseGear,hasElectricReel as electricReelEquipped} from './equipment.js?v=20260928-pixel-v74';
-import {HARBOR,BOARDING_WALK_PATH,walkHeight,walkAllowed,canBoardFrom,harborWaterBlocked} from './pixel-harbor-layout.js?v=20260928-pixel-v74';
-import {walkingBlocked as walkBlocked,walkingPointOpen,walkingSegmentOpen as safeWalkSegment,createGroundWalkSearch,advanceGroundWalk} from './pixel-walking-path.js?v=20260928-pixel-v74';
-import {FISHING_SPOTS,toGPS,bearingDegrees,onLand,onPier,MAP_BOUNDS} from './pixel-geography.js?v=20260928-pixel-v74';
-import {fishingHabitatAt} from './pixel-seafloor.js?v=20260928-pixel-v74';
-import {depthAt,depthInfoAt} from './bathymetry.js?v=20260928-pixel-v74';
-import {waterRoute,resolveVesselContact,contactAwareControl,clearResumeVesselPose} from './pixel-navigation.js?v=20260928-pixel-v74';
-import {createVesselState,stepVessel,syncVessel,vesselWind} from './vessel-physics.js?v=20260928-pixel-v74';
-import {fishEncounter,weightedEncounterFish} from './pixel-fish-ecology.js?v=20260928-pixel-v74';
-import {RIG_PROFILES,getRigProfile} from './fishing-rigs.js?v=20260928-pixel-v74';
-import {MAX_PAID_LINE_METERS,MAX_TROLL_SPEED_MPS,MAX_TROLL_THROTTLE,reelTurnsPerSecond,rodTipPosition,fishingCurrent,relativeFishingFlow,stepFishingLine} from './pixel-fishing-physics.js?v=20260928-pixel-v74';
-import {createFishFight,stepFishFight,canLandFish} from './pixel-fish-fight.js?v=20260928-pixel-v74';
-import {createHookHold,createBiteHold,stepHookHold} from './pixel-hooking.js?v=20260928-pixel-v74';
-import {consumableStatus,installBait,installRig,loseRig,damageSupplies,rigRequiresBait,USABLE_CONDITION} from './pixel-consumables.js?v=20260928-pixel-v74';
-import {ensureRodLoadouts,getRodAssembly,setRodAssembly,syncActiveRodLoadout} from './pixel-rod-loadouts.js?v=20260928-pixel-v74';
-import {assessCatchLedger,identifyRegulatedSpecies} from './fishing-regulations.js?v=20260928-pixel-v74';
-import {FishingPatrol} from './fish-patrol.js?v=20260928-pixel-v74';
-import {navigationStepScale} from './pixel-navigation-scale.js?v=20260928-pixel-v74';
+import {GEAR_CATALOG,BASE_GEAR,createProfile,mergeNavigationGear,equipmentStats,cargoWeight,settleFish,buyGear as purchaseGear,hasElectricReel as electricReelEquipped} from './equipment.js?v=20260928-pixel-v75';
+import {HARBOR,BOARDING_WALK_PATH,walkHeight,walkAllowed,canBoardFrom,harborWaterBlocked} from './pixel-harbor-layout.js?v=20260928-pixel-v75';
+import {walkingBlocked as walkBlocked,walkingPointOpen,walkingSegmentOpen as safeWalkSegment,createGroundWalkSearch,advanceGroundWalk} from './pixel-walking-path.js?v=20260928-pixel-v75';
+import {FISHING_SPOTS,toGPS,bearingDegrees,onLand,onPier,MAP_BOUNDS} from './pixel-geography.js?v=20260928-pixel-v75';
+import {fishingHabitatAt} from './pixel-seafloor.js?v=20260928-pixel-v75';
+import {depthAt,depthInfoAt} from './bathymetry.js?v=20260928-pixel-v75';
+import {waterRoute,resolveVesselContact,contactAwareControl,clearResumeVesselPose} from './pixel-navigation.js?v=20260928-pixel-v75';
+import {createVesselState,stepVessel,syncVessel,vesselWind} from './vessel-physics.js?v=20260928-pixel-v75';
+import {fishEncounter,weightedEncounterFish} from './pixel-fish-ecology.js?v=20260928-pixel-v75';
+import {RIG_PROFILES,getRigProfile} from './fishing-rigs.js?v=20260928-pixel-v75';
+import {MAX_PAID_LINE_METERS,MAX_TROLL_SPEED_MPS,MAX_TROLL_THROTTLE,reelTurnsPerSecond,rodTipPosition,fishingCurrent,relativeFishingFlow,stepFishingLine} from './pixel-fishing-physics.js?v=20260928-pixel-v75';
+import {createFishFight,stepFishFight,canLandFish} from './pixel-fish-fight.js?v=20260928-pixel-v75';
+import {createHookHold,createBiteHold,stepHookHold} from './pixel-hooking.js?v=20260928-pixel-v75';
+import {consumableStatus,installBait,installRig,loseRig,damageSupplies,rigRequiresBait,USABLE_CONDITION} from './pixel-consumables.js?v=20260928-pixel-v75';
+import {ensureRodLoadouts,getRodAssembly,setRodAssembly,syncActiveRodLoadout} from './pixel-rod-loadouts.js?v=20260928-pixel-v75';
+import {assessCatchLedger,identifyRegulatedSpecies} from './fishing-regulations.js?v=20260928-pixel-v75';
+import {FishingPatrol} from './fish-patrol.js?v=20260928-pixel-v75';
+import {navigationStepScale} from './pixel-navigation-scale.js?v=20260928-pixel-v75';
 export const GAME_TIME_SCALE=5;
 export const WALK_SPEED=2.90;
 export const BOAT_RENTAL_PRICE=15; // Virtual game credits, not a real rental quote.
@@ -96,7 +97,7 @@ export class PixelSimulation {
  stopPropulsion(){const s=this.state;if(s.motorMode==='navigate'){s.motorMode='hold';s.motorTarget=this.hasGear('gps')?{x:s.boatX,z:s.boatZ}:null;}s.engine=false;s.throttle=0;s.waypoint=null;s.waterRoute=[];this.transientThrottle=false;}
 
  rodAssembly(rodId=this.state.profile.loadout.rod){return getRodAssembly(this.state.profile,rodId);}
- assemblyItems(rodId){const assembly=this.rodAssembly(rodId);if(!assembly)return[];return[rodId,assembly.reel,assembly.line,assembly.leader,rigItem[assembly.rig],rigRequiresBait(assembly.rig)?'bait':null,assembly.weightGrams!==getRigProfile(assembly.rig).defaultWeightGrams?'sinker_heavy':null].filter(Boolean);}
+ assemblyItems(rodId){const assembly=this.rodAssembly(rodId);if(!assembly)return[];return[rodId,assembly.reel,assembly.line,assembly.leader,rigItem[assembly.rig],rigRequiresBait(assembly.rig)?'bait':null].filter(Boolean);}
  enableRodAssembly(rodId){const s=this.state;s.packed=[...new Set([...s.packed,...this.assemblyItems(rodId).filter(id=>s.profile.owned.includes(id))])];}
  rememberHookBait(){const s=this.state;if(this.activeRodId){s.rodBaitOnHooks??={};s.rodBaitOnHooks[this.activeRodId]=s.baitOnHook?clone(s.baitOnHook):null;const supply=s.profile.rodSupplies?.[this.activeRodId];if(supply)supply.bait=s.baitOnHook||null;}}
  applyActiveRod(rodId=this.state.profile.loadout.rod){
@@ -176,7 +177,7 @@ export class PixelSimulation {
   for(const f of this.unsettledCargo()){f.lost=true;f.settled=true;f.kept=false;f.reward=0;}
   s.fishState='idle';this.retrieve();this.stopPropulsion();
   // Clear ownership AND every physical inventory cache, including unselected rods.
-  const p=s.profile,lost=[...p.owned];p.equipmentLost=true;p.owned=[];p.stock=Object.fromEntries(Object.keys(p.stock).map(k=>[k,0]));p.rigStock=Object.fromEntries(Object.keys(p.rigStock||{}).map(k=>[k,[]]));p.rodSupplies={};p.rodLoadouts={};p.inventorySlots={};p.loadout={rod:null,reel:null,line:null,leader:null,cooler:null};this.activeRodId=null;
+  const p=s.profile,lost=[...p.owned];p.equipmentLost=true;p.owned=[];p.stock=Object.fromEntries(Object.keys(p.stock).map(k=>[k,0]));p.rigStock=Object.fromEntries(Object.keys(p.rigStock||{}).map(k=>[k,[]]));p.sinkerStock=Object.fromEntries(Object.keys(p.sinkerStock||{}).map(k=>[k,0]));p.sinkerVersion=1;p.rodSupplies={};p.rodLoadouts={};p.inventorySlots={};p.loadout={rod:null,reel:null,line:null,leader:null,cooler:null};this.activeRodId=null;
   Object.assign(s,{packed:[],pfd:false,pfdStateVersion:1,baitOnHook:null,rodBaitOnHooks:{},capsize:{elapsed:0,fee:RESCUE_FEE,worePfd,hospital,hospitalFee:hospital?HOSPITAL_FEE:0,lostEquipment:lost},bailing:false,motorMode:'off',motorTarget:null,motorThrustN:0,inspection:null,docking:null});
   p.towDebt=Math.max(0,finite(p.towDebt))+RESCUE_FEE;this.payTowDebt();
   if(hospital){p.medicalDebt=Math.max(0,finite(p.medicalDebt))+HOSPITAL_FEE;this.payMedicalDebt();}
@@ -268,6 +269,11 @@ export class PixelSimulation {
   this.enableRodAssembly(rodId);this.applyActiveRod();return this.notify(result.message);
  }
 
+ replaceSinker(rodId=this.state.profile.loadout.rod,oz=null){
+  if(this.state.fishState!=='idle')return this.notify('先收回钓组再换铅坠。',null,false);
+  if(!this.rodAssembly(rodId))return this.notify('还没有这根船竿。',null,false);
+  const result=installSinker(this.state.profile,rodId,oz);if(result.ok){this.enableRodAssembly(rodId);this.applyActiveRod();}return this.notify(result.message,null,result.ok);
+ }
  changeDrag(delta){const s=this.state;s.drag=clamp(s.drag+finite(delta),.2,.85);const assembly=s.profile.rodLoadouts?.[s.profile.loadout.rod];if(assembly)assembly.drag=s.drag;return s.drag;}
  setRodPose({elevation,azimuth}={}){const s=this.state;if(s.mode!=='boat'||s.paused||this.inspectionChecking())return{ok:false,message:''};const fighting=s.fishState==='fight'&&s.rodMount==='hand';if(fighting)return{ok:false,message:''};if(Number.isFinite(elevation))s[fighting?'rodTargetElevation':'rodElevation']=clamp(elevation,5,85);if(Number.isFinite(azimuth))s[fighting?'rodTargetAzimuth':'rodAzimuth']=clamp(azimuth,-110,110);if(!fighting){s.rodTargetElevation=null;s.rodTargetAzimuth=null;s.rodTip=rodTipPosition(s);}return{ok:true,message:''};}
  requestRodInHand(){

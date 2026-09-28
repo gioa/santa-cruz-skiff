@@ -20,7 +20,7 @@ test('spool length depends on three-dimensional tackle position, not horizontal 
  s.biteAt=Infinity;s.snagThreshold=Infinity;for(let i=0;i<200;i++)Object.assign(s,stepFishingLine(s,{dt:.05,environment:{bottomDepth:40},current:{x:0,z:0}}));
  assert.ok(s.lureDepth>2);assert.ok(s.paidLineMeters>splashLine);assert.ok(s.paidLineMeters<25);assert.ok(Math.abs(s.paidLineMeters-dist(s.rodTip,s.bobber))<.2);
  const paid=s.paidLineMeters;s.reelMode='brake';for(let i=0;i<100;i++)Object.assign(s,stepFishingLine(s,{dt:.05,environment:{bottomDepth:40}}));assert.equal(s.paidLineMeters,paid);assert.ok(dist(s.rodTip,s.bobber)<=paid+1e-6);
- s.crankRate=1.2;for(let i=0;i<80;i++)Object.assign(s,stepFishingLine(s,{dt:.05,environment:{bottomDepth:40}}));assert.ok(s.paidLineMeters<paid-2);
+ for(let i=0;i<80;i++){s.crankRate=1.2;Object.assign(s,stepFishingLine(s,{dt:.05,environment:{bottomDepth:40}}));}assert.ok(s.paidLineMeters<paid-2);
 });
 test('out-of-range taps are rejected without substituting a boat-side endpoint or consuming tackle',()=>{
  const sim=ready(),s=sim.state;

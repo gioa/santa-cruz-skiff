@@ -1,7 +1,8 @@
-import {GEAR_CATALOG} from './equipment.js?v=20260928-pixel-v74';
-import {RIG_PROFILES} from './fishing-rigs.js?v=20260928-pixel-v74';
-import {ensureConsumables,installBait,installRig,USABLE_CONDITION} from './pixel-consumables.js?v=20260928-pixel-v74';
-import {formatDepth} from './units.js?v=20260928-pixel-v74';
+import {rigWeight} from './pixel-sinkers.js?v=20260928-pixel-v75';
+import {GEAR_CATALOG} from './equipment.js?v=20260928-pixel-v75';
+import {RIG_PROFILES} from './fishing-rigs.js?v=20260928-pixel-v75';
+import {ensureConsumables,installBait,installRig,USABLE_CONDITION} from './pixel-consumables.js?v=20260928-pixel-v75';
+import {formatDepth} from './units.js?v=20260928-pixel-v75';
 
 /** Rod hardware is a premade set. Legacy mounted upgrades are preserved but
  * cannot be edited. Terminal rigs and bait are finite separate supplies. */
@@ -11,6 +12,7 @@ export const BASE_ROD_ASSEMBLY=Object.freeze({reel:null,line:null,leader:null,ri
 export const ROD_ASSEMBLY_SLOTS=Object.freeze([
  {key:'rig',name:'预组装钓组',iconId:'tackle'},
  {key:'bait',name:'鱼饵',iconId:'bait'},
+ {key:'sinker',name:'独立配重',iconId:'sinker_heavy'},
 ].map(Object.freeze));
 const ITEMS=new Map(GEAR_CATALOG.map(g=>[g.id,g]));
 const HARDWARE=['reel','line','leader'];
@@ -41,7 +43,7 @@ export function ensureRodLoadouts(profile,legacy={}){
  for(const id of rods)result[id]=normalizeAssembly(profile,record(saved[id])?saved[id]:id===active?migration:{});
  const seen=new Set();for(const id of [active,...rods.filter(id=>id!==active)].filter(Boolean))for(const slot of HARDWARE){const item=result[id][slot];if(!item)continue;if(seen.has(item))result[id][slot]=null;else seen.add(item);}
  profile.rodLoadouts=result;profile.rodLoadoutsVersion=ROD_LOADOUTS_VERSION;ensureConsumables(profile,legacy);
- for(const [id,a] of Object.entries(result)){const supply=profile.rodSupplies[id];if(!supply)continue;if(a.rig!==supply.rig)Object.assign(a,{rig:supply.rig},defaultsForRig(supply.rig));if(supply.bait)a.bait=supply.bait.kind;}
+ for(const [id,a] of Object.entries(result)){const supply=profile.rodSupplies[id];if(!supply){a.weightGrams=rigWeight(a.rig,null);continue;}if(a.rig!==supply.rig)Object.assign(a,{rig:supply.rig},defaultsForRig(supply.rig));a.weightGrams=rigWeight(supply.rig,supply);if(supply.bait)a.bait=supply.bait.kind;}
  return result;
 }
 export function getRodAssembly(profile,rodId=profile?.loadout?.rod){const map=ensureRodLoadouts(profile);return Object.hasOwn(map,rodId)?{...map[rodId]}:null;}
@@ -67,7 +69,8 @@ export function setRodAssembly(profile,rodId,patch={},packed){
  }
  if(Object.hasOwn(patch,'drag')){const drag=patch.drag;if(typeof drag!=='number'||!Number.isFinite(drag)||drag<.2||drag>.85)return fail('泄力设置需要在 20%–85% 之间。');next.drag=drag;}
  if(Object.hasOwn(patch,'fishingDepthMeters')){const depth=patch.fishingDepthMeters,max=next.rig==='float'?40:80;if(depth!==null&&(typeof depth!=='number'||!Number.isFinite(depth)||depth<.25||depth>max))return fail(`饵层需要在 ${formatDepth(.25)}–${formatDepth(max)} 之间。`);next.fishingDepthMeters=depth;}
- for(const key of ['rodLoadouts','rodLoadoutsVersion','rodSupplies','rigStock','stock','consumablesVersion'])profile[key]=draft[key];
+ next.weightGrams=rigWeight(next.rig,draft.rodSupplies[rodId]);
+ for(const key of ['rodLoadouts','rodLoadoutsVersion','rodSupplies','rigStock','stock','consumablesVersion','sinkerStock','sinkerVersion'])profile[key]=draft[key];
  if(profile.rodLoadouts[profile.loadout?.rod]){const active=profile.rodLoadouts[profile.loadout.rod];Object.assign(profile.loadout,{reel:active.reel,line:active.line,leader:active.leader});}
  return{ok:true,message:'这根船竿的预组装配置已保存。',assembly:{...next},transferred:[]};
 }

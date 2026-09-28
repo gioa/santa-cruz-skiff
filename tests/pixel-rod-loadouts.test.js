@@ -5,13 +5,13 @@ import {BASE_ROD_ASSEMBLY,ROD_ASSEMBLY_SLOTS,ensureRodLoadouts,getRodAssembly,se
 const clone=value=>JSON.parse(JSON.stringify(value));
 function prepared(ids=[]){const profile=createProfile();profile.credits=3000;for(const id of ids)assert.ok(buyGear(profile,id).ok);ensureRodLoadouts(profile);return profile;}
 
-test('starter premade rod has two editable consumable slots and detached readable settings',()=>{
+test('starter premade rod has three consumable slots and detached readable settings',()=>{
  const p=createProfile(),before=clone(p),map=ensureRodLoadouts(p);assert.deepEqual(map.rod,BASE_ROD_ASSEMBLY);assert.deepEqual(p.owned,before.owned);assert.deepEqual(p.stock,before.stock);
- assert.deepEqual(ROD_ASSEMBLY_SLOTS.map(s=>s.key),['rig','bait']);assert.equal(getRodAssembly(p,'rod_light'),null);assert.equal(getRodAssembly(p,'constructor'),null);const copy=getRodAssembly(p);copy.drag=.8;assert.equal(getRodAssembly(p).drag,.48);
+ assert.deepEqual(ROD_ASSEMBLY_SLOTS.map(s=>s.key),['rig','bait','sinker']);assert.equal(getRodAssembly(p,'rod_light'),null);assert.equal(getRodAssembly(p,'constructor'),null);const copy=getRodAssembly(p);copy.drag=.8;assert.equal(getRodAssembly(p).drag,.48);
 });
 
 test('legacy hardware is preserved readonly while obsolete custom sinkers normalize to the premade rig',()=>{
- const p=prepared(['rod_light','reel_smooth','line_braid','rig_slider','bait_anchovy']);delete p.rodLoadouts;delete p.rodLoadoutsVersion;delete p.consumablesVersion;delete p.rodSupplies;delete p.rigStock;Object.assign(p.loadout,{rod:'rod_light',reel:'reel_smooth',line:'line_braid'});
+ const p=prepared(['rod_light','reel_smooth','line_braid','rig_slider','bait_anchovy']);delete p.rodLoadouts;delete p.rodLoadoutsVersion;delete p.sinkerVersion;delete p.sinkerStock;delete p.consumablesVersion;delete p.rodSupplies;delete p.rigStock;Object.assign(p.loadout,{rod:'rod_light',reel:'reel_smooth',line:'line_braid'});
  ensureRodLoadouts(p,{rig:'slider',bait:'anchovy',weightGrams:170,drag:.63,fishingDepthMeters:4,baitOnHook:{kind:'anchovy',condition:.4}});
  assert.deepEqual(getRodAssembly(p,'rod_light'),{...BASE_ROD_ASSEMBLY,reel:'reel_smooth',line:'line_braid',rig:'slider',bait:'anchovy',weightGrams:57,drag:.63,fishingDepthMeters:4});
  assert.equal(setRodAssembly(p,'rod_light',{line:null}).ok,false);const restored=createProfile(clone(p));ensureRodLoadouts(restored,{rig:'bottom'});assert.deepEqual(restored.rodLoadouts,p.rodLoadouts);assert.deepEqual(restored.stock,p.stock);
@@ -32,8 +32,8 @@ test('hardware/weight edits and invalid mixed patches cannot spend stock or part
  const p=prepared(['rod_light','rig_float']);for(const patch of [{reel:null},{line:'line_braid'},{leader:'leader_heavy'},{weightGrams:85},{rig:'sabiki'},{rig:'float',bait:'anchovy'},{drag:Infinity},{drag:1},{fishingDepthMeters:NaN},{unknown:'rod'}]){const before=clone(p);assert.equal(setRodAssembly(p,'rod_light',patch).ok,false,JSON.stringify(patch));assert.deepEqual(p,before);}
 });
 
-test('whole rig sets its paired sinker; float depth remains bounded and drag remains independent',()=>{
- const p=prepared(['rig_float','rig_dropper','rig_sabiki']);assert.ok(setRodAssembly(p,'rod',{rig:'dropper',drag:.65}).ok);assert.equal(getRodAssembly(p).weightGrams,113);assert.ok(setRodAssembly(p,'rod',{rig:'float',fishingDepthMeters:4}).ok);assert.equal(getRodAssembly(p).weightGrams,7);assert.equal(getRodAssembly(p).drag,.65);assert.equal(setRodAssembly(p,'rod',{fishingDepthMeters:60}).ok,false);assert.ok(setRodAssembly(p,'rod',{rig:'sabiki'}).ok);assert.equal(getRodAssembly(p).weightGrams,28);
+test('new separate-weight rigs arrive without a sinker; float depth remains bounded and drag remains independent',()=>{
+ const p=prepared(['rig_float','rig_dropper','rig_sabiki']);assert.ok(setRodAssembly(p,'rod',{rig:'dropper',drag:.65}).ok);assert.equal(getRodAssembly(p).weightGrams,6);assert.ok(setRodAssembly(p,'rod',{rig:'float',fishingDepthMeters:4}).ok);assert.equal(getRodAssembly(p).weightGrams,7);assert.equal(getRodAssembly(p).drag,.65);assert.equal(setRodAssembly(p,'rod',{fishingDepthMeters:60}).ok,false);assert.ok(setRodAssembly(p,'rod',{rig:'sabiki'}).ok);assert.equal(getRodAssembly(p).weightGrams,6);
 });
 
 test('options expose finite spare counts and bait availability; individual hardware has no editing options',()=>{
