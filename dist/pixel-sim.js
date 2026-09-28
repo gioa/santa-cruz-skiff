@@ -1,29 +1,30 @@
-import {stepRodTip,fishTipSignal} from './pixel-rod-response.js?v=20260927-pixel-v31';
-import {baitSchoolInfluence} from './pixel-bait-schools.js?v=20260927-pixel-v31';
-import {planCast,stepCast} from './pixel-casting.js?v=20260927-pixel-v31';
-import {RETIRED_PIXEL_GEAR} from './pixel-gear-availability.js?v=20260927-pixel-v31';
-import {fishCommonName,fishDisplayName} from './pixel-fish-names.js?v=20260927-pixel-v31';
-import {stepBottomSnag,stepSnagAbrasion} from './pixel-snag.js?v=20260927-pixel-v31';
-import {formatLength,formatWeight} from './units.js?v=20260927-pixel-v31';
+import {fishMassKg} from './pixel-fish-mass.js?v=20260927-pixel-v32';
+import {stepRodTip,fishTipSignal} from './pixel-rod-response.js?v=20260927-pixel-v32';
+import {baitSchoolInfluence} from './pixel-bait-schools.js?v=20260927-pixel-v32';
+import {planCast,stepCast} from './pixel-casting.js?v=20260927-pixel-v32';
+import {RETIRED_PIXEL_GEAR} from './pixel-gear-availability.js?v=20260927-pixel-v32';
+import {fishCommonName,fishDisplayName} from './pixel-fish-names.js?v=20260927-pixel-v32';
+import {stepBottomSnag,stepSnagAbrasion} from './pixel-snag.js?v=20260927-pixel-v32';
+import {formatLength,formatWeight} from './units.js?v=20260927-pixel-v32';
 /** Pixel gameplay. Offshore travel uses a 1:2 map scale and the calendar clock runs at 2x. Input, fishing and animations use active real seconds. */
-import {GEAR_CATALOG,BASE_GEAR,createProfile,equipmentStats,cargoWeight,settleFish,buyGear as purchaseGear,hasElectricReel as electricReelEquipped} from './equipment.js?v=20260927-pixel-v31';
-import {HARBOR,BOARDING_WALK_PATH,walkHeight,walkAllowed,canBoardFrom,harborWaterBlocked} from './pixel-harbor-layout.js?v=20260927-pixel-v31';
-import {walkingBlocked as walkBlocked,walkingPointOpen,walkingSegmentOpen as safeWalkSegment,createGroundWalkSearch,advanceGroundWalk} from './pixel-walking-path.js?v=20260927-pixel-v31';
-import {FISHING_SPOTS,toGPS,bearingDegrees,onLand,onPier,MAP_BOUNDS} from './pixel-geography.js?v=20260927-pixel-v31';
-import {fishingHabitatAt} from './pixel-seafloor.js?v=20260927-pixel-v31';
-import {depthAt,depthInfoAt} from './bathymetry.js?v=20260927-pixel-v31';
-import {waterRoute,resolveVesselContact,contactAwareControl,clearResumeVesselPose} from './pixel-navigation.js?v=20260927-pixel-v31';
-import {createVesselState,stepVessel,syncVessel,vesselWind,vesselAutopilot} from './vessel-physics.js?v=20260927-pixel-v31';
-import {fishEncounter,weightedEncounterFish} from './pixel-fish-ecology.js?v=20260927-pixel-v31';
-import {RIG_PROFILES,getRigProfile} from './fishing-rigs.js?v=20260927-pixel-v31';
-import {MAX_PAID_LINE_METERS,MAX_TROLL_SPEED_MPS,MAX_TROLL_THROTTLE,reelTurnsPerSecond,rodTipPosition,fishingCurrent,relativeFishingFlow,stepFishingLine} from './pixel-fishing-physics.js?v=20260927-pixel-v31';
-import {createFishFight,stepFishFight,canLandFish} from './pixel-fish-fight.js?v=20260927-pixel-v31';
-import {createHookHold,createBiteHold,stepHookHold} from './pixel-hooking.js?v=20260927-pixel-v31';
-import {consumableStatus,installBait,installRig,loseRig,damageSupplies,rigRequiresBait,USABLE_CONDITION} from './pixel-consumables.js?v=20260927-pixel-v31';
-import {ensureRodLoadouts,getRodAssembly,setRodAssembly,syncActiveRodLoadout} from './pixel-rod-loadouts.js?v=20260927-pixel-v31';
-import {assessCatchLedger,identifyRegulatedSpecies} from './fishing-regulations.js?v=20260927-pixel-v31';
-import {FishingPatrol} from './fish-patrol.js?v=20260927-pixel-v31';
-import {NAVIGATION_COMPRESSION,navigationStepScale} from './pixel-navigation-scale.js?v=20260927-pixel-v31';
+import {GEAR_CATALOG,BASE_GEAR,createProfile,equipmentStats,cargoWeight,settleFish,buyGear as purchaseGear,hasElectricReel as electricReelEquipped} from './equipment.js?v=20260927-pixel-v32';
+import {HARBOR,BOARDING_WALK_PATH,walkHeight,walkAllowed,canBoardFrom,harborWaterBlocked} from './pixel-harbor-layout.js?v=20260927-pixel-v32';
+import {walkingBlocked as walkBlocked,walkingPointOpen,walkingSegmentOpen as safeWalkSegment,createGroundWalkSearch,advanceGroundWalk} from './pixel-walking-path.js?v=20260927-pixel-v32';
+import {FISHING_SPOTS,toGPS,bearingDegrees,onLand,onPier,MAP_BOUNDS} from './pixel-geography.js?v=20260927-pixel-v32';
+import {fishingHabitatAt} from './pixel-seafloor.js?v=20260927-pixel-v32';
+import {depthAt,depthInfoAt} from './bathymetry.js?v=20260927-pixel-v32';
+import {waterRoute,resolveVesselContact,contactAwareControl,clearResumeVesselPose} from './pixel-navigation.js?v=20260927-pixel-v32';
+import {createVesselState,stepVessel,syncVessel,vesselWind,vesselAutopilot} from './vessel-physics.js?v=20260927-pixel-v32';
+import {fishEncounter,weightedEncounterFish} from './pixel-fish-ecology.js?v=20260927-pixel-v32';
+import {RIG_PROFILES,getRigProfile} from './fishing-rigs.js?v=20260927-pixel-v32';
+import {MAX_PAID_LINE_METERS,MAX_TROLL_SPEED_MPS,MAX_TROLL_THROTTLE,reelTurnsPerSecond,rodTipPosition,fishingCurrent,relativeFishingFlow,stepFishingLine} from './pixel-fishing-physics.js?v=20260927-pixel-v32';
+import {createFishFight,stepFishFight,canLandFish} from './pixel-fish-fight.js?v=20260927-pixel-v32';
+import {createHookHold,createBiteHold,stepHookHold} from './pixel-hooking.js?v=20260927-pixel-v32';
+import {consumableStatus,installBait,installRig,loseRig,damageSupplies,rigRequiresBait,USABLE_CONDITION} from './pixel-consumables.js?v=20260927-pixel-v32';
+import {ensureRodLoadouts,getRodAssembly,setRodAssembly,syncActiveRodLoadout} from './pixel-rod-loadouts.js?v=20260927-pixel-v32';
+import {assessCatchLedger,identifyRegulatedSpecies} from './fishing-regulations.js?v=20260927-pixel-v32';
+import {FishingPatrol} from './fish-patrol.js?v=20260927-pixel-v32';
+import {NAVIGATION_COMPRESSION,navigationStepScale} from './pixel-navigation-scale.js?v=20260927-pixel-v32';
 export const GAME_TIME_SCALE=1/NAVIGATION_COMPRESSION;
 export const WALK_SPEED=2.90;
 export const BOAT_RENTAL_PRICE=15; // Virtual game credits, not a real rental quote.
@@ -35,8 +36,8 @@ export const PIXEL_FISH=[
  {name:'蓝岩鱼',latin:'Sebastes mystinus',color:'#718ba8',min:22,max:39,weight:.7,referenceLength:30.5,power:.86,spot:'kelp',bait:'squid'},
  {name:'铜岩鱼',latin:'Sebastes caurinus',color:'#cc9869',min:27,max:58,weight:1.3,referenceLength:37.5,power:1.03,spot:'reef',bait:'squid'},
  {name:'加州大比目鱼',latin:'Paralichthys californicus',color:'#a6aa74',min:38,max:69,weight:2.5,power:1.2,spot:'sand',bait:'anchovy'},
- {name:'太平洋鲭鱼',latin:'Scomber japonicus',color:'#73b8c1',min:25,max:38,weight:.6,power:.8,spot:'sand',bait:'jig'},
- {name:'长蛇齿单线鱼',latin:'Ophiodon elongatus',color:'#8ba878',min:40,max:65,weight:2.8,power:1.32,spot:'reef',bait:'jig'},
+ {name:'太平洋鲭鱼',latin:'Scomber japonicus',color:'#73b8c1',min:25,max:38,weight:.6,referenceLength:31.5,power:.8,spot:'sand',bait:'jig'},
+ {name:'长蛇齿单线鱼',latin:'Ophiodon elongatus',color:'#8ba878',min:40,max:65,weight:1.34,referenceLength:53,power:1.32,spot:'reef',bait:'jig'},
  {name:'朱红岩鱼',latin:'Sebastes miniatus',color:'#d78062',min:25,max:68,weight:1.35,referenceLength:41.2,rarity:.36,spot:'reef',bait:'squid'},
  {name:'帝王鲑',latin:'Oncorhynchus tshawytscha',color:'#a8c8ce',min:45,max:100,weight:5.5,referenceLength:70,rarity:.09,spot:'sand',bait:'anchovy'},
  {name:'白海鲈',latin:'Atractoscion nobilis',color:'#b2b5a6',min:55,max:140,weight:8.6,referenceLength:98.5,rarity:.025,spot:'kelp',bait:'squid'},
@@ -232,7 +233,7 @@ export class PixelSimulation {
  rigEnvironment(){const s=this.state,p=s.bobber||{x:s.boatX,z:s.boatZ},profile=getRigProfile(s.rig),bed=fishingHabitatAt(p.x,p.z),flow=relativeFishingFlow(fishingCurrent(this.conditions),this.vessel);return{schoolInfluence:baitSchoolInfluence(s.baitSchools,p,s.lureDepth),rig:s.rig,bottomDepth:depthAt(p.x,p.z),lureDepth:s.lureDepth,weightGrams:s.rigWeightGrams??profile.defaultWeightGrams,fishingDepthMeters:s.fishingDepthMeters??profile.defaultFishingDepth,currentMps:flow,boatSpeedMps:0,lineOutMeters:s.paidLineMeters,lineDiameterMm:s.profile.loadout.line==='line_braid'&&this.hasGear('line_braid')?.28:.36,habitat:bed.kind,substrateMapped:bed.mapped,substrateContextual:bed.contextual,bait:s.baitOnHook?.condition>USABLE_CONDITION?s.baitOnHook.kind:(rigRequiresBait(s.rig)?s.bait:'feather'),baitForm:s.baitOnHook?.kind==='squid'?'strip':'deadwhole',baitTipped:Boolean(s.baitOnHook?.condition>USABLE_CONDITION),tipFreshness:s.baitOnHook?.condition??0,anchored:false,driftSpeedMps:Math.hypot(this.vessel.vx||0,this.vessel.vz||0),freshness:rigRequiresBait(s.rig)?(s.baitOnHook?.condition??0):(s.profile.rodSupplies[s.profile.loadout.rod]?.condition??0),waterTemp:this.conditions.waterTemp,waveHeight:this.conditions.waveHeight,windKnots:this.conditions.windKnots,wavePeriod:this.conditions.period,month:Number(pacificMonth.format(new Date(this.captureTimestamp()))),retrieveSpeedMps:s.crankRate*.65*this.stats.retrieve,pumping:s.pumping,lureVerticalSpeedMps:finite(s.lureVerticalSpeedMps)};}
  // The fish is chosen when it takes the bait, not when a button is pressed.
  ensureBitingFish(){
-  const s=this.state;if(!s.biteFish){const f=weightedEncounterFish(PIXEL_FISH,this.rigEnvironment(),this.rng);if(!f)return null;const length=Math.round(f.min+Math.pow(this.rng(),1.65)*(f.max-f.min));s.biteFish={...f,length,kg:Number((f.weight*Math.pow(length/(f.referenceLength||((f.min+f.max)/2)),2.7)).toFixed(2))};}
+  const s=this.state;if(!s.biteFish){const f=weightedEncounterFish(PIXEL_FISH,this.rigEnvironment(),this.rng);if(!f)return null;const length=Math.round(f.min+Math.pow(this.rng(),1.65)*(f.max-f.min));s.biteFish={...f,length,kg:fishMassKg(f,length)};}
   if(!s.biteHold){s.biteHold=createBiteHold(s.biteFish,getRigProfile(s.rig),{holdRoll:this.rng(),seatRoll:this.rng(),wireDamage:s.profile.rodSupplies[s.profile.loadout.rod]?.hookDamage});damageSupplies(s.profile,s.profile.loadout.rod,'bite');}return s.biteFish;
  }
  hook({automatic=false}={}){
@@ -242,7 +243,7 @@ export class PixelSimulation {
   if(s.reelMode!=='brake'||s.lineSlackMeters>=.35||s.rodLoadN<.35||s.biteEngagement<s.biteHold.profile.engageSeconds)return{ok:false,message:''};
   if(s.biteHold.canSeat===false)return this.escape('miss');
   this.stopPropulsion();const p=s.bobber||{x:s.boatX,z:s.boatZ};
-  s.fish={...f,caughtAt:this.captureTimestamp(),caughtGPS:toGPS(p.x,p.z),rig:{id:s.rig,rod:s.profile.loadout.rod,reel:s.profile.loadout.reel,line:s.profile.loadout.line,leader:s.profile.loadout.leader,hookCount:rig.hooks,hookSize:rig.hookSize,hookStyle:rig.hookStyle,lineCount:1,weightGrams:s.rigWeightGrams,fishingDepthMeters:s.fishingDepthMeters,wireLeader:false,rodCount:1,bait:Boolean(s.baitOnHook&&s.baitOnHook.kind!=='jig'),circleHook:rig.hookStyle==='circle',trolling:Boolean(s.biteTrolling),sinkerLb:s.rigWeightGrams/453.592,breakawayWeight:false},hookCount:rig.hooks,lineCount:1,hasDescendingDevice:this.hasGear('descending_device'),landingNetDiameterInches:this.hasGear('net')?20:false,salmonAboardAtCapture:s.catches.some(c=>c.kept&&!c.settled&&identifyRegulatedSpecies(c)?.id==='chinook_salmon'),groundfishAboardAtCapture:s.catches.some(c=>{const sp=identifyRegulatedSpecies(c);return c.kept&&!c.settled&&sp?.groundfish&&!sp.groundfishGearExempt;})};
+  s.fish={...f,captureDepth:s.lureDepth,caughtAt:this.captureTimestamp(),caughtGPS:toGPS(p.x,p.z),rig:{id:s.rig,rod:s.profile.loadout.rod,reel:s.profile.loadout.reel,line:s.profile.loadout.line,leader:s.profile.loadout.leader,hookCount:rig.hooks,hookSize:rig.hookSize,hookStyle:rig.hookStyle,lineCount:1,weightGrams:s.rigWeightGrams,fishingDepthMeters:s.fishingDepthMeters,wireLeader:false,rodCount:1,bait:Boolean(s.baitOnHook&&s.baitOnHook.kind!=='jig'),circleHook:rig.hookStyle==='circle',trolling:Boolean(s.biteTrolling),sinkerLb:s.rigWeightGrams/453.592,breakawayWeight:false},hookCount:rig.hooks,lineCount:1,hasDescendingDevice:this.hasGear('descending_device'),landingNetDiameterInches:this.hasGear('net')?20:false,salmonAboardAtCapture:s.catches.some(c=>c.kept&&!c.settled&&identifyRegulatedSpecies(c)?.id==='chinook_salmon'),groundfishAboardAtCapture:s.catches.some(c=>{const sp=identifyRegulatedSpecies(c);return c.kept&&!c.settled&&sp?.groundfish&&!sp.groundfishGearExempt;})};
   s.hookHold=s.biteHold;s.biteFish=null;s.biteHold=null;s.biteEngagement=0;s.hookSetSeconds=0;s.biteExposure=0;
   s.fishFight=createFishFight(s.fish,this.rng());s.fishPullN=0;s.fishMotion=null;s.fishState='fight';s.stamina=100;s.tension=0;s.fightTime=0;s.breakMeter=0;return this.notify(s.rodMount==='hand'?'中鱼了。':'鱼竿已经受力，拿起鱼竿收线。','hook');
  }
@@ -338,7 +339,7 @@ export class PixelSimulation {
   if(!active){s.lureVerticalSpeedMps=0;return;}
   const env=this.rigEnvironment(),eq=this.stats,previousLureDepth=s.lureDepth;let pull=null;
   if(s.fishState==='bite'){const f=this.ensureBitingFish();if(!f){this.escape('miss');return;}pull=Math.max(.1,Math.min(8,.6+Math.pow(f.kg,.65)*1.4)+fishTipSignal(s).force*.32);}
-  if(s.fishState==='fight'){s.fightTime+=dt;const response=stepFishFight(s.fish,s.fishFight,{dt,time:s.fightTime,rodLoadN:s.rodLoadN,payoutRate:s.payoutRate,retrieveRate:s.retrieveRate,lineSlackMeters:s.lineSlackMeters,lureDepth:s.lureDepth});s.fishFight=response.fight;s.fishMotion=response.motion;s.fishPullN=pull=response.pullN;s.stamina=response.fight.energy*100;}
+  if(s.fishState==='fight'){s.fightTime+=dt;const response=stepFishFight(s.fish,s.fishFight,{dt,time:s.fightTime,rodLoadN:s.rodLoadN,payoutRate:s.payoutRate,retrieveRate:s.retrieveRate,lineSlackMeters:s.lineSlackMeters,lureDepth:s.lureDepth,fishHeight:s.bobber?.height,paidLineMeters:s.paidLineMeters});s.fishFight=response.fight;s.fishMotion=response.motion;s.fishPullN=pull=response.pullN;s.stamina=response.fight.energy*100;}
   Object.assign(s,stepFishingLine(s,{dt,environment:env,current:fishingCurrent(this.conditions),velocity:this.vessel,retrieve:eq.retrieve,strength:eq.strength,sensitivity:eq.sensitivity,smooth:eq.smooth,fishPullN:pull,fishMotion:s.fishMotion}));
   s.lureVerticalSpeedMps=dt>0?(previousLureDepth-s.lureDepth)/dt:0;env.lureVerticalSpeedMps=s.lureVerticalSpeedMps;
   // Virtual starter main line is 20 lb, leader 15 lb; knot efficiency .75 is a

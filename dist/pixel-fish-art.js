@@ -1,3 +1,4 @@
+import {fishBodyPose,drawFishBody} from './pixel-fish-motion.js?v=20260927-pixel-v32';
 // A shared measuring board: a fish never grows to fill its card. The same
 // centimetre-to-pixel scale applies to every species and every catch on a view.
 export const FISH_BOARD_SPAN_CM=152.4; // 60 in / 5 ft
@@ -93,7 +94,8 @@ export function drawFishArt(canvas,sprite,f={},options={}){
   ctx.fillStyle='#708875';ctx.fillRect(padding,compact?2:7,1,rulerY-(compact?2:7));
   // Source sprites face right. Put the nose at the same ruler zero for all fish.
   ctx.save();ctx.translate(fishX+fishWidth,fishY);ctx.scale(-1,1);
-  ctx.drawImage(sprite,bounds.x,bounds.y,bounds.width,bounds.height,0,0,fishWidth,fishHeight);ctx.restore();
+  const pose=options.animate?fishBodyPose(fishSpriteKind(f),{time:options.time||0,mass:f.kg,energy:options.energy??.6,landed:true,reducedMotion:options.reducedMotion}):null;
+  drawFishBody(ctx,sprite,bounds,{length:fishWidth,height:fishHeight,pose:pose?{...pose,pitch:0}:null});ctx.restore();
   ctx.fillStyle='#456055';ctx.fillRect(Math.round(fishX+fishWidth),rulerY-(compact?3:5),1,compact?4:6);
  }
  return layout;

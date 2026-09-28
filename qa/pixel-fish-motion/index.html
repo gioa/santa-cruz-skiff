@@ -1,0 +1,26 @@
+<!doctype html><html lang="zh"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>鱼的重量与动作 · 本机验证</title>
+<style>*{box-sizing:border-box;user-select:none}body{margin:0;background:#173f43;color:#fff0cf;font:14px system-ui;overflow:hidden}#view{display:block;width:100%;height:calc(100dvh - 175px);image-rendering:pixelated}header{height:175px;padding:8px 12px}select,button{font:inherit;padding:7px;margin:2px;background:#fff0cf;color:#173f43;border:0}output{display:block;font:11px monospace;overflow-wrap:anywhere}p{margin:3px}#card{position:fixed;top:18%;left:4%;width:92%;background:#fff1d5;color:#173f43;padding:18px;border:2px solid;box-shadow:7px 8px #173f4370}#card[hidden]{display:none}#art{width:100%;image-rendering:pixelated;border:2px solid}h2{margin:4px 0 10px}.stats{display:flex;justify-content:space-around;font:bold 24px monospace}.label{font:12px system-ui;display:block}</style>
+<canvas id="view"></canvas><section id="card" hidden><small>A MOMENT TO REMEMBER</small><h2 id="name"></h2><canvas id="art"></canvas><p class="stats"><span id="length"></span><span id="mass"></span></p></section><header><p>本机验证 · 正式鱼身、鱼竿与鱼线物理</p><select id="fish" aria-label="鱼种"></select><button id="reset">重新拉鱼</button><button id="catch">上船测量</button><button id="apex">跃起最高点</button><button id="pause">暂停</button><output id="status"></output></header>
+<script type="module">
+import {PIXEL_FISH} from '../../dist/pixel-sim.js';
+import {createPixelSprites} from '../../dist/pixel-sprites.js';
+import {createFightView} from '../../dist/pixel-fight-view.js';
+import {fishSpriteKind,drawFishArt} from '../../dist/pixel-fish-art.js';
+import {fishMassKg} from '../../dist/pixel-fish-mass.js';
+import {createFishFight,stepFishFight} from '../../dist/pixel-fish-fight.js';
+import {rodTipPosition,stepFishingLine} from '../../dist/pixel-fishing-physics.js';
+import {stepRodTip} from '../../dist/pixel-rod-response.js';
+if(!['localhost','127.0.0.1'].includes(location.hostname))throw Error('Local QA only');
+const $=id=>document.getElementById(id),sprites=createPixelSprites(),view=createFightView($('view'),{sprites});
+for(const f of PIXEL_FISH){const o=document.createElement('option');o.value=f.latin;o.textContent=f.name+' · '+fishSpriteKind(f);$('fish').append(o);}$('fish').value='Ophiodon elongatus';
+let s,t=0,last=performance.now(),paused=false,card=false,stopAtApex=false,peak=0,splashes=0,frames=0;
+function reset(){const source=PIXEL_FISH.find(f=>f.latin===$('fish').value),length=source.latin==='Ophiodon elongatus'?53:source.latin==='Oncorhynchus tshawytscha'?80:source.referenceLength||53,fish={...source,length,kg:fishMassKg(source,length)};s={fishState:'fight',fish,fishFight:createFishFight(fish,.1),rig:'bottom',rigWeightGrams:85,boatX:0,boatZ:0,heading:0,rodElevation:45,rodAzimuth:70,rodMount:'hand',reelMode:'brake',crankRate:0,drag:.9,pumpHeight:0,rodBend:.3,rodLoadN:3,lureDepth:.05,paidLineMeters:4,lineSlackMeters:0,profile:{loadout:{rod:'rod'}}};s.rodTip=rodTipPosition(s);s.bobber={x:s.rodTip.x+1.8,z:s.rodTip.z,height:-.05};s.fishFight.jumpCooldown=0;t=0;paused=false;card=false;peak=0;splashes=0;frames=0;stopAtApex=false;$('card').hidden=true;$('pause').textContent='暂停';}
+function resize(){view.resize(innerWidth,innerHeight-175);}resize();onresize=resize;reset();
+$('fish').onchange=reset;$('reset').onclick=reset;
+$('catch').onclick=()=>{card=true;t=0;$('card').hidden=false;$('name').textContent=s.fish.name+' · '+fishSpriteKind(s.fish);$('length').innerHTML=(s.fish.length/2.54).toFixed(1)+'<small class="label">英寸 in</small>';$('mass').innerHTML=(s.fish.kg*2.20462262).toFixed(2)+'<small class="label">磅 lb</small>';};
+$('pause').onclick=()=>{paused=!paused;$('pause').textContent=paused?'继续':'暂停';};
+$('apex').onclick=()=>{$('fish').value='Oncorhynchus tshawytscha';reset();stopAtApex=true;};
+function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;if(!paused){t+=dt;frames++;if(!card){const response=stepFishFight(s.fish,s.fishFight,{...s,dt,time:t,fishHeight:s.bobber.height});s.fishFight=response.fight;s.fishMotion=response.motion;s.fishPullN=response.pullN;Object.assign(s,stepFishingLine(s,{dt,environment:{bottomDepth:30},fishPullN:response.pullN,fishMotion:response.motion}));s.rodTipMotion=stepRodTip(s,dt);peak=Math.max(peak,s.bobber.height);if(s.fishMotion.splash>0)splashes++;if(stopAtApex&&s.bobber.height>0&&s.fishMotion.jumpVelocity<=.3){paused=true;$('pause').textContent='继续';}}}
+view.draw(s,dt,{active:true,paused:paused||card,bottomInset:0});if(card)drawFishArt($('art'),sprites.fish[fishSpriteKind(s.fish)],s.fish,{width:$('card').clientWidth-36,height:180,animate:true,time:t,energy:s.fishFight.energy});
+const snap=view.snapshot();$('status').textContent=JSON.stringify({kind:fishSpriteKind(s.fish),kg:s.fish.kg,time:+t.toFixed(2),height:+s.bobber.height.toFixed(3),peak:+peak.toFixed(3),phase:s.fishMotion?.phase,splashes,frames,hook:snap.hookPoint,water:snap.lineEntry});requestAnimationFrame(frame);}requestAnimationFrame(frame);
+</script></html>

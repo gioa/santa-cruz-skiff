@@ -5,7 +5,7 @@
  * pay line out, while turning the handle takes it in. Rod movement never
  * manufactures more line. This module has no inventory, UI or random events.
  */
-import {getRigProfile,stepRigLure} from './fishing-rigs.js?v=20260927-pixel-v31';
+import {getRigProfile,stepRigLure} from './fishing-rigs.js?v=20260927-pixel-v32';
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 const finite=(n,f=0)=>Number.isFinite(n)?n:f;
 export const MAX_PAID_LINE_METERS=120;
@@ -151,13 +151,13 @@ export function stepFishingLine(s,{dt,environment={},current={x:0,z:0},velocity=
  const d=Math.max(.001,separation(tip,lure)),outward=Math.min(Math.max(0,paid-d),dt*(.4+pull*.07));
  lure.x+=(lure.x-tip.x)/d*outward+finite(current.x)*dt;
  lure.z+=(lure.z-tip.z)/d*outward+finite(current.z)*dt;
- lure.height+= (lure.height-tip.height)/d*outward;
+ if(!fishMotion?.jumpActive)lure.height+=(lure.height-tip.height)/d*outward;
  if(fishMotion){
   const horizontal=Math.hypot(lure.x-tip.x,lure.z-tip.z),angle=finite(s.heading)-finite(s.rodAzimuth,70)*Math.PI/180;
   const dx=horizontal>.001?(lure.x-tip.x)/horizontal:-Math.sin(angle),dz=horizontal>.001?(lure.z-tip.z)/horizontal:-Math.cos(angle);
   const lateral=finite(fishMotion.lateralMps)*dt,run=Math.min(finite(fishMotion.runSpeedMps)*dt,Math.max(0,paid-d)+payoutRate*dt);
   lure.x+=dx*run-dz*lateral;lure.z+=dz*run+dx*lateral;
-  lure.height=Math.min(0,lure.height-finite(fishMotion.diveMps)*dt);
+  lure.height=fishMotion.jumpActive?lure.height-finite(fishMotion.diveMps)*dt:Math.min(0,lure.height-finite(fishMotion.diveMps)*dt);
  }
  if(lure.height< -bottom+.08){
   lure.height=-Math.max(0,bottom-.08);const vertical=tip.height-lure.height,radial=Math.sqrt(Math.max(0,(d+outward)**2-vertical**2)),horizontal=Math.hypot(lure.x-tip.x,lure.z-tip.z);

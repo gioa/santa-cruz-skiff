@@ -31,9 +31,9 @@ export function fishFightKind(fish={}){
 }
 export function createFishFight(fish={},variation=.5){
  const kind=fishFightKind(fish),mass=clamp(finite(fish.kg,.6),.05,80),p=FISH_FIGHT_PROFILES[kind];
- return{kind,mass,energy:1,variation:clamp(finite(variation,.5),0,1),capacityJ:p.budget*Math.pow(mass,.85),workJ:0};
+ return{kind,mass,energy:1,variation:clamp(finite(variation,.5),0,1),capacityJ:p.budget*Math.pow(mass,.85),workJ:0,jumpVelocity:0,jumpActive:false,jumpCooldown:6+clamp(finite(variation,.5),0,1)*12,splash:0};
 }
-export function stepFishFight(fish={},fight,{dt=.1,time=0,rodLoadN=0,payoutRate=0,retrieveRate=0,lineSlackMeters=0,lureDepth=0}={}){
+export function stepFishFight(fish={},fight,{dt=.1,time=0,rodLoadN=0,payoutRate=0,retrieveRate=0,lineSlackMeters=0,lureDepth=0,fishHeight=-lureDepth,paidLineMeters=0}={}){
  const f=fight||createFishFight(fish),p=FISH_FIGHT_PROFILES[f.kind]||FISH_FIGHT_PROFILES.rockfish;
  dt=clamp(finite(dt),0,.25);time=Math.max(0,finite(time));
  const massScale=Math.pow(f.mass,.78),v=.88+f.variation*.24,energy=clamp(finite(f.energy,1),0,1);
@@ -43,7 +43,20 @@ export function stepFishFight(fish={},fight,{dt=.1,time=0,rodLoadN=0,payoutRate=
  const envelope=burst?Math.sin(Math.PI*clamp(phase/(run*v),0,1))**.55:0;
  const rockFloor=.44+.16*largeRock;
  const fatigue=.12+.88*Math.sqrt(energy),rockSettle=f.kind==='rockfish'?(rockFloor+(1-rockFloor)*Math.exp(-time/(11+17*largeRock))):1;
- const headShake=(.5+.5*Math.sin(time*p.shake*Math.PI*2+f.variation*3))*envelope*fatigue;
+ let headShake=(.5+.5*Math.sin(time*p.shake*Math.PI*2+f.variation*3))*envelope*fatigue;
+ // Deep-caught rockfish may be subdued by decompression, not obliged to fight.
+ const decompression=f.kind==='rockfish'?clamp(1-Math.max(0,finite(fish.captureDepth)-20)/80,.22,1):1;
+ headShake*=decompression;
+ const height=finite(fishHeight,-lureDepth),cooldown=Math.max(0,finite(f.jumpCooldown,10)-dt);
+ let jumpVelocity=finite(f.jumpVelocity),jumpActive=Boolean(f.jumpActive),splash=Math.max(0,finite(f.splash)-dt);
+ // Chinook primarily run/dive. Only some vigorous individuals occasionally
+ // breach; no bottom fish is made to jump because it happens to be large.
+ if(!jumpActive&&f.kind==='salmon'&&f.variation<.22&&f.mass>=2&&energy>.45&&height>=-.18&&height<=0&&paidLineMeters>2.8&&cooldown===0){jumpActive=true;splash=.16;jumpVelocity=2.7+.5*Math.min(1,f.mass/8);}
+ let nextCooldown=cooldown;
+ if(jumpActive){
+  if(height<=0&&jumpVelocity<0){jumpActive=false;jumpVelocity=0;splash=.65;nextCooldown=18+f.variation*30;}
+  else{jumpVelocity-=9.81*dt;headShake=Math.max(headShake,.75*fatigue);}
+ }
  const drive=massScale*(p.base*.55+p.burst*(1+.2*largeRock)*envelope)*fatigue*rockSettle*v;
  const pullN=Math.max(.12,drive*(.86+.14*headShake));
  const loaded=lineSlackMeters<.3&&rodLoadN>.25;
@@ -56,12 +69,12 @@ export function stepFishFight(fish={},fight,{dt=.1,time=0,rodLoadN=0,payoutRate=
  const lateralMps=Math.sin(time*.62+f.variation*5)*p.lateral*envelope*fatigue;
  // Pelagic runs gradually travel upwards; bottom species stay close to reef.
  const diveMps=burst?p.dive*envelope*fatigue:((f.kind==='salmon'||f.kind==='bonito')&&lureDepth>1?-.16:0);
- return{fight:{...f,energy:nextEnergy,workJ:finite(f.workJ)+effort*dt},pullN,
-  motion:{runSpeedMps,lateralMps,diveMps,headShake,phase:envelope>.15?(f.kind==='rockfish'?'kick':'run'):energy<.25?'settle':'glide'}};
+ return{fight:{...f,energy:nextEnergy,workJ:finite(f.workJ)+effort*dt,jumpVelocity,jumpActive,jumpCooldown:nextCooldown,splash},pullN,
+  motion:{runSpeedMps,lateralMps,diveMps:jumpActive?-jumpVelocity:diveMps,headShake,jumpActive,jumpVelocity,splash,phase:jumpActive?'jump':envelope>.15?(f.kind==='rockfish'?'kick':'run'):energy<.25?'settle':'glide'}};
 }
 /** At the gunwale, an adequately controlled fish can be netted immediately.
  * A small fish never has to spend a scripted amount of time being fought.
  */
 export function canLandFish(s){
- return s.fishState==='fight'&&s.reelMode!=='free'&&s.paidLineMeters<=finite(s.rodTip?.height)+1.05&&s.lureDepth<1.1&&s.payoutRate<.12&&finite(s.fishPullN)<=Math.max(3,finite(s.dragThresholdN,13.5)*1.05);
+ return s.fishState==='fight'&&!s.fishMotion?.jumpActive&&s.reelMode!=='free'&&s.paidLineMeters<=finite(s.rodTip?.height)+1.05&&s.lureDepth<1.1&&s.payoutRate<.12&&finite(s.fishPullN)<=Math.max(3,finite(s.dragThresholdN,13.5)*1.05);
 }
