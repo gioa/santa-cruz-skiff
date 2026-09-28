@@ -1,4 +1,4 @@
-import {getRigProfile} from './fishing-rigs.js?v=20260927-pixel-v24';
+import {getRigProfile} from './fishing-rigs.js?v=20260927-pixel-v25';
 
 const profile=rig=>getRigProfile(rig);
 export const rigHookSize=rig=>profile(rig).hookSize||'—';

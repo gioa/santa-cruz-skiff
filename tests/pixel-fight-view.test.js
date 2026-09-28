@@ -1,13 +1,19 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
-import {createFightView,fightViewGeometry} from '../dist/pixel-fight-view.js';
+import {createFightView,fightViewGeometry,fightFishProjection} from '../dist/pixel-fight-view.js';
 
-const state=(overrides={})=>({fishState:'fight',rodMount:'hand',rodElevation:45,rodAzimuth:70,rodBend:.45,rodLoadN:12,paidLineMeters:18,lureDepth:12,lineSlackMeters:0,rig:'bottom',reelMode:'brake',crankRate:0,heading:0,rodTip:{x:2,z:0,height:1.8},lineEntry:{x:2.3,z:-1},...overrides});
+const state=(overrides={})=>({fishState:'fight',fish:{length:30,latin:'Sebastes melanops'},rodMount:'hand',rodElevation:45,rodAzimuth:70,rodBend:.45,rodLoadN:12,paidLineMeters:18,lureDepth:12,lineSlackMeters:0,rig:'bottom',reelMode:'brake',crankRate:0,heading:0,rodTip:{x:2,z:0,height:1.8},lineEntry:{x:2.3,z:-1},...overrides});
 function recordingCanvas(){
  let calls=[];const context={fillStyle:'',imageSmoothingEnabled:true};
- for(const name of['fillRect','beginPath','moveTo','lineTo','closePath','fill'])context[name]=(...args)=>calls.push([name,context.fillStyle,...args]);
- return{width:0,height:0,getContext:()=>context,reset(){calls=[];},digest(){return createHash('sha256').update(JSON.stringify(calls)).digest('hex');},get count(){return calls.length;}};
+ for(const name of['fillRect','beginPath','moveTo','lineTo','closePath','fill','save','restore','drawImage'])context[name]=(...args)=>calls.push([name,context.fillStyle,...args]);
+ return{width:0,height:0,getContext:()=>context,reset(){calls=[];},digest(){return createHash('sha256').update(JSON.stringify(calls)).digest('hex');},get count(){return calls.length;},get calls(){return calls;}};
+}
+
+function fishAsset(){
+ const width=48,height=24,data=new Uint8ClampedArray(width*height*4);
+ for(let y=8;y<16;y++)for(let x=4;x<44;x++)data[(y*width+x)*4+3]=255;
+ return{width,height,getContext:()=>({getImageData:()=>({data})})};
 }
 
 test('first-person rod stays within the view at every control limit and mount',()=>{
@@ -89,4 +95,33 @@ test('surface disturbance follows actual fish motion and never reads a stamina s
  assert.notEqual(render(surface),render({...surface,fishMotion:{headShake:0,lateralMps:0}}));
  const deep={...surface,lureDepth:20,paidLineMeters:25};
  assert.equal(render(deep),render({...deep,fishMotion:{headShake:0,lateralMps:0}}),'a submerged fish cannot splash above itself');
+});
+
+test('surface fish scale is proportional to actual centimetres and camera distance',()=>{
+ const atSurface=state({lureDepth:.2,paidLineMeters:4,boatX:0,boatZ:0,bobber:{x:0,z:2}});
+ const small=fightFishProjection(390,{...atSurface,fish:{length:20}}),large=fightFishProjection(390,{...atSurface,fish:{length:80}});
+ assert.equal(large.lengthPixels/small.lengthPixels,4,'a four-times longer fish occupies four-times the visible length');
+ const distant=fightFishProjection(390,{...atSurface,bobber:{x:0,z:6}});
+ const near=fightFishProjection(390,atSurface);
+ assert.ok(distant.lengthPixels<near.lengthPixels);
+ assert.ok(Math.abs(distant.lengthPixels/near.lengthPixels-near.distanceMeters/distant.distanceMeters)<1e-12);
+ const wider=fightFishProjection(780,atSurface);assert.equal(wider.lengthPixels,near.lengthPixels*2);
+ const tiny=fightFishProjection(390,{...atSurface,fish:{length:.01}});assert.ok(tiny.lengthPixels<1,'no minimum icon size inflates small fish');
+ const huge=fightFishProjection(390,{...atSurface,fish:{length:500}});assert.ok(huge.lengthPixels>390,'large fish are not shrunk to fit a slot');
+ for(const changes of[{fish:null},{fish:{length:0}},{lureDepth:2},{paidLineMeters:10},{fishState:'waiting'},{fishState:'landed'}])assert.equal(fightFishProjection(390,{...atSurface,...changes}),null);
+});
+
+test('surface artwork crops transparent padding, retains species proportions and meets the line at its head',()=>{
+ const asset=fishAsset(),canvas=recordingCanvas(),view=createFightView(canvas,{sprites:{fish:{rockfish:asset}}});
+ const s=state({lureDepth:.3,paidLineMeters:4});view.resize(390,844);view.draw(s,0,{active:true,reducedMotion:true,bottomInset:180});
+ const draw=canvas.calls.find(call=>call[0]==='drawImage');assert.ok(draw,'actual near-surface fish uses its species sprite');
+ const [, ,image,sx,sy,sw,sh,dx,dy,dw,dh]=draw;assert.strictEqual(image,asset);
+ assert.deepEqual([sx,sy,sw,sh],[4,8,40,8],'transparent sprite margins do not change nose-to-tail length');
+ assert.equal(dh/dw,8/40,'source species aspect ratio survives projection');
+ const g=fightViewGeometry(canvas.width,canvas.height,s,{bottomInset:180*canvas.height/844});
+ assert.ok(Math.abs(dx+dw-g.waterEntry.x)<1e-9);assert.ok(Math.abs(dy+dh*.5-g.waterEntry.y)<1e-9);
+ const shot=view.snapshot();assert.equal(shot.fishVisible,true);assert.equal(shot.fishLengthCm,30);
+ assert.ok(Math.abs(shot.fishLengthPixels-fightFishProjection(390,s).lengthPixels)<1e-9);
+ canvas.reset();view.draw({...s,lureDepth:20},0,{active:true,reducedMotion:true});assert.ok(!canvas.calls.some(call=>call[0]==='drawImage'));assert.equal(view.snapshot().fishVisible,false);
+ canvas.reset();view.draw(s,0,{active:false});assert.equal(view.snapshot().fishVisible,false);
 });

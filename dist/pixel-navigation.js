@@ -1,6 +1,6 @@
-import {createNavigation} from './navigation.js?v=20260927-pixel-v24';
-import {onLand,onPier,landPolygons,pierRings,PIXEL_PIER_BOUNDS} from './pixel-geography.js?v=20260927-pixel-v24';
-import {HARBOR,harborWaterBlocked,harborObstacleRings} from './pixel-harbor-layout.js?v=20260927-pixel-v24';
+import {createNavigation} from './navigation.js?v=20260927-pixel-v25';
+import {onLand,onPier,landPolygons,pierRings,PIXEL_PIER_BOUNDS} from './pixel-geography.js?v=20260927-pixel-v25';
+import {HARBOR,harborWaterBlocked,harborObstacleRings} from './pixel-harbor-layout.js?v=20260927-pixel-v25';
 
 export const {clearWaterSegment,hullPenetration,resolveVesselContact,contactAwareControl,waterRoute}=createNavigation({onLand,onPier,landPolygons,pierRings,harborWaterBlocked,harborObstacleRings});
 

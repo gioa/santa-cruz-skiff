@@ -1,4 +1,4 @@
-import {hasElectricReel} from './equipment.js?v=20260927-pixel-v24';
+import {hasElectricReel} from './equipment.js?v=20260927-pixel-v25';
 // Presentation policy for the bottom console. Model methods still validate
 // actions themselves; this pure selector keeps unavailable controls offscreen.
 export function boatActions(s,{panel='tackle',hasRod=true,hasAnchor=false,hasChart=false,canLower=false,nearDock=false}={}){
