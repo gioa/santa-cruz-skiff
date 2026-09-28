@@ -1,4 +1,4 @@
-import {rodFlexPoint} from './pixel-rod-response.js?v=20260927-pixel-v45';
+import {rodFlexPoint} from './pixel-rod-response.js?v=20260927-pixel-v46';
 // Shared presentation geometry. The model supplies angles, mount and actual
 // load-derived bend; rendering never invents fish pulls or changes line length.
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
@@ -45,7 +45,7 @@ export function getRodCurve(state,{origin={x:0,y:0},scale=1,heading=finite(state
   const side=mount==='port'?-1:mount==='starboard'?1:Math.sin(radians(azimuth))<0?-1:1;
   const localGround={x:localBase.x+Math.sin(radians(azimuth))*(length*Math.cos(e)+bend*length*.10),y:localBase.y-Math.cos(radians(azimuth))*(length*Math.cos(e)+bend*length*.10)};
   const waterBase=rotate(side*Math.max(27,Math.abs(localGround.x)),localGround.y);waterBase.y+=baseHeight*scale;
-  return{points,base,tip,butt,rearGrip,reel,tipGround,waterBase,tipHeightMeters:tipHeight/24,mount,mounted,elevation,azimuth,bend,scale,
+  return{points,base,tip,butt,rearGrip,reel,tipGround,waterBase,tipHeightPixels:tipHeight*scale,tipHeightMeters:tipHeight/24,mount,mounted,elevation,azimuth,bend,scale,
     shoulders:[rotate(bodyX-5,bodyY+5),rotate(bodyX+5,bodyY+4)],socket:rotate(localBase.x,localBase.y+5)};
 }
 
@@ -54,7 +54,7 @@ export function getReelPose(state,rod,{turns=0}={}){
   return{knob,hands:rod.mounted?[]:state.reeling?[rod.base,knob]:[rod.rearGrip,rod.base]};
 }
 
-/** Exact surface intersection for an invisible underwater lure, plus a short
+/** Surface intersection reconciled with the enlarged rod artwork, plus a short
  * fading underwater tail. A surface float/airborne lure retains its true point.
  */
 export function getFishingLine(state,rod,{project=(x,z)=>({x,y:z}),cameraScale=6}={}){
@@ -66,11 +66,24 @@ export function getFishingLine(state,rod,{project=(x,z)=>({x,y:z}),cameraScale=6
   if(presentation.kind==='submerged'){
     let underwaterTarget=lure;
     if(Number.isFinite(state.lineEntry?.x)&&Number.isFinite(state.lineEntry?.z)&&Number.isFinite(state.rodTip?.x)&&Number.isFinite(state.rodTip?.z)){
-      const physicalTip=project(state.rodTip.x,state.rodTip.z),physicalEntry=project(state.lineEntry.x,state.lineEntry.z),offset=state.castLine?{x:0,y:0}:{x:rod.waterBase.x-physicalTip.x,y:rod.waterBase.y-physicalTip.y};
-      // The boat and rod are enlarged pixel art. Translate the model's real
-      // tip-to-surface displacement onto that artwork, keeping the physical
-      // entry angle while preventing a line through the boat's open interior.
-      end={x:physicalEntry.x+offset.x,y:physicalEntry.y+offset.y};underwaterTarget={x:lure.x+offset.x,y:lure.y+offset.y};entrySource='model';
+      const physicalTip=project(state.rodTip.x,state.rodTip.z),physicalEntry=project(state.lineEntry.x,state.lineEntry.z);
+      const heightPixels=Math.max(1,rod.tipHeightPixels),heightMeters=Math.max(.01,finite(state.rodTip.height,1)),pixelsPerMeter=Math.max(.01,cameraScale);
+      if(state.castLine){
+        // A cast hits its world-space target. Intersect the ray from the
+        // enlarged rod with the surface; at splashdown it is exactly the
+        // cast target, then it moves continuously as the tackle sinks/tows.
+        const depth=Math.max(0,-finite(target.height,-finite(state.lureDepth,0)));
+        end=depth===0?{...lure}:lerp(rod.waterBase,lure,heightPixels/(heightPixels+depth*pixelsPerMeter));
+      }else{
+        // Rod artwork is enlarged relative to the map. Scaling only its
+        // vertical height made a towed line look almost vertical/fixed.
+        // Preserve horizontal displacement / height (the physical line
+        // slope), in BOTH world axes, on that same artwork scale.
+        const scale=heightPixels/(heightMeters*pixelsPerMeter);
+        end={x:rod.waterBase.x+(physicalEntry.x-physicalTip.x)*scale,y:rod.waterBase.y+(physicalEntry.y-physicalTip.y)*scale};
+        underwaterTarget={x:end.x+(lure.x-physicalEntry.x),y:end.y+(lure.y-physicalEntry.y)};
+      }
+      entrySource='model';
     }else{
       const depth=Math.max(.1,finite(state.lureDepth,.1)),fraction=rod.tipHeightMeters/(rod.tipHeightMeters+depth);end=lerp(rod.waterBase,lure,fraction);entrySource='projection';
     }

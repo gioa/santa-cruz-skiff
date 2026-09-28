@@ -47,7 +47,7 @@ test('visible line sag follows physical slack, not merely whether the bail is op
 });
 test('model surface-intersection displacement is preserved on the enlarged pixel-art rod',()=>{
   const state={...base,rodTip:{x:-128,z:-60,height:2},lineEntry:{x:-127.5,z:-59.8,height:0}},rod=getRodCurve(state,{origin:{x:100,y:150},scale:1.08}),line=getFishingLine(state,rod,{project});assert.equal(line.entrySource,'model');
-  assert.ok(Math.abs(line.end.x-rod.waterBase.x-.5*6)<1e-9);assert.ok(Math.abs(line.end.y-rod.waterBase.y-.2*6)<1e-9);assert.strictEqual(line.start,rod.tip);
+  assert.ok(Math.abs(line.end.x-rod.waterBase.x-.5/2*rod.tipHeightPixels)<1e-9);assert.ok(Math.abs(line.end.y-rod.waterBase.y-.2/2*rod.tipHeightPixels)<1e-9);assert.strictEqual(line.start,rod.tip);
 });
 
 globalThis.fetch=async url=>new Response(await readFile(url));

@@ -1,0 +1,238 @@
+[
+  {
+    "boatX": 0,
+    "boatZ": 0,
+    "heading": 0,
+    "rig": "bottom",
+    "rigWeightGrams": 85,
+    "rodMount": "starboard",
+    "rodElevation": 45,
+    "rodAzimuth": 70,
+    "paidLineMeters": 15,
+    "lureDepth": 12.82507575950825,
+    "reelMode": "brake",
+    "fishState": "waiting",
+    "bobber": {
+      "x": 2.185372351216217,
+      "z": 0.11212599843925175,
+      "height": -12.82507575950825
+    },
+    "rigFallSpeed": 0,
+    "rigVelocity": {
+      "vx": 0,
+      "vz": 0
+    },
+    "lineDistance": 2.188246913167318,
+    "pumpHeight": 0,
+    "crankRate": 0,
+    "rodTip": {
+      "x": 2.185372351216217,
+      "z": 0.11212599843925175,
+      "height": 2.17492424049175
+    },
+    "lineEntry": {
+      "x": 2.185372351216217,
+      "z": 0.11212599843925175,
+      "height": 0
+    },
+    "floatPosition": null,
+    "rigPresentation": {
+      "depth": 12.82507575950825,
+      "targetDepth": 12.82507575950825,
+      "sinkRate": 0.78,
+      "pumpHeight": 0,
+      "liftVelocity": 0,
+      "lineAngleDeg": 0,
+      "verticalSpeed": 0,
+      "bottomContact": false,
+      "nearBottom": false,
+      "snagRiskPerSecond": 5.0072082493041955e-62,
+      "attraction": 0.96
+    },
+    "lineSlackMeters": 0,
+    "snagStretchMeters": 0,
+    "payoutRate": 0,
+    "retrieveRate": 0,
+    "dragThresholdN": 13.559999999999999,
+    "relativeFlowMps": 0,
+    "rodLoadN": 0.7208633249999998,
+    "rodBend": 0.13909738719056233
+  },
+  {
+    "boatX": 0,
+    "boatZ": -20.000000000000153,
+    "heading": 0,
+    "rig": "bottom",
+    "rigWeightGrams": 85,
+    "rodMount": "starboard",
+    "rodElevation": 45,
+    "rodAzimuth": 70,
+    "paidLineMeters": 15,
+    "lureDepth": 9.982630662680098,
+    "reelMode": "brake",
+    "fishState": "waiting",
+    "bobber": {
+      "x": 2.185372351216217,
+      "z": -11.101870429039307,
+      "height": -9.982630662680098
+    },
+    "rigFallSpeed": -0.07436845184844998,
+    "rigVelocity": {
+      "vx": 0,
+      "vz": -0.8653302371826552
+    },
+    "lineDistance": 9.162563078913461,
+    "pumpHeight": 0,
+    "crankRate": 0,
+    "rodTip": {
+      "x": 2.185372351216217,
+      "z": -19.8878740015609,
+      "height": 2.17492424049175
+    },
+    "lineEntry": {
+      "x": 2.185372351216217,
+      "z": -18.316103008206067,
+      "height": 0
+    },
+    "floatPosition": null,
+    "rigPresentation": {
+      "depth": 9.982630662680098,
+      "targetDepth": 9.98053969684747,
+      "sinkRate": 0.5537706866270187,
+      "pumpHeight": 0,
+      "liftVelocity": 0,
+      "lineAngleDeg": 49.034274711709344,
+      "verticalSpeed": -0.22150827465083012,
+      "bottomContact": false,
+      "nearBottom": false,
+      "snagRiskPerSecond": 7.995858754397961e-65,
+      "attraction": 0.96
+    },
+    "lineSlackMeters": 0,
+    "snagStretchMeters": 0,
+    "payoutRate": 0,
+    "retrieveRate": 0,
+    "dragThresholdN": 13.559999999999999,
+    "relativeFlowMps": 0.8650369705560886,
+    "rodLoadN": 1.7145964733155534,
+    "rodBend": 0.25060903988678157
+  },
+  {
+    "boatX": -6.349516512592069,
+    "boatZ": -26.382849845925545,
+    "heading": 1.5655603390389137,
+    "rig": "bottom",
+    "rigWeightGrams": 85,
+    "rodMount": "starboard",
+    "rodElevation": 45,
+    "rodAzimuth": 70,
+    "paidLineMeters": 15,
+    "lureDepth": 9.140514334678514,
+    "reelMode": "brake",
+    "fishState": "waiting",
+    "bobber": {
+      "x": 1.6186548855657632,
+      "z": -22.61588006158012,
+      "height": -9.140514334678514
+    },
+    "rigFallSpeed": -0.00461430572956445,
+    "rigVelocity": {
+      "vx": -0.49645532085954347,
+      "vz": -1.0737363491587957
+    },
+    "lineDistance": 8.813728880932969,
+    "pumpHeight": 0,
+    "crankRate": 0,
+    "rodTip": {
+      "x": -6.225949520559108,
+      "z": -28.567605152925903,
+      "height": 2.17492424049175
+    },
+    "lineEntry": {
+      "x": -4.718149344135751,
+      "z": -27.423632598268107,
+      "height": 0
+    },
+    "floatPosition": null,
+    "rigPresentation": {
+      "depth": 9.140514334678514,
+      "targetDepth": 9.13787036172917,
+      "sinkRate": 0.4628544459557726,
+      "pumpHeight": 0,
+      "liftVelocity": 0,
+      "lineAngleDeg": 63.278783672104275,
+      "verticalSpeed": -0.18514177838232726,
+      "bottomContact": false,
+      "nearBottom": false,
+      "snagRiskPerSecond": 9.736733870527913e-66,
+      "attraction": 0.96
+    },
+    "lineSlackMeters": 1.7763568394002505e-15,
+    "snagStretchMeters": 0,
+    "payoutRate": 0,
+    "retrieveRate": 0,
+    "dragThresholdN": 13.559999999999999,
+    "relativeFlowMps": 1.1828907028031637,
+    "rodLoadN": 1.7287111311857977,
+    "rodBend": 0.2523662848611549
+  },
+  {
+    "boatX": -6.349516512592069,
+    "boatZ": -26.382849845925545,
+    "heading": 1.5707963267948966,
+    "rig": "bottom",
+    "rigWeightGrams": 85,
+    "rodMount": "starboard",
+    "rodElevation": 45,
+    "rodAzimuth": 70,
+    "paidLineMeters": 15,
+    "lureDepth": 12.822962062163889,
+    "reelMode": "brake",
+    "fishState": "waiting",
+    "bobber": {
+      "x": -6.4522221900411765,
+      "z": -28.699575931954865,
+      "height": -12.822962062163889
+    },
+    "rigFallSpeed": 0.002826910596009924,
+    "rigVelocity": {
+      "vx": 0.14154734809217767,
+      "vz": 0.08709510215403557
+    },
+    "lineDistance": 2.319001555383051,
+    "pumpHeight": 0,
+    "crankRate": 0,
+    "rodTip": {
+      "x": -6.237390514152817,
+      "z": -28.56822219714176,
+      "height": 2.17492424049175
+    },
+    "lineEntry": {
+      "x": -6.26854441211458,
+      "z": -28.587270509427842,
+      "height": 0
+    },
+    "floatPosition": null,
+    "rigPresentation": {
+      "depth": 12.822962062163889,
+      "targetDepth": 12.822961040712903,
+      "sinkRate": 0.766356505977521,
+      "pumpHeight": 0,
+      "liftVelocity": 0,
+      "lineAngleDeg": 3.037489418431367,
+      "verticalSpeed": -0.30654260239099784,
+      "bottomContact": false,
+      "nearBottom": false,
+      "snagRiskPerSecond": 8.371456889298162e-62,
+      "attraction": 0.96
+    },
+    "lineSlackMeters": 0,
+    "snagStretchMeters": 0,
+    "payoutRate": 0,
+    "retrieveRate": 0,
+    "dragThresholdN": 13.559999999999999,
+    "relativeFlowMps": 0.16528611655778036,
+    "rodLoadN": 0.7299690526933247,
+    "rodBend": 0.14021764517869204
+  }
+]
