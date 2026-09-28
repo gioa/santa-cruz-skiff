@@ -433,7 +433,7 @@ html,body,#app,#app *,#app *::before,#app *::after{-webkit-user-select:none;user
 /* Two stable control categories; assembly remains in the top backpack. */
 /* Thumb-reachable mode rail, outside the instrument panel. */
 #boat-panel-tabs{position:absolute;left:max(10px,env(safe-area-inset-left));bottom:calc(12px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:6px;width:56px;pointer-events:auto}
-#boat-panel-tabs button{width:56px;min-width:44px;min-height:48px;padding:8px 4px;border-radius:0;touch-action:manipulation}
+#boat-panel-tabs button{width:56px;min-width:44px;min-height:48px;padding:6px 4px;border-radius:0;touch-action:manipulation;display:grid;place-items:center}
 #boat-panel-tabs{z-index:3}
 #boat-panel-tabs button:disabled{opacity:.45;cursor:default}
 @media(max-height:500px) and (orientation:landscape){
@@ -524,3 +524,5 @@ html,body,#app,#app *,#app *::before,#app *::after{-webkit-user-select:none;user
 #app:not(.is-fishing-focus) #boat-console #boat-fishing.no-instruments .fishing-toolbar{grid-column:1;grid-row:2}
 #app:not(.is-fishing-focus) #boat-console #boat-fishing.no-tools{grid-template-columns:minmax(0,1fr)}
 #app:not(.is-fishing-focus) #boat-console #boat-fishing.no-tools .fishing-instruments{grid-column:1;width:112px;justify-self:center}
+
+#boat-panel-tabs .mode-icon{display:block;width:32px;height:32px;pointer-events:none}
