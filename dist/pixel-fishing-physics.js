@@ -5,8 +5,8 @@
  * pay line out, while turning the handle takes it in. Rod movement never
  * manufactures more line. This module has no inventory, UI or random events.
  */
-import {getRigProfile,stepRigLure} from './fishing-rigs.js?v=20260928-pixel-v58';
-import {rigHydrodynamics} from './pixel-rig-hydrodynamics.js?v=20260928-pixel-v58';
+import {getRigProfile,stepRigLure} from './fishing-rigs.js?v=20260928-pixel-v59';
+import {rigHydrodynamics} from './pixel-rig-hydrodynamics.js?v=20260928-pixel-v59';
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 const finite=(n,f=0)=>Number.isFinite(n)?n:f;
 export const MAX_PAID_LINE_METERS=120;
@@ -57,15 +57,27 @@ export function stepFishingLine(s,{dt,environment={},current={x:0,z:0},velocity=
  dt=clamp(finite(dt),0,.25);const rig=getRigProfile(s.rig),crankRate=reelTurnsPerSecond(s.crankRate),reelMode=crankRate>0?'brake':s.reelMode==='free'?'free':'brake';
  let loadedCrankRate=crankRate;
  environment={...environment,rig:s.rig,weightGrams:finite(s.rigWeightGrams,rig.defaultWeightGrams)};
- const oldTip=rodTipPosition(s),oldPump=clamp(finite(s.pumpHeight),0,.8),pumpHeight=s.pumping?Math.min(.8,oldPump+dt*.95):Math.max(0,oldPump-dt*.6);
- const tip=rodTipPosition({...s,pumpHeight}),lure={...(s.bobber||{x:tip.x,z:tip.z,height:0})};
+ const dragThresholdN=(3+clamp(finite(s.drag,.48),.2,.85)*22)*Math.max(.4,strength);
+ const mass=Math.max(.01,finite(s.fish?.kg,.5)),liftDamping=1.5+Math.sqrt(mass)*1.5,liftWater=.5*1025*Math.max(0,finite(fishMotion?.bodyDragArea));
+ const liftBudget=Math.max(1,dragThresholdN-Math.max(0,finite(fishPullN)))*.65;
+ const maxLiftSpeed=fishPullN==null?.95:liftWater>0?(-liftDamping+Math.sqrt(liftDamping**2+4*liftWater*liftBudget))/(2*liftWater):liftBudget/liftDamping;
+ const raiseDegrees=clamp(maxLiftSpeed/ROD_LENGTH_METERS*180/Math.PI,5,50);
+ const oldTip=rodTipPosition(s),oldPump=clamp(finite(s.pumpHeight),0,.8),pumpHeight=s.pumping?Math.min(.8,oldPump+dt*Math.min(.95,maxLiftSpeed)):Math.max(0,oldPump-dt*.6);
+ // A fighting angler moves through a finite stroke, even after a fast swipe.
+ const approach=(value,target,speed)=>value+clamp(finite(target,value)-value,-speed*dt,speed*dt);
+ const rodElevation=s.fishState==='fight'?approach(finite(s.rodElevation,45),s.rodTargetElevation,finite(s.rodTargetElevation,45)>finite(s.rodElevation,45)?raiseDegrees:50):finite(s.rodElevation,45);
+ const rodAzimuth=s.fishState==='fight'?approach(finite(s.rodAzimuth,70),s.rodTargetAzimuth,90):finite(s.rodAzimuth,70);
+ const tip=rodTipPosition({...s,pumpHeight,rodElevation,rodAzimuth}),lure={...(s.bobber||{x:tip.x,z:tip.z,height:0})};
  let paid=clamp(finite(s.paidLineMeters),0,MAX_PAID_LINE_METERS),payoutRate=0,retrieveRate=crankRate*.65*Math.max(.2,retrieve),load=0,snagStretchMeters=0;
  let rigVelocity={vx:finite(s.rigVelocity?.vx,finite(velocity.vx)),vz:finite(s.rigVelocity?.vz,finite(velocity.vz))};
  const flow=relativeFishingFlow(current,rigVelocity),bottom=Math.max(.1,finite(environment.bottomDepth,12));
- const dragThresholdN=(3+clamp(finite(s.drag,.48),.2,.85)*22)*Math.max(.4,strength);
+
  const fullDepth=Math.min(Math.max(0,bottom-rig.baitAboveBottom),rig.layer==='suspended'?finite(s.fishingDepthMeters,rig.defaultFishingDepth):bottom);
  let lineDrag=.5*1025*(finite(environment.lineDiameterMm,.36)*.001*Math.min(paid,35)*.45+rig.dragArea)*flow*flow;
  const startLure={...lure};
+ // Only actual rod motion projected along the line does work. Holding a high
+ // rod is not repeated pumping; boat translation is excluded from this stroke.
+ const rodStrokeMps=dt>0?(separation(tip,lure)-separation(oldTip,lure))/dt:0;
  if(s.snagged){
   // A caught hook cannot be reeled through the seabed. First take up the
   // loose loop, then stretch the line / bend the rod against a fixed point.
@@ -139,21 +151,24 @@ export function stepFishingLine(s,{dt,environment={},current={x:0,z:0},velocity=
   presentation.attraction=activity.attraction;presentation.snagRiskPerSecond=activity.snagRiskPerSecond;
   return finish({presentation,depth});
  }
- let pull=Math.max(0,finite(fishPullN));
+ const liftingSpeed=Math.max(0,rodStrokeMps);
+ const liftResistance=liftingSpeed*(1.5+Math.sqrt(mass)*1.5)+.5*1025*Math.max(0,finite(fishMotion?.bodyDragArea))*liftingSpeed*liftingSpeed;
+ let pull=Math.max(0,finite(fishPullN))+liftResistance;
  const bodyArea=Math.max(0,finite(fishMotion?.bodyDragArea)),initialSlack=Math.max(0,paid-separation(tip,lure));
 
+ const freeTakeup=dt>0?Math.min(retrieveRate,initialSlack/dt):0,loadedRequest=Math.max(0,retrieveRate-freeTakeup);
  // Broadside flatfish resist being lifted through water, even between kicks.
  // Solve speed and v² water resistance together. Drag is a slip limit, not
  // extra handle torque: tightening it cannot make winding arbitrarily easy.
- if(bodyArea>0&&initialSlack<=.3&&reelMode!=='free'&&retrieveRate>0){
-  const requested=retrieveRate,capacity=32*Math.max(.4,strength);
+ if(bodyArea>0&&reelMode!=='free'&&loadedRequest>0){
+  const requested=loadedRequest,capacity=32*Math.max(.4,strength);
   let low=0,high=requested;
   for(let i=0;i<18;i++){const rate=(low+high)/2,force=pull+.5*1025*bodyArea*rate*rate;
    const possible=force>=dragThresholdN?0:requested*Math.max(0,1-force/capacity);
    if(rate>possible)high=rate;else low=rate;
   }
-  retrieveRate=(low+high)/2;pull+=.5*1025*bodyArea*retrieveRate*retrieveRate;
-  loadedCrankRate=crankRate*retrieveRate/requested;
+  const loadedRate=(low+high)/2;retrieveRate=freeTakeup+loadedRate;pull+=.5*1025*bodyArea*loadedRate*loadedRate;
+  loadedCrankRate=crankRate*retrieveRate/(requested+freeTakeup);
  }
  if(reelMode==='free'){
   // A fish first consumes the loose loop; only its remaining displacement
@@ -163,12 +178,12 @@ export function stepFishingLine(s,{dt,environment={},current={x:0,z:0},velocity=
  }
  else{
   payoutRate=initialSlack>.3?0:clamp((pull-dragThresholdN)*.16,0,2.4);
-  if(!bodyArea)retrieveRate*=pull>dragThresholdN?.08:clamp(1-pull/(dragThresholdN*1.8),.25,1);
+  if(!bodyArea){retrieveRate=freeTakeup+loadedRequest*(pull>dragThresholdN?.08:clamp(1-pull/(dragThresholdN*1.8),.25,1));loadedCrankRate=crankRate*retrieveRate/Math.max(.001,freeTakeup+loadedRequest);}
   // A smoother purchased drag reduces the breakaway shock, not the chosen
   // steady drag setting. Merely carrying that reel gives no benefit.
   const startingSlip=finite(s.payoutRate)<=.01&&payoutRate>.01,shock=startingSlip?.08*clamp(finite(smooth,1),.3,1):.08;
   const stopAtSpoolEnd=paid>=MAX_PAID_LINE_METERS-.01&&initialSlack<.06;
-  load=Math.min(pull+retrieveRate*3+Math.max(0,pumpHeight-oldPump)*18/Math.max(.01,dt),stopAtSpoolEnd?150:dragThresholdN*(1+shock));
+  load=Math.min(pull+Math.max(0,retrieveRate-freeTakeup)*3,stopAtSpoolEnd?150:dragThresholdN*(1+shock));
  }
  paid=clamp(paid+(payoutRate-retrieveRate)*dt,.08,MAX_PAID_LINE_METERS);
  // Fish movement is continuous from the actual hooked rig. There is no
@@ -202,6 +217,6 @@ export function stepFishingLine(s,{dt,environment={},current={x:0,z:0},velocity=
   }
   if(dt>0&&!s.snagged&&fishPullN!=null)rigVelocity={vx:(lure.x-startLure.x)/dt,vz:(lure.z-startLure.z)/dt};
   const entry=lineWaterEntry(tip,lure),slack=Math.max(0,paid-separation(tip,lure));
-  return{rigFallSpeed:dt>0?(startLure.height-lure.height)/dt:finite(s.rigFallSpeed),rigVelocity,paidLineMeters:paid,bobber:lure,lureDepth:depth,lineDistance:Math.hypot(lure.x-finite(s.boatX),lure.z-finite(s.boatZ)),pumpHeight,reelMode,crankRate:loadedCrankRate,rodTip:tip,lineEntry:entry,floatPosition:rig.id==='float'?{x:lure.x,z:lure.z,height:0}:null,rigPresentation:presentation,lineSlackMeters:slack,snagStretchMeters,payoutRate,retrieveRate,dragThresholdN,relativeFlowMps:flow,...smoothRod(s,load,dt,strength,sensitivity)};
+  return{rodElevation,rodAzimuth,rodStrokeMps,rigFallSpeed:dt>0?(startLure.height-lure.height)/dt:finite(s.rigFallSpeed),rigVelocity,paidLineMeters:paid,bobber:lure,lureDepth:depth,lineDistance:Math.hypot(lure.x-finite(s.boatX),lure.z-finite(s.boatZ)),pumpHeight,reelMode,crankRate:loadedCrankRate,rodTip:tip,lineEntry:entry,floatPosition:rig.id==='float'?{x:lure.x,z:lure.z,height:0}:null,rigPresentation:presentation,lineSlackMeters:slack,snagStretchMeters,payoutRate,retrieveRate,dragThresholdN,relativeFlowMps:flow,...smoothRod({...s,rodElevation},load,dt,strength,sensitivity)};
  }
 }

@@ -35,7 +35,7 @@ export function createFishFight(fish={},variation=.5){
  const kind=fishFightKind(fish),mass=clamp(finite(fish.kg,.6),kind==='baitfish'?.005:.05,80),p=FISH_FIGHT_PROFILES[kind];
  return{kind,mass,energy:1,variation:clamp(finite(variation,.5),0,1),capacityJ:p.budget*Math.pow(mass,.85),workJ:0,surfaceStartleUsed:false,surfaceBurstSeconds:0,jumpVelocity:0,jumpActive:false,jumpCooldown:6+clamp(finite(variation,.5),0,1)*12,splash:0};
 }
-export function stepFishFight(fish={},fight,{dt=.1,time=0,rodLoadN=0,payoutRate=0,retrieveRate=0,lineSlackMeters=0,lureDepth=0,fishHeight=-lureDepth,paidLineMeters=0}={}){
+export function stepFishFight(fish={},fight,{dt=.1,time=0,rodLoadN=0,payoutRate=0,retrieveRate=0,lineSlackMeters=0,lureDepth=0,fishHeight=-lureDepth,paidLineMeters=0,rodStrokeMps=0}={}){
  const f=fight||createFishFight(fish),p=FISH_FIGHT_PROFILES[f.kind]||FISH_FIGHT_PROFILES.rockfish;
  dt=clamp(finite(dt),0,.25);time=Math.max(0,finite(time));
  const massScale=Math.pow(f.mass,.78),v=.88+f.variation*.24,energy=clamp(finite(f.energy,1),0,1);
@@ -71,7 +71,7 @@ export function stepFishFight(fish={},fight,{dt=.1,time=0,rodLoadN=0,payoutRate=
  const loaded=lineSlackMeters<.3&&rodLoadN>.25;
  // Work against the line plus muscle effort under load. Free slack lets fish
  // recover; merely waiting does not empty a timer-based health bar.
- const effort=loaded?(pullN*(.045+envelope*.16)+Math.max(0,rodLoadN)*(Math.max(0,retrieveRate)+Math.max(0,payoutRate)*.32)):0;
+ const effort=loaded?(pullN*(.045+envelope*.16)+Math.max(0,rodLoadN)*(Math.max(0,retrieveRate)+Math.max(0,rodStrokeMps)+Math.max(0,payoutRate)*.32)):0;
  const recovery=loaded?0:dt*.008;
  const nextEnergy=clamp(energy-effort*dt/Math.max(1,f.capacityJ)+recovery,.025,1);
  const runSpeedMps=p.speed*Math.pow(f.mass,.12)*envelope*fatigue*rockSettle;

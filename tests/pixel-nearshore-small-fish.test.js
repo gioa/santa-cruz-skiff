@@ -23,6 +23,7 @@ test('ordinary croaker and sanddab wind directly up without required exhaustion 
   s.rodTip=rodTipPosition(s);s.bobber={x:s.rodTip.x,z:s.rodTip.z,height:-12};
   let hold=createHookHold(fish,RIG_PROFILES.bottom,.00001),time=0,landed=false,paidOut=0;
   for(;time<45;time+=.05){
+   s.crankRate=1.2; // Held user input; do not feed the loaded wheel speed back as its next command.
    const result=stepFishFight(fish,s.fishFight,{...s,time,dt:.05});s.fishFight=result.fight;s.fishPullN=result.pullN;s.fishMotion=result.motion;
    Object.assign(s,stepFishingLine(s,{dt:.05,environment:{bottomDepth:25},fishPullN:result.pullN,fishMotion:result.motion}));
    const hook=stepHookHold(hold,{dt:.05,rodLoadN:s.rodLoadN,lineSlackMeters:s.lineSlackMeters,headShake:result.motion.headShake});hold=hook.hold;

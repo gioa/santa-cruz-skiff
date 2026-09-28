@@ -1,0 +1,298 @@
+[
+  {
+    "stage": "before-lift",
+    "state": {
+      "fixture": true,
+      "haptics": {
+        "supported": true,
+        "enabled": true,
+        "acceptedPulses": 0
+      },
+      "rodTargetElevation": null,
+      "rodStrokeMps": 0,
+      "rodLoadN": 6.48995135400755,
+      "lineSlackMeters": 0,
+      "phase": "glide",
+      "energy": 0.9598035025659639,
+      "depth": 22.276773220249066,
+      "rodBend": 0.6826911992990745,
+      "surfaceStartleUsed": false,
+      "drag": 0.85,
+      "crankRate": 0,
+      "paidLineMeters": 24.00663919926571,
+      "retrieveRate": 0,
+      "payoutRate": 0,
+      "reelMode": "brake",
+      "rodElevation": 20,
+      "focus": {
+        "active": true,
+        "view": "first-person",
+        "phase": "fight",
+        "width": 390,
+        "height": 844,
+        "mount": "hand",
+        "rodElevation": 20,
+        "rodAzimuth": 70,
+        "bend": 0.6826911992990745,
+        "crankAngle": 0,
+        "spoolAngle": -5.535969367217125,
+        "reelCenter": {
+          "x": 158,
+          "y": 709
+        },
+        "reelKnob": {
+          "x": 220,
+          "y": 709
+        },
+        "rearGrip": {
+          "x": 67,
+          "y": 718
+        },
+        "reelTouchRadius": 79,
+        "railY": 721,
+        "rodTip": {
+          "x": 272,
+          "y": 564
+        },
+        "lineEntry": {
+          "x": 272,
+          "y": 683
+        },
+        "hookPoint": {
+          "x": 272,
+          "y": 683
+        },
+        "fishAirHeight": 0,
+        "lineVisible": true,
+        "floatVisible": false,
+        "surfaceFish": false,
+        "fishVisible": false,
+        "fishLengthCm": null,
+        "fishLengthPixels": null,
+        "fishDistanceMeters": null
+      }
+    }
+  },
+  {
+    "stage": "raised",
+    "state": {
+      "fixture": true,
+      "haptics": {
+        "supported": true,
+        "enabled": true,
+        "acceptedPulses": 6
+      },
+      "rodTargetElevation": 85,
+      "rodStrokeMps": 0,
+      "rodLoadN": 6.253898145758095,
+      "lineSlackMeters": 0,
+      "phase": "glide",
+      "energy": 0.8819099590986795,
+      "depth": 22.046047686201334,
+      "rodBend": 0.423957796697804,
+      "surfaceStartleUsed": false,
+      "drag": 0.85,
+      "crankRate": 0,
+      "paidLineMeters": 25.51748931678117,
+      "retrieveRate": 0,
+      "payoutRate": 0,
+      "reelMode": "brake",
+      "rodElevation": 85,
+      "focus": {
+        "active": true,
+        "view": "first-person",
+        "phase": "fight",
+        "width": 390,
+        "height": 844,
+        "mount": "hand",
+        "rodElevation": 85,
+        "rodAzimuth": 70,
+        "bend": 0.423957796697804,
+        "crankAngle": 0,
+        "spoolAngle": -4.944713362430728,
+        "reelCenter": {
+          "x": 177,
+          "y": 707
+        },
+        "reelKnob": {
+          "x": 239,
+          "y": 707
+        },
+        "rearGrip": {
+          "x": 92,
+          "y": 733
+        },
+        "reelTouchRadius": 79,
+        "railY": 721,
+        "rodTip": {
+          "x": 265,
+          "y": 405
+        },
+        "lineEntry": {
+          "x": 269,
+          "y": 683
+        },
+        "hookPoint": {
+          "x": 269,
+          "y": 683
+        },
+        "fishAirHeight": 0,
+        "lineVisible": true,
+        "floatVisible": false,
+        "surfaceFish": false,
+        "fishVisible": false,
+        "fishLengthCm": null,
+        "fishLengthPixels": null,
+        "fishDistanceMeters": null
+      }
+    }
+  },
+  {
+    "stage": "lower-and-wind",
+    "state": {
+      "fixture": true,
+      "haptics": {
+        "supported": true,
+        "enabled": true,
+        "acceptedPulses": 6
+      },
+      "rodTargetElevation": 5,
+      "rodStrokeMps": -0.9557089941521569,
+      "rodLoadN": 16.038924855489064,
+      "lineSlackMeters": 3.552713678800501e-15,
+      "phase": "run",
+      "energy": 0.8339413149358136,
+      "depth": 20.392434306233124,
+      "rodBend": 0.8864851400648193,
+      "surfaceStartleUsed": false,
+      "drag": 0.85,
+      "crankRate": 1.2,
+      "paidLineMeters": 23.5527505348283,
+      "retrieveRate": 0.7799999999999077,
+      "payoutRate": 0,
+      "reelMode": "brake",
+      "rodElevation": 65.01499999999996,
+      "focus": {
+        "active": true,
+        "view": "first-person",
+        "phase": "fight",
+        "width": 390,
+        "height": 844,
+        "mount": "hand",
+        "rodElevation": 65.01499999999996,
+        "rodAzimuth": 70,
+        "bend": 0.8864851400648193,
+        "crankAngle": 0.14247153571095894,
+        "spoolAngle": 4.991536601061175,
+        "reelCenter": {
+          "x": 175,
+          "y": 709
+        },
+        "reelKnob": {
+          "x": 237,
+          "y": 715
+        },
+        "rearGrip": {
+          "x": 90,
+          "y": 734
+        },
+        "reelTouchRadius": 79,
+        "railY": 723,
+        "rodTip": {
+          "x": 277,
+          "y": 483
+        },
+        "lineEntry": {
+          "x": 281,
+          "y": 685
+        },
+        "hookPoint": {
+          "x": 281,
+          "y": 685
+        },
+        "fishAirHeight": 0,
+        "lineVisible": true,
+        "floatVisible": false,
+        "surfaceFish": false,
+        "fishVisible": false,
+        "fishLengthCm": null,
+        "fishLengthPixels": null,
+        "fishDistanceMeters": null
+      }
+    }
+  },
+  {
+    "stage": "lowered-and-winding",
+    "state": {
+      "fixture": true,
+      "haptics": {
+        "supported": true,
+        "enabled": true,
+        "acceptedPulses": 11
+      },
+      "rodTargetElevation": 5,
+      "rodStrokeMps": 0,
+      "rodLoadN": 14.034228391041415,
+      "lineSlackMeters": 0,
+      "phase": "glide",
+      "energy": 0.7226748134387683,
+      "depth": 19.850022348585664,
+      "rodBend": 0.9999999999999996,
+      "surfaceStartleUsed": false,
+      "drag": 0.85,
+      "crankRate": 0.7269813537597657,
+      "paidLineMeters": 21.40932590824509,
+      "retrieveRate": 0.4725378799438477,
+      "payoutRate": 0,
+      "reelMode": "brake",
+      "rodElevation": 5,
+      "focus": {
+        "active": true,
+        "view": "first-person",
+        "phase": "fight",
+        "width": 390,
+        "height": 844,
+        "mount": "hand",
+        "rodElevation": 5,
+        "rodAzimuth": 70,
+        "bend": 0.9999999999999996,
+        "crankAngle": 3.2093641357451674,
+        "spoolAngle": 2.6962248885819498,
+        "reelCenter": {
+          "x": 144,
+          "y": 709
+        },
+        "reelKnob": {
+          "x": 82,
+          "y": 707
+        },
+        "rearGrip": {
+          "x": 51,
+          "y": 706
+        },
+        "reelTouchRadius": 79,
+        "railY": 723,
+        "rodTip": {
+          "x": 281,
+          "y": 620
+        },
+        "lineEntry": {
+          "x": 283,
+          "y": 685
+        },
+        "hookPoint": {
+          "x": 283,
+          "y": 685
+        },
+        "fishAirHeight": 0,
+        "lineVisible": true,
+        "floatVisible": false,
+        "surfaceFish": false,
+        "fishVisible": false,
+        "fishLengthCm": null,
+        "fishLengthPixels": null,
+        "fishDistanceMeters": null
+      }
+    }
+  }
+]

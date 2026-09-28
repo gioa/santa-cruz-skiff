@@ -9,6 +9,7 @@ function encounter(kind,kg,{dt=.05,depth=12,drag=.48,seconds=600,crank=1.2}={}){
  s.rodTip=rodTipPosition(s);s.bobber={x:s.rodTip.x,z:s.rodTip.z,height:-depth};
  let maxPull=0,paidOut=0,maxLine=s.paidLineMeters,time=0,landed=false;
  for(;time<seconds;time+=dt){
+  s.crankRate=crank; // A held input requests fresh handle torque on every frame.
   const r=stepFishFight(fish,s.fishFight,{...s,dt,time});s.fishFight=r.fight;s.fishPullN=r.pullN;s.fishMotion=r.motion;
   const previous=s.paidLineMeters;Object.assign(s,stepFishingLine(s,{dt,environment:{bottomDepth:30},fishPullN:r.pullN,fishMotion:r.motion}));
   assert.ok(Math.abs(s.paidLineMeters-previous-(s.payoutRate-s.retrieveRate)*dt)<1e-8,'actual spool motion conserves paid line');
