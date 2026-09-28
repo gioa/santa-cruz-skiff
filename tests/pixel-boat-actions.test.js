@@ -23,7 +23,7 @@ test('each reachable fishing phase offers only its permitted actions, distinguis
   ['sinking','hand',['adjustPose','reel','spool','mount']],
   ['waiting','hand',['adjustPose','reel','spool','mount']],
   ['bite','hand',['adjustPose','reel','spool','hook']],
-  ['fight','hand',['adjustPose','reel','spool','drag']],
+  ['fight','hand',['adjustPose','reel','drag']],
   ['landed','hand',['catch']],
  ];
  for(const mount of['port','starboard'])cases.push(
@@ -31,7 +31,7 @@ test('each reachable fishing phase offers only its permitted actions, distinguis
   ['sinking',mount,['switchPanel','adjustPose','spool','take','return']],
   ['waiting',mount,['switchPanel','adjustPose','spool','take','return']],
   ['bite',mount,['adjustPose','spool','take']],
-  ['fight',mount,['adjustPose','spool','drag','take']],
+  ['fight',mount,['adjustPose','drag','take']],
  );
  for(const[fishState,rodMount,expected]of cases){
   const state={...base,fishState,rodMount},a=boatActions(state,{hasRod:true,hasAnchor:true,hasChart:true,canLower:fishState==='idle',canCast:fishState==='idle'&&rodMount==='hand',nearDock:false});

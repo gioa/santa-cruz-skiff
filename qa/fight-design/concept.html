@@ -1,0 +1,117 @@
+<!doctype html><html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>body{margin:0;color-scheme:light}</style><style>
+#reel-concept{--rc-ink:light-dark(#173f43,#e0ead9);--rc-paper:light-dark(#fff0cf,#234b51);--rc-line:light-dark(#a8b8a1,#527878);--rc-sky:light-dark(#b7cfcb,#70999f);--rc-haze:light-dark(#ede2bd,#afbeb1);--rc-sea:light-dark(#367f8b,#245d70);--rc-wave:light-dark(#8cbcaf,#64929a);--rc-deep:light-dark(#236471,#194957);--rc-wood:light-dark(#a58056,#77644e);--rc-woodlight:light-dark(#d7b980,#ac9971);--rc-metal:light-dark(#b9c6b2,#8eaaa4);--rc-dark:light-dark(#193b40,#152f39);--rc-gold:light-dark(#cbb57e,#ae9d74);--rc-highlight:light-dark(#f7edc7,#d0d8bf);--rc-skin:light-dark(#d8a074,#b58b70);--rc-skinlight:light-dark(#f1c69b,#d6ab8a);--rc-shirt:light-dark(#345e70,#25495e);--rc-shirtlight:light-dark(#598191,#406778);font:400 14px system-ui,sans-serif;color:var(--rc-ink);width:100%;}
+#reel-concept *{box-sizing:border-box}#reel-concept .rc-shell{position:relative;max-width:390px;margin:0 auto;background:var(--rc-sea);border:1px solid var(--rc-line);border-radius:22px;overflow:hidden;isolation:isolate;aspect-ratio:390/730;}
+#reel-concept .rc-scene{display:block;width:100%;height:100%;image-rendering:pixelated;}
+#reel-concept .rc-top{position:absolute;inset:20px 18px auto;display:flex;justify-content:space-between;align-items:center;color:var(--rc-dark);pointer-events:none}#reel-concept .rc-mark{font-size:11px;letter-spacing:.15em}#reel-concept .rc-time{font:500 15px ui-monospace,monospace;letter-spacing:.05em}
+#reel-concept .rc-live{position:absolute;top:63px;left:18px;display:flex;align-items:center;gap:7px;min-height:20px;font-size:12px;color:var(--rc-dark)}#reel-concept .rc-dot{width:5px;height:5px;background:var(--rc-dark);box-shadow:3px 0 var(--rc-haze)}
+#reel-concept button{font:500 12px system-ui,sans-serif;color:var(--rc-ink);-webkit-tap-highlight-color:transparent;user-select:none;touch-action:none;cursor:inherit}
+#reel-concept .rc-crank{position:absolute;right:2%;top:74%;width:40%;height:18%;background:transparent;border:0;padding:0;display:flex;align-items:flex-end;justify-content:center;touch-action:none;}
+#reel-concept .rc-crank .rc-label{background:var(--rc-paper);padding:7px 11px;border:1px solid var(--rc-line);border-radius:3px;white-space:nowrap;box-shadow:0 2px var(--rc-dark)}
+#reel-concept .rc-crank[aria-pressed=true] .rc-label{background:var(--rc-gold);color:var(--rc-dark)}
+#reel-concept .rc-footer{max-width:390px;margin:10px auto 0;display:flex;justify-content:space-between;gap:12px;font-size:12px;color:var(--rc-ink)}#reel-concept .rc-footer span{opacity:.8}
+#reel-concept .rc-drag{position:absolute;left:5%;bottom:27%;width:64px;height:155px;background:var(--rc-paper);border:1px solid var(--rc-line);border-radius:8px;padding:10px 8px;display:flex;flex-direction:column;align-items:center;gap:6px;color:var(--rc-ink);box-shadow:0 3px var(--rc-dark)}
+#reel-concept .rc-dragtitle{font-size:13px;font-weight:500}#reel-concept .rc-draghint{font-size:11px}#reel-concept .rc-drag input{writing-mode:vertical-lr;direction:rtl;width:44px;min-height:44px;flex:1;accent-color:var(--rc-ink);touch-action:none;margin:0}
+#reel-concept .rc-dragvalue{font-size:11px;color:var(--rc-ink)}#reel-concept .rc-bottom{position:absolute;bottom:14px;left:0;right:0;text-align:center;color:var(--rc-highlight);font-size:11px;letter-spacing:.1em}
+#reel-concept.rc-quiet .rc-label{visibility:hidden}
+</style>
+<div id="reel-concept" aria-label="潮汐之间：渔轮交互视觉设计">
+ <div class="rc-shell">
+  <canvas class="rc-scene" width="260" height="487" role="img" aria-label="第一视角海钓：双臂握住船竿，带裸露线杯、星形泄力和摇柄的卧式轮"></canvas>
+  <div class="rc-top"><span class="rc-mark">潮汐之间 / SANTA CRUZ</span><span class="rc-time">06:12</span></div>
+  <div class="rc-live" role="status" aria-live="polite"><i class="rc-dot"></i><span data-live>鱼在拉线</span></div>
+  <button class="rc-crank cursor-interaction" aria-label="按住摇柄匀速收线，或沿摇柄划圈" aria-pressed="false"><span class="rc-label">按住 / 划圈摇轮</span></button>
+  <label class="rc-drag"><span class="rc-dragtitle">泄力</span><span class="rc-draghint">收紧 ↑</span><input class="cursor-interaction" type="range" min="15" max="85" value="43" step="1" aria-label="左手调节泄力，上推收紧，下拉放松" aria-orientation="vertical" aria-valuetext="适中"><span class="rc-draghint">放松 ↓</span><span class="rc-dragvalue" data-drag>适中</span></label>
+  <div class="rc-bottom">A LITTLE BOAT. A WHOLE OCEAN.</div>
+ </div>
+ <div class="rc-footer"><span>可交互视觉稿</span><span data-action>左手调泄力 · 右手摇轮</span></div>
+</div>
+<script>
+(()=>{
+ const root=document.getElementById('reel-concept'),canvas=root.querySelector('canvas'),ctx=canvas.getContext('2d');
+ const crank=root.querySelector('.rc-crank'),drag=root.querySelector('input'),live=root.querySelector('[data-live]'),action=root.querySelector('[data-action]');
+ const config={scenario:'fish',hand:'right',labels:true};let holding=false,angle=.15,spool=0,phase=0,bend=.64,load=.43,pointer=null,last=0,raf=0,moveUntil=0,previewUntil=0,disposed=false;
+ const reduced=matchMedia('(prefers-reduced-motion: reduce)');
+ const css=()=>{const probe=document.createElement('span');probe.style.display='none';root.append(probe);const colors={};for(const k of ['ink','paper','line','sky','haze','sea','wave','deep','wood','woodlight','metal','dark','gold','highlight','skin','skinlight','shirt','shirtlight']){probe.style.color='var(--rc-'+k+')';colors[k]=getComputedStyle(probe).color;}probe.remove();return colors;};
+ let C=css();const w=260,h=487;
+ const rect=(x,y,ww,hh,col)=>{ctx.fillStyle=col;ctx.fillRect(Math.round(x),Math.round(y),Math.max(1,Math.round(ww)),Math.max(1,Math.round(hh)));};
+ const line=(x,y,xx,yy,col,width=1)=>{let ax=Math.round(x),ay=Math.round(y),bx=Math.round(xx),by=Math.round(yy),dx=Math.abs(bx-ax),sx=ax<bx?1:-1,dy=-Math.abs(by-ay),sy=ay<by?1:-1,err=dx+dy;for(let i=0;i<1500;i++){rect(ax,ay,width,width,col);if(ax===bx&&ay===by)break;let e=2*err;if(e>=dy){err+=dy;ax+=sx;}if(e<=dx){err+=dx;ay+=sy;}}};
+ const poly=(p,col)=>{ctx.fillStyle=col;ctx.beginPath();p.forEach(([x,y],i)=>ctx[i?'lineTo':'moveTo'](Math.round(x),Math.round(y)));ctx.closePath();ctx.fill();};
+ const oval=(x,y,rx,ry,col)=>{for(let a=-Math.ceil(ry);a<=Math.ceil(ry);a++){let span=Math.sqrt(Math.max(0,1-(a/ry)**2))*rx;rect(x-span,y+a,span*2,1,col);}};
+ function arm(ex,ey,hx,hy,right){
+  if(right){
+   poly([[285,429],[285,384],[hx+28,hy+9],[hx+8,hy+32]],C.dark);
+   poly([[285,424],[285,390],[hx+29,hy+13],[hx+13,hy+31]],C.shirt);
+   poly([[285,397],[hx+30,hy+14],[hx+24,hy+22],[282,418]],C.shirtlight);
+   poly([[hx+30,hy+11],[hx+11,hy+29],[hx-3,hy+13],[hx+12,hy-7]],C.skin);
+   poly([[hx+27,hy+12],[hx+15,hy+22],[hx+6,hy+10],[hx+15,hy-4]],C.skinlight);
+   line(hx+28,hy+13,hx+13,hy+29,C.dark,3);
+   poly([[hx-4,hy-12],[hx+10,hy-13],[hx+19,hy-3],[hx+17,hy+13],[hx+7,hy+22],[hx-7,hy+15],[hx-13,hy+4]],C.skin);
+   poly([[hx-4,hy-10],[hx+9,hy-10],[hx+15,hy-1],[hx+12,hy+8],[hx-7,hy+6]],C.skinlight);
+  }else{
+   poly([[-35,417],[-35,366],[hx-26,hy+8],[hx-11,hy+31]],C.dark);
+   poly([[-35,411],[-35,372],[hx-29,hy+12],[hx-15,hy+29]],C.shirt);
+   poly([[-35,375],[hx-30,hy+13],[hx-26,hy+20],[-35,394]],C.shirtlight);
+   poly([[hx-30,hy+13],[hx-16,hy+29],[hx+3,hy+18],[hx-9,hy-1]],C.skin);
+   poly([[hx-26,hy+13],[hx-18,hy+22],[hx-3,hy+14],[hx-10,hy+4]],C.skinlight);
+   line(hx-31,hy+13,hx-17,hy+29,C.dark,3);
+   poly([[hx-14,hy+12],[hx-18,hy-2],[hx-12,hy-14],[hx-1,hy-19],[hx+13,hy-13],[hx+17,hy+5],[hx+10,hy+19],[hx-4,hy+22]],C.skin);
+   poly([[hx-13,hy-1],[hx-8,hy-12],[hx+1,hy-15],[hx+10,hy-10],[hx+11,hy+4],[hx+2,hy+14],[hx-9,hy+13]],C.skinlight);
+  }
+ }
+ function draw(){
+  ctx.clearRect(0,0,w,h);rect(0,0,w,115,C.sky);rect(0,85,w,40,C.haze);
+  [[26,60,29],[123,73,42],[191,47,25]].forEach(([x,y,n])=>{rect(x,y,n,4,C.highlight);rect(x+7,y-4,n*.48,5,C.highlight);});oval(204,100,9,9,C.highlight);
+  rect(0,124,w,h-124,C.sea);rect(0,124,w,2,C.wave);
+  for(let row=0;row<45;row++){const y=128+row*6.3;for(let j=0;j<7;j++){const x=(j*47+row*19)%280-12,l=4+row*.4;rect(x,y,l,1,row%3===0?C.wave:C.deep);if((row+j)%3===0)rect(x+4,y-1,l*.5,1,C.wave);}}
+  ctx.save();ctx.translate(0,80);
+  poly([[0,349],[36,337],[224,337],[260,349],[260,487],[0,487]],C.wood);for(let i=0;i<9;i++)line(18+i*29,343,4+i*32,487,C.dark);
+  poly([[0,348],[35,334],[225,334],[260,348],[260,355],[223,342],[37,342],[0,355]],C.dark);poly([[0,347],[36,332],[224,332],[260,347],[260,351],[224,339],[36,339],[0,351]],C.woodlight);line(0,348,36,334,C.highlight,2);line(36,334,224,334,C.highlight,2);
+  rect(0,410,w,8,C.dark);rect(0,410,w,4,C.woodlight);
+  ctx.restore();
+  ctx.save();ctx.translate(-25,10);ctx.scale(1.15,1.15);
+  const gx=100,gy=308,tipX=180,tipY=192+bend*37+(reduced.matches?0:Math.sin(phase*7)*bend*1.5);
+  const cx=145,cy=350,knobX=cx+Math.cos(angle)*43,knobY=cy+Math.sin(angle)*27;
+  const gripX=95+(knobX-95)*.74,gripY=334+(knobY-334)*.74;
+  const handX=80,handY=366;
+  arm(67,384,handX-3,handY+3,false);arm(215,398,gripX+6,gripY+5,true);
+  line(68,388,gx+7,287,C.dark,11);line(71,386,gx+7,287,C.gold,7);for(let i=0;i<12;i++)line(71+i*2.7,381-i*8,79+i*2.7,382-i*8,C.wood,1);
+  let pts=[];for(let i=0;i<=35;i++){let t=i/35;pts.push([gx+80*t,gy-(118+13*bend)*t+49*bend*t**3]);}pts[35]=[tipX,tipY];
+  for(let i=1;i<pts.length;i++){line(...pts[i-1],...pts[i],C.dark,i<8?5:i<20?3:2);if(i<22)line(pts[i-1][0]-1,pts[i-1][1],pts[i][0]-1,pts[i][1],C.metal,1);}
+  for(let i of[7,13,20,27,35]){const p=pts[i];rect(p[0],p[1],4,3,C.metal);rect(p[0]+1,p[1],2,2,C.deep);}
+  line(tipX,tipY,189,327,C.highlight,1);line(185,330,192,330,C.wave,1);line(195,331,199,331,C.wave,1);
+  // Compact reel and crank, scaled together around the reel seat.
+  ctx.save();ctx.translate(95,334);ctx.scale(.74,.74);ctx.translate(-95,-334);
+  line(111,334,132,359,C.dark,8);poly([[95,324],[136,314],[163,333],[121,346]],C.dark);
+  oval(110,339,20,25,C.dark);oval(110,338,17,22,C.metal);oval(110,338,12,17,C.deep);
+  poly([[107,321],[143,323],[143,356],[107,355]],C.gold);
+  for(let i=0;i<14;i++){let x=108+i*2.5;line(x,322,x,354,i%3?C.gold:C.highlight,1);}
+  const shift=((spool*9)%8+8)%8;for(let i=0;i<5;i++)line(109,322+i*8+shift,142,324+i*8+shift,C.wood,1);
+  oval(145,341,21,26,C.dark);oval(145,339,18,23,C.metal);oval(145,339,14,19,C.dark);oval(145,339,10,15,C.deep);oval(145,339,6,8,C.gold);
+  line(108,318,144,320,C.metal,4);line(105,359,143,361,C.metal,3);rect(108,320,33,1,C.highlight);
+  for(let i=0;i<5;i++){let a=i*Math.PI*2/5+load*3;line(145,341,145+Math.cos(a)*14,341+Math.sin(a)*14,C.gold,4);}
+  line(cx,cy,knobX,knobY,C.dark,7);line(cx,cy,knobX,knobY,C.metal,4);oval(cx,cy,4,4,C.highlight);
+  oval(knobX,knobY,9,7,C.dark);rect(knobX-7,knobY-4,14,4,C.shirtlight);
+  ctx.restore();
+  for(let i=0;i<4;i++){let y=handY-11+i*7;oval(handX+8,y,9-i*.4,4,C.skin);line(handX+4,y-2,handX+12,y-1,C.skinlight,2);}
+  poly([[handX-13,handY-12],[handX-9,handY-21],[handX,handY-24],[handX+8,handY-20],[handX+8,handY-14],[handX-1,handY-14],[handX-5,handY-5]],C.skin);
+  line(handX-7,handY-19,handX+2,handY-20,C.skinlight,4);
+  for(let i=0;i<3;i++){oval(gripX+6+i*4,gripY-6+i*5,5,5,C.skin);line(gripX+5+i*4,gripY-8+i*5,gripX+9+i*4,gripY-7+i*5,C.skinlight,2);}
+  line(gripX-6,gripY-10,gripX+3,gripY-5,C.skinlight,6);
+  ctx.restore();
+ }
+ function caption(){const label=config.scenario==='fish'?(load<.6?'鱼在拉线':holding?'正在收线':'鱼竿承受拉力'):holding?'正在收线':'等候鱼讯';if(live.textContent!==label)live.textContent=label;}
+ function render(){root.classList.toggle('rc-quiet',!config.labels);crank.setAttribute('aria-pressed',String(holding));const name=load<.33?'偏松':load>.64?'偏紧':'适中';root.querySelector('[data-drag]').textContent=name;drag.setAttribute('aria-valuetext',name);caption();draw();}
+ function save(){window.openai?.setWidgetState?.({modelContent:{reelDesign:'integrated-conventional-reel',scenario:config.scenario,hand:config.hand,labels:config.labels,clutch:'engaged',drag:Math.round(load*100)},privateContent:{angle}})?.catch(()=>{});}
+ function apply(saved){const s=saved?.modelContent;if(!s)return;if(['fish','waiting'].includes(s.scenario))config.scenario=s.scenario;if(typeof s.labels==='boolean')config.labels=s.labels;if(Number.isFinite(s.drag))load=Math.min(.85,Math.max(.15,s.drag/100));drag.value=String(Math.round(load*100));if(Number.isFinite(saved?.privateContent?.angle))angle=saved.privateContent.angle;render();}
+ function tick(now){raf=0;if(disposed)return;const dt=Math.min(.04,Math.max(0,(now-last)/1000));last=now;if(holding||now<previewUntil){if(holding&&now>moveUntil)angle+=dt*3.8;const taking=config.scenario==='fish'&&load<.6;spool+=dt*(taking?-(.6-load)*22:holding?5:0);phase+=dt;bend=config.scenario==='fish'?.24+load*.8:.15;render();raf=requestAnimationFrame(tick);}}
+ function run(){if(!raf){last=performance.now();raf=requestAnimationFrame(tick);}}
+ crank.onpointerdown=e=>{if(e.button!==0)return;crank.setPointerCapture(e.pointerId);holding=true;const r=crank.getBoundingClientRect();pointer={x:r.left+r.width/2,y:r.top+r.height/2,a:Math.atan2(e.clientY-r.top-r.height/2,e.clientX-r.left-r.width/2)};action.textContent='摇柄、手腕与线杯分别运动';render();run();};
+ crank.onpointermove=e=>{if(!holding||!pointer)return;const a=Math.atan2(e.clientY-pointer.y,e.clientX-pointer.x);let d=a-pointer.a;if(d>Math.PI)d-=Math.PI*2;if(d<-Math.PI)d+=Math.PI*2;pointer.a=a;if(Math.abs(d)>.025){angle+=Math.max(0,d);moveUntil=performance.now()+160;render();}};
+ const stop=()=>{if(!holding)return;holding=false;pointer=null;caption();render();save();};crank.onpointerup=stop;crank.onpointercancel=stop;crank.onlostpointercapture=stop;crank.onkeydown=e=>{if([' ','Enter'].includes(e.key)){e.preventDefault();holding=true;run();}};crank.onkeyup=stop;crank.onblur=stop;
+ drag.oninput=()=>{load=Number(drag.value)/100;bend=config.scenario==='fish'?.24+load*.8:.15;action.textContent=load<.33?'泄力放松，线杯更容易出线':load>.64?'泄力收紧，鱼竿承受更大拉力':'左手调泄力 · 右手摇轮';previewUntil=performance.now()+1200;render();run();};drag.onchange=save;
+ apply(window.openai?.widgetState);render();window.addEventListener('openai:set_globals',e=>{if(e.detail?.globals?.widgetState)apply(e.detail.globals.widgetState);});
+ if(globalThis.Tweak){const tweak=new Tweak({container:root,onChange:()=>{bend=config.scenario==='fish'?.64:.15;render();save();}});tweak.addSelect(config,'scenario',{label:'预览场景',options:[{label:'中鱼 · 大鱼出线',value:'fish'},{label:'正常收线',value:'waiting'}]});tweak.addToggle(config,'labels',{label:'显示触摸提示'});}
+ new MutationObserver(()=>{C=css();draw();}).observe(document.documentElement,{attributes:true,attributeFilter:['class','style','data-theme']});
+ window.addEventListener('pagehide',()=>{disposed=true;if(raf)cancelAnimationFrame(raf);});
+})();
+</script>

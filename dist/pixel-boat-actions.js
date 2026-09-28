@@ -1,4 +1,4 @@
-import {hasElectricReel} from './equipment.js?v=20260927-pixel-v48';
+import {hasElectricReel} from './equipment.js?v=20260927-pixel-v49';
 // Presentation policy for the bottom console. Model methods still validate
 // actions themselves; this pure selector keeps unavailable controls offscreen.
 export function boatActions(s,{panel='tackle',hasRod=true,hasChart=false,canLower=false,nearDock=false}={}){
@@ -13,7 +13,7 @@ export function boatActions(s,{panel='tackle',hasRod=true,hasChart=false,canLowe
   switchPanel:boatFree,switchLabel:helm?'钓鱼':'操船',
   monitor:helm&&mounted,
   adjustPose:tackle&&!['casting','flight','landed'].includes(fish)&&(Math.abs(s.throttle||0)<=.01||mounted),
-  reelInstrument:tackle&&(water||fish==='flight'),reel:tackle&&water&&!mounted,spool:tackle&&water,drag:tackle&&(fish==='fight'||Boolean(s.snagged)),
+  reelInstrument:tackle&&(water||fish==='flight'),reel:tackle&&water&&!mounted,spool:tackle&&water&&fish!=='fight',drag:tackle&&(fish==='fight'||Boolean(s.snagged)),
   lower:tackle&&idle&&canLower,cast:tackle&&idle&&canLower&&!mounted,
   hook:tackle&&fish==='bite'&&!mounted,catch:tackle&&fish==='landed',retrieve:tackle&&waiting&&!mounted&&hasElectricReel(s.profile,s.packed),
   mount:tackle&&hasRod&&!mounted&&(idle||waiting),take:pickUp,

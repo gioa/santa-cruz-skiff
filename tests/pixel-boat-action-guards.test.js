@@ -8,6 +8,16 @@ function ready(){
  const sim=new PixelSimulation({rng:()=>.05,patrolRng:()=>.9,profile:{version:2,credits:200}});sim.start();Object.assign(sim.state,{playerX:HARBOR.counterX,playerZ:HARBOR.counterZ});assert.ok(sim.launchBoat().ok);run(sim,24.1);Object.assign(sim.state,{playerX:HARBOR.boardingX,playerZ:HARBOR.boardingZ});assert.ok(sim.board().ok);assert.ok(sim.unmoor().ok);return sim;
 }
 
+test('fighting prevents free-spool commands but preserves adjustable drag and normal lowering',()=>{
+ const sim=ready(),s=sim.state;
+ assert.equal(sim.lowerRig().ok,true);assert.equal(s.reelMode,'free');
+ sim.setReelMode('brake');s.fishState='fight';
+ const before={paid:s.paidLineMeters,point:{...s.bobber}};
+ assert.equal(sim.setReelMode('free').ok,false);assert.equal(s.reelMode,'brake');
+ sim.changeDrag(.1);assert.ok(s.drag>.48);assert.equal(s.paidLineMeters,before.paid);assert.deepEqual(s.bobber,before.point);
+ s.fishState='waiting';assert.equal(sim.setReelMode('free').ok,true);
+});
+
 test('retired anchor calls cannot change navigation or deployed tackle in any fishing phase',()=>{
  const sim=ready(),s=sim.state;assert.ok(sim.lowerRig().ok);run(sim,2);
  for(const fishState of ['sinking','waiting','bite','fight','landed'])for(const rodMount of ['hand','port','starboard']){

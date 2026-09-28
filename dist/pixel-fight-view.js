@@ -1,10 +1,10 @@
-import {drawAnglerArm} from './pixel-angler-arms.js?v=20260927-pixel-v48';
-import {fishBodyPose,drawFishBody} from './pixel-fish-motion.js?v=20260927-pixel-v48';
-import {rodFlexPoint} from './pixel-rod-response.js?v=20260927-pixel-v48';
+import {drawCloseTackle} from './pixel-fight-tackle.js?v=20260927-pixel-v49';
+import {fishBodyPose,drawFishBody} from './pixel-fish-motion.js?v=20260927-pixel-v49';
+import {rodFlexPoint} from './pixel-rod-response.js?v=20260927-pixel-v49';
 // First-person artwork uses the same rod pose, load, surface intersection and
 // crank speed as the simulation. It is a camera change, never another fight.
-import {reelMotion} from './pixel-fishing-feedback.js?v=20260927-pixel-v48';
-import {fishSpriteKind,fishSpriteBounds} from './pixel-fish-art.js?v=20260927-pixel-v48';
+import {reelMotion} from './pixel-fishing-feedback.js?v=20260927-pixel-v49';
+import {fishSpriteKind,fishSpriteBounds} from './pixel-fish-art.js?v=20260927-pixel-v49';
 const TAU=Math.PI*2;
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 const finite=(n,f=0)=>Number.isFinite(n)?n:f;
@@ -29,24 +29,26 @@ export function fightFishProjection(width,state={}){
 /** Geometry is in logical pixels. Shared endpoints keep line and rod attached. */
 export function fightViewGeometry(width,height,state={},options={}){
  const w=Math.max(1,finite(width,1)),h=Math.max(1,finite(height,1)),landscape=w>h*1.2;
- const inset=clamp(finite(options.bottomInset),0,h*.48),bottom=clamp(h-inset-8,h*.48,h*.88);
+ const inset=clamp(finite(options.bottomInset),0,h*.48),bottom=clamp(h-inset*.12-8,h*.76,h*.86);
  const mount=['port','starboard'].includes(state.rodMount)?state.rodMount:'hand',mounted=mount!=='hand';
  const elevation=clamp(finite(state.rodElevation,45),5,85),azimuth=clamp(finite(state.rodAzimuth,70),-110,110),bend=clamp(finite(state.rodBend),0,1);
  const heave=options.reducedMotion?0:Math.sin(finite(options.clock)*.72)*Math.min(1.1,h*.003);
- const horizon=Math.round(h*(landscape?.25:.31)),railY=Math.min(h*.86,bottom+23)+heave;
- const scale=clamp(Math.min(w/200,h/260),.68,1.45);
- const armRoom=mounted?15*scale:Math.min(57*scale,(bottom-horizon)*.32);
- const base={x:w*(mount==='port'?.25:mount==='starboard'?.73:.36),y:bottom-armRoom+heave};
- const length=Math.min(w*.70,Math.max(20,(base.y-horizon)*1.04)),e=elevation*Math.PI/180;
+ const horizon=Math.round(h*.255),railY=h*.855+heave;
+ const scale=Math.min(w/260,h/(landscape?310:487))*1.15;
+ const armRoom=mounted?15*scale:0;
+ const base={x:w*(mount==='port'?.25:mount==='starboard'?.73:.35),y:(mounted?bottom-armRoom:h*(landscape?.61:.745))+heave};
+ const length=Math.min(w*.66,Math.max(20,(base.y-horizon)*.95)),e=elevation*Math.PI/180;
  // Perspective compresses the sideways sweep near the camera edges. Reserve
  // some of that span for the loaded tip so full left/right sweeps never clip.
  const span=azimuth<0?base.x-w*.06:w*.94-base.x,dx=span*(azimuth/110)*.80,dy=-length*(.34+.74*Math.sin(e));
  const flexX=span*(azimuth/110)*.18*bend,flexY=bend*Math.min(length*.50,-dy*.90);
  const points=[];for(let i=0;i<=28;i++){const t=i/28,motion=rodFlexPoint(state,t,length),flex=motion.shape;points.push({x:clamp(base.x+dx*t+flexX*flex+motion.x,w*.06,w*.94),y:base.y+dy*t+flexY*flex+motion.y});}
- const tip=points.at(-1),norm=Math.hypot(dx,dy)||1,ux=dx/norm,uy=dy/norm;
- const butt={x:base.x-ux*29*scale,y:base.y-uy*29*scale};
- const reel={x:base.x-uy*11*scale-ux*10*scale,y:base.y+ux*11*scale-uy*10*scale};
- const angle=finite(options.crankAngle),knob={x:reel.x+Math.cos(angle)*15*scale,y:reel.y+Math.sin(angle)*10*scale};
+ const tip=points.at(-1),norm=Math.hypot(dx,dy)||1,ux=dx/norm*.7,uy=-Math.sqrt(1-ux*ux);
+ const butt={x:base.x-ux*87*scale,y:base.y-uy*87*scale};
+ const reel={x:base.x-uy*26*scale-ux*35*scale,y:base.y+ux*26*scale-uy*35*scale};
+ const grip={x:base.x-ux*66*scale,y:base.y-uy*66*scale};
+ const reelHub={x:reel.x+13.2*scale,y:reel.y+3.3*scale};
+ const angle=finite(options.crankAngle),knob={x:reelHub.x+Math.cos(angle)*36*scale,y:reelHub.y+Math.sin(angle)*23*scale};
  // Only the line's actual surface entry is visible; no invented float or
  // underwater fish marker. Translate the actual displacement relative to the
  // rod tip into this deliberately enlarged first-person rod presentation.
@@ -64,7 +66,7 @@ export function fightViewGeometry(width,height,state={},options={}){
  const control={x:mix(tip.x,hookPoint.x,.5),y:mix(tip.y,hookPoint.y,.5)+slack};
  const line=[];for(let i=0;i<=18;i++){const t=i/18,u=1-t;line.push({x:u*u*tip.x+2*u*t*control.x+t*t*hookPoint.x,y:u*u*tip.y+2*u*t*control.y+t*t*hookPoint.y});}
  line[0]=tip;line[line.length-1]=hookPoint;
- return{width:w,height:h,landscape,horizon,railY,bottom,scale,mount,mounted,elevation,azimuth,bend,base,butt,reel,knob,tip,points,line,waterEntry,hookPoint,heave,
+ return{width:w,height:h,landscape,horizon,railY,bottom,scale,mount,mounted,elevation,azimuth,bend,base,butt,grip,reel,reelHub,knob,tip,points,line,waterEntry,hookPoint,heave,
   showFloat:state.rig==='float'&&Boolean(state.floatPosition)&&state.fishState!=='landed',
   surfaceFish:Boolean(fishProjection),fishProjection,
   lineVisible:['bite','fight'].includes(state.fishState)};
@@ -153,33 +155,13 @@ export function createFightView(canvas,{sprites}={}){
   const seatY=y+29*s;if(seatY<h){rect(0,seatY,w,7*s,'#715c46');rect(0,seatY,w,3*s,'#c09864');rect(0,seatY+1,w,1,'#d3b782');}
  }
  function tackle(g,s){
-  const {width:w,height:h,scale:k,base,reel,knob,points,butt,mounted}=g;
-  if(!mounted){
-   // The left hand wraps the foregrip; the right hand stays on the actual crank.
-   const armSpan=Math.min(w*.17,38*k),leftElbow={x:base.x-armSpan,y:g.bottom+12*k},rightElbow={x:knob.x+armSpan*1.4,y:g.bottom+14*k};
-   drawAnglerArm(c,{root:{x:leftElbow.x-armSpan*.5,y:h+18*k},elbow:leftElbow,hand:{x:base.x-4*k,y:base.y+4*k},scale:k});
-   drawAnglerArm(c,{root:{x:rightElbow.x+armSpan*.65,y:h+18*k},elbow:rightElbow,hand:{x:knob.x+3*k,y:knob.y+4*k},scale:k,right:true});
-  }else{
-   const mountX=base.x;rect(mountX-7*k,g.railY-7*k,15*k,4*k,'#324d51');rect(mountX-6*k,g.railY-7*k,12*k,2*k,'#b6c4b3');
-   line({x:mountX,y:g.railY-4*k},butt,'#263e44',11*k);line({x:mountX-1*k,y:g.railY-4*k},{x:butt.x-1*k,y:butt.y},'#a7bcb1',7*k);line({x:mountX-3*k,y:g.railY-4*k},{x:butt.x-3*k,y:butt.y},'#d2dac3',2*k);
+  const {scale:k,base,reel,points,butt,mounted}=g;
+  if(mounted){
+   rect(base.x-7*k,g.railY-7*k,15*k,4*k,'#324d51');
+   line({x:base.x,y:g.railY-4*k},butt,'#a7bcb1',8*k);
   }
-  line(butt,points[4],'#202e32',8*k);line(butt,points[4],'#a88956',5*k);line({x:butt.x-1,y:butt.y},points[4],'#d2b57d',2*k);
-  for(let i=0;i<5;i++){const p={x:mix(butt.x,base.x,i/5),y:mix(butt.y,base.y,i/5)};rect(p.x-2*k,p.y,4*k,1,'#786349');}
-  // A continuous tapered blank, with the upper section curving under real load.
-  for(let i=1;i<points.length;i++){const p=points[i-1],q=points[i],width=i<5?5*k:i<12?3*k:i<21?2*k:1;line(p,q,i<5?'#203b3d':'#264b4a',width);if(i<18)line({x:p.x-1,y:p.y},{x:q.x-1,y:q.y},i<5?'#8f9270':'#849c87',1);}
-  const guides=[5,10,15,20,24,28];for(const index of guides){const p=points[index],r=index<12?2:1;rect(p.x-r,p.y+r,r*2+1,1,'#c1c8a3');rect(p.x-r,p.y,1,r+1,'#9aaa91');rect(p.x+r,p.y,1,r+1,'#536e66');}
-  // Above-blank conventional reel: dark side plates, brass wound spool and
-  // steel handle. Both the painted knob and right palm use one crank endpoint.
-  const r=11*k;ellipse(reel.x,reel.y,r+2*k,r+1*k,'#203e42');ellipse(reel.x,reel.y,r,r,'#a3b7a3');ellipse(reel.x,reel.y,r-2*k,r-2*k,'#365951');ellipse(reel.x,reel.y,r-4*k,r-4*k,'#c4ac71');
-  for(let i=0;i<5;i++){const yy=reel.y-5*k+i*2*k;line({x:reel.x-5*k,y:yy},{x:reel.x+5*k,y:yy},i%2?'#e0ce99':'#8c815d',1);}
-  for(let i=0;i<4;i++){const a=spoolAngle+i*TAU/4;rect(reel.x+Math.cos(a)*(r-1)-.5,reel.y+Math.sin(a)*(r-1)-.5,1,1,'#eef0d1');}
-  line(reel,knob,'#294b48',4*k);line(reel,knob,'#c7cdb2',2*k);ellipse(reel.x,reel.y,3*k,3*k,'#d8b670');ellipse(knob.x,knob.y,5*k,3*k,'#233e3d');rect(knob.x-3*k,knob.y-2*k,6*k,1,'#6d8c78');
-  if(!mounted){
-   // Fingers overlap the cork and crank instead of hovering beside the tackle.
-   for(let i=0;i<3;i++){line({x:base.x-5*k,y:base.y-3*k+i*3*k},{x:base.x+3*k,y:base.y-3*k+i*3*k},i===0?'#f3c58b':'#e2ad78',2*k);rect(base.x+3*k,base.y-3*k+i*3*k,1,2*k,'#ae7655');}
-   line({x:base.x-7*k,y:base.y-4*k},{x:base.x-3*k,y:base.y-9*k},'#f3c58b',3*k);
-   line({x:knob.x+1*k,y:knob.y+3*k},{x:knob.x+5*k,y:knob.y-1*k},'#eab985',4*k);rect(knob.x+1*k,knob.y+3*k,4*k,1,'#b78259');
-  }
+  drawCloseTackle(c,g,{line,ellipse,rect,spoolAngle});
+  const guides=[5,10,15,20,24,28];
   if(g.lineVisible){
    let prev=reel;for(const index of guides){const p=points[index],q={x:p.x,y:p.y+1};line(prev,q,'#d3d5b4',1);prev=q;}
    for(let i=1;i<g.line.length;i++)line(g.line[i-1],g.line[i],i>g.line.length-4?'#b4d0bd':'#ece6c8',1);
@@ -196,7 +178,7 @@ export function createFightView(canvas,{sprites}={}){
  function snapshot(){
   if(!lastGeometry)return{active,view:'first-person',phase:lastPhase,width:cssWidth,height:cssHeight};
   const g=lastGeometry,cssPoint=p=>({x:Math.round(p.x*cssWidth/g.width),y:Math.round(p.y*cssHeight/g.height)});
-  return{active,view:'first-person',phase:lastPhase,width:cssWidth,height:cssHeight,mount:g.mount,rodElevation:g.elevation,rodAzimuth:g.azimuth,bend:g.bend,crankAngle,spoolAngle,rodTip:cssPoint(g.tip),lineEntry:cssPoint(g.waterEntry),hookPoint:cssPoint(g.hookPoint),fishAirHeight:g.fishProjection?.airHeight||0,lineVisible:g.lineVisible,floatVisible:g.showFloat,surfaceFish:g.surfaceFish,fishVisible,fishLengthCm:g.fishProjection?.lengthCm??null,fishLengthPixels:g.fishProjection?g.fishProjection.lengthPixels*cssWidth/g.width:null,fishDistanceMeters:g.fishProjection?.distanceMeters??null};
+  return{active,view:'first-person',phase:lastPhase,width:cssWidth,height:cssHeight,mount:g.mount,rodElevation:g.elevation,rodAzimuth:g.azimuth,bend:g.bend,crankAngle,spoolAngle,reelCenter:cssPoint(g.reelHub),reelKnob:cssPoint(g.knob),rearGrip:cssPoint(g.grip),reelTouchRadius:Math.round(46*g.scale*cssWidth/g.width),railY:Math.round(g.railY*cssHeight/g.height),rodTip:cssPoint(g.tip),lineEntry:cssPoint(g.waterEntry),hookPoint:cssPoint(g.hookPoint),fishAirHeight:g.fishProjection?.airHeight||0,lineVisible:g.lineVisible,floatVisible:g.showFloat,surfaceFish:g.surfaceFish,fishVisible,fishLengthCm:g.fishProjection?.lengthCm??null,fishLengthPixels:g.fishProjection?g.fishProjection.lengthPixels*cssWidth/g.width:null,fishDistanceMeters:g.fishProjection?.distanceMeters??null};
  }
  resize(cssWidth,cssHeight);return{resize,draw,snapshot};
 }

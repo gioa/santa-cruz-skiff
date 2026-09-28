@@ -373,6 +373,44 @@ html,body,#app,#app *,#app *::before,#app *::after{-webkit-user-select:none;user
 #rod-load{font-size:10px;color:#527263}
 #rod-monitor b{max-width:7em;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
 
+/* The first-person reel is the control itself; no second instrument panel. */
+.drag-focus-up,.drag-focus-down,.drag-focus-track,.drag-focus-value{display:none}
+.is-fishing-focus #boat-fishing .fishing-instruments{
+ left:var(--focus-reel-left,55%);top:var(--focus-reel-top,70%);right:auto;bottom:auto;
+ width:var(--focus-reel-size,112px);height:var(--focus-reel-size,112px)
+}
+.is-fishing-focus #boat-fishing .reel-instrument{
+ display:block;background:transparent;border:0;box-shadow:none;overflow:visible
+}
+.is-fishing-focus #boat-fishing #reel-wheel{width:100%;height:100%;background:transparent;touch-action:none}
+.is-fishing-focus #boat-fishing.can-wind .reel-instrument::after{
+ content:'按住 / 划圈收线';position:absolute;top:min(100%,calc(100dvh - var(--focus-reel-top,70vh) - 30px - var(--safe-bottom)));left:50%;transform:translateX(-50%);
+ padding:5px 8px;background:#fff0cf;color:#173f43;border:1px solid #9daa91;
+ font:11px/1.4 system-ui,sans-serif;white-space:nowrap;pointer-events:none
+}
+.is-fishing-focus #boat-fishing .reel-instrument #reel-btn{
+ top:auto;bottom:-22px;left:50%;right:auto;transform:translateX(-50%);
+ width:96px;height:44px;background:#fff0cf;color:#173f43;border:1px solid #9daa91;
+ box-shadow:0 2px #274d4c;font-size:11px
+}
+.is-fishing-focus #boat-fishing .fishing-toolbar{
+ bottom:calc(26% + var(--safe-bottom));left:max(5%,env(safe-area-inset-left));width:68px;gap:8px
+}
+.is-fishing-focus #boat-fishing .fishing-toolbar #drag-knob{
+ width:64px;height:160px;min-height:160px;display:flex;flex-direction:column;gap:5px;padding:10px 6px;border-radius:8px;
+ color:#173f43;background:#fff0cf;border:1px solid #9daa91;box-shadow:0 2px #274d4c;
+ touch-action:none;user-select:none
+}
+.is-fishing-focus #drag-knob .drag-star,.is-fishing-focus #drag-knob .drag-marks{display:none}
+.is-fishing-focus #drag-knob .drag-caption{font:600 13px/1.2 system-ui,sans-serif}
+.is-fishing-focus #drag-knob .drag-focus-up,.is-fishing-focus #drag-knob .drag-focus-down,.is-fishing-focus #drag-knob .drag-focus-value{display:block;font:11px/1.2 system-ui,sans-serif}
+.is-fishing-focus #drag-knob .drag-focus-track{display:block;position:relative;flex:1;width:5px;min-height:44px;margin:6px 0;background:#afbea8;border-radius:3px}
+.is-fishing-focus #drag-knob .drag-focus-track i{position:absolute;left:50%;top:var(--drag-position,50%);width:18px;height:18px;border-radius:50%;background:#285452;transform:translate(-50%,-50%)}
+@media(max-height:500px) and (orientation:landscape){
+ .is-fishing-focus #boat-fishing .fishing-toolbar{bottom:calc(17% + var(--safe-bottom))}
+ .is-fishing-focus #boat-fishing .fishing-toolbar #drag-knob{height:132px;min-height:132px;padding:8px 6px;gap:4px}
+}
+
 /* Whole rigs and bait remain touch-sized independent inventory slots. */
 .premade-workbench .rod-assembly-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.premade-workbench .assembly-slot{min-height:132px}.supply-condition{font-size:9px;color:#536a54;line-height:1.35}.supply-condition.empty{color:#935334}.supply-action{font-size:9px;padding:3px 6px;background:#ded0ab;color:#344f48}.premade-workbench .rod-part{min-height:110px}.premade-workbench .rod-part-options{max-height:360px}.rod-part:disabled .supply-action{background:transparent}.premade-workbench .assembly-slot strong{font-size:11px}
 @media(max-width:600px){.premade-workbench .assembly-slot{min-height:106px}.premade-workbench .rod-part{min-height:104px}.premade-workbench .rod-part-options{max-height:232px}.premade-workbench .assembly-slot strong{font-size:10px}}

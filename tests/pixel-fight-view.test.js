@@ -4,6 +4,16 @@ import {createHash} from 'node:crypto';
 import {createFightView,fightViewGeometry,fightFishProjection} from '../dist/pixel-fight-view.js';
 
 const state=(overrides={})=>({fishState:'fight',fish:{length:30,latin:'Sebastes melanops'},rodMount:'hand',rodElevation:45,rodAzimuth:70,rodBend:.45,rodLoadN:12,paidLineMeters:18,lureDepth:12,lineSlackMeters:0,rig:'bottom',reelMode:'brake',crankRate:0,heading:0,rodTip:{x:2,z:0,height:1.8},lineEntry:{x:2.3,z:-1},...overrides});
+
+test('rear grip stays behind the reel seat and boat occupies only the lower edge',()=>{
+ for(const [w,h] of [[320,568],[390,844],[844,390]])for(const elevation of[5,45,85]){
+  const g=fightViewGeometry(w,h,state({rodElevation:elevation}),{bottomInset:180});
+  assert.ok(g.grip.y>g.reel.y,'support hand is below the reel, never on the foregrip');
+  assert.ok(g.railY>=h*.84,'low gunwale matches the approved close view');
+  assert.ok(Math.hypot(g.grip.x-g.butt.x,g.grip.y-g.butt.y)<Math.hypot(g.base.x-g.butt.x,g.base.y-g.butt.y));
+  assert.ok(g.knob.x<w&&g.knob.y<h);
+ }
+});
 function recordingCanvas(){
  let calls=[];const context={fillStyle:'',imageSmoothingEnabled:true};
  for(const name of['fillRect','beginPath','moveTo','lineTo','closePath','fill','save','restore','drawImage'])context[name]=(...args)=>calls.push([name,context.fillStyle,...args]);
@@ -124,4 +134,15 @@ test('surface artwork crops transparent padding, retains species proportions and
  assert.ok(Math.abs(shot.fishLengthPixels-fightFishProjection(390,s).lengthPixels)<1e-9);
  canvas.reset();view.draw({...s,lureDepth:20},0,{active:true,reducedMotion:true});assert.ok(!canvas.calls.some(call=>call[0]==='drawImage'));assert.equal(view.snapshot().fishVisible,false);
  canvas.reset();view.draw(s,0,{active:false});assert.equal(view.snapshot().fishVisible,false);
+});
+
+
+test('close tackle matches the approved portrait scale and crank hit target tracks the visible handle',()=>{
+ for(const [w,h] of [[320,568],[390,844],[844,390]]){
+  const canvas=recordingCanvas(),view=createFightView(canvas);view.resize(w,h);view.draw(state(),0,{active:true});
+  const shot=view.snapshot(),distance=Math.hypot(shot.reelKnob.x-shot.reelCenter.x,shot.reelKnob.y-shot.reelCenter.y);
+  assert.ok(distance<shot.reelTouchRadius);
+  assert.ok(shot.rearGrip.y>shot.reelCenter.y);
+  if(w<h){assert.ok(shot.rearGrip.y>h*.83&&shot.rearGrip.y<h*.96);assert.ok(shot.reelTouchRadius>w*.16);}
+ }
 });

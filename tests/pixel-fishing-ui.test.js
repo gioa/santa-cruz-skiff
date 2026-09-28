@@ -19,7 +19,7 @@ class Element {
  removeAttribute(name){delete this.attributes[name];}
 }
 
-function fixture(t,fishState='idle',{electric=false}={}){
+function fixture(t,fishState='idle',{electric=false,focus=false}={}){
  const priorDocument=globalThis.document;globalThis.document={getElementById:()=>null};
  t.after(()=>{if(priorDocument===undefined)delete globalThis.document;else globalThis.document=priorDocument;});
  const buttons=['drag-knob','spool-toggle','lower-rig','reel-btn','retrieve-rig','take-rod'];
@@ -30,7 +30,7 @@ function fixture(t,fishState='idle',{electric=false}={}){
  const state={mode:'boat',rentalPaid:true,launchStage:'afloat',fishState,rodMount:'hand',rodElevation:45,rodAzimuth:70,drag:.5,rig:'bottom',fuel:80,engine:false,paused:false,inspection:null,profile:{owned:['rod',...(electric?['rod_electric']:[])],loadout:{rod:electric?'rod_electric':'rod'}},packed:['rod',...(electric?['rod_electric']:[])]};
  const sim={state,lowerRig:()=>{state.fishState='sinking';return{ok:true};},setRodPose:pose=>{state.rodElevation=pose.elevation;state.rodAzimuth=pose.azimuth;},changeDrag:delta=>{state.drag+=delta;}};
  let retrieveCalls=0;
- const ui=mountFishingConsole(root,{sim,getActions:()=>boatActions(state,{canLower:true}),onFeedback(){},onMount(){},onRetrieve(){retrieveCalls++;}});
+ const ui=mountFishingConsole(root,{sim,getFocusView:()=>({active:focus}),getActions:()=>boatActions(state,{canLower:true}),onFeedback(){},onMount(){},onRetrieve(){retrieveCalls++;}});
  ui.update();return{state,ui,elements,retrieveCalls:()=>retrieveCalls};
 }
 
@@ -131,4 +131,36 @@ test('electric recovery appears only on the purchased active set and stops accep
   const base={...state};Object.assign(state,patch);ui.update();assert.equal(retrieve.hidden,true);retrieve.onclick();assert.equal(retrieveCalls(),1);Object.assign(state,base);
  }
  state.packed=['rod'];ui.update();assert.equal(retrieve.hidden,true);
+});
+
+test('focus reel can be held while a second thumb adjusts drag; each pointer releases independently',t=>{
+ const {state,ui,elements}=fixture(t,'fight',{focus:true}),wheel=elements['reel-wheel'],drag=elements['drag-knob'];
+ assert.equal(elements['spool-toggle'].hidden,true);
+ wheel.emit('pointerdown',{pointerId:11,clientX:145,clientY:70});
+ assert.equal(ui.input(.05).reel,1.2);
+ drag.emit('pointerdown',{pointerId:22,clientY:100});drag.emit('pointermove',{pointerId:22,clientY:64});
+ assert.ok(Math.abs(state.drag-.7)<1e-12);assert.equal(ui.input(.05).reel,1.2);
+ wheel.emit('pointerup',{pointerId:22});assert.equal(ui.input(.05).reel,1.2,'other thumb cannot release winding');
+ drag.emit('pointerup',{pointerId:22});assert.equal(ui.input(.05).reel,1.2);
+ wheel.emit('pointerup',{pointerId:11});assert.equal(ui.input(.05).reel,0);
+ wheel.emit('pointerdown',{pointerId:33});ui.reset();assert.equal(ui.input(.05).reel,0);
+ wheel.emit('pointermove',{pointerId:33});assert.equal(ui.input(.05).reel,0);
+});
+
+test('deliberate circular input stops on stillness, and focus loss cannot latch winding',t=>{
+ const {state,ui,elements}=fixture(t,'fight',{focus:true}),wheel=elements['reel-wheel'];
+ wheel.emit('pointerdown',{clientX:145,clientY:70});wheel.emit('pointermove',{clientX:100,clientY:115});
+ assert.ok(ui.input(.05).reel>0);assert.equal(ui.input(.2).reel,0);
+ wheel.emit('pointerup');wheel.emit('pointerdown');assert.equal(ui.input(.05).reel,1.2);
+ state.paused=true;assert.equal(ui.input(.05).reel,0);state.paused=false;assert.equal(ui.input(.05).reel,0);
+});
+
+
+test('focus drag slider uses its actual track for taps and full top-to-bottom travel',t=>{
+ const {state,ui,elements}=fixture(t,'fight',{focus:true}),drag=elements['drag-knob'];
+ drag.querySelector=selector=>selector==='.drag-focus-track'?{getBoundingClientRect:()=>({top:200,height:64})}:null;
+ drag.emit('pointerdown',{clientY:232});assert.ok(Math.abs(state.drag-.525)<1e-12);
+ drag.emit('pointermove',{clientY:200});assert.equal(state.drag,.85);
+ drag.emit('pointermove',{clientY:264});assert.ok(Math.abs(state.drag-.2)<1e-12);
+ drag.emit('pointercancel');drag.emit('pointermove',{clientY:200});assert.ok(Math.abs(state.drag-.2)<1e-12);
 });
