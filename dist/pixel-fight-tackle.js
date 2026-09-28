@@ -1,6 +1,6 @@
-// Close, foreshortened hands. The left grip is behind/below the reel seat;
-// the right palm and the crank share the same moving endpoint.
-export function drawCloseTackle(ctx,g,{line,ellipse,rect,spoolAngle}){
+// Close, foreshortened hands. Hardware and line are behind the full grasp,
+// including the palm and wrist, not merely behind the finger highlights.
+export function drawCloseTackle(ctx,g,{line,ellipse,rect,spoolAngle,drawFishingLine=()=>{}}){
  const {width:w,scale:k,grip,reel,knob,base,butt,points}=g;
  const hand=g.rightHand||knob;
  const C={dark:'#193b40',shirt:'#345e70',shirtlight:'#598191',skin:'#d8a074',skinlight:'#f1c69b'};
@@ -29,7 +29,6 @@ export function drawCloseTackle(ctx,g,{line,ellipse,rect,spoolAngle}){
   }
  }
 
- if(!g.mounted){arm(grip.x/k-3,grip.y/k,false);arm(hand.x/k+6,hand.y/k+5,true);}
  line(butt,points[3],'#213b3c',9*k);line(butt,points[3],'#a58b5d',6*k);
  for(let i=0;i<12;i++){const t=i/12,x=butt.x+(points[3].x-butt.x)*t,y=butt.y+(points[3].y-butt.y)*t;rect(x-2*k,y,4*k,1,'#d2b98a');}
  // Rod blank, guides, and line remain bound to the physical rod pose.
@@ -51,8 +50,12 @@ export function drawCloseTackle(ctx,g,{line,ellipse,rect,spoolAngle}){
  for(let i=0;i<5;i++){const a=i*Math.PI*2/5;line(hub,{x:hub.x+Math.cos(a)*5*rk,y:hub.y+Math.sin(a)*5*rk},'#c8ad71',2*rk);}
  line(hub,knob,'#223f43',4*rk);line(hub,knob,'#c3cdbb',2*rk);
  ellipse(knob.x,knob.y,5*rk,3.5*rk,'#243e43');rect(knob.x-3*rk,knob.y-2*rk,6*rk,k,'#74928c');
- // Fingers wrap over the rear grip and crank, after those surfaces are drawn.
+ // Draw the guide-to-spool and outgoing line before the near-side arms.
+ // This also masks a line crossing the wrist during a lift/recovery transition.
+ drawFishingLine();
  if(!g.mounted){
+ arm(grip.x/k-3,grip.y/k,false);arm(hand.x/k+6,hand.y/k+5,true);
+ // Fingers close over the grip/knob; the whole palm masks its hidden shaft.
  for(let i=0;i<4;i++){const yy=grip.y-11*k+i*7*k;ellipse(grip.x+5*k,yy,(9-i*.4)*k,4*k,C.skin);line({x:grip.x+1*k,y:yy-2*k},{x:grip.x+9*k,y:yy-k},C.skinlight,2*k);}
  line({x:grip.x-10*k,y:grip.y-19*k},{x:grip.x-1*k,y:grip.y-20*k},C.skinlight,4*k);
  for(let i=0;i<3;i++){ellipse(hand.x+6*k+i*4*k,hand.y-6*k+i*5*k,5*k,5*k,C.skin);line({x:hand.x+5*k+i*4*k,y:hand.y-8*k+i*5*k},{x:hand.x+9*k+i*4*k,y:hand.y-7*k+i*5*k},C.skinlight,2*k);}

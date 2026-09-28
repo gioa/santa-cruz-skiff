@@ -1,11 +1,11 @@
-import {drawWeatherOverlay} from './pixel-daily-weather.js?v=20260928-pixel-v78';
-import {drawCloseTackle} from './pixel-fight-tackle.js?v=20260928-pixel-v78';
-import {fishBodyPose,drawFishBody} from './pixel-fish-motion.js?v=20260928-pixel-v78';
-import {rodFlexPoint} from './pixel-rod-response.js?v=20260928-pixel-v78';
+import {drawWeatherOverlay} from './pixel-daily-weather.js?v=20260928-pixel-v79';
+import {drawCloseTackle} from './pixel-fight-tackle.js?v=20260928-pixel-v79';
+import {fishBodyPose,drawFishBody} from './pixel-fish-motion.js?v=20260928-pixel-v79';
+import {rodFlexPoint} from './pixel-rod-response.js?v=20260928-pixel-v79';
 // First-person artwork uses the same rod pose, load, surface intersection and
 // crank speed as the simulation. It is a camera change, never another fight.
-import {reelMotion} from './pixel-fishing-feedback.js?v=20260928-pixel-v78';
-import {fishSpriteKind,fishSpriteBounds} from './pixel-fish-art.js?v=20260928-pixel-v78';
+import {reelMotion} from './pixel-fishing-feedback.js?v=20260928-pixel-v79';
+import {fishSpriteKind,fishSpriteBounds} from './pixel-fish-art.js?v=20260928-pixel-v79';
 const TAU=Math.PI*2;
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 const finite=(n,f=0)=>Number.isFinite(n)?n:f;
@@ -175,13 +175,14 @@ export function createFightView(canvas,{sprites}={}){
    rect(base.x-7*k,g.railY-7*k,15*k,4*k,'#324d51');
    line({x:base.x,y:g.railY-4*k},butt,'#a7bcb1',8*k);
   }
-  drawCloseTackle(c,g,{line,ellipse,rect,spoolAngle});
+  drawCloseTackle(c,g,{line,ellipse,rect,spoolAngle,drawFishingLine(){
   const guides=[5,10,15,20,24,28];
   if(g.lineVisible){
    let prev=reel;for(const index of guides){const p=points[index],q={x:p.x,y:p.y+1};line(prev,q,'#d3d5b4',1);prev=q;}
    for(let i=1;i<g.line.length;i++)line(g.line[i-1],g.line[i],i>g.line.length-4?'#b4d0bd':'#ece6c8',1);
    if(s.rig!=='float'&&!(g.fishProjection?.airHeight>0))line(g.waterEntry,{x:g.waterEntry.x+1,y:g.waterEntry.y+4},'#669e92',1);
   }
+  }});
  }
  function draw(state,dt,{active:visible=true,paused=false,reducedMotion=false,bottomInset=0,conditions={}}={}){
   active=Boolean(visible);if(!active){fishVisible=false;return;}

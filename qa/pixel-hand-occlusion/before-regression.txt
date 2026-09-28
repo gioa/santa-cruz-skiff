@@ -1,0 +1,54 @@
+✖ fishing line cannot paint over either palm, wrist or sleeve through lift and a full crank revolution (27.973458ms)
+✖ crank knob remains inside the opaque right-hand grasp throughout winding (1.720709ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 0
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 107.613958
+
+✖ failing tests:
+
+test at tests/pixel-fight-view.test.js:197:1
+✖ fishing line cannot paint over either palm, wrist or sleeve through lift and a full crank revolution (27.973458ms)
+  AssertionError [ERR_ASSERTION]: 390x844 lift crank 0: line crossed skin/sleeve
+  + actual - expected
+  
+  + '#d3d5b4'
+  - '#d8a074'
+       ^
+  
+      at file:///private/tmp/skiff-hand-occlusion/tests/pixel-fight-view.test.js:209:50
+      at Array.forEach (<anonymous>)
+      at TestContext.<anonymous> (file:///private/tmp/skiff-hand-occlusion/tests/pixel-fight-view.test.js:208:11)
+      at Test.runInAsyncScope (node:async_hooks:212:14)
+      at Test.run (node:internal/test_runner/test:1109:25)
+      at Test.start (node:internal/test_runner/test:1006:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:358:17) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: '#d3d5b4',
+    expected: '#d8a074',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests/pixel-fight-view.test.js:217:1
+✖ crank knob remains inside the opaque right-hand grasp throughout winding (1.720709ms)
+  AssertionError [ERR_ASSERTION]: crank 0: knob shaft must not pierce palm
+      at TestContext.<anonymous> (file:///private/tmp/skiff-hand-occlusion/tests/pixel-fight-view.test.js:223:10)
+      at Test.runInAsyncScope (node:async_hooks:212:14)
+      at Test.run (node:internal/test_runner/test:1109:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:786:18)
+      at Test.postRun (node:internal/test_runner/test:1238:19)
+      at Test.run (node:internal/test_runner/test:1166:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:358:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }

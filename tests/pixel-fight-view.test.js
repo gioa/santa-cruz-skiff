@@ -167,3 +167,59 @@ test('high pump visibly raises the grip and both hands support a heavy fish only
   assert.equal(fightViewGeometry(w,h,{...base,fish:{kg:.3},rodLoadN:2,fightPumpPhase:'lift'}).twoHanded,false);
  }
 });
+
+// Rasterize the actual renderer's opaque rectangles and polygons so this checks
+// visible coverage, rather than relying on a particular function-call order.
+function raster(canvas){
+ const w=canvas.width,h=canvas.height,pixels=new Array(w*h).fill('');let path=[];
+ for(const [op,color,...a] of canvas.calls){
+  if(op==='beginPath')path=[];
+  else if(op==='moveTo'||op==='lineTo')path.push(a);
+  else if(op==='fillRect'){
+   const [x,y,rw,rh]=a;
+   for(let py=Math.max(0,Math.ceil(y));py<Math.min(h,y+rh);py++)for(let px=Math.max(0,Math.ceil(x));px<Math.min(w,x+rw);px++)pixels[py*w+px]=color;
+  }else if(op==='fill'&&path.length){
+   const minY=Math.max(0,Math.floor(Math.min(...path.map(p=>p[1])))),maxY=Math.min(h,Math.ceil(Math.max(...path.map(p=>p[1]))));
+   for(let y=minY;y<maxY;y++){
+    const crossings=[];
+    for(let i=0,j=path.length-1;i<path.length;j=i++){
+     const [ax,ay]=path[j],[bx,by]=path[i];
+     if((ay>y+.5)!==(by>y+.5))crossings.push(ax+(y+.5-ay)*(bx-ax)/(by-ay));
+    }
+    crossings.sort((a,b)=>a-b);
+    for(let i=0;i+1<crossings.length;i+=2)for(let x=Math.max(0,Math.ceil(crossings[i]-.5));x<Math.min(w,crossings[i+1]-.5);x++)pixels[y*w+x]=color;
+   }
+  }
+ }
+ return pixels;
+}
+
+test('fishing line cannot paint over either palm, wrist or sleeve through lift and a full crank revolution',()=>{
+ const foreground=new Set(['#d8a074','#f1c69b','#345e70','#598191']);let visibleLinePixels=0;
+ for(const [w,h] of [[390,844],[844,390]])for(const phase of ['lift','recover'])for(const settleFrames of [1,8])for(let angle=0;angle<8;angle++){
+  const s=state({fish:{kg:6,length:80},fightPumpPhase:phase,rodElevation:phase==='lift'?82:24,lineEntry:{x:3,z:0}});
+  const render=fishState=>{
+   const canvas=recordingCanvas(),view=createFightView(canvas);view.resize(w,h);
+   // Warm the support-hand transition and rotate the crank to eight positions.
+   for(let i=0;i<settleFrames;i++)view.draw({...s,fishState,crankRate:angle/(settleFrames*.8)},.1,{reducedMotion:true});
+   canvas.reset();view.draw({...s,fishState,crankRate:0},0,{reducedMotion:true});return raster(canvas);
+  };
+  const without=render('waiting'),withLine=render('fight');let handPixels=0;
+  without.forEach((color,i)=>{
+   if(foreground.has(color)){handPixels++;assert.equal(withLine[i],color,`${w}x${h} ${phase} crank ${angle}: line crossed skin/sleeve`);}
+   if(withLine[i]!==color&&['#d3d5b4','#ece6c8','#b4d0bd'].includes(withLine[i]))visibleLinePixels++;
+  });
+  assert.ok(handPixels>200,'test covers full hands and forearms');
+ }
+ assert.ok(visibleLinePixels>500,'line remains visible outside the hands');
+});
+
+test('crank knob remains inside the opaque right-hand grasp throughout winding',()=>{
+ for(let angle=0;angle<16;angle++){
+  const canvas=recordingCanvas(),view=createFightView(canvas),s=state({rodElevation:24,fightPumpPhase:'recover',crankRate:angle/1.6});
+  view.resize(390,844);view.draw(s,.1,{reducedMotion:true});
+  const g=fightViewGeometry(canvas.width,canvas.height,s,{crankAngle:angle*Math.PI/8}),pixels=raster(canvas);
+  const x=Math.round(g.knob.x),y=Math.round(g.knob.y);
+  assert.ok(['#d8a074','#f1c69b'].includes(pixels[y*canvas.width+x]),`crank ${angle}: knob shaft must not pierce palm`);
+ }
+});
