@@ -2,6 +2,7 @@
 // the right palm and the crank share the same moving endpoint.
 export function drawCloseTackle(ctx,g,{line,ellipse,rect,spoolAngle}){
  const {width:w,scale:k,grip,reel,knob,base,butt,points}=g;
+ const hand=g.rightHand||knob;
  const C={dark:'#193b40',shirt:'#345e70',shirtlight:'#598191',skin:'#d8a074',skinlight:'#f1c69b'};
  const poly=(p,col)=>{ctx.fillStyle=col;ctx.beginPath();p.forEach(([x,y],i)=>ctx[i?'lineTo':'moveTo'](Math.round(x*k),Math.round(y*k)));ctx.closePath();ctx.fill();};
  const armLine=(x,y,xx,yy,col,width)=>line({x:x*k,y:y*k},{x:xx*k,y:yy*k},col,width*k);
@@ -28,7 +29,7 @@ export function drawCloseTackle(ctx,g,{line,ellipse,rect,spoolAngle}){
   }
  }
 
- if(!g.mounted){arm(grip.x/k-3,grip.y/k,false);arm(knob.x/k+6,knob.y/k+5,true);}
+ if(!g.mounted){arm(grip.x/k-3,grip.y/k,false);arm(hand.x/k+6,hand.y/k+5,true);}
  line(butt,points[3],'#213b3c',9*k);line(butt,points[3],'#a58b5d',6*k);
  for(let i=0;i<12;i++){const t=i/12,x=butt.x+(points[3].x-butt.x)*t,y=butt.y+(points[3].y-butt.y)*t;rect(x-2*k,y,4*k,1,'#d2b98a');}
  // Rod blank, guides, and line remain bound to the physical rod pose.
@@ -54,7 +55,7 @@ export function drawCloseTackle(ctx,g,{line,ellipse,rect,spoolAngle}){
  if(!g.mounted){
  for(let i=0;i<4;i++){const yy=grip.y-11*k+i*7*k;ellipse(grip.x+5*k,yy,(9-i*.4)*k,4*k,C.skin);line({x:grip.x+1*k,y:yy-2*k},{x:grip.x+9*k,y:yy-k},C.skinlight,2*k);}
  line({x:grip.x-10*k,y:grip.y-19*k},{x:grip.x-1*k,y:grip.y-20*k},C.skinlight,4*k);
- for(let i=0;i<3;i++){ellipse(knob.x+6*k+i*4*k,knob.y-6*k+i*5*k,5*k,5*k,C.skin);line({x:knob.x+5*k+i*4*k,y:knob.y-8*k+i*5*k},{x:knob.x+9*k+i*4*k,y:knob.y-7*k+i*5*k},C.skinlight,2*k);}
- line({x:knob.x-6*k,y:knob.y-10*k},{x:knob.x+3*k,y:knob.y-5*k},C.skinlight,6*k);
+ for(let i=0;i<3;i++){ellipse(hand.x+6*k+i*4*k,hand.y-6*k+i*5*k,5*k,5*k,C.skin);line({x:hand.x+5*k+i*4*k,y:hand.y-8*k+i*5*k},{x:hand.x+9*k+i*4*k,y:hand.y-7*k+i*5*k},C.skinlight,2*k);}
+ line({x:hand.x-6*k,y:hand.y-10*k},{x:hand.x+3*k,y:hand.y-5*k},C.skinlight,6*k);
  }
 }

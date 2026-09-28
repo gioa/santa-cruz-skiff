@@ -1,9 +1,9 @@
-import {hasElectricReel} from './equipment.js?v=20260928-pixel-v77';
+import {hasElectricReel} from './equipment.js?v=20260928-pixel-v78';
 // Presentation policy for the bottom console. Model methods still validate
 // actions themselves; this pure selector keeps unavailable controls offscreen.
 export function boatActions(s,{panel='tackle',hasRod=true,hasChart=false,canLower=false,nearDock=false}={}){
  const fish=s.fishState||'idle',idle=fish==='idle',waiting=['sinking','waiting'].includes(fish),water=waiting||['bite','fight'].includes(fish),mounted=['port','starboard'].includes(s.rodMount);
- const ready=s.mode==='boat'&&s.rentalPaid&&s.launchStage==='afloat'&&!s.paused&&!s.dayTransition&&!s.capsize&&!s.bailing&&!s.docking&&s.inspection?.phase!=='checking',aboard=ready;
+ const ready=s.mode==='boat'&&s.rentalPaid&&s.launchStage==='afloat'&&!s.paused&&(!s.fishLanding||fish==='landed')&&!s.dayTransition&&!s.capsize&&!s.bailing&&!s.docking&&s.inspection?.phase!=='checking',aboard=ready;
  const boatFree=aboard&&!s.snagged&&(idle||mounted&&waiting),helm=boatFree&&panel==='helm',tackle=aboard&&!helm&&(hasRod||fish==='landed');
  const pickUp=tackle&&mounted&&['idle','sinking','waiting','bite','fight'].includes(fish)&&Math.abs(s.throttle||0)<=.01&&Math.abs(s.speed||0)<=1.2;
  return{

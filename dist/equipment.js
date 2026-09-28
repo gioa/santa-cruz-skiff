@@ -1,5 +1,5 @@
-import {SINKER_ITEMS,ensureSinkers} from './pixel-sinkers.js?v=20260928-pixel-v77';
-import {starterConsumables,ensureConsumables,suppliesWeight} from './pixel-consumables.js?v=20260928-pixel-v77';
+import {SINKER_ITEMS,ensureSinkers} from './pixel-sinkers.js?v=20260928-pixel-v78';
+import {starterConsumables,ensureConsumables,suppliesWeight} from './pixel-consumables.js?v=20260928-pixel-v78';
 // Virtual credits and simulation tuning. These are not retail prices or harvest rules.
 export const GEAR_CATALOG=[
  ...SINKER_ITEMS,

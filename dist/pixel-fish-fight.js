@@ -75,11 +75,15 @@ export function stepFishFight(fish={},fight,{dt=.1,time=0,rodLoadN=0,payoutRate=
  const recovery=loaded?0:dt*.008;
  const nextEnergy=clamp(energy-effort*dt/Math.max(1,f.capacityJ)+recovery,.025,1);
  const runSpeedMps=p.speed*Math.pow(f.mass,.12)*envelope*fatigue*rockSettle;
- const lateralMps=Math.sin(time*.62+f.variation*5)*p.lateral*envelope*fatigue;
+ // Quiet fish still make short swimming corrections between surges. These
+ // move the hooked body through the line solver, without adding large runs.
+ const cruise=decompression*fatigue;
+ const lateralMps=Math.sin(time*.62+f.variation*5)*p.lateral*(envelope+.20*cruise)*fatigue;
+ const foreAftMps=Math.sin(time*1.45+f.variation*6)*Math.min(.13,p.speed*.18)*cruise;
  // Pelagic runs gradually travel upwards; bottom species stay close to reef.
  const diveMps=surfaceBurst?(1.15+.25*Math.pow(f.mass,.12))*fatigue:burst?p.dive*envelope*fatigue:((f.kind==='salmon'||f.kind==='bonito')&&lureDepth>1?-.16:0);
  return{fight:{...f,energy:nextEnergy,workJ:finite(f.workJ)+effort*dt,surfaceStartleUsed:Boolean(f.surfaceStartleUsed||startled),surfaceBurstSeconds,jumpVelocity,jumpActive,jumpCooldown:nextCooldown,splash},pullN,
-  motion:{bodyDragArea:f.kind==='halibut'?.018*Math.pow(f.mass,2/3):0,runSpeedMps,lateralMps,diveMps:jumpActive?-jumpVelocity:diveMps,headShake,jumpActive,jumpVelocity,splash,phase:jumpActive?'jump':surfaceBurst?'dive':envelope>.15?(f.kind==='rockfish'?'kick':'run'):energy<.25?'settle':'glide'}};
+  motion:{bodyDragArea:f.kind==='halibut'?.018*Math.pow(f.mass,2/3):0,runSpeedMps,lateralMps,foreAftMps,diveMps:jumpActive?-jumpVelocity:diveMps,headShake,jumpActive,jumpVelocity,splash,phase:jumpActive?'jump':surfaceBurst?'dive':envelope>.15?(f.kind==='rockfish'?'kick':'run'):energy<.25?'settle':'glide'}};
 }
 /** At the gunwale, an adequately controlled fish can be netted immediately.
  * A small fish never has to spend a scripted amount of time being fought.

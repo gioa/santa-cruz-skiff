@@ -1,11 +1,11 @@
-import {drawWeatherOverlay} from './pixel-daily-weather.js?v=20260928-pixel-v77';
-import {drawCloseTackle} from './pixel-fight-tackle.js?v=20260928-pixel-v77';
-import {fishBodyPose,drawFishBody} from './pixel-fish-motion.js?v=20260928-pixel-v77';
-import {rodFlexPoint} from './pixel-rod-response.js?v=20260928-pixel-v77';
+import {drawWeatherOverlay} from './pixel-daily-weather.js?v=20260928-pixel-v78';
+import {drawCloseTackle} from './pixel-fight-tackle.js?v=20260928-pixel-v78';
+import {fishBodyPose,drawFishBody} from './pixel-fish-motion.js?v=20260928-pixel-v78';
+import {rodFlexPoint} from './pixel-rod-response.js?v=20260928-pixel-v78';
 // First-person artwork uses the same rod pose, load, surface intersection and
 // crank speed as the simulation. It is a camera change, never another fight.
-import {reelMotion} from './pixel-fishing-feedback.js?v=20260928-pixel-v77';
-import {fishSpriteKind,fishSpriteBounds} from './pixel-fish-art.js?v=20260928-pixel-v77';
+import {reelMotion} from './pixel-fishing-feedback.js?v=20260928-pixel-v78';
+import {fishSpriteKind,fishSpriteBounds} from './pixel-fish-art.js?v=20260928-pixel-v78';
 const TAU=Math.PI*2;
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 const finite=(n,f=0)=>Number.isFinite(n)?n:f;
@@ -18,11 +18,11 @@ const hash=(n)=>{let x=Math.imul(n|0,1597334677);x^=x>>>15;return((Math.imul(x,2
  */
 export function fightFishProjection(width,state={}){
  const lengthCm=state.fish?.length,depth=state.lureDepth;
- if(state.fishState!=='fight'||!Number.isFinite(lengthCm)||lengthCm<=0||!Number.isFinite(depth)||depth<0||depth>=1.15||!Number.isFinite(state.paidLineMeters)||state.paidLineMeters>=8)return null;
+ if(!(state.fishState==='fight'||state.fishState==='landed'&&state.fishLanding)||!Number.isFinite(lengthCm)||lengthCm<=0||!Number.isFinite(depth)||depth<0||depth>=1.15||!Number.isFinite(state.paidLineMeters)||state.paidLineMeters>=8)return null;
  const target=state.bobber||state.lineEntry;
  const origin=Number.isFinite(state.boatX)&&Number.isFinite(state.boatZ)?{x:state.boatX,z:state.boatZ}:state.rodTip;
  if(!Number.isFinite(target?.x)||!Number.isFinite(target?.z)||!Number.isFinite(origin?.x)||!Number.isFinite(origin?.z))return null;
- const horizontalDistance=Math.hypot(target.x-origin.x,target.z-origin.z),distanceMeters=Math.max(.5,Math.hypot(horizontalDistance,1.35-finite(target.height,-depth)));
+ const horizontalDistance=Math.hypot(target.x-origin.x,target.z-origin.z),distanceMeters=Math.max(state.fishLanding?1.6:.5,Math.hypot(horizontalDistance,1.35-finite(target.height,-depth)));
  const focalPixels=Math.max(1,finite(width,1))/(2*Math.tan(31*Math.PI/180));
  return{lengthCm,lengthPixels:lengthCm/100*focalPixels/distanceMeters,distanceMeters,depth,airHeight:Math.max(0,finite(target.height)),pixelsPerMeter:focalPixels/distanceMeters};
 }
@@ -37,8 +37,9 @@ export function fightViewGeometry(width,height,state={},options={}){
  const horizon=Math.round(h*.255),railY=h*.855+heave;
  const scale=Math.min(w/260,h/(landscape?310:487))*1.15;
  const armRoom=mounted?15*scale:0;
- const base={x:w*(mount==='port'?.25:mount==='starboard'?.73:.35),y:(mounted?bottom-armRoom:h*(landscape?.61:.745))+heave};
- const length=Math.min(w*.66,Math.max(20,(base.y-horizon)*.95)),e=elevation*Math.PI/180;
+ const stroke=mounted?0:clamp((elevation-24)/58,0,1),lift=stroke*h*(landscape?.22:.20);
+ const base={x:w*(mount==='port'?.25:mount==='starboard'?.73:.35),y:(mounted?bottom-armRoom:h*(landscape?.61:.745)-lift)+heave};
+ const length=Math.min(w*.66,Math.max(20,(base.y+lift-horizon)*.95)),e=elevation*Math.PI/180;
  // Perspective compresses the sideways sweep near the camera edges. Reserve
  // some of that span for the loaded tip so full left/right sweeps never clip.
  const span=azimuth<0?base.x-w*.06:w*.94-base.x,dx=span*(azimuth/110)*.80,dy=-length*(.34+.74*Math.sin(e));
@@ -53,6 +54,9 @@ export function fightViewGeometry(width,height,state={},options={}){
  const grip={x:base.x-ux*66*scale,y:base.y-uy*66*scale};
  const reelHub={x:reel.x+13.2*scale,y:reel.y+3.3*scale};
  const angle=finite(options.crankAngle),knob={x:reelHub.x+Math.cos(angle)*36*scale,y:reelHub.y+Math.sin(angle)*23*scale};
+ const twoHanded=!mounted&&(state.fightPumpPhase==='lift'||Boolean(state.fishLanding))&&(finite(state.fish?.kg)>=2.5||finite(state.rodLoadN)>=12);
+ const supportBlend=clamp(finite(options.supportBlend,twoHanded?1:0),0,1),foregrip=points[2];
+ const rightHand={x:mix(knob.x,foregrip.x,supportBlend),y:mix(knob.y,foregrip.y,supportBlend)};
  // Only the line's actual surface entry is visible; no invented float or
  // underwater fish marker. Translate the actual displacement relative to the
  // rod tip into this deliberately enlarged first-person rod presentation.
@@ -62,22 +66,29 @@ export function fightViewGeometry(width,height,state={},options={}){
   const x=entry.x-physicalTip.x,z=entry.z-physicalTip.z;
   lateral=x*Math.cos(heading)-z*Math.sin(heading);forward=-x*Math.sin(heading)-z*Math.cos(heading);
  }
- const entryX=clamp(tip.x+lateral*w*.022,w*.06,w*.94);
- const entryY=clamp(railY-22*scale-Math.max(0,forward)*h*.016,horizon+12,railY-14*scale);
+ const near=state.fishState==='fight'?clamp((1.15-finite(state.lureDepth,99))/1.15,0,1)*clamp((8-finite(state.paidLineMeters,99))/3,0,1):0;
+ const entryX=clamp(tip.x+lateral*w*mix(.022,.16,near),w*.06,w*.94);
+ const entryY=clamp(railY-22*scale-Math.max(0,forward)*h*mix(.016,.05,near),horizon+12,railY-14*scale);
  const waterEntry={x:entryX,y:entryY};
- const fishProjection=fightFishProjection(w,state),hookPoint=fishProjection?.airHeight>0?{x:waterEntry.x,y:waterEntry.y-fishProjection.airHeight*fishProjection.pixelsPerMeter}:waterEntry;
+ const fishProjection=fightFishProjection(w,state);let hookPoint=fishProjection?.airHeight>0?{x:waterEntry.x,y:waterEntry.y-fishProjection.airHeight*fishProjection.pixelsPerMeter}:waterEntry;
+ if(state.fishLanding&&fishProjection){
+  const a=state.fishLanding,up=clamp(a.elapsed/(a.duration*.4),0,1),aboard=clamp((a.elapsed/a.duration-.4)/.4,0,1),ease=aboard*aboard*(3-2*aboard);
+  const raised={x:w*.64,y:railY-h*.30};
+  hookPoint={x:mix(waterEntry.x,raised.x,up),y:mix(waterEntry.y,raised.y,up)};
+  hookPoint={x:mix(hookPoint.x,w*.72,ease),y:mix(hookPoint.y,railY+h*.08,ease)};
+ }
  const slack=clamp(finite(state.lineSlackMeters)*1.5,0,18)*scale;
  const control={x:mix(tip.x,hookPoint.x,.5),y:mix(tip.y,hookPoint.y,.5)+slack};
  const line=[];for(let i=0;i<=18;i++){const t=i/18,u=1-t;line.push({x:u*u*tip.x+2*u*t*control.x+t*t*hookPoint.x,y:u*u*tip.y+2*u*t*control.y+t*t*hookPoint.y});}
  line[0]=tip;line[line.length-1]=hookPoint;
- return{width:w,height:h,landscape,horizon,railY,bottom,scale,mount,mounted,elevation,azimuth,bend,base,butt,grip,reelSeat,reel,reelHub,knob,tip,points,line,waterEntry,hookPoint,heave,
+ return{width:w,height:h,landscape,horizon,railY,bottom,scale,mount,mounted,elevation,azimuth,bend,base,butt,grip,reelSeat,reel,reelHub,knob,tip,points,line,waterEntry,hookPoint,heave,twoHanded,rightHand,supportBlend,
   showFloat:state.rig==='float'&&Boolean(state.floatPosition)&&state.fishState!=='landed',
   surfaceFish:Boolean(fishProjection),fishProjection,
   lineVisible:['bite','fight'].includes(state.fishState)};
 }
 
 export function createFightView(canvas,{sprites}={}){
- const c=canvas.getContext('2d',{alpha:false});let cssWidth=390,cssHeight=844,clock=0,crankAngle=0,spoolAngle=0,lastGeometry=null,lastPhase='idle',active=false,fishVisible=false;
+ const c=canvas.getContext('2d',{alpha:false});let lastLanding=null;let cssWidth=390,cssHeight=844,clock=0,crankAngle=0,spoolAngle=0,lastGeometry=null,lastPhase='idle',active=false,fishVisible=false,supportBlend=0;
  const rect=(x,y,w,h,color)=>{c.fillStyle=color;c.fillRect(Math.round(x),Math.round(y),Math.max(1,Math.round(w)),Math.max(1,Math.round(h)));};
  const polygon=(points,color)=>{c.fillStyle=color;c.beginPath();points.forEach((p,i)=>c[i?'lineTo':'moveTo'](Math.round(p.x),Math.round(p.y)));c.closePath();c.fill();};
  const line=(a,b,color,width=1)=>{
@@ -126,7 +137,7 @@ export function createFightView(canvas,{sprites}={}){
   for(let i=0;i<17;i++){const p=i/17,yy=y+3+p*p*seaH*.61,width=(4+p*16)*(1+Math.sin(i*4.7+tick*.3)*.22);rect(w*.76-width*.5+(hash(i+73)-.5)*13,yy,width,1,i%3?'#b3c6ad':'#d1d3b3');}
  }
  function waterContact(g,s,reducedMotion){
-  if(!g.lineVisible)return;const {x,y}=g.waterEntry,t=reducedMotion?0:clock;
+  if(!g.lineVisible||s.fishLanding)return;const {x,y}=g.waterEntry,t=reducedMotion?0:clock;
   const pull=s.fishState==='fight'?clamp(g.bend,0,1):clamp(g.bend*.7,0,.5),radius=3+(Math.sin(t*1.5)+1)*1.5+pull*2;
   // Tiny rings mark line entry. Large splashes only happen when the actual fish
   // has reached the surface; a fish thirty metres down never splashes above it.
@@ -142,7 +153,7 @@ export function createFightView(canvas,{sprites}={}){
   // keeps its original aspect ratio, so a slender lingcod stays slender.
   if(p.airHeight>0)ellipse(g.waterEntry.x-length*.5,g.waterEntry.y,length*.38,2,'#2d7b7e');
   c.save();c.globalAlpha=1-p.depth/1.15*.42;
-  const pose=fishBodyPose(fishSpriteKind(s.fish),{time:clock,mass:s.fish.kg,energy:s.fishFight?.energy??1,headShake:s.fishMotion?.headShake??.3,phase:s.fishMotion?.phase,reducedMotion,jumpVelocity:s.fishMotion?.jumpVelocity,airborne:p.airHeight>0});
+  const pose=fishBodyPose(fishSpriteKind(s.fish),{time:clock,mass:s.fish.kg,energy:s.fishFight?.energy??1,headShake:s.fishMotion?.headShake??.3,phase:s.fishMotion?.phase,landed:s.fishLanding?.phase==='settle'||s.fishState==='landed',reducedMotion,jumpVelocity:s.fishMotion?.jumpVelocity,airborne:p.airHeight>0});
   drawFishBody(c,asset,crop,{x:g.hookPoint.x-length,y:g.hookPoint.y-height*.5,length,height,pose});
   c.restore();fishVisible=true;
  }
@@ -176,13 +187,15 @@ export function createFightView(canvas,{sprites}={}){
   active=Boolean(visible);if(!active){fishVisible=false;return;}
   const advance=!paused&&!state.paused?clamp(finite(dt),0,.1):0;
   clock+=advance;if(advance){crankAngle=(crankAngle+Math.max(0,finite(state.crankRate))*TAU*advance)%TAU;spoolAngle=(spoolAngle+reelMotion(state).spoolRadiansPerSecond*advance)%TAU;}
-  const g=fightViewGeometry(canvas.width,canvas.height,state,{bottomInset:bottomInset*canvas.height/cssHeight,clock,crankAngle,reducedMotion});lastGeometry=g;lastPhase=state.fishState;
-  sky(g,conditions);ocean(g,reducedMotion,conditions);surfaceFish(g,state,reducedMotion);waterContact(g,state,reducedMotion);drawWeatherOverlay(c,canvas.width,canvas.height,conditions,clock,{layer:'atmosphere'});skiff(g);tackle(g,state);drawWeatherOverlay(c,canvas.width,canvas.height,conditions,clock,{layer:'rain'});
+  const supporting=state.rodMount==='hand'&&(state.fightPumpPhase==='lift'||Boolean(state.fishLanding))&&(finite(state.fish?.kg)>=2.5||finite(state.rodLoadN)>=12);
+  if(advance)supportBlend+=((supporting?1:0)-supportBlend)*(1-Math.exp(-advance*12));
+  const g=fightViewGeometry(canvas.width,canvas.height,state,{bottomInset:bottomInset*canvas.height/cssHeight,clock,crankAngle,reducedMotion,supportBlend});lastGeometry=g;lastPhase=state.fishState;lastLanding=state.fishLanding?{...state.fishLanding}:null;
+  sky(g,conditions);ocean(g,reducedMotion,conditions);if(!state.fishLanding)surfaceFish(g,state,reducedMotion);waterContact(g,state,reducedMotion);drawWeatherOverlay(c,canvas.width,canvas.height,conditions,clock,{layer:'atmosphere'});skiff(g);tackle(g,state);if(state.fishLanding)surfaceFish(g,state,reducedMotion);drawWeatherOverlay(c,canvas.width,canvas.height,conditions,clock,{layer:'rain'});
  }
  function snapshot(){
   if(!lastGeometry)return{active,view:'first-person',phase:lastPhase,width:cssWidth,height:cssHeight};
   const g=lastGeometry,cssPoint=p=>({x:Math.round(p.x*cssWidth/g.width),y:Math.round(p.y*cssHeight/g.height)});
-  return{active,view:'first-person',phase:lastPhase,width:cssWidth,height:cssHeight,mount:g.mount,rodElevation:g.elevation,rodAzimuth:g.azimuth,bend:g.bend,crankAngle,spoolAngle,reelCenter:cssPoint(g.reelHub),reelKnob:cssPoint(g.knob),rearGrip:cssPoint(g.grip),reelTouchRadius:Math.round(46*g.scale*cssWidth/g.width),railY:Math.round(g.railY*cssHeight/g.height),rodTip:cssPoint(g.tip),lineEntry:cssPoint(g.waterEntry),hookPoint:cssPoint(g.hookPoint),fishAirHeight:g.fishProjection?.airHeight||0,lineVisible:g.lineVisible,floatVisible:g.showFloat,surfaceFish:g.surfaceFish,fishVisible,fishLengthCm:g.fishProjection?.lengthCm??null,fishLengthPixels:g.fishProjection?g.fishProjection.lengthPixels*cssWidth/g.width:null,fishDistanceMeters:g.fishProjection?.distanceMeters??null};
+  return{active,view:'first-person',phase:lastPhase,width:cssWidth,height:cssHeight,mount:g.mount,twoHanded:g.twoHanded,rightHand:cssPoint(g.rightHand),landing:lastLanding,rodElevation:g.elevation,rodAzimuth:g.azimuth,bend:g.bend,crankAngle,spoolAngle,reelCenter:cssPoint(g.reelHub),reelKnob:cssPoint(g.knob),rearGrip:cssPoint(g.grip),reelTouchRadius:Math.round(46*g.scale*cssWidth/g.width),railY:Math.round(g.railY*cssHeight/g.height),rodTip:cssPoint(g.tip),lineEntry:cssPoint(g.waterEntry),hookPoint:cssPoint(g.hookPoint),fishAirHeight:g.fishProjection?.airHeight||0,lineVisible:g.lineVisible,floatVisible:g.showFloat,surfaceFish:g.surfaceFish,fishVisible,fishLengthCm:g.fishProjection?.lengthCm??null,fishLengthPixels:g.fishProjection?g.fishProjection.lengthPixels*cssWidth/g.width:null,fishDistanceMeters:g.fishProjection?.distanceMeters??null};
  }
  resize(cssWidth,cssHeight);return{resize,draw,snapshot};
 }

@@ -137,13 +137,13 @@ test('surface artwork crops transparent padding, retains species proportions and
 });
 
 
-test('close tackle matches the approved portrait scale and crank hit target tracks the visible handle',()=>{
+test('close tackle retains its scale while lifted arms remain in frame',()=>{
  for(const [w,h] of [[320,568],[390,844],[844,390]]){
   const canvas=recordingCanvas(),view=createFightView(canvas);view.resize(w,h);view.draw(state(),0,{active:true});
   const shot=view.snapshot(),distance=Math.hypot(shot.reelKnob.x-shot.reelCenter.x,shot.reelKnob.y-shot.reelCenter.y);
   assert.ok(distance<shot.reelTouchRadius);
   if(w<h)assert.ok(shot.rearGrip.y>shot.reelCenter.y);
-  if(w<h){assert.ok(shot.rearGrip.y>h*.83&&shot.rearGrip.y<h*.96);assert.ok(shot.reelTouchRadius>w*.16);}
+  if(w<h){assert.ok(shot.rearGrip.y>h*.70&&shot.rearGrip.y<h*.96);assert.ok(shot.reelTouchRadius>w*.16);}
  }
 });
 
@@ -156,5 +156,14 @@ test('handle, reel seat and lower blank share one straight axis at every pose an
    const perpendicular=Math.abs(dx*(p.y-g.butt.y)-dy*(p.x-g.butt.x))/length;
    assert.ok(perpendicular<1e-8,`${w}x${h} ${rodElevation}/${rodAzimuth}: handle-to-blank has no corner`);
   }
+ }
+});
+
+
+test('high pump visibly raises the grip and both hands support a heavy fish only while lifting',()=>{
+ for(const [w,h] of [[390,844],[844,390]]){
+  const base=state({fish:{length:80,kg:6},rodElevation:24,fightPumpPhase:'recover'}),low=fightViewGeometry(w,h,base),high=fightViewGeometry(w,h,{...base,rodElevation:82,fightPumpPhase:'lift'});
+  assert.ok(low.grip.y-high.grip.y>h*.1);assert.ok(low.tip.y-high.tip.y>h*.16);assert.equal(high.twoHanded,true);assert.deepEqual(high.rightHand,high.points[2]);assert.deepEqual(low.rightHand,low.knob);
+  assert.equal(fightViewGeometry(w,h,{...base,fish:{kg:.3},rodLoadN:2,fightPumpPhase:'lift'}).twoHanded,false);
  }
 });

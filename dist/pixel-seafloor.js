@@ -1,4 +1,4 @@
-import {toGPS} from './pixel-geography.js?v=20260928-pixel-v77';
+import {toGPS} from './pixel-geography.js?v=20260928-pixel-v78';
 // Categories are sampled, never interpolated. Unknown coastal strips remain
 // unknown instead of borrowing substrate from the nearest named waypoint.
 export const seafloor=await fetch(new URL('./data/seafloor.json',import.meta.url)).then(r=>{if(!r.ok)throw Error('Seafloor map unavailable');return r.json();});

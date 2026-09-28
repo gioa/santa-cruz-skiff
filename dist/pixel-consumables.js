@@ -1,4 +1,4 @@
-import {ensureSinkers,validSinker,rigWeight,SINKER_SIZES,OUNCE_GRAMS} from './pixel-sinkers.js?v=20260928-pixel-v77';
+import {ensureSinkers,validSinker,rigWeight,SINKER_SIZES,OUNCE_GRAMS} from './pixel-sinkers.js?v=20260928-pixel-v78';
 /** Finite, persistent physical supplies. Rates and wear are game tuning.
  * Bait portions are numeric stock; spare rigs hold their own condition and bait.
  * Casting never installs supplies. Only explicit replacements transfer stock.

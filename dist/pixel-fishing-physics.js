@@ -5,8 +5,8 @@
  * pay line out, while turning the handle takes it in. Rod movement never
  * manufactures more line. This module has no inventory, UI or random events.
  */
-import {getRigProfile,stepRigLure} from './fishing-rigs.js?v=20260928-pixel-v77';
-import {rigHydrodynamics} from './pixel-rig-hydrodynamics.js?v=20260928-pixel-v77';
+import {getRigProfile,stepRigLure} from './fishing-rigs.js?v=20260928-pixel-v78';
+import {rigHydrodynamics} from './pixel-rig-hydrodynamics.js?v=20260928-pixel-v78';
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 const finite=(n,f=0)=>Number.isFinite(n)?n:f;
 export const MAX_PAID_LINE_METERS=120;
@@ -209,7 +209,8 @@ export function stepFishingLine(s,{dt,environment={},current={x:0,z:0},velocity=
   const horizontal=Math.hypot(lure.x-tip.x,lure.z-tip.z),angle=finite(s.heading)-finite(s.rodAzimuth,70)*Math.PI/180;
   const dx=horizontal>.001?(lure.x-tip.x)/horizontal:-Math.sin(angle),dz=horizontal>.001?(lure.z-tip.z)/horizontal:-Math.cos(angle);
   const lateral=finite(fishMotion.lateralMps)*dt,run=Math.min(finite(fishMotion.runSpeedMps)*dt,Math.max(0,paid-d)+payoutRate*dt);
-  lure.x+=dx*run-dz*lateral;lure.z+=dz*run+dx*lateral;
+  const swim=finite(fishMotion.foreAftMps)*dt;
+  lure.x+=dx*run-dz*lateral-Math.sin(finite(s.heading))*swim;lure.z+=dz*run+dx*lateral-Math.cos(finite(s.heading))*swim;
   lure.height=fishMotion.jumpActive?lure.height-finite(fishMotion.diveMps)*dt:Math.min(0,lure.height-finite(fishMotion.diveMps)*dt);
  }
  if(lure.height< -bottom+.08){

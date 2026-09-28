@@ -1,11 +1,11 @@
-import {rodSelectionStatus} from './pixel-rod-selection.js?v=20260928-pixel-v77';
-import {drawAnglerArm} from './pixel-angler-arms.js?v=20260928-pixel-v77';
-import {rodFlexPoint} from './pixel-rod-response.js?v=20260928-pixel-v77';
-import {rigHookSize} from './pixel-hook-label.js?v=20260928-pixel-v77';
-import {formatDepth} from './units.js?v=20260928-pixel-v77';
-import {getRigProfile} from './fishing-rigs.js?v=20260928-pixel-v77';
-import {bindPointer} from './input.js?v=20260928-pixel-v77';
-import {fishingFeedback,reelMotion} from './pixel-fishing-feedback.js?v=20260928-pixel-v77';
+import {rodSelectionStatus} from './pixel-rod-selection.js?v=20260928-pixel-v78';
+import {drawAnglerArm} from './pixel-angler-arms.js?v=20260928-pixel-v78';
+import {rodFlexPoint} from './pixel-rod-response.js?v=20260928-pixel-v78';
+import {rigHookSize} from './pixel-hook-label.js?v=20260928-pixel-v78';
+import {formatDepth} from './units.js?v=20260928-pixel-v78';
+import {getRigProfile} from './fishing-rigs.js?v=20260928-pixel-v78';
+import {bindPointer} from './input.js?v=20260928-pixel-v78';
+import {fishingFeedback,reelMotion} from './pixel-fishing-feedback.js?v=20260928-pixel-v78';
 
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const rigNames={bottom:'沉底组',dropper:'双支线',slider:'滑铅组',jig:'软饵组',float:'浮漂组',sabiki:'羽毛组',feather40:'双支羽毛'};

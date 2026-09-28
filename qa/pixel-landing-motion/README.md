@@ -1,0 +1,13 @@
+# Higher pumping, supporting hand, landing sequence and quiet fish movement
+
+Pump target increased from 66° to 82°. The arm/grip rises with rod elevation, so the change is visible in both phone orientations rather than only rotating the blank. Existing force-dependent lift speed and surge back-drive remain. During lifting a fish of at least 2.5 kg, or a load of 12 N or more, the right hand moves from the crank to the foregrip. It returns to the reel on recovery. Thresholds are animation/game tuning, not angling advice.
+
+A controlled boat-side fish begins a 2.6–3.2 second handling sequence: lift above the gunwale, move inside, then settle briefly in the boat. Only completion sets `landed`, opens catch choices and permits recording the catch. Handling preserves paid line, does not fake spool retrieval, pauses with the game, and clears on release/rescue/resume. A retained final pose keeps the fish inside the boat behind the catch dialog. Mounted rods are taken into the hands for this handling step. This is a stylized secured-fish handling animation, not a detailed net/leader load simulation.
+
+Quiet intervals retain small signed fore/aft and lateral swimming. These velocities move the actual hooked endpoint through the line constraint solver; small fish do not gain mandatory long runs, exhaustion gates or extra drag. Species, fatigue and rockfish decompression still influence response. Close-to-surface line-entry motion becomes easier to see as a fish approaches, rather than compressing all motion to the distant-water scale.
+
+Verification covers lift magnitude and phone frame rates, collinear grips/blank, both hand attachment points, quiet motion directions and real line conservation, landing height and inside-boat endpoint, pause, blocked premature keep, catch reopening and cleanup. The end-to-end voyage fixture excludes random water patrols to avoid timing-dependent autopilot interruption; mandatory landing inspections remain tested elsewhere.
+
+Phone browser QA used an isolated labelled local fixture (not included in dist). The production pump binding reached 82° with twoHanded=true and returned to 24° with the right hand back at the reel after release. Production landing snapshots show a 32 cm rockfish above the gunwale and then on the interior deck in portrait and landscape. These screenshots capture manually selected points in the handling animation; unit/integration tests check automatic progression and completion. Final timing includes a 20% settle interval. No console errors. Temporary viewport reset, tab closed, fixture removed before release.
+
+Release rebased onto Pacifica commit 6e6135e, retaining its destination and shop. Final syntax and all 740 tests passed after cache version v78.

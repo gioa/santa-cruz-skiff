@@ -1,4 +1,4 @@
-import {rodPoseFromDrag} from './pixel-fishing-input.js?v=20260928-pixel-v77';
+import {rodPoseFromDrag} from './pixel-fishing-input.js?v=20260928-pixel-v78';
 
 // The catch decision remains in this view. A modal may pause the simulation,
 // but pausing must not change the camera behind it.
