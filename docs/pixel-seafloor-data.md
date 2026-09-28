@@ -78,3 +78,32 @@ interpolator within 0.001 ft (numerical consistency, not survey accuracy);
 reef/sand/unknown reference locations agree with gameplay/sounder sampling;
 mobile canvas inspection, layer toggle, zoom, pan, waypoint preview and modal
 reopening checked in the browser. See `tests/pixel-chart.test.js`.
+
+## GPS chart device and map destinations — v57
+
+The shop now sells one `nautical_chart` device, labelled GPS 海图仪 (120 game
+credits). Both chart and GPS readings require this device to be enabled. The
+sounder remains separate. Old `gps` ownership, activation and backpack slots
+migrate to the chart ID before inventory filtering; existing chart owners gain
+GPS too. Duplicate IDs collapse without changing credits or purchase history.
+
+A blue heading arrow shows the current simulated location on land or at sea.
+The locate control centers it; an edge indicator keeps it discoverable after
+panning away. The modal pauses simulation, so its opening position remains
+current until it closes. Reopening refreshes it and restores the active target.
+
+Tapping the chart places a pin and previews an obstacle-cleared route. The
+separate “前往标点” control closes the chart, selects helm and runs the existing
+boat autopilot, without teleportation or time changes. `planWaypoint` is a pure
+preview shared by all departure paths; it rejects invalid coordinates, land,
+pier, map boundaries and unavailable boat/fishing states. Pan/pinch gestures
+never create destinations. Manual helm input retains its route-cancel behavior.
+The pixel pathfinder's search bounds include the whole wharf, allowing short
+cross-wharf trips to detour around its seaward end.
+
+Validation: six legacy ownership/activation cases; single-item capabilities;
+preview immutability; actual physics travel to an arbitrary GPS point and
+neutral on arrival; invalid pins preserve an existing route; obstacle-free
+wharf detours; hand-held deployed tackle blocks departure, a holder allows it.
+Phone UI checks cover tap, route execution, updated boat position, land
+rejection, drag without pin changes, locate and the combined backpack item.

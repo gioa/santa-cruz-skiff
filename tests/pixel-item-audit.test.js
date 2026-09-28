@@ -24,10 +24,10 @@ for(const item of GEAR_CATALOG.filter(g=>g.price>0&&pixelGearAvailable(g))){
  });
 }
 test('chart selection genuinely sails, updates GPS/depth/heading, and stowing instruments removes readings',()=>{
- const sim=shop();for(const id of ['nautical_chart','compass','gps','sounder']){assert.ok(sim.buyGear(id).ok);assert.ok(sim.equip(id).ok);}afloat(sim);
+ const sim=shop();for(const id of ['nautical_chart','compass','sounder']){assert.ok(sim.buyGear(id).ok);assert.ok(sim.equip(id).ok);}afloat(sim);
  const before=sim.navigationInstruments();assert.deepEqual(before.gpsPosition,toGPS(FISHING_SPOTS[1].x,FISHING_SPOTS[1].z));assert.equal(before.heading,bearingDegrees(.7));assert.deepEqual(before.depth,depthInfoAt(FISHING_SPOTS[1].x,FISHING_SPOTS[1].z));
  assert.ok(sim.selectWaypoint(FISHING_SPOTS[2]).ok);for(let i=0;i<200;i++)sim.step(.1);assert.ok(sim.state.sailed>10);assert.notDeepEqual(sim.navigationInstruments().gpsPosition,before.gpsPosition);assert.deepEqual(sim.navigationInstruments().depth,depthInfoAt(sim.state.boatX,sim.state.boatZ));
- for(const id of ['nautical_chart','compass','gps','sounder'])sim.equip(id);const after=sim.navigationInstruments();assert.equal(after.heading,null);assert.equal(after.gpsPosition,null);assert.equal(after.depth,null);assert.equal(after.speedKnots,null);assert.equal(sim.selectWaypoint(FISHING_SPOTS[2]).ok,false);
+ for(const id of ['nautical_chart','compass','sounder'])sim.equip(id);const after=sim.navigationInstruments();assert.equal(after.heading,null);assert.equal(after.gpsPosition,null);assert.equal(after.depth,null);assert.equal(after.speedKnots,null);assert.equal(sim.selectWaypoint(FISHING_SPOTS[2]).ok,false);
 });
 test('large cooler admits a catch rejected by the base cooler; stowing it restores the limit',()=>{
  const sim=shop();sim.buyGear('cooler_large');afloat(sim);const fish={name:'白海鲈',latin:'Atractoscion nobilis',length:110,kg:10};Object.assign(sim.state,{fishState:'landed',fish});assert.equal(sim.keepCatch().ok,false);sim.state.fishState='idle';sim.equip('cooler_large');Object.assign(sim.state,{fishState:'landed',fish});assert.ok(sim.keepCatch().ok);assert.equal(sim.state.catches[0].kg,10);sim.equip('cooler_large');assert.equal(sim.stats.capacity,8);

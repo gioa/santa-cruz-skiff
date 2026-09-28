@@ -1,6 +1,6 @@
-import {bindPointer} from './input.js?v=20260927-pixel-v56';
-import {tillerFromPointer} from './pixel-tiller-input.js?v=20260927-pixel-v56';
-import {createSingleLeverControl,leverFromDrag,leverForThrottle,LEVER_NEUTRAL_DEADBAND} from './pixel-single-lever.js?v=20260927-pixel-v56';
+import {bindPointer} from './input.js?v=20260927-pixel-v57';
+import {tillerFromPointer} from './pixel-tiller-input.js?v=20260927-pixel-v57';
+import {createSingleLeverControl,leverFromDrag,leverForThrottle,LEVER_NEUTRAL_DEADBAND} from './pixel-single-lever.js?v=20260927-pixel-v57';
 
 // Drag the tiller to steer. The separate
 // retained push/pull lever selects direction and power without a touch jump.

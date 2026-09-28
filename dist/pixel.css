@@ -500,3 +500,9 @@ html,body,#app,#app *,#app *::before,#app *::after{-webkit-user-select:none;user
 .chart-sources summary{min-height:44px;padding:10px 0;cursor:pointer}
 @media(max-width:560px){#chart{height:min(360px,80vw,45dvh)}.chart-controls button{padding:8px;font-size:11px}}
 @media(max-height:500px) and (orientation:landscape){#chart{height:240px}}
+
+/* Chart destinations stay separate from the pan/zoom touch surface. */
+.chart-destination{display:flex;align-items:center;gap:12px;margin:8px 0 14px}
+.chart-destination span{flex:1;font-size:12px;line-height:1.5;color:var(--muted,#617876)}
+.chart-destination button{min-height:44px;min-width:112px;margin:0;flex-shrink:0}
+.chart-controls{flex-wrap:wrap}

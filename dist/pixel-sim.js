@@ -1,31 +1,31 @@
-import {fishMassKg} from './pixel-fish-mass.js?v=20260927-pixel-v56';
-import {stepRodTip,fishTipSignal} from './pixel-rod-response.js?v=20260927-pixel-v56';
-import {baitFishCandidates} from './pixel-small-fish.js?v=20260927-pixel-v56';
-import {baitSchoolInfluence} from './pixel-bait-schools.js?v=20260927-pixel-v56';
-import {planCast,stepCast} from './pixel-casting.js?v=20260927-pixel-v56';
-import {RETIRED_PIXEL_GEAR} from './pixel-gear-availability.js?v=20260927-pixel-v56';
-import {fishCommonName,fishDisplayName} from './pixel-fish-names.js?v=20260927-pixel-v56';
-import {stepBottomSnag,stepSnagAbrasion} from './pixel-snag.js?v=20260927-pixel-v56';
-import {formatLength,formatWeight} from './units.js?v=20260927-pixel-v56';
+import {fishMassKg} from './pixel-fish-mass.js?v=20260927-pixel-v57';
+import {stepRodTip,fishTipSignal} from './pixel-rod-response.js?v=20260927-pixel-v57';
+import {baitFishCandidates} from './pixel-small-fish.js?v=20260927-pixel-v57';
+import {baitSchoolInfluence} from './pixel-bait-schools.js?v=20260927-pixel-v57';
+import {planCast,stepCast} from './pixel-casting.js?v=20260927-pixel-v57';
+import {RETIRED_PIXEL_GEAR} from './pixel-gear-availability.js?v=20260927-pixel-v57';
+import {fishCommonName,fishDisplayName} from './pixel-fish-names.js?v=20260927-pixel-v57';
+import {stepBottomSnag,stepSnagAbrasion} from './pixel-snag.js?v=20260927-pixel-v57';
+import {formatLength,formatWeight} from './units.js?v=20260927-pixel-v57';
 /** Pixel gameplay. Offshore travel uses a 1:2 map scale and the calendar clock runs at 2x. Input, fishing and animations use active real seconds. */
-import {GEAR_CATALOG,BASE_GEAR,createProfile,equipmentStats,cargoWeight,settleFish,buyGear as purchaseGear,hasElectricReel as electricReelEquipped} from './equipment.js?v=20260927-pixel-v56';
-import {HARBOR,BOARDING_WALK_PATH,walkHeight,walkAllowed,canBoardFrom,harborWaterBlocked} from './pixel-harbor-layout.js?v=20260927-pixel-v56';
-import {walkingBlocked as walkBlocked,walkingPointOpen,walkingSegmentOpen as safeWalkSegment,createGroundWalkSearch,advanceGroundWalk} from './pixel-walking-path.js?v=20260927-pixel-v56';
-import {FISHING_SPOTS,toGPS,bearingDegrees,onLand,onPier,MAP_BOUNDS} from './pixel-geography.js?v=20260927-pixel-v56';
-import {fishingHabitatAt} from './pixel-seafloor.js?v=20260927-pixel-v56';
-import {depthAt,depthInfoAt} from './bathymetry.js?v=20260927-pixel-v56';
-import {waterRoute,resolveVesselContact,contactAwareControl,clearResumeVesselPose} from './pixel-navigation.js?v=20260927-pixel-v56';
-import {createVesselState,stepVessel,syncVessel,vesselWind,vesselAutopilot} from './vessel-physics.js?v=20260927-pixel-v56';
-import {fishEncounter,weightedEncounterFish} from './pixel-fish-ecology.js?v=20260927-pixel-v56';
-import {RIG_PROFILES,getRigProfile} from './fishing-rigs.js?v=20260927-pixel-v56';
-import {MAX_PAID_LINE_METERS,MAX_TROLL_SPEED_MPS,MAX_TROLL_THROTTLE,reelTurnsPerSecond,rodTipPosition,fishingCurrent,relativeFishingFlow,stepFishingLine} from './pixel-fishing-physics.js?v=20260927-pixel-v56';
-import {createFishFight,stepFishFight,canLandFish} from './pixel-fish-fight.js?v=20260927-pixel-v56';
-import {createHookHold,createBiteHold,stepHookHold} from './pixel-hooking.js?v=20260927-pixel-v56';
-import {consumableStatus,installBait,installRig,loseRig,damageSupplies,rigRequiresBait,USABLE_CONDITION} from './pixel-consumables.js?v=20260927-pixel-v56';
-import {ensureRodLoadouts,getRodAssembly,setRodAssembly,syncActiveRodLoadout} from './pixel-rod-loadouts.js?v=20260927-pixel-v56';
-import {assessCatchLedger,identifyRegulatedSpecies} from './fishing-regulations.js?v=20260927-pixel-v56';
-import {FishingPatrol} from './fish-patrol.js?v=20260927-pixel-v56';
-import {NAVIGATION_COMPRESSION,navigationStepScale} from './pixel-navigation-scale.js?v=20260927-pixel-v56';
+import {GEAR_CATALOG,BASE_GEAR,createProfile,mergeNavigationGear,equipmentStats,cargoWeight,settleFish,buyGear as purchaseGear,hasElectricReel as electricReelEquipped} from './equipment.js?v=20260927-pixel-v57';
+import {HARBOR,BOARDING_WALK_PATH,walkHeight,walkAllowed,canBoardFrom,harborWaterBlocked} from './pixel-harbor-layout.js?v=20260927-pixel-v57';
+import {walkingBlocked as walkBlocked,walkingPointOpen,walkingSegmentOpen as safeWalkSegment,createGroundWalkSearch,advanceGroundWalk} from './pixel-walking-path.js?v=20260927-pixel-v57';
+import {FISHING_SPOTS,toGPS,bearingDegrees,onLand,onPier,MAP_BOUNDS} from './pixel-geography.js?v=20260927-pixel-v57';
+import {fishingHabitatAt} from './pixel-seafloor.js?v=20260927-pixel-v57';
+import {depthAt,depthInfoAt} from './bathymetry.js?v=20260927-pixel-v57';
+import {waterRoute,resolveVesselContact,contactAwareControl,clearResumeVesselPose} from './pixel-navigation.js?v=20260927-pixel-v57';
+import {createVesselState,stepVessel,syncVessel,vesselWind,vesselAutopilot} from './vessel-physics.js?v=20260927-pixel-v57';
+import {fishEncounter,weightedEncounterFish} from './pixel-fish-ecology.js?v=20260927-pixel-v57';
+import {RIG_PROFILES,getRigProfile} from './fishing-rigs.js?v=20260927-pixel-v57';
+import {MAX_PAID_LINE_METERS,MAX_TROLL_SPEED_MPS,MAX_TROLL_THROTTLE,reelTurnsPerSecond,rodTipPosition,fishingCurrent,relativeFishingFlow,stepFishingLine} from './pixel-fishing-physics.js?v=20260927-pixel-v57';
+import {createFishFight,stepFishFight,canLandFish} from './pixel-fish-fight.js?v=20260927-pixel-v57';
+import {createHookHold,createBiteHold,stepHookHold} from './pixel-hooking.js?v=20260927-pixel-v57';
+import {consumableStatus,installBait,installRig,loseRig,damageSupplies,rigRequiresBait,USABLE_CONDITION} from './pixel-consumables.js?v=20260927-pixel-v57';
+import {ensureRodLoadouts,getRodAssembly,setRodAssembly,syncActiveRodLoadout} from './pixel-rod-loadouts.js?v=20260927-pixel-v57';
+import {assessCatchLedger,identifyRegulatedSpecies} from './fishing-regulations.js?v=20260927-pixel-v57';
+import {FishingPatrol} from './fish-patrol.js?v=20260927-pixel-v57';
+import {NAVIGATION_COMPRESSION,navigationStepScale} from './pixel-navigation-scale.js?v=20260927-pixel-v57';
 export const GAME_TIME_SCALE=1/NAVIGATION_COMPRESSION;
 export const WALK_SPEED=2.90;
 export const BOAT_RENTAL_PRICE=15; // Virtual game credits, not a real rental quote.
@@ -83,7 +83,7 @@ export class PixelSimulation {
  get rentalReady(){return this.state.rentalPaid===true&&this.state.launchStage==='afloat';}
  navigationScale(state=this.state){return this.navigationScaleOverride?this.navigationScaleOverride(state):navigationStepScale(state);}
  hasGear(id){const s=this.state;return s.profile.owned.includes(id)&&s.packed.includes(id);}
- navigationInstruments(){const s=this.state,p=s.mode==='walk'?{x:s.playerX,z:s.playerZ}:s.mode==='swim'&&s.swim?s.swim:{x:s.boatX,z:s.boatZ},chart=this.hasGear('nautical_chart'),compass=this.hasGear('compass'),gps=this.hasGear('gps'),sounder=this.hasGear('sounder');return{chart,compass,gps,sounder,heading:compass||gps?bearingDegrees(s.mode==='boat'?s.heading:s.yaw):null,gpsPosition:gps?toGPS(p.x,p.z):null,depth:sounder?depthInfoAt(s.boatX,s.boatZ):null,speedKnots:gps?Math.abs(s.speed)*1.94384:null};}
+ navigationInstruments(){const s=this.state,p=s.mode==='walk'?{x:s.playerX,z:s.playerZ}:s.mode==='swim'&&s.swim?s.swim:{x:s.boatX,z:s.boatZ},chart=this.hasGear('nautical_chart'),compass=this.hasGear('compass'),gps=chart,sounder=this.hasGear('sounder');return{chart,compass,gps,sounder,heading:compass||gps?bearingDegrees(s.mode==='boat'?s.heading:s.yaw):null,gpsPosition:gps?toGPS(p.x,p.z):null,depth:sounder?depthInfoAt(s.boatX,s.boatZ):null,speedKnots:gps?Math.abs(s.speed)*1.94384:null};}
  captureTimestamp(){return new Date(Date.parse(this.state.dayStartAt)+Math.round(this.state.gameElapsed*1000)).toISOString();}
  inspectionPending(){return ['approaching','checking'].includes(this.state.inspection?.phase);}
  inspectionChecking(){return this.state.inspection?.phase==='checking';}
@@ -112,7 +112,7 @@ export class PixelSimulation {
   if(!resume&&hasSavedBoatRental(this.saved)&&s.profile.credits<BOAT_RENTAL_PRICE)return this.notify('潮汐点不足以开启新航次，请继续上次已租航程。',null,false);
   if(resume&&this.saved?.edition==='pixel'){
    const p=this.saved;Object.assign(s,clone(p),{profile:createProfile(p.profile),mode:p.mode==='boat'?'boat':'walk',engine:false,throttle:0,pendingRodPickup:false,speed:0,waypoint:null,waterRoute:[],walkRoute:[],autoWalk:false,castLine:false,casting:false,castFlight:null,bobber:null,fishState:'idle',fish:null,biteFish:null,biteHold:null,biteExposure:0,biteEngagement:0,hookSetSeconds:0,hookHold:null,standing:false,deckX:0,deckZ:.8,walking:false,swim:null,docking:null,paused:false,fishFight:null,fishPullN:0,fishMotion:null,time:0,elapsed:0,gameElapsed:0,timeScale:GAME_TIME_SCALE,clock:'06:00:00',events:[],tension:0,lureDepth:0,lineDistance:0,castPower:0,reeling:false,pumping:false,arrival:null});
-   s.packed=(p.packed||[]).filter(id=>s.profile.owned.includes(id)&&!RETIRED_PIXEL_GEAR.has(id));s.catches=p.catches||[];
+   s.packed=mergeNavigationGear(p.packed).filter(id=>s.profile.owned.includes(id)&&!RETIRED_PIXEL_GEAR.has(id));s.catches=p.catches||[];
    if(s.mode==='walk'){s.playerX=HARBOR.spawnX;s.playerZ=HARBOR.spawnZ;s.loaded=false;}
    // Restoring an interrupted immersion is the same explicit free recovery as
    // the rescue action: never strand the player ashore with an offshore boat.
@@ -169,11 +169,26 @@ export class PixelSimulation {
  interact(){const s=this.state;if(s.paused)return this.notify('',null,false);if(s.mode==='walk'){if(this.atCounter)return{ok:true,action:'staff',message:''};if(canBoardFrom(s.playerX,s.playerZ))return this.board();return this.notify('靠近小屋柜台或左侧登船平台。',null,false);}if(s.mode==='boat'){if(s.fishState==='bite')return this.hook();if(s.fishState==='idle'&&Math.hypot(s.boatX-HARBOR.boatX,s.boatZ-HARBOR.boatZ)<16&&Math.abs(s.speed)<.85)return this.dock();}return this.notify('',null,false);}
  setThrottle(value){const s=this.state;if(!this.rentalReady)return false;if(this.inspectionChecking())return false;if(s.mode!=='boat'||s.docking||s.paused)return false;if(!this.canOperateHelm&&finite(value)!==0)return false;s.engine=true;s.throttle=this.canOperateHelm?clamp(finite(value),s.fishState==='idle'?-.3:0,s.fishState==='idle'?1:MAX_TROLL_THROTTLE):0;this.transientThrottle=false;s.waypoint=null;s.waterRoute=[];return true;}
  toggleAnchor(){this.state.anchor=false;return this.notify('',null,false);}
+ // Pure preview and execution share validation, so a chart pin cannot bypass boat rules.
+ planWaypoint(destination){
+  const s=this.state,fail=message=>({ok:false,message});
+  if(!this.rentalReady)return fail('先租船并等木艇下水。');
+  if(this.inspectionChecking())return fail('正在进行例行检查。');
+  if(!this.hasGear('nautical_chart'))return fail('启用 GPS 海图仪后可以标记航线。');
+  if(s.mode!=='boat'||s.docking)return fail('先登船。');
+  if(!this.canOperateHelm)return fail('先收回钓组或将鱼竿放入竿架。');
+  const target=destination&&typeof destination==='object'?{...destination,name:destination.name||'海图标点'}:destination==='dock'?{x:HARBOR.returnX,z:HARBOR.returnZ,name:'租船登船平台',kind:'dock'}:FISHING_SPOTS.find(p=>p.kind===destination);
+  if(!target||!Number.isFinite(target.x)||!Number.isFinite(target.z))return fail('没有找到这个钓点。');
+  const inside=p=>p.x>=MAP_BOUNDS.minX+3&&p.x<=MAP_BOUNDS.maxX-3&&p.z>=MAP_BOUNDS.minZ+3&&p.z<=MAP_BOUNDS.maxZ-3;
+  if(!inside(target))return fail('标点超出可航行海域。');
+  if(onLand(target.x,target.z)||onPier(target.x,target.z)||harborWaterBlocked(target.x,target.z))return fail('请选择可航行的水面。');
+  const route=waterRoute({x:s.boatX,z:s.boatZ},target);
+  if(!route||!route.every(inside))return fail('无法规划避开岸线与码头的航线。');
+  return{ok:true,target,route};
+ }
  selectWaypoint(destination){
-  const s=this.state;if(!this.rentalReady)return this.notify('先在小屋租船，等木艇下水后再出发。',null,false);if(this.inspectionChecking())return this.notify('正在进行例行检查。',null,false);if(!this.hasGear('nautical_chart'))return this.notify('带上海图后可以标记航线。',null,false);if(s.mode!=='boat'||s.docking)return this.notify('先登船。',null,false);if(!this.canOperateHelm)return this.notify('先收回钓组或将鱼竿放入竿架。',null,false);
-  const target=typeof destination==='object'?{...destination,name:destination.name||'选定水面'}:destination==='dock'?{x:HARBOR.returnX,z:HARBOR.returnZ,name:'租船登船平台',kind:'dock'}:FISHING_SPOTS.find(p=>p.kind===destination);
-  if(!target||!Number.isFinite(target.x)||!Number.isFinite(target.z))return this.notify('没有找到这个钓点。',null,false);
-  const route=waterRoute({x:s.boatX,z:s.boatZ},target);if(!route)return this.notify('这条航线无法安全穿过码头。',null,false);
+  const plan=this.planWaypoint(destination);if(!plan.ok)return this.notify(plan.message,null,false);
+  const s=this.state,{target,route}=plan;
   s.anchor=false;s.engine=true;this.transientThrottle=false;s.waterRoute=route;s.waypoint={...target,returning:destination==='dock'||target.kind==='dock'};s.arrival=null;s.phase=s.waypoint.returning?'return':'launch';this.journal(`航向 ${target.name}。`);return this.notify(`正在驶向 ${target.name}。`);
  }
  setRig(patch={}){

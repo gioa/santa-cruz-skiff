@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {GEAR_CATALOG,BASE_GEAR,createProfile,buyGear,equipmentStats,settleFish} from '../dist/equipment.js';
 import {RIG_PROFILES} from '../dist/fishing-rigs.js';
 
-const instruments={nautical_chart:'hasChart',compass:'hasCompass',gps:'hasGPS',sounder:'hasSounder'};
+const instruments={nautical_chart:'hasChart',compass:'hasCompass',sounder:'hasSounder'};
 
 test('free starter includes landing and release tools, never navigation instruments',()=>{
   const profile=createProfile(),packed=BASE_GEAR.map(item=>item.id),stats=equipmentStats(profile,packed);
@@ -21,7 +21,7 @@ test('free starter includes landing and release tools, never navigation instrume
 
 test('purchased instruments reveal only their own capability and only while carried',()=>{
   const profile=createProfile();profile.credits=1000;
-  const expected={nautical_chart:120,compass:45,gps:180,sounder:210};
+  const expected={nautical_chart:120,compass:45,sounder:210};
   let spent=0;
   for(const[id,flag]of Object.entries(instruments)){
     const item=GEAR_CATALOG.find(g=>g.id===id);assert.equal(item.price,expected[id]);
@@ -30,13 +30,14 @@ test('purchased instruments reveal only their own capability and only while carr
     assert.equal(equipmentStats(profile,[])[flag],false,'locker ownership is not equipped');
     const stats=equipmentStats(profile,[id]);assert.equal(stats[flag],true);
     for(const other of Object.values(instruments))if(other!==flag)assert.equal(stats[other],false);
+    assert.equal(stats.hasGPS,id==='nautical_chart','chart carries GPS in the same device');
     assert.equal(buyGear(profile,id).ok,false);
     assert.equal(profile.credits,1000-spent,'duplicate purchase cannot debit credits');
     assert.equal(equipmentStats(profile,[])[flag],false,'unpacking hides the instrument');
   }
 });
 
-test('the first settled starter catch can fund the paper chart without free instruments',()=>{
+test('the first settled starter catch can fund the GPS chart without free instruments',()=>{
   const profile=createProfile();assert.equal(buyGear(profile,'nautical_chart').ok,false);assert.equal(profile.credits,100);
   const reward=settleFish(profile,{catchId:'starter-chart',name:'蓝岩鱼',kg:.45,length:25,kept:true});
   assert.ok(reward>=20);

@@ -23,13 +23,13 @@ function stored(speciesId,extra={}){return{speciesId,name:speciesId,catchId:`${s
 test('purchased navigation tools require packing; starting without chart still permits manual boating and fishing',()=>{
  const sim=prepared();assert.equal(sim.selectWaypoint('sand').ok,false);assert.equal(sim.navigationInstruments().chart,false);assert.equal(sim.publicState().gps,null);assert.equal(sim.publicState().referenceDepth,null);assert.equal(sim.publicState().boat.heading,null);assert.equal(sim.publicState().speedKnots,null);
  assert.equal(sim.setThrottle(.25),true);run(sim,3);assert.ok(sim.state.speed>0);sim.setThrottle(0);until(sim,s=>Math.abs(s.speed)<.5,30);assert.equal(sim.lowerRig().ok,true);sim.retrieve();
- const equipped=prepared(['nautical_chart','compass','gps','sounder']);equipped.state.heading=.4;const nav=equipped.navigationInstruments();assert.equal(nav.heading,bearingDegrees(.4));assert.deepEqual(nav.gpsPosition,toGPS(equipped.state.boatX,equipped.state.boatZ));assert.equal(typeof nav.depth.value,'number');assert.equal(equipped.selectWaypoint('sand').ok,true);
- equipped.state.packed=equipped.state.packed.filter(id=>!['nautical_chart','compass','gps','sounder'].includes(id));assert.equal(equipped.selectWaypoint('dock').ok,false);assert.equal(equipped.navigationInstruments().gps,false);assert.equal(equipped.publicState().referenceDepth,null);
+ const equipped=prepared(['nautical_chart','compass','sounder']);equipped.state.heading=.4;const nav=equipped.navigationInstruments();assert.equal(nav.heading,bearingDegrees(.4));assert.deepEqual(nav.gpsPosition,toGPS(equipped.state.boatX,equipped.state.boatZ));assert.equal(typeof nav.depth.value,'number');assert.equal(equipped.selectWaypoint('sand').ok,true);
+ equipped.state.packed=equipped.state.packed.filter(id=>!['nautical_chart','compass','sounder'].includes(id));assert.equal(equipped.selectWaypoint('dock').ok,false);assert.equal(equipped.navigationInstruments().gps,false);assert.equal(equipped.publicState().referenceDepth,null);
  equipped.state.packed.push('sounder');equipped.state.profile.owned=equipped.state.profile.owned.filter(id=>id!=='sounder');assert.equal(equipped.navigationInstruments().sounder,false,'packing an unowned item grants no instrument');
 });
 
 test('handheld GPS follows walking position rather than the moored boat and jumping cannot change it',()=>{
- const sim=prepared(['gps']);Object.assign(sim.state,{mode:'walk',playerX:HARBOR.spawnX,playerZ:HARBOR.spawnZ});const gps=toGPS(HARBOR.spawnX,HARBOR.spawnZ);assert.deepEqual(sim.navigationInstruments().gpsPosition,gps);assert.equal(sim.jump().ok,false);assert.deepEqual(sim.navigationInstruments().gpsPosition,gps);assert.equal(sim.state.swim,null);
+ const sim=prepared(['nautical_chart']);Object.assign(sim.state,{mode:'walk',playerX:HARBOR.spawnX,playerZ:HARBOR.spawnZ});const gps=toGPS(HARBOR.spawnX,HARBOR.spawnZ);assert.deepEqual(sim.navigationInstruments().gpsPosition,gps);assert.equal(sim.jump().ok,false);assert.deepEqual(sim.navigationInstruments().gpsPosition,gps);assert.equal(sim.state.swim,null);
 });
 
 test('offshore navigation covers about twice the geography while fuel and vessel speed stay unscaled and both modes share the 2x clock',()=>{

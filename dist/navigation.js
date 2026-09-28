@@ -1,6 +1,6 @@
 import {onLand as defaultOnLand,onPier as defaultOnPier,landPolygons as defaultLandPolygons,pierRings as defaultPierRings} from './geography.js?v=20260927-articulated-v5';
 import {harborWaterBlocked as defaultHarborWaterBlocked,harborObstacleRings as defaultHarborObstacleRings} from './harbor-layout.js?v=20260927-articulated-v5';
-export function createNavigation({onLand=defaultOnLand,onPier=defaultOnPier,landPolygons=defaultLandPolygons,pierRings=defaultPierRings,harborWaterBlocked=defaultHarborWaterBlocked,harborObstacleRings=defaultHarborObstacleRings}={}){
+export function createNavigation({onLand=defaultOnLand,onPier=defaultOnPier,landPolygons=defaultLandPolygons,pierRings=defaultPierRings,harborWaterBlocked=defaultHarborWaterBlocked,harborObstacleRings=defaultHarborObstacleRings,detourBounds=null}={}){
 const geographicBlocked=(x,z)=>onLand(x,z)||onPier(x,z);
 const blocked=(x,z)=>geographicBlocked(x,z)||harborWaterBlocked(x,z);
 const polygonEdges=rings=>rings.flatMap(r=>r.map((a,i)=>[a,r[(i+1)%r.length]]));
@@ -66,7 +66,8 @@ function contactAwareControl(v,control,options={}){
  return{...control,steer:0,throttle:-.25,arrived:false,recovering:true};
 }
 function waterRoute(start,target){if(blocked(target.x,target.z))return null;if(clearWaterSegment(start,target))return[{...target}];
- const step=30,margin=450,minX=Math.min(start.x,target.x)-margin,minZ=Math.min(start.z,target.z)-margin,w=Math.ceil((Math.abs(start.x-target.x)+2*margin)/step)+1,h=Math.ceil((Math.abs(start.z-target.z)+2*margin)/step)+1;
+ // Pixel charts may need to go around the entire long wharf, even for a nearby pin.
+ const step=30,margin=450,minX=Math.min(Math.min(start.x,target.x)-margin,detourBounds?.minX??Infinity),minZ=Math.min(Math.min(start.z,target.z)-margin,detourBounds?.minZ??Infinity),maxX=Math.max(Math.max(start.x,target.x)+margin,detourBounds?.maxX??-Infinity),maxZ=Math.max(Math.max(start.z,target.z)+margin,detourBounds?.maxZ??-Infinity),w=Math.ceil((maxX-minX)/step)+1,h=Math.ceil((maxZ-minZ)/step)+1;
  if(w*h>25000)return null;const pos=i=>({x:minX+(i%w)*step,z:minZ+Math.floor(i/w)*step});const cell=p=>Math.round((p.z-minZ)/step)*w+Math.round((p.x-minX)/step),first=cell(start),last=cell(target);const costs=new Float64Array(w*h).fill(Infinity),parent=new Int32Array(w*h).fill(-1),closed=new Uint8Array(w*h),blockedCache=new Int8Array(w*h).fill(-1);const bad=i=>{if(blockedCache[i]<0){const p=pos(i);blockedCache[i]=blocked(p.x,p.z)?1:0;}return blockedCache[i];};
  if(first===last)return null;costs[first]=0;const open=[first],heuristic=i=>{const p=pos(i);return Math.hypot(p.x-target.x,p.z-target.z);};let found=false,iterations=0;
  while(open.length&&iterations++<25000){let best=0;for(let k=1;k<open.length;k++)if(costs[open[k]]+heuristic(open[k])<costs[open[best]]+heuristic(open[best]))best=k;const current=open.splice(best,1)[0];if(closed[current])continue;closed[current]=1;if(current===last){found=true;break;}const cx=current%w,cy=Math.floor(current/w);for(const [dx,dy]of[[1,0],[-1,0],[0,1],[0,-1],[1,1],[-1,-1],[1,-1],[-1,1]]){const nx=cx+dx,ny=cy+dy;if(nx<0||ny<0||nx>=w||ny>=h)continue;const next=ny*w+nx;if(closed[next]||(next!==last&&bad(next)))continue;if(!clearWaterSegment(current===first?start:pos(current),next===last?target:pos(next)))continue;const cost=costs[current]+Math.hypot(dx,dy)*step;if(cost<costs[next]){costs[next]=cost;parent[next]=current;open.push(next);}}}

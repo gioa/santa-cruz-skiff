@@ -1,8 +1,8 @@
-import {createNavigation} from './navigation.js?v=20260927-pixel-v56';
-import {onLand,onPier,landPolygons,pierRings,PIXEL_PIER_BOUNDS} from './pixel-geography.js?v=20260927-pixel-v56';
-import {HARBOR,harborWaterBlocked,harborObstacleRings} from './pixel-harbor-layout.js?v=20260927-pixel-v56';
+import {createNavigation} from './navigation.js?v=20260927-pixel-v57';
+import {onLand,onPier,landPolygons,pierRings,PIXEL_PIER_BOUNDS} from './pixel-geography.js?v=20260927-pixel-v57';
+import {HARBOR,harborWaterBlocked,harborObstacleRings} from './pixel-harbor-layout.js?v=20260927-pixel-v57';
 
-export const {clearWaterSegment,hullPenetration,resolveVesselContact,contactAwareControl,waterRoute}=createNavigation({onLand,onPier,landPolygons,pierRings,harborWaterBlocked,harborObstacleRings});
+export const {clearWaterSegment,hullPenetration,resolveVesselContact,contactAwareControl,waterRoute}=createNavigation({onLand,onPier,landPolygons,pierRings,harborWaterBlocked,harborObstacleRings,detourBounds:{minX:PIXEL_PIER_BOUNDS.minX-60,maxX:PIXEL_PIER_BOUNDS.maxX+60,minZ:PIXEL_PIER_BOUNDS.minZ-60,maxZ:PIXEL_PIER_BOUNDS.maxZ+60}});
 
 // A geometry update may replace an old water pocket with straight deck. Only
 // overlapping restored hulls move; normal navigation never calls this helper.

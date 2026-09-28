@@ -1,4 +1,4 @@
-import {starterConsumables,ensureConsumables,suppliesWeight} from './pixel-consumables.js?v=20260927-pixel-v56';
+import {starterConsumables,ensureConsumables,suppliesWeight} from './pixel-consumables.js?v=20260927-pixel-v57';
 // Virtual credits and simulation tuning. These are not retail prices or harvest rules.
 export const GEAR_CATALOG=[
  {id:'pfd',slot:'safety',name:'救生衣',price:0,kg:.7,desc:'穿在身上 · 落水时提供浮力',icon:'◈'},
@@ -28,9 +28,8 @@ export const GEAR_CATALOG=[
  {id:'bait_sardine',slot:'consumable',name:'沙丁鱼饵 · 12 份',price:18,kg:.3,desc:'油性鱼饵；并不保证特定鱼种',bait:'sardine',quantity:12},
  {id:'bait_soft',slot:'consumable',name:'软饵 · 8 条',price:18,kg:.1,desc:'提竿与缓收带出动作；每次搏鱼可能损耗',bait:'jig',quantity:8},
  {id:'cooler_large',slot:'cooler',name:'大冷藏箱',price:125,kg:5.5,desc:'39.7 lb 虚拟鱼获容量；增加船上载荷',capacity:18},
- {id:'nautical_chart',slot:'navigation',name:'纸质海图',price:120,kg:.1,desc:'查看静态海岸、地标与钓区；船位需 GPS',instrument:'chart'},
+ {id:'nautical_chart',slot:'navigation',name:'GPS 海图仪',price:120,kg:.22,desc:'海底结构与水深海图、当前位置、航速；点选海面规划航线',instrument:'chart'},
  {id:'compass',slot:'navigation',name:'船用罗盘',price:45,kg:.12,desc:'显示船首方位，便于按地标与航向操船',instrument:'compass'},
- {id:'gps',slot:'navigation',name:'手持 GPS',price:180,kg:.22,desc:'显示实时坐标、航速与定位；海区底图另购',instrument:'gps'},
  {id:'sounder',slot:'electronics',name:'便携测深仪',price:210,kg:.8,desc:'读取船底水深与地形趋势，不保证鱼群',instrument:'sounder'},
  {id:'anchor',slot:'utility',name:'小艇船锚与锚绳',price:65,kg:4.2,desc:'停机减速后下锚 · 锚绳与短链约束船位'},
  {id:'sea_anchor',slot:'utility',name:'漂流伞',price:80,kg:1.8,desc:'关闭发动机漂钓时减慢受风漂移'},
@@ -38,10 +37,15 @@ export const GEAR_CATALOG=[
 export const BASE_GEAR=GEAR_CATALOG.filter(g=>g.starter||g.price===0);
 // Electric retrieval belongs to the selected, carried rod, never to ownership alone.
 export function hasElectricReel(profile,packed){const id=profile?.loadout?.rod;return Boolean(id&&Array.isArray(profile?.owned)&&profile.owned.includes(id)&&Array.isArray(packed)&&packed.includes(id)&&GEAR_CATALOG.some(g=>g.id===id&&g.slot==='rod'&&g.electricRetrieve===true));}
+// Legacy GPS and paper charts become one device, without charging existing owners.
+export const navigationGearId=id=>id==='gps'?'nautical_chart':id;
+export const mergeNavigationGear=ids=>[...new Set((ids||[]).map(navigationGearId))];
 export function createProfile(previous){
  const base={...starterConsumables(),version:2,credits:100,owned:BASE_GEAR.map(g=>g.id),stock:{squid:12,anchovy:0,shrimp:0,sardine:0,jig:3},loadout:{rod:'rod',reel:null,line:null,leader:null,cooler:'cooler'},condition:100,transactions:[],settled:[],seen:[],nextCatch:1};
  if(previous?.version===2){Object.assign(base,previous);base.owned=[...new Set([...BASE_GEAR.map(g=>g.id),...(previous.owned||[])])];base.stock={squid:12,anchovy:0,shrimp:0,sardine:0,jig:3,...previous.stock};base.loadout={rod:'rod',reel:null,line:null,leader:null,cooler:'cooler',...previous.loadout};base.settled=previous.settled||[];base.transactions=previous.transactions||[];base.seen=previous.seen||[];}
  if(previous?.version===2&&previous.consumablesVersion===undefined&&(previous.owned||previous.stock||previous.loadout)){delete base.consumablesVersion;delete base.rodSupplies;delete base.rigStock;}
+ base.owned=mergeNavigationGear(base.owned);
+ if(base.inventorySlots)base.inventorySlots=Object.fromEntries(Object.entries(base.inventorySlots).map(([kind,slots])=>[kind,slots.map(navigationGearId)]));
  base.credits=Math.max(0,Math.floor(base.credits));return base;
 }
 export function buyGear(profile,id){
@@ -61,7 +65,7 @@ export function fishReward(fish){if(fish.baitfish)return Math.max(1,Math.round((
 export function settleFish(profile,fish){if(!fish.catchId||profile.settled.includes(fish.catchId)||fish.settled)return 0;const first=!profile.seen.includes(fish.name);const reward=fishReward(fish)+(first?15:0);profile.settled.push(fish.catchId);fish.settled=true;fish.reward=reward;profile.credits+=reward;if(first)profile.seen.push(fish.name);profile.transactions.unshift({kind:fish.kept?'fish_trade':'release_record',catchId:fish.catchId,delta:reward,time:new Date().toISOString()});return reward;}
 export function cargoWeight(catches){return catches.filter(f=>f.kept&&!f.settled).reduce((n,f)=>n+(f.kg||0),0);}
 export function carriedWeight(packed,profile){const baitMass=packed.includes('bait')&&profile?Object.values(profile.stock).reduce((a,b)=>a+b,0)*.018:0;return GEAR_CATALOG.filter(g=>packed.includes(g.id)&&g.slot!=='consumable'&&(g.slot!=='rig'||g.id==='tackle')).reduce((n,g)=>n+g.kg,0)+baitMass+suppliesWeight(profile||{},packed);}
-export function equipmentStats(profile,packed){const use=id=>id&&packed.includes(id)?GEAR_CATALOG.find(g=>g.id===id):null;const instrument=id=>Boolean(profile.owned?.includes(id)&&use(id));const rod=use(profile.loadout.rod)||GEAR_CATALOG.find(g=>g.slot==='rod'&&packed.includes(g.id));const cooler=use(profile.loadout.cooler)||GEAR_CATALOG.find(g=>g.slot==='cooler'&&packed.includes(g.id));return{hasRod:Boolean(rod),hasRig:GEAR_CATALOG.some(g=>g.slot==='rig'&&packed.includes(g.id)),hasBaitBox:packed.includes('bait'),hasChart:instrument('nautical_chart'),hasCompass:instrument('compass'),hasGPS:instrument('gps'),hasSounder:instrument('sounder'),hasAnchor:instrument('anchor'),strength:(rod?.strength||1)*(use(profile.loadout.line)?.strength||1)*(use(profile.loadout.leader)?.strength||1),retrieve:rod?.retrieve||1,sensitivity:rod?.sensitivity||1,smooth:use('reel_smooth')?.smooth||1,capacity:cooler?.capacity||0,weight:carriedWeight(packed,profile)};}
+export function equipmentStats(profile,packed){const use=id=>id&&packed.includes(id)?GEAR_CATALOG.find(g=>g.id===id):null;const instrument=id=>Boolean(profile.owned?.includes(id)&&use(id));const rod=use(profile.loadout.rod)||GEAR_CATALOG.find(g=>g.slot==='rod'&&packed.includes(g.id));const cooler=use(profile.loadout.cooler)||GEAR_CATALOG.find(g=>g.slot==='cooler'&&packed.includes(g.id));return{hasRod:Boolean(rod),hasRig:GEAR_CATALOG.some(g=>g.slot==='rig'&&packed.includes(g.id)),hasBaitBox:packed.includes('bait'),hasChart:instrument('nautical_chart'),hasCompass:instrument('compass'),hasGPS:instrument('nautical_chart'),hasSounder:instrument('sounder'),hasAnchor:instrument('anchor'),strength:(rod?.strength||1)*(use(profile.loadout.line)?.strength||1)*(use(profile.loadout.leader)?.strength||1),retrieve:rod?.retrieve||1,sensitivity:rod?.sensitivity||1,smooth:use('reel_smooth')?.smooth||1,capacity:cooler?.capacity||0,weight:carriedWeight(packed,profile)};}
 // All species retain nonzero overlap; bait and tackle are never exclusive locks.
 export function fishWeights(fishes,{habitat='sand',depth=12,bait='squid',rig='bottom',freshness=1}={}){return fishes.map(f=>{const home=f.spot===habitat?2.7:1;const affinity=f.bait===bait?1.4:({squid:1.03,anchovy:1.08,shrimp:.95,sardine:1.04,jig:.9}[bait]||1);const presentation=rig==='float'?(f.name.includes('鲭')?1.5:.58):rig==='jig'?(f.spot==='reef'?1.18:.9):1;const d=f.spot==='reef'?(depth>10?1.15:.65):depth>28?.7:1;return Math.max(.05,home*affinity*presentation*d*(.75+.25*freshness));});}
 export function weightedFish(fishes,options,rng=Math.random){const weights=fishWeights(fishes,options);let roll=rng()*weights.reduce((a,b)=>a+b,0);for(let i=0;i<fishes.length;i++){roll-=weights[i];if(roll<=0)return fishes[i];}return fishes.at(-1);}
