@@ -91,3 +91,15 @@ test('a 30-foot cast and its real diagonal paid line keep the same hull ratio th
  assert.ok(Math.abs(state.paidLineMeters-separation-.08)<1e-8,'payout is measured from the rod tip, not a scaled screen length');
  for(const zoom of[3,6,12,18]){world.setZoom(zoom);world.draw(state,0);const hull=world.publicState().boats.player,boat=world.cssWorldToScreen(state.boatX,state.boatZ),lure=world.cssWorldToScreen(state.bobber.x,state.bobber.z);assert.ok(Math.abs(Math.hypot(lure.x-boat.x,lure.y-boat.y)/hull.hullLength-2)<.06);}
 });
+
+test('boarding and waiting labels clear the entire boat and crane animation on mobile viewports',async()=>{
+ const {layoutWorldAction}=await import('../dist/pixel-action-layout.js');
+ const intersects=(a,b)=>a.left<b.right&&a.right>b.left&&a.top<b.bottom&&a.bottom>b.top;
+ for(const [width,height]of[[320,568],[390,844],[568,320],[844,390]])for(const player of[{playerX:HARBOR.counterX,playerZ:HARBOR.counterZ},{playerX:HARBOR.boardingX,playerZ:HARBOR.boardingZ}]){
+  const world=createPixelWorld(fakeCanvas());world.resize(width,height);const state={...base,...player,launchStage:'lowering',launchProgress:0};world.draw(state,0);
+  const anchor=world.interactionAnchors(state),hud={left:0,top:0,right:width,bottom:height<500?116:124},bounds={width,height,top:hud.bottom,bottom:18};
+  const label=layoutWorldAction({x:anchor.boarding.x,y:anchor.boarding.y-8,width:116,height:44},bounds,[hud,anchor.animationBounds]);
+  assert.equal(intersects(label.rect,anchor.animationBounds),false,`${width}×${height}: corridor hidden`);
+  for(let i=0;i<=240;i++){state.launchProgress=i/240;world.draw(state,0);const boat=world.publicState().boats.player;assert.equal(intersects(label.rect,boat.bounds),false,`${width}×${height} phase ${i}: boat hidden`);}
+ }
+});

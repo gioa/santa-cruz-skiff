@@ -1,12 +1,12 @@
-import {pierRings,landPolygons,coastLines,buildingFootprints,FISHING_SPOTS,onLand,onPier} from './pixel-geography.js?v=20260927-pixel-v37';
-import {HARBOR} from './harbor-layout.js?v=20260927-pixel-v37';
-import {depthInfoAt} from './bathymetry.js?v=20260927-pixel-v37';
-import {createWildlife,drawWildlife} from './pixel-wildlife.js?v=20260927-pixel-v37';
-import {cameraOffset,projectPixel,unprojectPixel,stepDeadzoneCamera,cameraDeadzone,cameraPlayfield,fitCameraBounds,zoomCameraAt,rectilinearOutline} from './pixel-camera.js?v=20260927-pixel-v37';
-import {ladderPoint} from './swimming.js?v=20260927-pixel-v37';
-import {SKIFF_HULL_OUTLINE,SKIFF_RACKS,boatRenderPose,parkedSkiffPoses,skiffScreenPose,hitSkiff,outboardPose} from './pixel-boat-geometry.js?v=20260927-pixel-v37';
-import {wakeProfile,wakeOrigin} from './pixel-wake.js?v=20260927-pixel-v37';
-import {getRodCurve,getReelPose,getFishingLine,getFishingPresentation} from './pixel-rod-geometry.js?v=20260927-pixel-v37';
+import {pierRings,landPolygons,coastLines,buildingFootprints,FISHING_SPOTS,onLand,onPier} from './pixel-geography.js?v=20260927-pixel-v38';
+import {HARBOR} from './harbor-layout.js?v=20260927-pixel-v38';
+import {depthInfoAt} from './bathymetry.js?v=20260927-pixel-v38';
+import {createWildlife,drawWildlife} from './pixel-wildlife.js?v=20260927-pixel-v38';
+import {cameraOffset,projectPixel,unprojectPixel,stepDeadzoneCamera,cameraDeadzone,cameraPlayfield,fitCameraBounds,zoomCameraAt,rectilinearOutline} from './pixel-camera.js?v=20260927-pixel-v38';
+import {ladderPoint} from './swimming.js?v=20260927-pixel-v38';
+import {SKIFF_HULL_OUTLINE,SKIFF_RACKS,boatRenderPose,parkedSkiffPoses,skiffScreenPose,hitSkiff,outboardPose} from './pixel-boat-geometry.js?v=20260927-pixel-v38';
+import {wakeProfile,wakeOrigin} from './pixel-wake.js?v=20260927-pixel-v38';
+import {getRodCurve,getReelPose,getFishingLine,getFishingPresentation} from './pixel-rod-geometry.js?v=20260927-pixel-v38';
 
 // Hulls and fishing targets share the sailing simulation’s metre coordinates.
 // A closer boat camera preserves phone readability without enlarging the hull
@@ -358,6 +358,16 @@ export function createPixelWorld(canvas,{sprites={},conditions={}}={}){
     return {camera,rodVisible:fishing,wildlife:ecology.snapshot()};
   }
   resize(canvas.clientWidth||640,canvas.clientHeight||360);
+  function boardingAnimationBounds(state){
+    // Reserve the complete journey, not just the current hull, so the label
+    // stays put while the crane swings and the boat passes beneath its hook.
+    const poses=Array.from({length:41},(_,i)=>boatRenderPose({...state,launchStage:'lowering',launchProgress:i/40},HARBOR));
+    poses.push(boatRenderPose(state,HARBOR));
+    const frames=poses.map(skiffGeometry),c=point(HARBOR.craneX,HARBOR.craneZ),scale=frames[0].scale;
+    const left=Math.min(c.x-6*scale,...frames.map(g=>g.bounds.left)),right=Math.max(c.x+6*scale,...frames.map(g=>g.bounds.right));
+    const top=Math.min(c.y-54*scale,...frames.map(g=>g.bounds.top)),bottom=Math.max(c.y+9*scale,...frames.map(g=>g.bounds.bottom));
+    return{left:left*cssWidth/canvas.width-12,right:right*cssWidth/canvas.width+12,top:top*cssHeight/canvas.height-12,bottom:bottom*cssHeight/canvas.height+12};
+  }
   function interactionAnchors(state){
     const pose=boatRenderPose(state,HARBOR),g=skiffGeometry(pose),bx=pose.x,bz=pose.z,heading=pose.heading,ladder=ladderPoint(bx,bz,heading),motor={x:bx+Math.sin(heading)*2.4,z:bz+Math.cos(heading)*2.4};
     const anchor=(x,z,offsetY=0)=>{const p=cssWorldToScreen(x,z);return{...p,y:p.y+offsetY,worldX:x,worldZ:z};};
@@ -365,7 +375,7 @@ export function createPixelWorld(canvas,{sprites={},conditions={}}={}){
     const boatSocket=(x,y,world)=>{const sx=g.screenX+g.scale*(x*Math.cos(heading)+y*Math.sin(heading)),sy=g.screenY+g.scale*(-x*Math.sin(heading)+y*Math.cos(heading));return{x:sx*cssWidth/canvas.width,y:sy*cssHeight/canvas.height,visible:sx>=0&&sx<=canvas.width&&sy>=0&&sy<=canvas.height,worldX:world.x,worldZ:world.z};};
     const boatAnchor=boatSocket(0,0,{x:bx,z:bz});
     const ladderAnchor=boatSocket(-25,27,ladder),engine=boatSocket(0,38,motor);
-    return{counter,npc:counter,boarding,boat:boatAnchor,dock,returnDock:dock,ladder:ladderAnchor,engine};
+    return{animationBounds:boardingAnimationBounds(state),counter,npc:counter,boarding,boat:boatAnchor,dock,returnDock:dock,ladder:ladderAnchor,engine};
   }
   function walkingTargetAt(x,y,state){
     if(state.mode!=='walk')return null;

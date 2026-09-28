@@ -39,3 +39,8 @@ test('fully occupied layouts return a deterministic visible fallback',()=>{
   const b=bounds(320,568),occupied=[{left:0,top:0,right:320,bottom:568}],desired={x:165,y:290,width:92,height:44};
   const first=layoutWorldAction(desired,b,occupied);checkPlacement(first,b);assert.deepEqual(layoutWorldAction(desired,b,occupied),first);
 });
+
+test('large animation exclusion finds clear space beyond the original nearby offsets',()=>{
+ const b=bounds(390,844),animation={left:28,top:175,right:370,bottom:560},hud={left:0,top:0,right:390,bottom:124};
+ const placed=layoutWorldAction({x:180,y:350,width:116,height:44},b,[animation,hud]);checkPlacement(placed,b,[animation,hud]);assert.ok(placed.rect.top>animation.bottom);
+});

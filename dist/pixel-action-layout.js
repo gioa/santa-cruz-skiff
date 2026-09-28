@@ -24,8 +24,13 @@ export function layoutWorldAction(desired,bounds,occupiedRects=[]){
   const minY=Math.min(viewportHeight,height+top),maxY=Math.max(minY,viewportHeight-bottom);
   const origin={x:number(desired.x,viewportWidth/2),y:number(desired.y,minY)},base={x:clamp(origin.x,minX,maxX),y:clamp(origin.y,minY,maxY)};
   const occupied=occupiedRects.filter(Boolean).map(normalizedRect),gap=Math.max(0,number(bounds.gap,6));
+  // Obstacle edges and viewport edges cover clear space beyond the old
+  // fixed 100px search, including the entire boat/crane animation corridor.
+  const xs=[minX,maxX,base.x],ys=[minY,maxY,base.y];
+  for(const r of occupied){xs.push(r.left-gap-width/2-1,r.right+gap+width/2+1);ys.push(r.top-gap-1,r.bottom+gap+height+1);}
+  const candidates=[...offsets,...xs.flatMap(x=>ys.map(y=>[x-base.x,y-base.y]))];
   let best=null;
-  for(const [dx,dy]of offsets){
+  for(const [dx,dy]of candidates){
     const x=Math.round(clamp(base.x+dx,minX,maxX)),y=Math.round(clamp(base.y+dy,minY,maxY));
     const rect={left:x-width/2,top:y-height,right:x+width/2,bottom:y,width,height};
     const area=occupied.reduce((sum,other)=>sum+overlap(rect,other,gap),0),distance=(x-origin.x)**2+(y-origin.y)**2;

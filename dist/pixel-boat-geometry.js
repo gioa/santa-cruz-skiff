@@ -1,4 +1,4 @@
-import {SKIFF_LENGTH_METERS,SKIFF_HULL_PIXELS,SKIFF_METERS_PER_PIXEL} from './skiff-dimensions.js?v=20260927-pixel-v37';
+import {SKIFF_LENGTH_METERS,SKIFF_HULL_PIXELS,SKIFF_METERS_PER_PIXEL} from './skiff-dimensions.js?v=20260927-pixel-v38';
 export {SKIFF_LENGTH_METERS,SKIFF_HULL_PIXELS,SKIFF_METERS_PER_PIXEL};
 // Presentation only: the simulation retains the surveyed boarding point and
 // water coordinates. Every rental uses the same hull and sprite dimensions.
