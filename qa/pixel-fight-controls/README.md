@@ -1,0 +1,9 @@
+# Contextual fight controls; no touch crank
+
+Removed circular/hold/keyboard input from the reel illustration and deleted the obsolete clockwise travel accumulator. The overhead reel stays as a passive image with actual payout/winding animation. First-person view has no transparent reel touch overlay or crank hint. Winding is an explicit hold button or F; existing hold-water-to-lift / release-to-recover behavior, drag slider, reel audio and art remain.
+
+During first-person fishing, hide helm/rod mode buttons, navigation tools and rod identity/configuration. Keep settings and any actual safety/bailing action. Winding appears when usable. Hook/pickup/catch actions remain state-dependent; a mounted rod shows only the available hand pickup, not disabled holder buttons. Drag remains restricted to hookup/snag availability. Outside focus, ordinary navigation and mounting controls remain.
+
+725 tests passed. Updated console tests cover passive reel input in all phases, context-specific hidden actions, mounted pickup, bite/landing transitions and drag cancellation. Existing pump physics, touch cancellation and button input tests continue to pass. Test count is lower by three because the deleted circular-crank helper tests were removed.
+
+Browser QA: isolated local 32 inch halibut fixture with production controls, at 390×844 and 844×390. Winding button generated reel input 1.2. Water hold/release recorded both lift/recover phases, maximum actual crank 1.022 turns/s and retrieval 0.664 m/s. Horizontal drag slider changed 65 → 43. Accessible view contained only the full-scene pump, settings, winding button and drag slider (plus status text); no disabled config/mode or reel control. No console errors. Screenshots show both orientations; fixture and recorder were removed from dist before release. Temporary viewport reset and test tab closed.

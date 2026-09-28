@@ -84,23 +84,19 @@ test('a waiting-state snag exposes drag adjustment and releasing the snag cancel
  drag.emit('pointerdown',{pointerId:2});drag.emit('pointermove',{pointerId:2,clientY:118});assert.equal(state.drag,.5,'fresh downward drag loosens the drag');
 });
 
-test('losing reel availability clears captured crank travel and keyboard winding, not just output',t=>{
+test('reel illustration never captures touch or keyboard winding in any phase',t=>{
  const {state,ui,elements}=fixture(t,'waiting'),wheel=elements['reel-wheel'];
- wheel.emit('pointerdown',{clientX:150,clientY:68.6});wheel.emit('pointermove',{clientX:92,clientY:125});
- wheel.emit('keydown',{key:'ArrowUp'});assert.ok(ui.input(.01).reel>0);
- state.paused=true;ui.update();assert.equal(wheel.attributes.role,'img');assert.equal(wheel.hasPointerCapture(1),false);assert.equal(ui.input(.01).reel,0);
- state.paused=false;ui.update();assert.equal(ui.input(.01).reel,0,'queued travel and a held key must not restart after resuming');
- wheel.emit('pointermove',{clientX:35,clientY:68.6});assert.equal(ui.input(.01).reel,0);
- wheel.emit('pointerdown',{pointerId:2,clientX:150,clientY:68.6});wheel.emit('pointermove',{pointerId:2,clientX:92,clientY:125});assert.ok(ui.input(.01).reel>0);
+ for(const fishState of ['idle','flight','sinking','waiting','bite','fight','landed']){
+  state.fishState=fishState;ui.update();wheel.emit('pointerdown',{clientX:150,clientY:68.6});wheel.emit('pointermove',{clientX:92,clientY:125});wheel.emit('keydown',{key:'ArrowUp'});
+  assert.equal(wheel.attributes.role,'img');assert.equal(wheel.tabIndex,-1);assert.equal(wheel.hasPointerCapture(1),false);assert.equal(ui.input(.01).reel,0);
+ }
 });
 
-test('phase changes cancel gestures before the next UI refresh or pointer release',t=>{
- const {state,ui,elements}=fixture(t,'fight'),drag=elements['drag-knob'],wheel=elements['reel-wheel'];
- drag.emit('pointerdown',{pointerId:2});wheel.emit('pointerdown',{pointerId:3,clientX:150,clientY:68.6});
- state.paused=true;drag.emit('pointermove',{pointerId:2,clientY:20});
- assert.equal(state.rodElevation,45);assert.equal(state.drag,.5);assert.equal(drag.hasPointerCapture(2),false);assert.equal(wheel.hasPointerCapture(3),false);
- state.paused=false;ui.update();wheel.emit('keydown',{key:'ArrowUp'});assert.equal(ui.input(.01).reel,1.2);
- state.paused=true;assert.equal(ui.input(.01).reel,0);state.paused=false;assert.equal(ui.input(.01).reel,0,'the frame gate also cancels a held key before update() runs');
+test('phase changes cancel drag before the next UI refresh',t=>{
+ const {state,ui,elements}=fixture(t,'fight'),drag=elements['drag-knob'];
+ drag.emit('pointerdown',{pointerId:2});state.paused=true;drag.emit('pointermove',{pointerId:2,clientY:20});
+ assert.equal(state.drag,.5);assert.equal(drag.hasPointerCapture(2),false);
+ state.paused=false;ui.update();drag.emit('pointermove',{pointerId:2,clientY:20});assert.equal(state.drag,.5);
 });
 
 test('console replaces force percentages with line cues and a physical drag adjuster',t=>{
@@ -113,7 +109,7 @@ test('console replaces force percentages with line cues and a physical drag adju
 });
 
 
-test('manual reels hide automatic recovery while wheel and hold controls remain available',t=>{
+test('manual reels hide automatic recovery while hold controls remain available',t=>{
  const {state,ui,elements,retrieveCalls}=fixture(t,'waiting');
  const retrieve=elements['retrieve-rig'];
  for(const phase of ['sinking','waiting','bite','fight']){
@@ -133,28 +129,20 @@ test('electric recovery appears only on the purchased active set and stops accep
  state.packed=['rod'];ui.update();assert.equal(retrieve.hidden,true);
 });
 
-test('focus reel can be held while a second thumb adjusts drag; each pointer releases independently',t=>{
- const {state,ui,elements}=fixture(t,'fight',{focus:true}),wheel=elements['reel-wheel'],drag=elements['drag-knob'];
- assert.equal(elements['spool-toggle'].hidden,true);
- wheel.emit('pointerdown',{pointerId:11,clientX:145,clientY:70});
- assert.equal(ui.input(.05).reel,1.2);
- drag.emit('pointerdown',{pointerId:22,clientY:100});drag.emit('pointermove',{pointerId:22,clientY:64});
- assert.ok(Math.abs(state.drag-.7)<1e-12);assert.equal(ui.input(.05).reel,1.2);
- wheel.emit('pointerup',{pointerId:22});assert.equal(ui.input(.05).reel,1.2,'other thumb cannot release winding');
- drag.emit('pointerup',{pointerId:22});assert.equal(ui.input(.05).reel,1.2);
- wheel.emit('pointerup',{pointerId:11});assert.equal(ui.input(.05).reel,0);
- wheel.emit('pointerdown',{pointerId:33});ui.reset();assert.equal(ui.input(.05).reel,0);
- wheel.emit('pointermove',{pointerId:33});assert.equal(ui.input(.05).reel,0);
+test('focus exposes the winding button and drag, hiding passive reel and unavailable actions',t=>{
+ const {state,ui,elements}=fixture(t,'fight',{focus:true});
+ for(const id of ['spool-toggle','rod-config-btn','rod-mount','retrieve-rig','lower-rig','reel-instrument','.fishing-instruments'])assert.equal(elements[id].hidden,true,id);
+ assert.equal(elements['reel-btn'].hidden,false);assert.equal(elements['reel-actions'].hidden,false);assert.equal(elements['drag-knob'].hidden,false);
+ const wheel=elements['reel-wheel'];wheel.emit('pointerdown');wheel.emit('pointermove',{clientX:160});assert.equal(ui.input(.05).reel,0);
+ state.rodMount='port';ui.update();assert.equal(elements['rod-hand'].hidden,false);assert.equal(elements['rod-port'].hidden,true);assert.equal(elements['rod-starboard'].hidden,true);
+ state.fishState='landed';ui.update();assert.equal(elements['reel-btn'].hidden,true);assert.equal(elements['drag-knob'].hidden,true);assert.equal(elements['lower-rig'].hidden,false);
 });
 
-test('deliberate circular input stops on stillness, and focus loss cannot latch winding',t=>{
- const {state,ui,elements}=fixture(t,'fight',{focus:true}),wheel=elements['reel-wheel'];
- wheel.emit('pointerdown',{clientX:145,clientY:70});wheel.emit('pointermove',{clientX:100,clientY:115});
- assert.ok(ui.input(.05).reel>0);assert.equal(ui.input(.2).reel,0);
- wheel.emit('pointerup');wheel.emit('pointerdown');assert.equal(ui.input(.05).reel,1.2);
- state.paused=true;assert.equal(ui.input(.05).reel,0);state.paused=false;assert.equal(ui.input(.05).reel,0);
+test('bite phase keeps hook or pickup action and steady winding without showing drag',t=>{
+ const {state,ui,elements}=fixture(t,'bite',{focus:true});
+ assert.equal(elements['lower-rig'].hidden,false);assert.equal(elements['reel-btn'].hidden,false);assert.equal(elements['drag-knob'].hidden,true);
+ state.rodMount='starboard';ui.update();assert.equal(elements['lower-rig'].hidden,true);assert.equal(elements['rod-hand'].hidden,false);assert.equal(elements['rod-starboard'].hidden,true);
 });
-
 
 test('focus drag slider uses its actual track for taps and full top-to-bottom travel',t=>{
  const {state,ui,elements}=fixture(t,'fight',{focus:true}),drag=elements['drag-knob'];
@@ -182,8 +170,8 @@ test('icon placement switches directly between hand and either holder, with one 
 test('both side holders keep manual winding and the purchased electric reel available',t=>{
  const {state,ui,elements}=fixture(t,'waiting',{electric:true});
  for(const mount of ['port','starboard']){
-  state.rodMount=mount;ui.update();assert.equal(elements['reel-btn'].hidden,false);assert.equal(elements['reel-wheel'].attributes.role,'slider');assert.equal(elements['retrieve-rig'].hidden,false);
-  elements['reel-wheel'].emit('keydown',{key:'ArrowUp'});assert.ok(ui.input(.05).reel>0);assert.equal(state.rodMount,mount);elements['reel-wheel'].emit('keyup',{key:'ArrowUp'});assert.equal(ui.input(.05).reel,0);
+  state.rodMount=mount;ui.update();assert.equal(elements['reel-btn'].hidden,false);assert.equal(elements['reel-wheel'].attributes.role,'img');assert.equal(elements['retrieve-rig'].hidden,false);
+  elements['reel-wheel'].emit('keydown',{key:'ArrowUp'});assert.equal(ui.input(.05).reel,0);assert.equal(state.rodMount,mount);elements['reel-wheel'].emit('keyup',{key:'ArrowUp'});assert.equal(ui.input(.05).reel,0);
  }
 });
 

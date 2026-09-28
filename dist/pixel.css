@@ -373,26 +373,8 @@ html,body,#app,#app *,#app *::before,#app *::after{-webkit-user-select:none;user
 #rod-load{font-size:10px;color:#527263}
 #rod-monitor b{max-width:7em;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
 
-/* The first-person reel is the control itself; no second instrument panel. */
+/* The first-person reel is rendered in the scene, never a touch control. */
 .drag-focus-up,.drag-focus-down,.drag-focus-track,.drag-focus-value{display:none}
-.is-fishing-focus #boat-fishing .fishing-instruments{
- left:var(--focus-reel-left,55%);top:var(--focus-reel-top,70%);right:auto;bottom:auto;
- width:var(--focus-reel-size,112px);height:var(--focus-reel-size,112px)
-}
-.is-fishing-focus #boat-fishing .reel-instrument{
- display:block;background:transparent;border:0;box-shadow:none;overflow:visible
-}
-.is-fishing-focus #boat-fishing #reel-wheel{width:100%;height:100%;background:transparent;touch-action:none}
-.is-fishing-focus #boat-fishing.can-wind .reel-instrument::after{
- content:'按住 / 划圈收线';position:absolute;top:min(100%,calc(100dvh - var(--focus-reel-top,70vh) - 30px - var(--safe-bottom)));left:50%;transform:translateX(-50%);
- padding:5px 8px;background:#fff0cf;color:#173f43;border:1px solid #9daa91;
- font:11px/1.4 system-ui,sans-serif;white-space:nowrap;pointer-events:none
-}
-.is-fishing-focus #boat-fishing .reel-instrument #reel-btn{
- top:auto;bottom:-22px;left:50%;right:auto;transform:translateX(-50%);
- width:96px;height:44px;background:#fff0cf;color:#173f43;border:1px solid #9daa91;
- box-shadow:0 2px #274d4c;font-size:11px
-}
 .is-fishing-focus #boat-fishing .fishing-toolbar{
  bottom:calc(26% + var(--safe-bottom));left:max(5%,env(safe-area-inset-left));width:68px;gap:8px
 }
@@ -557,3 +539,20 @@ html,body,#app,#app *,#app *::before,#app *::after{-webkit-user-select:none;user
 .weighted-workbench .rod-assembly-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.weighted-workbench .assembly-slot{min-width:0;padding:8px 4px}.weighted-workbench .assembly-slot small{overflow-wrap:anywhere}
 
 .weighted-workbench .assembly-slot small{font-size:9px;line-height:1.4}.weighted-workbench .sinker-options{grid-template-columns:repeat(3,minmax(0,1fr))}.weighted-workbench .sinker-options .rod-part{min-height:92px}
+
+/* Fight actions: left drag adjuster, right hold-to-wind; open water pumps the rod. */
+#reel-wheel{pointer-events:none!important}
+.is-fishing-focus #boat-fishing .rod-identity,
+.is-fishing-focus #boat-fishing .fishing-instruments,
+.is-fishing-focus #helm-tab,.is-fishing-focus #fishing-tab,
+.is-fishing-focus #map-btn,.is-fishing-focus #compass-btn,
+.is-fishing-focus #sounder-btn,.is-fishing-focus #trolling-motor-toggle{display:none!important}
+.is-fishing-focus #boat-fishing .fishing-toolbar .reel-actions{
+ position:fixed;right:max(16px,env(safe-area-inset-right));bottom:calc(24px + var(--safe-bottom));
+ display:block;width:96px;height:56px;pointer-events:none
+}
+.is-fishing-focus #boat-fishing .fishing-toolbar #reel-btn{
+ width:96px;height:56px;min-height:56px;background:#fff0cf;color:#173f43;
+ border:1px solid #9daa91;box-shadow:0 2px #274d4c;font-size:14px;touch-action:none
+}
+.is-fishing-focus #boat-fishing #rod-mount{grid-template-columns:1fr}

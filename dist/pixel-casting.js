@@ -1,5 +1,5 @@
-import {rodTipPosition,MAX_PAID_LINE_METERS} from './pixel-fishing-physics.js?v=20260928-pixel-v76';
-import {getRigProfile} from './fishing-rigs.js?v=20260928-pixel-v76';
+import {rodTipPosition,MAX_PAID_LINE_METERS} from './pixel-fishing-physics.js?v=20260928-pixel-v77';
+import {getRigProfile} from './fishing-rigs.js?v=20260928-pixel-v77';
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 const distance=(a,b)=>Math.hypot(a.x-b.x,a.z-b.z,(a.height||0)-(b.height||0));
 // Short, controlled boat casts. These ranges are gameplay calibration, not

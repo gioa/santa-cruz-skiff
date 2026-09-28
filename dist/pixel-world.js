@@ -1,14 +1,14 @@
-import {sampleDailyWater,drawWeatherOverlay} from './pixel-daily-weather.js?v=20260928-pixel-v76';
-import {pierRings,landPolygons,coastLines,buildingFootprints,FISHING_SPOTS,onLand,onPier} from './pixel-geography.js?v=20260928-pixel-v76';
-import {FISHING_SCENE_SCALE,fishingProjector,fishingPhysicalPoint} from './pixel-fishing-projection.js?v=20260928-pixel-v76';
-import {HARBOR,harborWaterBlocked} from './harbor-layout.js?v=20260928-pixel-v76';
-import {depthInfoAt} from './bathymetry.js?v=20260928-pixel-v76';
-import {createWildlife,drawWildlife} from './pixel-wildlife.js?v=20260928-pixel-v76';
-import {cameraOffset,projectPixel,unprojectPixel,stepDeadzoneCamera,cameraDeadzone,cameraPlayfield,fitCameraBounds,zoomCameraAt,rectilinearOutline} from './pixel-camera.js?v=20260928-pixel-v76';
-import {ladderPoint} from './swimming.js?v=20260928-pixel-v76';
-import {SKIFF_HULL_OUTLINE,SKIFF_RACKS,boatRenderPose,parkedSkiffPoses,skiffScreenPose,hitSkiff,outboardPose,skiffDavitGeometry} from './pixel-boat-geometry.js?v=20260928-pixel-v76';
-import {createWakeTrail,crestPoints,foamPoint} from './pixel-wake.js?v=20260928-pixel-v76';
-import {getRodCurve,getReelPose,getFishingLine,getFishingPresentation} from './pixel-rod-geometry.js?v=20260928-pixel-v76';
+import {sampleDailyWater,drawWeatherOverlay} from './pixel-daily-weather.js?v=20260928-pixel-v77';
+import {pierRings,landPolygons,coastLines,buildingFootprints,FISHING_SPOTS,onLand,onPier} from './pixel-geography.js?v=20260928-pixel-v77';
+import {FISHING_SCENE_SCALE,fishingProjector,fishingPhysicalPoint} from './pixel-fishing-projection.js?v=20260928-pixel-v77';
+import {HARBOR,harborWaterBlocked} from './harbor-layout.js?v=20260928-pixel-v77';
+import {depthInfoAt} from './bathymetry.js?v=20260928-pixel-v77';
+import {createWildlife,drawWildlife} from './pixel-wildlife.js?v=20260928-pixel-v77';
+import {cameraOffset,projectPixel,unprojectPixel,stepDeadzoneCamera,cameraDeadzone,cameraPlayfield,fitCameraBounds,zoomCameraAt,rectilinearOutline} from './pixel-camera.js?v=20260928-pixel-v77';
+import {ladderPoint} from './swimming.js?v=20260928-pixel-v77';
+import {SKIFF_HULL_OUTLINE,SKIFF_RACKS,boatRenderPose,parkedSkiffPoses,skiffScreenPose,hitSkiff,outboardPose,skiffDavitGeometry} from './pixel-boat-geometry.js?v=20260928-pixel-v77';
+import {createWakeTrail,crestPoints,foamPoint} from './pixel-wake.js?v=20260928-pixel-v77';
+import {getRodCurve,getReelPose,getFishingLine,getFishingPresentation} from './pixel-rod-geometry.js?v=20260928-pixel-v77';
 
 // Boat and wharf art retain readable proportions. Fishing and visible fish
 // share the same geographic projection as the seabed.
