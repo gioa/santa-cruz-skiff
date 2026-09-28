@@ -126,3 +126,16 @@ test('entire launch clears the crane upright and boom while cables stay above th
   for(const p of[d.base,d.top,d.tip,d.hook,...d.slings])assert.ok(p.x>=d.bounds.left&&p.x<=d.bounds.right&&p.y>=d.bounds.top&&p.y<=d.bounds.bottom,'shared animation exclusion bounds cover all crane pieces');
  }
 });
+
+test('a reachable mobile water tap stays the exact splash point through projection and cast planning',async()=>{
+ const {planCast,stepCast}=await import('../dist/pixel-casting.js');
+ for(const [width,height]of [[390,844],[320,568],[844,390]])for(const zoom of [3,6,9])for(const heading of [0,.7,Math.PI]){
+  const world=createPixelWorld(fakeCanvas());world.resize(width,height);world.setZoom(zoom);
+  const state={...base,mode:'boat',launchStage:'afloat',boatX:1300,boatZ:-320,heading,engine:false,moored:false,rodMount:'hand',rodElevation:50,rig:'bottom',paidLineMeters:0};world.draw(state,0);
+  const click=world.fishingWorldToScreen(state.boatX-6,state.boatZ+1,state),target=world.screenToFishingWorld(click.x,click.y,state),plan=planCast(state,target);
+  assert.ok(plan.ok);assert.deepEqual({x:plan.flight.end.x,z:plan.flight.end.z},target);
+  Object.assign(state,{castFlight:plan.flight,rodAzimuth:plan.azimuth,fishState:'flight',paidLineMeters:plan.paid});Object.assign(state,stepCast(state,plan.flight.duration));
+  const splash=world.fishingWorldToScreen(state.bobber.x,state.bobber.z,state);
+  assert.ok(Math.hypot(splash.x-click.x,splash.y-click.y)<1e-7,`${width}/${zoom}: hit the tapped water pixel`);
+ }
+});

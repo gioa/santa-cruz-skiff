@@ -1,5 +1,6 @@
-import {rodTipPosition,MAX_PAID_LINE_METERS} from './pixel-fishing-physics.js?v=20260928-pixel-v73';
-import {getRigProfile} from './fishing-rigs.js?v=20260928-pixel-v73';
+import {rodTipPosition,MAX_PAID_LINE_METERS} from './pixel-fishing-physics.js?v=20260928-pixel-v74';
+import {formatDepth} from './units.js?v=20260928-pixel-v74';
+import {getRigProfile} from './fishing-rigs.js?v=20260928-pixel-v74';
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 const distance=(a,b)=>Math.hypot(a.x-b.x,a.z-b.z,(a.height||0)-(b.height||0));
 // Short, controlled boat casts. These ranges are gameplay calibration, not
@@ -15,7 +16,11 @@ export function planCast(s,target,{isWater=()=>true}={}){
  const dx=target.x-s.boatX,dz=target.z-s.boatZ,requested=Math.hypot(dx,dz);
  if(requested<3)return{ok:false,message:'船边可直接下放钓组。'};
  if(!isWater(target.x,target.z))return{ok:false,message:'请选择水面。'};
- const range=castRange(s),travel=Math.min(requested,range),end={x:s.boatX+dx/requested*travel,z:s.boatZ+dz/requested*travel,height:0};
+ const range=castRange(s);
+ // A tap is a destination, not a direction. Never silently substitute a
+ // shorter endpoint: on the enlarged hull that looked like a boat-side drop.
+ if(requested>range+1e-8)return{ok:false,reason:'out-of-range',range,message:`超出这套钓组的抛投范围（约 ${formatDepth(range,0)}），请点近一些。`};
+ const travel=requested,end={x:target.x,z:target.z,height:0};
  // Check the full flight corridor, not just the endpoint: no casts across
  // the pier/buildings or another stretch of shoreline.
  for(let d=.5;d<=travel+.5;d+=.5){const u=Math.min(1,d/travel);if(!isWater(s.boatX+(end.x-s.boatX)*u,s.boatZ+(end.z-s.boatZ)*u))return{ok:false,message:'这条抛投路线被岸边挡住了。'};}
@@ -27,7 +32,7 @@ export function planCast(s,target,{isWater=()=>true}={}){
  // the line counter or let a far-away sinker float through the air unnaturally.
  const horizontal=Math.hypot(end.x-start.x,end.z-start.z),launchAngle=Math.PI/6;
  const duration=Math.sqrt(2*(start.height+horizontal*Math.tan(launchAngle))/9.81),arc=9.81*duration*duration/8;
- return{ok:true,limited:requested>range,azimuth,range,flight:{version:1,t:0,duration,start,end,arc},tip,paid:distance(tip,start)+.08};
+ return{ok:true,azimuth,range,flight:{version:1,t:0,duration,start,end,arc},tip,paid:distance(tip,start)+.08};
 }
 export function stepCast(s,dt){
  const f=s.castFlight;if(f?.version!==1||!f.start||!f.end||!Number.isFinite(f.duration)||f.duration<=0)return null;

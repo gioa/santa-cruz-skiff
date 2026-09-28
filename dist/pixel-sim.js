@@ -1,36 +1,36 @@
-import {fightPumpControl} from './pixel-fight-pump.js?v=20260928-pixel-v73';
-import {createStability,RESCUE_FEE,HOSPITAL_FEE} from './pixel-stability.js?v=20260928-pixel-v73';
-import {generateDailyWeather,dailyConditions,sampleDailyWater} from './pixel-daily-weather.js?v=20260928-pixel-v73';
-import {DAY_LENGTH_SECONDS,DAY_TRANSITION_SECONDS,TOW_FEE,restoreTripTime} from './pixel-day-cycle.js?v=20260928-pixel-v73';
-import {trollingMotorForce} from './pixel-trolling-motor.js?v=20260928-pixel-v73';
-import {fishMassKg} from './pixel-fish-mass.js?v=20260928-pixel-v73';
-import {stepRodTip,fishTipSignal} from './pixel-rod-response.js?v=20260928-pixel-v73';
-import {baitFishCandidates} from './pixel-small-fish.js?v=20260928-pixel-v73';
-import {baitSchoolInfluence} from './pixel-bait-schools.js?v=20260928-pixel-v73';
-import {planCast,stepCast} from './pixel-casting.js?v=20260928-pixel-v73';
-import {RETIRED_PIXEL_GEAR} from './pixel-gear-availability.js?v=20260928-pixel-v73';
-import {fishCommonName,fishDisplayName} from './pixel-fish-names.js?v=20260928-pixel-v73';
-import {stepBottomSnag,stepSnagAbrasion} from './pixel-snag.js?v=20260928-pixel-v73';
-import {formatLength,formatWeight} from './units.js?v=20260928-pixel-v73';
+import {fightPumpControl} from './pixel-fight-pump.js?v=20260928-pixel-v74';
+import {createStability,RESCUE_FEE,HOSPITAL_FEE} from './pixel-stability.js?v=20260928-pixel-v74';
+import {generateDailyWeather,dailyConditions,sampleDailyWater} from './pixel-daily-weather.js?v=20260928-pixel-v74';
+import {DAY_LENGTH_SECONDS,DAY_TRANSITION_SECONDS,TOW_FEE,restoreTripTime} from './pixel-day-cycle.js?v=20260928-pixel-v74';
+import {trollingMotorForce} from './pixel-trolling-motor.js?v=20260928-pixel-v74';
+import {fishMassKg} from './pixel-fish-mass.js?v=20260928-pixel-v74';
+import {stepRodTip,fishTipSignal} from './pixel-rod-response.js?v=20260928-pixel-v74';
+import {baitFishCandidates} from './pixel-small-fish.js?v=20260928-pixel-v74';
+import {baitSchoolInfluence} from './pixel-bait-schools.js?v=20260928-pixel-v74';
+import {planCast,stepCast} from './pixel-casting.js?v=20260928-pixel-v74';
+import {RETIRED_PIXEL_GEAR} from './pixel-gear-availability.js?v=20260928-pixel-v74';
+import {fishCommonName,fishDisplayName} from './pixel-fish-names.js?v=20260928-pixel-v74';
+import {stepBottomSnag,stepSnagAbrasion} from './pixel-snag.js?v=20260928-pixel-v74';
+import {formatLength,formatWeight} from './units.js?v=20260928-pixel-v74';
 /** Pixel gameplay. Offshore travel uses a 1:2 map scale and the calendar clock runs at 5x. Input, fishing and animations use active real seconds. */
-import {GEAR_CATALOG,BASE_GEAR,createProfile,mergeNavigationGear,equipmentStats,cargoWeight,settleFish,buyGear as purchaseGear,hasElectricReel as electricReelEquipped} from './equipment.js?v=20260928-pixel-v73';
-import {HARBOR,BOARDING_WALK_PATH,walkHeight,walkAllowed,canBoardFrom,harborWaterBlocked} from './pixel-harbor-layout.js?v=20260928-pixel-v73';
-import {walkingBlocked as walkBlocked,walkingPointOpen,walkingSegmentOpen as safeWalkSegment,createGroundWalkSearch,advanceGroundWalk} from './pixel-walking-path.js?v=20260928-pixel-v73';
-import {FISHING_SPOTS,toGPS,bearingDegrees,onLand,onPier,MAP_BOUNDS} from './pixel-geography.js?v=20260928-pixel-v73';
-import {fishingHabitatAt} from './pixel-seafloor.js?v=20260928-pixel-v73';
-import {depthAt,depthInfoAt} from './bathymetry.js?v=20260928-pixel-v73';
-import {waterRoute,resolveVesselContact,contactAwareControl,clearResumeVesselPose} from './pixel-navigation.js?v=20260928-pixel-v73';
-import {createVesselState,stepVessel,syncVessel,vesselWind} from './vessel-physics.js?v=20260928-pixel-v73';
-import {fishEncounter,weightedEncounterFish} from './pixel-fish-ecology.js?v=20260928-pixel-v73';
-import {RIG_PROFILES,getRigProfile} from './fishing-rigs.js?v=20260928-pixel-v73';
-import {MAX_PAID_LINE_METERS,MAX_TROLL_SPEED_MPS,MAX_TROLL_THROTTLE,reelTurnsPerSecond,rodTipPosition,fishingCurrent,relativeFishingFlow,stepFishingLine} from './pixel-fishing-physics.js?v=20260928-pixel-v73';
-import {createFishFight,stepFishFight,canLandFish} from './pixel-fish-fight.js?v=20260928-pixel-v73';
-import {createHookHold,createBiteHold,stepHookHold} from './pixel-hooking.js?v=20260928-pixel-v73';
-import {consumableStatus,installBait,installRig,loseRig,damageSupplies,rigRequiresBait,USABLE_CONDITION} from './pixel-consumables.js?v=20260928-pixel-v73';
-import {ensureRodLoadouts,getRodAssembly,setRodAssembly,syncActiveRodLoadout} from './pixel-rod-loadouts.js?v=20260928-pixel-v73';
-import {assessCatchLedger,identifyRegulatedSpecies} from './fishing-regulations.js?v=20260928-pixel-v73';
-import {FishingPatrol} from './fish-patrol.js?v=20260928-pixel-v73';
-import {navigationStepScale} from './pixel-navigation-scale.js?v=20260928-pixel-v73';
+import {GEAR_CATALOG,BASE_GEAR,createProfile,mergeNavigationGear,equipmentStats,cargoWeight,settleFish,buyGear as purchaseGear,hasElectricReel as electricReelEquipped} from './equipment.js?v=20260928-pixel-v74';
+import {HARBOR,BOARDING_WALK_PATH,walkHeight,walkAllowed,canBoardFrom,harborWaterBlocked} from './pixel-harbor-layout.js?v=20260928-pixel-v74';
+import {walkingBlocked as walkBlocked,walkingPointOpen,walkingSegmentOpen as safeWalkSegment,createGroundWalkSearch,advanceGroundWalk} from './pixel-walking-path.js?v=20260928-pixel-v74';
+import {FISHING_SPOTS,toGPS,bearingDegrees,onLand,onPier,MAP_BOUNDS} from './pixel-geography.js?v=20260928-pixel-v74';
+import {fishingHabitatAt} from './pixel-seafloor.js?v=20260928-pixel-v74';
+import {depthAt,depthInfoAt} from './bathymetry.js?v=20260928-pixel-v74';
+import {waterRoute,resolveVesselContact,contactAwareControl,clearResumeVesselPose} from './pixel-navigation.js?v=20260928-pixel-v74';
+import {createVesselState,stepVessel,syncVessel,vesselWind} from './vessel-physics.js?v=20260928-pixel-v74';
+import {fishEncounter,weightedEncounterFish} from './pixel-fish-ecology.js?v=20260928-pixel-v74';
+import {RIG_PROFILES,getRigProfile} from './fishing-rigs.js?v=20260928-pixel-v74';
+import {MAX_PAID_LINE_METERS,MAX_TROLL_SPEED_MPS,MAX_TROLL_THROTTLE,reelTurnsPerSecond,rodTipPosition,fishingCurrent,relativeFishingFlow,stepFishingLine} from './pixel-fishing-physics.js?v=20260928-pixel-v74';
+import {createFishFight,stepFishFight,canLandFish} from './pixel-fish-fight.js?v=20260928-pixel-v74';
+import {createHookHold,createBiteHold,stepHookHold} from './pixel-hooking.js?v=20260928-pixel-v74';
+import {consumableStatus,installBait,installRig,loseRig,damageSupplies,rigRequiresBait,USABLE_CONDITION} from './pixel-consumables.js?v=20260928-pixel-v74';
+import {ensureRodLoadouts,getRodAssembly,setRodAssembly,syncActiveRodLoadout} from './pixel-rod-loadouts.js?v=20260928-pixel-v74';
+import {assessCatchLedger,identifyRegulatedSpecies} from './fishing-regulations.js?v=20260928-pixel-v74';
+import {FishingPatrol} from './fish-patrol.js?v=20260928-pixel-v74';
+import {navigationStepScale} from './pixel-navigation-scale.js?v=20260928-pixel-v74';
 export const GAME_TIME_SCALE=5;
 export const WALK_SPEED=2.90;
 export const BOAT_RENTAL_PRICE=15; // Virtual game credits, not a real rental quote.
@@ -298,7 +298,7 @@ export class PixelSimulation {
  castTo(target){const ready=this.fishingReady(true);if(!ready.ok)return ready;
   const s=this.state,plan=planCast(s,target,{isWater:(x,z)=>x>=MAP_BOUNDS.minX&&x<=MAP_BOUNDS.maxX&&z>=MAP_BOUNDS.minZ&&z<=MAP_BOUNDS.maxZ&&!onLand(x,z)&&!onPier(x,z)&&!harborWaterBlocked(x,z)});if(!plan.ok)return this.notify(plan.message,null,false);
   s.rodElevation=50;s.rodAzimuth=plan.azimuth;this.baitRig();Object.assign(s,{rigFallSpeed:undefined,rigVelocity:null,fishState:'flight',castLine:true,casting:false,castFlight:plan.flight,bobber:{...plan.flight.start},rodTip:plan.tip,paidLineMeters:plan.paid,lineEntry:null,floatPosition:null,lineDistance:Math.hypot(plan.flight.start.x-s.boatX,plan.flight.start.z-s.boatZ)});
-  this.journal(`第 ${s.casts} 次向水面抛投。`);return this.notify(plan.limited?'已抛至这套钓组的可达范围。':'');
+  this.journal(`第 ${s.casts} 次向水面抛投。`);return this.notify('');
  }
  // Old charge/release controls have no target and cannot create a cast.
  startCast(target){return target?this.castTo(target):{ok:false,message:''};}
