@@ -1,7 +1,8 @@
 import {PacificaSimulation,BAITS} from './pacifica-sim.js?v=coast-6';
 import {createPacificaWorld} from './pacifica-world.js?v=coast-6';
-import {createPacificaMenus} from './pacifica-menus.js?v=coast-6';
+import {createPacificaMenus} from './pacifica-menus.js?v=coast-7';
 import {createPixelSprites} from './pixel-sprites.js?v=20260928-pixel-v80';
+import {createShoreFightView,shoreFightActive} from './shore-fight-view.js?v=coast-7';
 
 import {getShoreScene,sampleShore,onPier} from './shore-data.js?v=coast-6';
 
@@ -12,10 +13,11 @@ const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;
 const scene=getShoreScene($('app').dataset.location),WORLD=scene.world,SHOP=scene.shop,SAVE_KEY=scene.saveKey;
 let saved;try{saved=JSON.parse(localStorage.getItem(SAVE_KEY)||'null');}catch{}
 const sim=new PacificaSimulation({saved,sceneId:scene.id}),world=createPacificaWorld($('world'),{sceneId:scene.id});
+const fightView=createShoreFightView($('fight-view'),{sceneId:scene.id}),reducedMotion=matchMedia('(prefers-reduced-motion: reduce)');
 const keys=new Set(),dialog=$('modal'),modalLayer=$('modal-layer');
 const sprites=createPixelSprites();
 for(const el of document.querySelectorAll('[data-icon]')){const asset=sprites.icons[el.dataset.icon];if(asset){el.width=asset.width;el.height=asset.height;el.getContext('2d').drawImage(asset,0,0);}}
-let lastFocus=null,lastConsoleHeight=-1;
+let lastFocus=null,lastConsoleHeight=-1,focusActive=false;
 let started=false,focused=true,last=performance.now(),lastSave=0,lastPhase=sim.state.phase,lastMessage='',chargeStart=0,reeling=false,shopOnArrival=false,scenePickerOpen=false,inspectionId=null,toastTimer,modalType='',sound=null,soundEnabled=false;
 let aim=0,afterPierWalk=null,anglerOnArrival=null;
 function persist(){try{localStorage.setItem(SAVE_KEY,JSON.stringify(sim.snapshot()));}catch{}}
@@ -23,9 +25,18 @@ function feedback(result){if(result?.message)toast(result.message);persist();upd
 function toast(message){$('toast').textContent=String(message).replaceAll('贝币','潮汐点');$('toast').classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').classList.remove('show'),3300);}
 function resetInput(){keys.clear();chargeStart=0;reeling=false;$('beach-reel').classList.remove('active');show('cast-charge',false);}
 function paused(){return !started||Boolean(modalType)||scenePickerOpen||document.hidden||!focused;}
+function syncFightFocus(){
+  const active=started&&shoreFightActive(sim.state);
+  if(sim.state.phase!=='fighting'&&reeling)setReel(false);
+  if(active!==focusActive){
+    focusActive=active;resetInput();$('app').classList.toggle('is-fishing-focus',active);show('fight-view',active);
+    $('world').tabIndex=active?-1:0;$('world').setAttribute('aria-hidden',String(active));lastConsoleHeight=-1;
+  }
+  $('app').classList.toggle('focus-muted',active&&paused());return active;
+}
 function backgroundInert(value){for(const node of $('app').children)if(node!==modalLayer)node.inert=value;}
 function openDialog(type,html){if(!modalType)lastFocus=document.activeElement;resetInput();modalType=type;dialog.classList.toggle('inventory-modal',type==='gear');$('modal-content').innerHTML=html;show('modal-layer',true);backgroundInert(true);dialog.scrollTop=0;persist();$('close-modal').focus();updateUI();}
-function closeDialog(){if(!modalType)return;if(modalType==='inspection'){sim.acknowledgeInspection();persist();}modalType='';show('modal-layer',false);backgroundInert(false);resetInput();last=performance.now();(lastFocus?.isConnected?lastFocus:$('world')).focus({preventScroll:true});}
+function closeDialog(){if(!modalType)return;if(modalType==='inspection'){sim.acknowledgeInspection();persist();}modalType='';show('modal-layer',false);backgroundInert(false);resetInput();last=performance.now();updateUI();(lastFocus?.isConnected&&lastFocus.getClientRects().length?lastFocus:focusActive?$('settings-btn'):$('world')).focus({preventScroll:true});}
 $('close-modal').onclick=closeDialog;
 modalLayer.addEventListener('click',e=>{if(e.target===modalLayer)closeDialog();});
 
@@ -47,7 +58,7 @@ function walkSurf(){if(sim.state.phase!=='walk'){toast('先收回钓组，再换
 function walkShop(){if(sim.state.phase!=='walk'){toast('先收回钓组，再回小店。');return;}if(sim.nearShop){openShop();return;}walkTo(SHOP.door.x,SHOP.door.y);shopOnArrival=true;}
 $('walk-surf').onclick=walkSurf;$('walk-shop').onclick=walkShop;
 $('world').addEventListener('pointerdown',e=>{
-  if(paused()||e.button>0)return;const p=world.screenToWorld(e.clientX,e.clientY);if(!p)return;
+  if(paused()||shoreFightActive(sim.state)||e.button>0)return;const p=world.screenToWorld(e.clientX,e.clientY);if(!p)return;
   const angler=sim.state.shoreLore.encounter;if(angler&&Math.hypot(p.x-angler.x,p.y-(angler.y-18))<40){approachAngler();return;}
   if(scene.pier&&onPier(scene,p.x,p.y)){if(sim.onPier)feedback(sim.walkTo(p.x,p.y));else if(sim.nearPier)openPier();else feedback(sim.walkTo(scene.pier.gate.x,scene.pier.gate.y));return;}
   if(p.x>=SHOP.x-20&&p.x<=SHOP.x+SHOP.width+20&&p.y>=SHOP.y-65&&p.y<=SHOP.door.y+30){walkShop();return;}
@@ -83,6 +94,7 @@ function openHelp(){menus.openHelp();const toggle=$('settings-audio');if(toggle)
 $('gear-btn').onclick=openBag;$('journal-btn').onclick=openJournal;$('credits-btn').onclick=openJournal;$('settings-btn').onclick=openHelp;$('rod-config-btn').onclick=()=>menus.openBag(sim.state.activeRod,'rig');$('map-btn').onclick=openMap;$('pier-btn').onclick=()=>sim.onPier?feedback(sim.leavePier()):openPier();
 
 function updateUI(){
+  syncFightFocus();
   const s=sim.state,bait=BAITS.find(b=>b.id===s.bait),atShore=sim.onPier||s.player.y-WORLD.shoreY(s.player.x)<=130,fishing=atShore||s.phase!=='walk';
   $('credits').textContent=Math.floor(s.credits);show('map-btn',s.shoreLore.notes.length>0);
   const e=s.shoreLore.encounter,ep=e?world.worldToScreen(e):null,near=e&&Math.hypot(e.x-s.player.x,e.y-s.player.y)<480;const talkVisible=started&&!modalType&&!scenePickerOpen&&s.phase==='walk'&&!s.onPier&&near&&ep.x>36&&ep.x<innerWidth-36&&ep.y>(innerHeight<500?110:190)&&ep.y<innerHeight-$('boat-console').offsetHeight-50;show('angler-talk',Boolean(talkVisible));if(talkVisible){$('angler-talk').style.left=`${Math.max(64,Math.min(innerWidth-64,ep.x))}px`;$('angler-talk').style.top=`${ep.y-68}px`;const label=e.talked?'再聊两句':'打个招呼';if($('angler-talk').textContent!==label)$('angler-talk').textContent=label;}
@@ -100,8 +112,8 @@ function updateUI(){
   show('beach-cast',['walk','bite','landed'].includes(s.phase));$('beach-cast').textContent=s.phase==='bite'?'扬竿':s.phase==='landed'?'查看鱼获':'按住抛竿';
   show('beach-reel',s.phase==='fighting');show('beach-retrieve',['casting','waiting','bite'].includes(s.phase));show('beach-tension',s.phase==='fighting');
   $('boat-console').classList.toggle('is-bite',s.phase==='bite');const tension=Math.min(100,Math.max(0,s.tension*100));$('tension-value').textContent=Math.round(tension)+'%';$('tension-fill').style.width=tension+'%';$('fight-advice').textContent=tension>80?'松手让线':tension<15?'轻轻收紧鱼线':'保持节奏';
-  $('beach-state').textContent=JSON.stringify({scene:scene.id,started,paused:paused(),...s,canCast:sim.canCast,nearShop:sim.nearShop});
-  const height=started?$('boat-console').offsetHeight:0;if(height!==lastConsoleHeight){lastConsoleHeight=height;syncInsets();}
+  $('beach-state').textContent=JSON.stringify({scene:scene.id,started,paused:paused(),...s,canCast:sim.canCast,nearShop:sim.nearShop,view:focusActive?'first-person':'overhead',focusView:{...fightView.snapshot(),active:focusActive}});
+  const height=started&&!focusActive?$('boat-console').offsetHeight:0;if(height!==lastConsoleHeight){lastConsoleHeight=height;syncInsets();}
 }
 
 window.addEventListener('keydown',e=>{
@@ -114,8 +126,8 @@ window.addEventListener('focus',()=>{focused=true;last=performance.now();});
 document.addEventListener('visibilitychange',()=>{resetInput();persist();last=performance.now();});
 window.addEventListener('pagehide',persist);
 window.addEventListener('location-picker',e=>{scenePickerOpen=Boolean(e.detail?.open);resetInput();persist();last=performance.now();});
-function syncInsets(){const bottom=started?Math.min(innerHeight*.5,$('boat-console').offsetHeight+38):80;world.setInsets?.({top:innerHeight<500?90:125,bottom});$('app').style.setProperty('--shore-console-height',($('boat-console').offsetHeight+34)+'px');}
-function resize(){world.resize(innerWidth,innerHeight);syncInsets();resetInput();}
+function syncInsets(){const height=started&&!focusActive?$('boat-console').offsetHeight:0,bottom=started?Math.min(innerHeight*.5,height+38):80;world.setInsets?.({top:innerHeight<500?90:125,bottom});$('app').style.setProperty('--shore-console-height',(height+34)+'px');}
+function resize(){world.resize(innerWidth,innerHeight);fightView.resize(innerWidth,innerHeight);syncInsets();resetInput();}
 window.addEventListener('resize',resize);resize();
 function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;if(!paused()){
   const x=Number(keys.has('d')||keys.has('arrowright'))-Number(keys.has('a')||keys.has('arrowleft')),y=Number(keys.has('s')||keys.has('arrowdown'))-Number(keys.has('w')||keys.has('arrowup'));
@@ -126,6 +138,7 @@ function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;if(!paused()
 }
   if(chargeStart){const p=Math.min(1,(now-chargeStart)/1400);$('charge-fill').style.width=p*100+'%';$('charge-label').textContent='蓄力 '+Math.round(p*100)+'%';}
   if(sound){sound.gain.gain.setTargetAtTime(soundEnabled&&!document.hidden&&focused?(.12+.06*Math.sin(now/1400)):0,sound.ctx.currentTime,.2);}
-  world.draw(sim.state,sim.state.elapsed);updateUI();requestAnimationFrame(frame);
+  const active=syncFightFocus();if(!active)world.draw(sim.state,sim.state.elapsed);
+  fightView.draw(sim.state,dt,{active,paused:paused(),reeling,reducedMotion:reducedMotion.matches});updateUI();requestAnimationFrame(frame);
 }
 updateUI();requestAnimationFrame(frame);

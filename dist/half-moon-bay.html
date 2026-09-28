@@ -8,12 +8,13 @@
   <title>Half Moon Bay · 潮汐之间</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath fill='%23163e47' d='M0 0h32v32H0z'/%3E%3Cpath fill='%23f8d393' d='M14 3h4v3h4v16h-4v6h-4v-6h-4V6h4z'/%3E%3C/svg%3E">
   <link rel="stylesheet" href="./pixel.css?v=20260928-pixel-css-v80">
-  <link rel="stylesheet" href="./pacifica.css?v=coast-6">
+  <link rel="stylesheet" href="./pacifica.css?v=coast-7">
   <link rel="stylesheet" href="./pixel-locations.css?v=coast-6">
 </head>
 <body>
 <main id="app" class="is-intro" data-location="half-moon-bay" data-shore-scene>
 <canvas id="world" aria-label="Half Moon Bay 沙滩钓场，Francis、Venice 与 Dunes 的浅色沙滩，轻点沙地行走，轻点海面瞄准" tabindex="0"></canvas>
+<canvas id="fight-view" role="img" aria-label="Half Moon Bay 面朝海面的第一人称搏鱼视角" hidden></canvas>
 <header class="hud"><div class="brand"><span>≈</span><div>潮汐之间<small>HALF MOON BAY · PIXEL FISHING</small></div></div><div class="day-card"><span id="weather-icon" aria-label="天气">☁</span><time id="clock">06:00</time><span id="weather">晨雾</span></div><div class="hud-tools"><button id="credits-btn" class="coin-button" aria-label="查看鱼获与潮汐点"><i>✦</i><span id="credits">100</span></button><button id="audio-btn" class="square" aria-label="开关声音">♪</button><button id="settings-btn" class="square" aria-label="设置与帮助">☰</button></div></header>
 <section id="intro" class="intro"><div class="stamp"><span></span>A LITTLE ROD. A WHOLE OCEAN.</div><h1>潮汐之间<small>像素里的海风，<br>属于你的慢时光。</small></h1><p>一片沙滩，一根鱼竿。<br>从 Half Moon Bay 的清晨出发。</p><button id="start-btn" class="primary intro-start">去沙滩 <span>→</span></button><button id="resume-btn" class="text-button" hidden>继续上次航程 ↗</button><div class="intro-foot"><span id="intro-clock">06:00 AM</span><i></i><span>HALF MOON BAY, CA</span></div></section>
 <div id="intro-location" class="intro-location"><span>37°28′ N · 122°27′ W</span><strong>THE BEACH</strong><small>今天，也去浪边待一会儿。</small></div>
@@ -38,6 +39,6 @@
 <button id="angler-talk" class="shore-angler-talk" hidden>打个招呼</button>
 <output id="beach-state" hidden></output>
 </main>
-<script type="module" src="./pacifica-game.js?v=coast-6"></script>
+<script type="module" src="./pacifica-game.js?v=coast-7"></script>
 <script type="module" src="./pixel-locations.js?v=coast-6"></script>
 </body></html>

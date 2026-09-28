@@ -1,6 +1,6 @@
 // Close, foreshortened hands. Hardware and line are behind the full grasp,
 // including the palm and wrist, not merely behind the finger highlights.
-export function drawCloseTackle(ctx,g,{line,ellipse,rect,spoolAngle,drawFishingLine=()=>{}}){
+export function drawCloseTackle(ctx,g,{line,ellipse,rect,spoolAngle,rotorAngle=spoolAngle,reelStyle='conventional',drawFishingLine=()=>{}}){
  const {width:w,scale:k,grip,reel,knob,base,butt,points}=g;
  const hand=g.rightHand||knob;
  const C={dark:'#193b40',shirt:'#345e70',shirtlight:'#598191',skin:'#d8a074',skinlight:'#f1c69b'};
@@ -34,9 +34,25 @@ export function drawCloseTackle(ctx,g,{line,ellipse,rect,spoolAngle,drawFishingL
  // Rod blank, guides, and line remain bound to the physical rod pose.
  for(let i=1;i<points.length;i++){const a=points[i-1],b=points[i];line(a,b,'#254447',i<5?4*k:i<13?2*k:1);if(i<17)line({x:a.x-1,y:a.y},{x:b.x-1,y:b.y},'#91a697',1);}
  for(const i of[5,10,15,20,24,28]){const p=points[i];rect(p.x-1,p.y,3,2,'#b5c5b1');rect(p.x,p.y,1,1,'#385f60');}
+ const x=reel.x,y=reel.y,rk=k*1.65;
+ if(reelStyle==='spinning'){
+  // Shore kits carry a fixed-spool spinning reel. The rotor/bail turns around
+  // the spool; payout does not rotate the handle. The shared hands still meet
+  // the same grip and crank knob.
+  line(g.reelSeat,{x:x+2*k,y:y+11*k},'#253e41',5*k);
+  ellipse(x+4*k,y+5*k,12*k,14*k,'#213e43');
+  ellipse(x+3*k,y+3*k,9*k,11*k,'#8eaaa3');
+  ellipse(x-1*k,y+2*k,5*k,8*k,'#416660');
+  rect(x-7*k,y-22*k,15*k,14*k,'#b3b9a1');
+  for(let i=0;i<6;i++)rect(x-6*k,y+(-20+i*2)*k,13*k,k,i%2?'#d5cba1':'#8e9075');
+  ellipse(x,y-22*k,9*k,3*k,'#314d4d');ellipse(x,y-23*k,7*k,2*k,'#c6ccb1');
+  const angle=rotorAngle,side=Math.cos(angle)*12*k;
+  line({x:x-11*k,y:y-7*k},{x:x+side,y:y-25*k},'#ccdacb',2*k);
+  line({x:x+side,y:y-25*k},{x:x+11*k,y:y-8*k},'#ccdacb',2*k);
+  ellipse(x+side,y-25*k,2*k,2*k,'#567a72');
+ }else{
  // A compact conventional spool, flanked by two side plates. Its overall
  // diameter is close to a palm rather than larger than both hands together.
- const x=reel.x,y=reel.y,rk=k*1.65;
  line(g.reelSeat,{x,y:y+8*rk},'#263c3e',4*rk);
  ellipse(x-9*rk,y,5*rk,9*rk,'#1d393e');ellipse(x-9*rk,y,3.6*rk,7.5*rk,'#a6bbb1');
  rect(x-9*rk,y-7*rk,17*rk,14*rk,'#baa370');
@@ -46,6 +62,7 @@ export function drawCloseTackle(ctx,g,{line,ellipse,rect,spoolAngle,drawFishingL
  ellipse(x+8*rk,y,6*rk,9*rk,'#1d393e');ellipse(x+8*rk,y,4.5*rk,7.5*rk,'#b1c4b7');ellipse(x+8*rk,y,3*rk,5.8*rk,'#365b58');
  line({x:x-9*rk,y:y-8*rk},{x:x+8*rk,y:y-8*rk},'#c8d1bd',2*rk);
  line({x:x-9*rk,y:y+8*rk},{x:x+8*rk,y:y+8*rk},'#99afa4',2*rk);
+ }
  const hub=g.reelHub;
  for(let i=0;i<5;i++){const a=i*Math.PI*2/5;line(hub,{x:hub.x+Math.cos(a)*5*rk,y:hub.y+Math.sin(a)*5*rk},'#c8ad71',2*rk);}
  line(hub,knob,'#223f43',4*rk);line(hub,knob,'#c3cdbb',2*rk);

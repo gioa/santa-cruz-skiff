@@ -37,3 +37,55 @@
 
 .shore-destinations{grid-template-columns:1fr}.shore-destinations .gear-card p{font-size:13px;line-height:1.75}.shore-destinations .gear-card small{font-size:11px}
 .shore-angler-talk:active{transform:translate(-50%,calc(-100% + 2px))}
+
+/* Shore fights share the first-person HUD, with compact controls below the hands. */
+#app[data-shore-scene].is-fishing-focus #world{pointer-events:none}
+#app[data-shore-scene].is-fishing-focus .location-hud-link{display:none!important}
+#app[data-shore-scene].is-fishing-focus #boat-console,
+#app[data-shore-scene].is-fishing-focus #boat-console.fishing-open{
+ position:absolute;inset:0;display:block;width:100%!important;height:100%;max-height:none;
+ max-width:none;transform:none;pointer-events:none
+}
+#app[data-shore-scene].is-fishing-focus #boat-console #boat-fishing{
+ position:static;display:block;width:auto;height:auto;flex:none
+}
+#app[data-shore-scene].is-fishing-focus #boat-fishing .fish-status{
+ top:calc(12px + var(--safe-top));left:max(12px,calc(env(safe-area-inset-left,0px) + 8px));
+ width:max-content;max-width:calc(100% - 80px);padding:8px 10px;gap:4px
+}
+#app[data-shore-scene].is-fishing-focus #boat-fishing .fish-status-head{flex-wrap:wrap;gap:6px}
+#app[data-shore-scene].is-fishing-focus #boat-fishing #fish-distance{display:inline;margin-left:4px;color:#e3dac1}
+#app[data-shore-scene].is-fishing-focus #boat-fishing #fish-detail{margin:0;color:#e3dac1;font-size:10px}
+#app[data-shore-scene].is-fishing-focus #boat-fishing .fishing-toolbar{
+ position:absolute;inset:0;display:block;width:auto;height:auto;min-width:0;margin:0;padding:0;pointer-events:none
+}
+#app[data-shore-scene].is-fishing-focus #boat-fishing .shore-tension{
+ position:absolute;left:max(12px,calc(env(safe-area-inset-left,0px) + 8px));
+ bottom:calc(12px + var(--safe-bottom));width:min(220px,calc(100% - 152px - env(safe-area-inset-left,0px) - env(safe-area-inset-right,0px)));
+ padding:7px 9px;background:#163e46d9;color:#fff1d5;border:1px solid #d8e7d77d;pointer-events:none
+}
+#app[data-shore-scene].is-fishing-focus .shore-tension .meter-caption{margin:0 0 5px;font-size:10px}
+#app[data-shore-scene].is-fishing-focus .shore-tension small{display:block;margin-top:4px;color:#e3dac1;font-size:10px}
+#app[data-shore-scene].is-fishing-focus #boat-fishing .reel-actions{
+ position:absolute;left:auto;top:auto;right:max(12px,calc(env(safe-area-inset-right,0px) + 8px));
+ bottom:calc(12px + var(--safe-bottom));display:flex;gap:0;width:112px;height:56px;pointer-events:none
+}
+#app[data-shore-scene].is-fishing-focus #boat-fishing .reel-actions button{
+ flex:1;width:100%;min-width:44px;height:56px;min-height:56px;margin:0;padding:6px;
+ border:1px solid #d8e7d77d;box-shadow:0 2px 0 #102e3940;font:700 13px ui-monospace,monospace;pointer-events:auto
+}
+#app[data-shore-scene].is-fishing-focus #boat-fishing #beach-reel,
+#app[data-shore-scene].is-fishing-focus #boat-fishing #beach-cast{background:#fff0cf;color:#173f43}
+#app[data-shore-scene].is-fishing-focus #boat-fishing #beach-reel.active{background:#dfac76;color:#173f43}
+#app[data-shore-scene].is-fishing-focus #toast{bottom:calc(88px + var(--safe-bottom));max-width:min(380px,calc(100% - 32px));font-size:11px}
+@media(max-height:500px) and (orientation:landscape){
+ #app[data-shore-scene].is-fishing-focus .hud,
+ #app[data-shore-scene].is-fishing-focus #boat-fishing .fish-status{top:calc(8px + var(--safe-top))}
+ #app[data-shore-scene].is-fishing-focus #boat-fishing .fish-status{padding:6px 9px;gap:2px}
+ #app[data-shore-scene].is-fishing-focus #boat-fishing .shore-tension,
+ #app[data-shore-scene].is-fishing-focus #boat-fishing .reel-actions{bottom:calc(8px + var(--safe-bottom))}
+ #app[data-shore-scene].is-fishing-focus #boat-fishing .shore-tension{width:min(200px,calc(100% - 152px - env(safe-area-inset-left,0px) - env(safe-area-inset-right,0px)));padding:5px 8px}
+ #app[data-shore-scene].is-fishing-focus #boat-fishing .reel-actions,
+ #app[data-shore-scene].is-fishing-focus #boat-fishing .reel-actions button{height:48px;min-height:48px}
+ #app[data-shore-scene].is-fishing-focus #toast{bottom:calc(76px + var(--safe-bottom));max-width:min(320px,calc(100% - 32px));font-size:10px}
+}

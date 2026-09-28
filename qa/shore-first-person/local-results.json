@@ -1,0 +1,8 @@
+{
+  "checks": [
+    "pacifica: 4 viewport bounds, pause/focus, F reel and release, menu freeze, landed/release, break exit",
+    "half-moon-bay: 4 viewport bounds, pause/focus, F reel and release, menu freeze, landed/release, break exit",
+    "Pier uses concrete and rail; inspection immediately exits first person"
+  ],
+  "errors": []
+}
