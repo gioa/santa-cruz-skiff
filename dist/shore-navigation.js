@@ -1,4 +1,5 @@
-import {sampleShore,shoreProfile} from './shore-data.js?v=coast-3';
+import {inspectionReportMarkup} from './pixel-inspection-report.js?v=20260928-pixel-v80';
+import {sampleShore,shoreProfile} from './shore-data.js?v=coast-4';
 const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 export const habitatName=id=>({swash:'近岸浪脚',bar:'浅沙坝',trough:'深沙槽',channel:'沙坝缺口',offshore:'外侧深水',surf:'浪区'}[id]||'浪区');
 export function createShoreNavigation({scene,sim,openDialog,closeDialog,feedback,walkTo}){
@@ -20,12 +21,12 @@ export function createShoreNavigation({scene,sim,openDialog,closeDialog,feedback
  function openPier(){
   if(!scene.pier)return;
   if(!sim.nearPier){feedback({message:'先走到栈桥入口。'});walkTo(scene.pier.gate.x,scene.pier.gate.y);return;}
-  openDialog('pier',`<div class="eyebrow">PACIFICA MUNICIPAL PIER</div><h2 id="modal-title">栈桥封闭</h2><div class="staff-banner"><p><b>维修围栏 · 禁止进入</b>风化的混凝土桥面向海里延伸，受损栏杆旁挂着封闭告示。</p></div><p class="modal-desc">可以越栏进去钓鱼，但在桥上逗留可能遇到鱼警巡查。被查后罚 <b>80 潮汐点</b>并遣返入口；点数不足会留下待缴罚款。</p><div class="button-row"><button id="pier-enter" class="primary">翻越围栏进入</button><button id="pier-cancel" class="secondary">留在沙滩</button></div><p class="credits-note">巡查概率和罚款属于本游戏设定。</p>`);
+  openDialog('pier',`<div class="eyebrow">PACIFICA MUNICIPAL PIER</div><h2 id="modal-title">栈桥封闭</h2><div class="staff-banner"><p><b>维修围栏 · 禁止进入</b>风化的混凝土桥面向海里延伸，受损栏杆旁挂着封闭告示。</p></div><p class="modal-desc">可以越栏进去钓鱼，但在桥上逗留可能遇到鱼警巡查。被查后罚 <b>80 潮汐点</b>、没收携带的全部鱼获并遣返入口；点数不足会留下待缴罚款。</p><div class="button-row"><button id="pier-enter" class="primary">翻越围栏进入</button><button id="pier-cancel" class="secondary">留在沙滩</button></div><p class="credits-note">巡查概率和罚款属于本游戏设定。</p>`);
   $('pier-enter').onclick=()=>{const r=sim.enterPier();if(r.ok)closeDialog();feedback(r);};$('pier-cancel').onclick=closeDialog;
  }
  function openInspection(){
   const i=sim.state.inspection;if(!i)return;
-  openDialog('inspection',`<div class="eyebrow">PIER PATROL</div><h2 id="modal-title">鱼警巡查</h2><div class="staff-banner"><p><b>「这里仍然封闭，请离开栈桥。」</b>你的钓组已收回，鱼警把你带回了入口。</p></div><div class="catch-stats"><div><strong>${i.fine}</strong><small>罚款 · 潮汐点</small></div><div><strong>${i.paid}</strong><small>已扣点数</small></div><div><strong>${sim.state.fineDebt||0}</strong><small>待缴罚款</small></div></div><p class="credits-note">${sim.state.fineDebt?'下次在小店兑换鱼获时优先补缴，仍可领取应急鱼饵。':'已完成本次处罚。'}沙滩仍然可以正常岸钓。</p><div class="button-row"><button id="inspection-ok" class="primary">回到沙滩</button></div>`);
+  openDialog('inspection',`<div class="eyebrow">PIER PATROL</div><h2 id="modal-title">鱼警巡查</h2>${inspectionReportMarkup({...i,debt:sim.state.fineDebt})}<div class="button-row"><button id="inspection-ok" class="primary">回到沙滩</button></div>`);
   $('inspection-ok').onclick=closeDialog;
  }
  return{openMap,openPier,openInspection};

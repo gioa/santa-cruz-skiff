@@ -556,3 +556,5 @@ html,body,#app,#app *,#app *::before,#app *::after{-webkit-user-select:none;user
  border:1px solid #9daa91;box-shadow:0 2px #274d4c;font-size:14px;touch-action:none
 }
 .is-fishing-focus #boat-fishing #rod-mount{grid-template-columns:1fr}
+
+.inspection-findings{padding-left:1.5em;line-height:1.65}.inspection-findings li{margin:12px 0}.inspection-findings p{margin:4px 0 0;overflow-wrap:anywhere}

@@ -25,8 +25,8 @@ test('every actual landing starts exactly one mandatory check, independent of RN
 test('undersized halibut is retained freely, confiscated once on landing and never exchanged for credits',()=>{
  const sim=ready(),small=fish('under',40),legal=fish('legal');sim.state.catches=[small,legal];assert.ok(assessCatchLedger(sim.state.catches).violations.some(v=>v.code==='undersize'));
  const before=sim.state.profile.credits;landing(sim);counter(sim);assert.equal(sim.trade().action,'inspection-required');assert.equal(small.settled,undefined);
- until(sim,s=>s.landingInspection?.status==='complete');assert.equal(small.confiscated,true);assert.equal(small.reward,0);assert.equal(legal.settled,undefined);assert.equal(sim.state.profile.credits,before-100);assert.equal(sim.state.lastInspection.fine,100);assert.equal(sim.state.lastInspection.paid,100);assert.equal(sim.state.lastInspection.debt,0);
- const exchange=sim.trade();assert.equal(exchange.count,1);assert.ok(exchange.total>0);assert.equal(sim.state.profile.transactions.some(t=>t.kind==='fish_trade'&&t.catchId===small.catchId),false);const earned=sim.state.profile.credits;
+ until(sim,s=>s.landingInspection?.status==='complete');assert.equal(small.confiscated,true);assert.equal(small.reward,0);assert.equal(legal.confiscated,true);assert.equal(legal.reward,0);assert.equal(sim.state.lastInspection.confiscated.length,2);assert.match(sim.state.lastInspection.findings[0].detail,/15.7 in.*22 in/);assert.equal(sim.state.profile.credits,before-100);assert.equal(sim.state.lastInspection.fine,100);assert.equal(sim.state.lastInspection.paid,100);assert.equal(sim.state.lastInspection.debt,0);
+ const exchange=sim.trade();assert.equal(exchange.count,0);assert.equal(exchange.total,0);assert.equal(sim.state.profile.transactions.some(t=>t.kind==='fish_trade'&&t.catchId===small.catchId),false);const earned=sim.state.profile.credits;
  assert.equal(sim.trade().total,0);assert.equal(sim.state.profile.credits,earned);assert.equal(sim.state.profile.transactions.filter(t=>t.kind==='inspection_fine').length,1);
 });
 
@@ -48,10 +48,21 @@ test('legal checked cargo stays cleared across reload while newly added cargo re
 
 test('fine shortfalls persist without negative credits and later legitimate earnings repay debt first',()=>{
  const sim=ready(25);sim.state.catches=[fish('small',40),fish('legal')];landing(sim);until(sim,s=>s.landingInspection?.status==='complete');assert.equal(sim.state.profile.credits,0);assert.equal(sim.state.profile.fineDebt,75);assert.equal(sim.state.lastInspection.paid,25);
- const resumed=new PixelSimulation({saved:sim.snapshot(),now});resumed.start(true);counter(resumed);const r=resumed.trade();assert.equal(r.count,1);assert.equal(r.finePayment,Math.min(75,r.grossTotal));assert.equal(r.total,r.grossTotal-r.finePayment);assert.equal(resumed.state.profile.fineDebt,75-r.finePayment);assert.equal(resumed.state.profile.credits,r.total);
+ const resumed=new PixelSimulation({saved:sim.snapshot(),now});resumed.start(true);counter(resumed);assert.equal(resumed.trade().count,0);resumed.state.catches.push(fish('new-legal',61,{caughtAt:'2026-09-28T14:00:00Z'}));assert.equal(resumed.trade().ok,false);until(resumed,s=>s.landingInspection?.status==='complete');const r=resumed.trade();assert.equal(r.count,1);assert.equal(r.finePayment,Math.min(75,r.grossTotal));assert.equal(r.total,r.grossTotal-r.finePayment);assert.equal(resumed.state.profile.fineDebt,75-r.finePayment);assert.equal(resumed.state.profile.credits,r.total);
  const debt=resumed.state.profile.fineDebt;resumed.state.fish=fish('released',70,{kept:false});resumed.state.fishState='landed';const result=resumed.releaseCatch();assert.equal(result.ok,true);assert.ok(resumed.state.profile.fineDebt<=debt);assert.match(result.message,/入账/);assert.equal(resumed.state.profile.transactions.filter(t=>t.kind==='inspection_fine').length,1);
 });
 
 test('paused shore checks preserve progress and impose no penalty before the result',()=>{
  const sim=ready();sim.state.catches=[fish('small',40)];landing(sim);run(sim,3);const elapsed=sim.state.inspection.elapsed,balance=sim.state.profile.credits;sim.pause(true);run(sim,20);assert.equal(sim.state.inspection.elapsed,elapsed);assert.equal(sim.state.profile.credits,balance);assert.equal(sim.state.catches[0].confiscated,undefined);sim.pause(false);until(sim,s=>s.landingInspection?.status==='complete');assert.equal(sim.state.profile.credits,balance-100);
+});
+
+
+test('water patrol confiscates all carried fish but preserves released and previously settled catches',()=>{
+ const sim=ready();sim.patrol.isWater=()=>true;
+ const small=fish('small',40),legal=fish('legal'),released=fish('released',60,{kept:false}),sold=fish('sold',60,{settled:true,caughtAt:'2026-09-26T13:00:00Z'});
+ sim.state.catches=[small,legal,released,sold];sim.state.inspection={id:'water-test',reason:'water',phase:'checking',x:sim.state.boatX+11,z:sim.state.boatZ,side:1,elapsed:7.9};
+ sim.stepPatrol(.2);const report=sim.state.lastInspection;
+ assert.equal(report.reason,'water');assert.equal(report.fine,100);assert.equal(report.confiscated.length,2);assert.equal(legal.confiscated,true);assert.equal(released.confiscated,undefined);assert.equal(sold.confiscated,undefined);
+ assert.equal(report.findings.length,1);assert.equal(report.acknowledged,false);
+ const resumed=new PixelSimulation({saved:sim.snapshot(),now});resumed.start(true);assert.deepEqual(resumed.state.lastInspection,report);run(resumed,20);assert.equal(resumed.state.profile.transactions.filter(t=>t.kind==='inspection_fine').length,1);
 });

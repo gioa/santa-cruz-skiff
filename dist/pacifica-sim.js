@@ -1,6 +1,6 @@
 // Shared shore-fishing simulation. Geometry and habitats are scene specific;
 // prices, bite rates, inspection odds and fines are authored game tuning.
-import {getShoreScene, sampleShore, onPier} from './shore-data.js?v=coast-3';
+import {getShoreScene, sampleShore, onPier} from './shore-data.js?v=coast-4';
 export const SAVE_KEY = 'pacifica-surf-save-v1';
 export const WORLD = getShoreScene('pacifica').world;
 export const SHOP = getShoreScene('pacifica').shop;
@@ -227,9 +227,10 @@ export class PacificaSimulation {
       if (this.random() >= PIER_RULES.probability) continue;
       const paid = Math.min(s.credits, PIER_RULES.fine), debt = PIER_RULES.fine - paid;
       s.credits -= paid; s.fineDebt += debt; s.inspectionCount++;
+      const confiscated=s.catches.map(f=>({...f}));s.catches=[];
       this.clearLine(); this.ejectFromPier();
-      s.inspection = {id: s.inspectionCount, fine: PIER_RULES.fine, paid, debt, exposure: s.pierExposure,
-        message: `巡查员发现你进入封闭栈桥，罚款 ${PIER_RULES.fine} 潮汐点，已带回入口。${debt ? `尚欠 ${debt} 点，出售渔获时优先偿还。` : ''}`};
+      s.inspection = {id: s.inspectionCount, fine: PIER_RULES.fine, paid, debt, exposure: s.pierExposure,confiscated,findings:[{location:'Pacifica Municipal Pier',code:'closed_pier_entry',detail:'翻越入口封闭围栏，进入维修期间禁止进入的栈桥。鱼警已将你带回入口。'}],
+        message: `巡查员发现你进入封闭栈桥，罚款 ${PIER_RULES.fine} 潮汐点，没收全部 ${confiscated.length} 尾鱼获，已带回入口。${debt ? `尚欠 ${debt} 点，出售渔获时优先偿还。` : ''}`};
       s.message = s.inspection.message;
       return true;
     }
@@ -483,7 +484,8 @@ export class PacificaSimulation {
         s.inspectionCount = Math.max(id, s.inspectionCount);
         // Balances in the save already contain this fine: displaying a pending
         // notice must never apply it a second time or mint a pending fish.
-        s.inspection = {id, fine: PIER_RULES.fine, paid, debt: PIER_RULES.fine - paid, exposure: s.pierExposure,
+        const confiscated=[...(Array.isArray(saved.inspection.confiscated)?saved.inspection.confiscated:[]),...s.catches].map(safeFish).filter(Boolean);s.catches=[];
+        s.inspection = {id, fine: PIER_RULES.fine, paid, debt: PIER_RULES.fine - paid, exposure: s.pierExposure,confiscated,findings:[{location:'Pacifica Municipal Pier',code:'closed_pier_entry',detail:'翻越入口封闭围栏，进入维修期间禁止进入的栈桥。鱼警已将你带回入口。'}],
           message: `封闭栈桥检查已结算：罚款 ${PIER_RULES.fine} 潮汐点。${s.fineDebt ? `尚欠 ${s.fineDebt} 点。` : ''}请确认后继续。`};
         this.ejectFromPier();
       }

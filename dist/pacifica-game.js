@@ -1,11 +1,11 @@
-import {PacificaSimulation,BAITS} from './pacifica-sim.js?v=coast-3';
-import {createPacificaWorld} from './pacifica-world.js?v=coast-3';
-import {createPacificaMenus} from './pacifica-menus.js?v=coast-3';
-import {createPixelSprites} from './pixel-sprites.js?v=20260928-pixel-v79';
+import {PacificaSimulation,BAITS} from './pacifica-sim.js?v=coast-4';
+import {createPacificaWorld} from './pacifica-world.js?v=coast-4';
+import {createPacificaMenus} from './pacifica-menus.js?v=coast-4';
+import {createPixelSprites} from './pixel-sprites.js?v=20260928-pixel-v80';
 
-import {getShoreScene,sampleShore,onPier} from './shore-data.js?v=coast-3';
+import {getShoreScene,sampleShore,onPier} from './shore-data.js?v=coast-4';
 
-import {createShoreNavigation,habitatName} from './shore-navigation.js?v=coast-3';
+import {createShoreNavigation,habitatName} from './shore-navigation.js?v=coast-4';
 
 const $=id=>document.getElementById(id), show=(id,value)=>{$(id).hidden=!value;};
 const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));

@@ -242,8 +242,21 @@ test('version-one saves migrate catch and equipment; inspection and pending catc
   inspected.inspectionCount = 1;
   const restored = new PacificaSimulation({saved: inspected});
   assert.equal(restored.state.phase, 'walk');
-  assert.equal(restored.state.catches.length, 2);
+  assert.equal(restored.state.catches.length, 0);
+  assert.equal(restored.state.inspection.confiscated.length, 2);
   assert.equal(restored.state.credits, 70);
   assert.equal(restored.resolveCatch(true).ok, false);
   assert.equal(restored.cast().ok, false);
+});
+
+
+test('pier violations confiscate the entire carried catch and preserve the itemized notice across reload',()=>{
+ const sim=new PacificaSimulation({rng:()=>0});
+ sim.state.catches=[{id:'surfperch',name:'红尾海鲫',catchId:7,weightKg:.8},{id:'halibut',name:'加州比目鱼',catchId:8,weightKg:2}];
+ enter(sim);advance(sim,30);
+ assert.equal(sim.state.catches.length,0);assert.equal(sim.state.inspection.confiscated.length,2);
+ assert.match(sim.state.inspection.findings[0].detail,/翻越.*禁止进入/);
+ const before=sim.state.credits,resumed=new PacificaSimulation({saved:sim.snapshot(),rng:()=>0});
+ assert.equal(resumed.state.catches.length,0);assert.equal(resumed.state.inspection.confiscated.length,2);assert.equal(resumed.state.credits,before);
+ resumed.acknowledgeInspection();Object.assign(resumed.state.player,resumed.shop.door);assert.equal(resumed.sellCatch().total,0);
 });

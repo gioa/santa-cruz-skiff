@@ -1,6 +1,6 @@
-import {BAITS, SHOP_ITEMS} from './pacifica-sim.js?v=coast-3';
-import {drawItemIcon} from './pixel-item-icons.js?v=20260928-pixel-v79';
-import {createPixelSprites} from './pixel-sprites.js?v=20260928-pixel-v79';
+import {BAITS, SHOP_ITEMS} from './pacifica-sim.js?v=coast-4';
+import {drawItemIcon} from './pixel-item-icons.js?v=20260928-pixel-v80';
+import {createPixelSprites} from './pixel-sprites.js?v=20260928-pixel-v80';
 
 // Pacifica uses the game's shared modal, inventory and pixel-art components.
 // These views only call the existing simulation actions; the save format stays
