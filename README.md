@@ -139,3 +139,14 @@ The pixel chart now samples historical USGS Santa Cruz seafloor-character raster
 Stationary squid strips on sand mainly attract small local bottomfish; halibut has a low incidental weight. Slow drift with a baitfish presentation is substantially more effective in the model. Rockfish and lingcod favor structure and suitable bottom presentations; feather rigs benefit from lifting. Monthly availability is soft, not an equipment or legal-season gate. Every poor-but-possible combination remains possible at a lower absolute rate. Numerical coefficients are authored game calibration, not measured field catch rates.
 
 See [ecology evidence and monthly plan](docs/pixel-fishing-ecology-evidence.md), [seafloor reproduction](docs/pixel-seafloor-data.md), [landing checks](docs/pixel-landing-inspections.md) and [small local fish](docs/pixel-nearshore-small-fish.md). `node scripts/calibrate-pixel-ecology.mjs` records 324 month/location/method comparisons with source hashes.
+
+
+## Electric-only automatic recovery
+
+Manual reels have no automatic "recover rig" action. Turn the reel or hold its
+handle / F to wind line; releasing stops manual winding. The 320-credit electric
+reel boat-rod set includes a power pack and must be bought, carried and selected
+as the active rod before **电动收线** appears. Ownership alone does not unlock it
+for other rods. Rigs and bait remain independently consumable premade assemblies.
+Automatic recovery winds real line and stops on cancellation, menus, a bite,
+rod-holder changes or loss of the electric set. Fish fighting remains manual.

@@ -6,7 +6,7 @@ export const CONSUMABLES_VERSION=1;
 export const RIG_IDS=Object.freeze(['bottom','slider','jig','float','dropper','sabiki','feather40']);
 export const BAIT_IDS=Object.freeze(['squid','anchovy','shrimp','sardine','jig']);
 export const USABLE_CONDITION=.08;
-const ROD_IDS=['rod','rod_light','rod_boat'];
+const ROD_IDS=['rod','rod_light','rod_boat','rod_electric'];
 const RIG_ITEMS={bottom:'tackle',slider:'rig_slider',jig:'rig_jig',float:'rig_float',dropper:'rig_dropper',sabiki:'rig_sabiki',feather40:'rig_feather40'};
 const clone=x=>x==null?null:JSON.parse(JSON.stringify(x));
 const bounded=v=>Number.isFinite(v)?Math.max(0,Math.min(1,v)):0;

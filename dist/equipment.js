@@ -1,4 +1,4 @@
-import {starterConsumables,ensureConsumables,suppliesWeight} from './pixel-consumables.js?v=20260927-pixel-v22';
+import {starterConsumables,ensureConsumables,suppliesWeight} from './pixel-consumables.js?v=20260927-pixel-v23';
 // Virtual credits and simulation tuning. These are not retail prices or harvest rules.
 export const GEAR_CATALOG=[
  {id:'pfd',slot:'safety',name:'救生衣',price:0,kg:.7,desc:'穿在身上 · 落水时提供浮力',icon:'◈'},
@@ -12,6 +12,7 @@ export const GEAR_CATALOG=[
  {id:'safety',slot:'safety',name:'通讯与应急包',price:0,kg:1.1,desc:'VHF、急救包、哨子 · 救援始终免费',icon:'⊞'},
  {id:'rod_light',slot:'rod',name:'轻型敏感船竿',price:85,kg:.46,desc:'细微鱼讯更清晰；大鱼搏斗更考验泄力',strength:.84,retrieve:1.02,sensitivity:1.3},
  {id:'rod_boat',slot:'rod',name:'强韧船竿',price:160,kg:.81,desc:'持续负荷更稳；竿身较重、竿尖较迟钝',strength:1.16,retrieve:1.08,sensitivity:.88},
+ {id:'rod_electric',slot:'rod',name:'电轮船竿套装',price:320,kg:1.25,desc:'预组装船竿与电动渔轮，含一体电源 · 可持续电动收线',strength:1,retrieve:1,sensitivity:1,electricRetrieve:true},
  {id:'reel_smooth',slot:'reel',name:'顺滑泄力轮',price:145,kg:.34,desc:'减小泄力启动冲击；不增加鱼种解锁',smooth:.86},
  {id:'line_braid',slot:'line',name:'30 lb 拉力编织主线',price:70,kg:.1,desc:'传递鱼讯更直接；低延展需要温和提竿',strength:1.14},
  {id:'leader_heavy',slot:'leader',name:'30 lb 拉力耐磨前导',price:40,kg:.12,desc:'礁石附近更耐磨；更粗的前导较显眼',strength:1.1},
@@ -35,6 +36,8 @@ export const GEAR_CATALOG=[
  {id:'sea_anchor',slot:'utility',name:'漂流伞',price:80,kg:1.8,desc:'关闭发动机漂钓时减慢受风漂移'},
 ];
 export const BASE_GEAR=GEAR_CATALOG.filter(g=>g.price===0);
+// Electric retrieval belongs to the selected, carried rod, never to ownership alone.
+export function hasElectricReel(profile,packed){const id=profile?.loadout?.rod;return Boolean(id&&Array.isArray(profile?.owned)&&profile.owned.includes(id)&&Array.isArray(packed)&&packed.includes(id)&&GEAR_CATALOG.some(g=>g.id===id&&g.slot==='rod'&&g.electricRetrieve===true));}
 export function createProfile(previous){
  const base={...starterConsumables(),version:2,credits:100,owned:BASE_GEAR.map(g=>g.id),stock:{squid:12,anchovy:0,shrimp:0,sardine:0,jig:3},loadout:{rod:'rod',reel:null,line:null,leader:null,cooler:'cooler'},condition:100,transactions:[],settled:[],seen:[],nextCatch:1};
  if(previous?.version===2){Object.assign(base,previous);base.owned=[...new Set([...BASE_GEAR.map(g=>g.id),...(previous.owned||[])])];base.stock={squid:12,anchovy:0,shrimp:0,sardine:0,jig:3,...previous.stock};base.loadout={rod:'rod',reel:null,line:null,leader:null,cooler:'cooler',...previous.loadout};base.settled=previous.settled||[];base.transactions=previous.transactions||[];base.seen=previous.seen||[];}

@@ -31,6 +31,14 @@ function drawRig(a,id){const {r,px,l,p,o,hook,shadow}=a;shadow();
 const painters={
  pfd(a){const {r,l,p,shadow}=a;shadow();p([[8,4],[12,3],[13,7],[19,7],[20,3],[24,4],[25,12],[28,15],[26,28],[6,28],[4,15],[7,12]],'ink');p([[9,5],[11,5],[12,10],[15,11],[15,26],[7,26],[6,16],[9,13]],'coral');p([[21,5],[23,5],[23,13],[26,16],[25,26],[17,26],[17,11],[20,10]],'rust');r(19,12,5,12,'coral');r(9,12,3,9,'peach');r(7,17,19,3,'navy');r(8,23,18,2,'navy');r(14,16,5,5,'ink');r(15,17,3,3,'gold');r(16,18,1,1,'navy');l(16,11,16,25,'cream');},
  rod:a=>rod(a,'rod'),rod_light:a=>rod(a,'rod_light'),rod_boat:a=>rod(a,'rod_boat'),
+ rod_electric(a){rod(a,'rod_boat');const {r,l,o,px}=a;
+  // Compact electric reel with a top display and an integrated power pack.
+  r(8,17,13,10,'ink');r(9,18,11,8,'slate');r(9,18,3,7,'steel');r(10,19,1,5,'light');
+  r(13,16,7,6,'ink');r(14,17,5,3,'mint');r(15,18,3,1,'greenDark');px(18,17,'white');
+  o(17,23,3,3,'navy');o(17,23,2,2,'steel');r(16,22,2,3,'light');px(13,23,'gold');
+  r(5,25,9,5,'ink');r(6,26,7,3,'navy');r(7,27,3,1,'jade');px(11,27,'mint');l(10,25,10,23,'ink');
+  l(20,23,23,25,'steel');r(22,25,4,2,'ink');px(23,25,'light');
+ },
  tackle(a){const {r,l,o,hook,shadow}=a;shadow();r(4,5,24,9,'ink');r(5,6,22,7,'water');r(7,7,18,1,'jade');r(4,14,24,13,'ink');r(5,15,22,11,'sand');r(6,16,20,9,'ivory');r(13,16,1,9,'wood');r(21,16,1,9,'wood');r(6,21,15,1,'wood');r(6,16,6,4,'white');hook(11,15,1,'steel');o(17,18,2,2,'coral');r(16,20,2,1,'cream');o(17,24,2,1,'steel');l(24,17,24,23,'light');o(24,23,1,2,'slate');r(14,27,5,2,'ink');r(15,27,3,1,'gold');},
  bait(a){const {r,l,p,o,shadow}=a;shadow();r(5,7,23,20,'ink');r(6,8,21,4,'water');r(7,9,19,1,'jade');r(6,12,21,14,'ivory');r(8,14,17,10,'white');p([[17,13],[21,19],[18,21],[14,21],[12,19]],'coral');p([[17,14],[20,19],[16,21],[13,19]],'peach');for(const [x,y]of[[13,25],[16,25],[19,24],[22,25]])l(16,20,x,y,'coral');o(17,18,1,1,'cream');r(6,26,21,1,'steel');},
  cooler:a=>cooler(a),cooler_large:a=>cooler(a,true),

@@ -20,8 +20,8 @@ test('each reachable fishing phase offers only its permitted actions, distinguis
   ['idle','hand',['engine','anchor','adjustPose','lower','mount','assemble','return']],
   ['casting','hand',[]],
   ['flight','hand',[]],
-  ['sinking','hand',['adjustPose','reel','spool','retrieve','mount']],
-  ['waiting','hand',['adjustPose','reel','spool','retrieve','mount']],
+  ['sinking','hand',['adjustPose','reel','spool','mount']],
+  ['waiting','hand',['adjustPose','reel','spool','mount']],
   ['bite','hand',['adjustPose','reel','spool','hook']],
   ['fight','hand',['adjustPose','reel','spool','drag']],
   ['landed','hand',['catch']],
@@ -41,7 +41,7 @@ test('each reachable fishing phase offers only its permitted actions, distinguis
 
 test('a hand-held deployed rig hides boat operation until a real reel retrieve or side-holder transition',()=>{
  const sim=ready();assert.equal(actions(sim).engine,true);assert.ok(sim.lowerRig().ok);sim.state.biteAt=1e6;sim.state.snagThreshold=Infinity;run(sim,5);
- for(const key of['engine','anchor','return','dock','assemble','switchPanel'])assert.equal(actions(sim,{nearDock:true})[key],false,key);assert.equal(sim.toggleEngine().ok,false);assert.equal(sim.setThrottle(.2),false);assert.equal(actions(sim).retrieve,true);
+ for(const key of['engine','anchor','return','dock','assemble','switchPanel'])assert.equal(actions(sim,{nearDock:true})[key],false,key);assert.equal(sim.toggleEngine().ok,false);assert.equal(sim.setThrottle(.2),false);assert.equal(actions(sim).retrieve,false);
  const line=sim.state.paidLineMeters;sim.step(.1,{reel:1.2});assert.ok(sim.state.paidLineMeters<line);assert.equal(actions(sim).engine,false,'one crank stroke must not act as an instant retrieve');
  for(let t=0;t<40&&sim.state.fishState!=='idle';t+=.1)sim.step(.1,{reel:1.2});assert.equal(sim.state.fishState,'idle');assert.equal(actions(sim).engine,true);
  assert.ok(sim.lowerRig().ok);assert.ok(sim.setRodMount('port').ok);assert.equal(actions(sim).engine,true);assert.equal(actions(sim).retrieve,false);assert.equal(actions(sim).reel,false);assert.ok(sim.toggleEngine().ok);assert.ok(sim.setThrottle(.2));run(sim,2);const helm=actions(sim,{panel:'helm'});assert.equal(helm.helm,true);assert.equal(helm.monitor,true);assert.equal(helm.tackle,false);assert.equal(helm.switchPanel,true);assert.equal(actions(sim).take,false,'a driven boat cannot immediately pick up the rod');

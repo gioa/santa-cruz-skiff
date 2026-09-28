@@ -19,7 +19,7 @@ class Element {
  removeAttribute(name){delete this.attributes[name];}
 }
 
-function fixture(t,fishState='idle'){
+function fixture(t,fishState='idle',{electric=false}={}){
  const priorDocument=globalThis.document;globalThis.document={getElementById:()=>null};
  t.after(()=>{if(priorDocument===undefined)delete globalThis.document;else globalThis.document=priorDocument;});
  const buttons=['drag-knob','spool-toggle','lower-rig','reel-btn','retrieve-rig','take-rod'];
@@ -27,10 +27,11 @@ function fixture(t,fishState='idle'){
  const elements=Object.fromEntries(ids.map(id=>[id,new Element(id==='rod-mount'?'SELECT':buttons.includes(id)?'BUTTON':'DIV')]));
  elements['.fishing-toolbar']=new Element();elements['.fishing-instruments']=new Element();
  const root=new Element();root.querySelector=query=>elements[query.startsWith('#')?query.slice(1):query];
- const state={mode:'boat',rentalPaid:true,launchStage:'afloat',fishState,rodMount:'hand',rodElevation:45,rodAzimuth:70,drag:.5,rig:'bottom',fuel:80,engine:false};
+ const state={mode:'boat',rentalPaid:true,launchStage:'afloat',fishState,rodMount:'hand',rodElevation:45,rodAzimuth:70,drag:.5,rig:'bottom',fuel:80,engine:false,paused:false,inspection:null,profile:{owned:['rod',...(electric?['rod_electric']:[])],loadout:{rod:electric?'rod_electric':'rod'}},packed:['rod',...(electric?['rod_electric']:[])]};
  const sim={state,lowerRig:()=>{state.fishState='sinking';return{ok:true};},setRodPose:pose=>{state.rodElevation=pose.elevation;state.rodAzimuth=pose.azimuth;},changeDrag:delta=>{state.drag+=delta;}};
- const ui=mountFishingConsole(root,{sim,getActions:()=>boatActions(state,{canLower:true}),onFeedback(){},onMount(){},onRetrieve(){}});
- ui.update();return{state,ui,elements};
+ let retrieveCalls=0;
+ const ui=mountFishingConsole(root,{sim,getActions:()=>boatActions(state,{canLower:true}),onFeedback(){},onMount(){},onRetrieve(){retrieveCalls++;}});
+ ui.update();return{state,ui,elements,retrieveCalls:()=>retrieveCalls};
 }
 
 
@@ -109,4 +110,25 @@ test('console replaces force percentages with line cues and a physical drag adju
  assert.ok(elements['drag-knob'].innerHTML.includes('drag-star'));assert.ok(!elements['drag-knob'].innerHTML.includes('%'));
  assert.equal(elements['drag-knob'].attributes['aria-valuetext'],'泄力适中，向上拧紧，向下放松');
  Object.assign(state,{lineSlackMeters:1,payoutRate:0});ui.update();assert.equal(elements['rod-load'].textContent,'鱼线松了');
+});
+
+
+test('manual reels hide automatic recovery while wheel and hold controls remain available',t=>{
+ const {state,ui,elements,retrieveCalls}=fixture(t,'waiting');
+ const retrieve=elements['retrieve-rig'];
+ for(const phase of ['sinking','waiting','bite','fight']){
+  state.fishState=phase;ui.update();assert.equal(retrieve.hidden,true);assert.equal(retrieve.disabled,true);
+  retrieve.onclick();assert.equal(retrieveCalls(),0);assert.equal(elements['reel-btn'].hidden,false);
+ }
+});
+
+test('electric recovery appears only on the purchased active set and stops accepting hidden actions',t=>{
+ const {state,ui,elements,retrieveCalls}=fixture(t,'waiting',{electric:true});
+ const retrieve=elements['retrieve-rig'];assert.equal(retrieve.hidden,false);assert.equal(retrieve.textContent,'电动收线');retrieve.onclick();assert.equal(retrieveCalls(),1);
+ state.profile.loadout.rod='rod';ui.update();assert.equal(retrieve.hidden,true);retrieve.onclick();assert.equal(retrieveCalls(),1);
+ state.profile.loadout.rod='rod_electric';ui.update();assert.equal(retrieve.hidden,false);
+ for(const patch of [{paused:true},{rodMount:'port'},{fishState:'bite'},{fishState:'fight'},{fishState:'idle'},{inspection:{phase:'checking'}}]){
+  const base={...state};Object.assign(state,patch);ui.update();assert.equal(retrieve.hidden,true);retrieve.onclick();assert.equal(retrieveCalls(),1);Object.assign(state,base);
+ }
+ state.packed=['rod'];ui.update();assert.equal(retrieve.hidden,true);
 });

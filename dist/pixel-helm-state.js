@@ -1,4 +1,4 @@
-import {formatSpeed} from './units.js?v=20260927-pixel-v22';
+import {formatSpeed} from './units.js?v=20260927-pixel-v23';
 /** Pure, persistent tiller controls. Normal pointer release does nothing:
  * steering and twist throttle hold their positions through friction. The UI
  * owns pointer capture and calls reset on cancellation, blur or menus.

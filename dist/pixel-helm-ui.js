@@ -1,6 +1,6 @@
-import {bindPointer} from './input.js?v=20260927-pixel-v22';
-import {tillerFromPointer} from './pixel-tiller-input.js?v=20260927-pixel-v22';
-import {createSingleLeverControl,leverFromDrag,leverForThrottle,LEVER_NEUTRAL_DEADBAND} from './pixel-single-lever.js?v=20260927-pixel-v22';
+import {bindPointer} from './input.js?v=20260927-pixel-v23';
+import {tillerFromPointer} from './pixel-tiller-input.js?v=20260927-pixel-v23';
+import {createSingleLeverControl,leverFromDrag,leverForThrottle,LEVER_NEUTRAL_DEADBAND} from './pixel-single-lever.js?v=20260927-pixel-v23';
 
 // Steering stays on the tiller; a single retained push/pull lever selects both
 // direction and power. Touching it alone never changes the propulsion source.
