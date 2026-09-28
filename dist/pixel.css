@@ -532,3 +532,17 @@ html,body,#app,#app *,#app *::before,#app *::after{-webkit-user-select:none;user
 .day-changing #world-actions{visibility:hidden}
 
 #bail-btn{position:fixed;right:16px;top:calc(190px + env(safe-area-inset-top));z-index:25;display:flex;align-items:center;gap:5px;min-height:54px;padding:8px 12px;touch-action:none}#bail-btn[aria-pressed="true"]{background:#f1c779}#bail-btn[hidden],#rescue-view[hidden]{display:none}#rescue-view{position:fixed;inset:0;width:100%;height:100%;z-index:35;pointer-events:none;image-rendering:pixelated}.day-changing #bail-btn{display:none}
+
+/* All enabled equipment opens from the left thumb rail. */
+#boat-panel-tabs{max-height:calc(100dvh - 145px - var(--safe-top) - var(--safe-bottom));overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;scrollbar-width:thin;padding:2px 3px 5px 0;width:59px}
+#boat-panel-tabs>button{flex:0 0 48px}
+#boat-panel-tabs>button[hidden]{display:none!important}
+#boat-panel-tabs #bail-btn{position:static;width:56px;min-height:48px;height:48px;padding:6px 4px;display:grid;place-items:center}
+#boat-panel-tabs #bail-btn span{display:none}
+#boat-panel-tabs{scrollbar-width:none;touch-action:pan-y}
+#boat-panel-tabs::-webkit-scrollbar{display:none}
+@media(max-height:500px) and (orientation:landscape){
+ #app:not(.is-fishing-focus) #boat-panel-tabs{display:grid;grid-template-columns:repeat(2,56px);width:118px;align-content:end}
+ #app:not(.is-fishing-focus) #controls:has(#boat-panel-tabs:not([hidden])) #boat-console{left:calc(50% + 64px);width:calc(100% - 152px);max-width:620px}
+ #app:not(.is-fishing-focus) #controls:has(#boat-panel-tabs:not([hidden])) #boat-console.fishing-open{width:min(360px,calc(100% - 152px))}
+}
