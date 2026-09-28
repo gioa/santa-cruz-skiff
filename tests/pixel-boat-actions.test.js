@@ -28,10 +28,10 @@ test('each reachable fishing phase offers only its permitted actions, distinguis
  ];
  for(const mount of['port','starboard'])cases.push(
   ['idle',mount,['switchPanel','adjustPose','lower','take','assemble','return']],
-  ['sinking',mount,['switchPanel','adjustPose','spool','take','return']],
-  ['waiting',mount,['switchPanel','adjustPose','spool','take','return']],
-  ['bite',mount,['adjustPose','spool','take']],
-  ['fight',mount,['adjustPose','drag','take']],
+  ['sinking',mount,['switchPanel','adjustPose','reel','spool','take','return']],
+  ['waiting',mount,['switchPanel','adjustPose','reel','spool','take','return']],
+  ['bite',mount,['adjustPose','reel','spool','take']],
+  ['fight',mount,['adjustPose','reel','drag','take']],
  );
  for(const[fishState,rodMount,expected]of cases){
   const state={...base,fishState,rodMount},a=boatActions(state,{hasRod:true,hasAnchor:true,hasChart:true,canLower:fishState==='idle',canCast:fishState==='idle'&&rodMount==='hand',nearDock:false});
@@ -44,12 +44,12 @@ test('a hand-held deployed rig hides boat operation until a real reel retrieve o
  for(const key of['switchPanel','anchor','return','dock','assemble','switchPanel'])assert.equal(actions(sim,{nearDock:true})[key],false,key);assert.equal(sim.setThrottle(.2),false);assert.equal(actions(sim).retrieve,false);
  const line=sim.state.paidLineMeters;sim.step(.1,{reel:1.2});assert.ok(sim.state.paidLineMeters<line);assert.equal(actions(sim).switchPanel,false,'one crank stroke must not act as an instant retrieve');
  for(let t=0;t<40&&sim.state.fishState!=='idle';t+=.1)sim.step(.1,{reel:1.2});assert.equal(sim.state.fishState,'idle');assert.equal(actions(sim).switchPanel,true);
- assert.ok(sim.lowerRig().ok);assert.ok(sim.setRodMount('port').ok);assert.equal(actions(sim).switchPanel,true);assert.equal(actions(sim).retrieve,false);assert.equal(actions(sim).reel,false);assert.ok(sim.setThrottle(.2));run(sim,2);const helm=actions(sim,{panel:'helm'});assert.equal(helm.helm,true);assert.equal(helm.monitor,true);assert.equal(helm.tackle,false);assert.equal(helm.switchPanel,true);assert.equal(actions(sim).take,false,'a driven boat cannot immediately pick up the rod');
+ assert.ok(sim.lowerRig().ok);assert.ok(sim.setRodMount('port').ok);assert.equal(actions(sim).switchPanel,true);assert.equal(actions(sim).retrieve,false);assert.equal(actions(sim).reel,true);assert.ok(sim.setThrottle(.2));run(sim,2);const helm=actions(sim,{panel:'helm'});assert.equal(helm.helm,true);assert.equal(helm.monitor,true);assert.equal(helm.tackle,false);assert.equal(helm.switchPanel,true);assert.equal(actions(sim).take,false,'a driven boat cannot immediately pick up the rod');
 });
 
 test('a mounted bite offers pickup rather than strike, and pickup exposes the real hook action',()=>{
  const sim=ready();assert.ok(sim.setRodMount('starboard').ok);assert.ok(sim.lowerRig().ok);sim.state.biteAt=Infinity;sim.state.snagThreshold=Infinity;run(sim,3);assert.ok(sim.state.lureDepth>.15);sim.state.biteAt=.000001;
- for(let t=0;t<5&&sim.state.fishState!=='bite';t+=.1)sim.step(.1);assert.equal(sim.state.fishState,'bite');let a=actions(sim);assert.equal(a.take,true);assert.equal(a.hook,false);assert.equal(a.switchPanel,false);assert.equal(a.anchor,false);assert.equal(a.reel,false);assert.equal(sim.hook().ok,false);
+ for(let t=0;t<5&&sim.state.fishState!=='bite';t+=.1)sim.step(.1);assert.equal(sim.state.fishState,'bite');let a=actions(sim);assert.equal(a.take,true);assert.equal(a.hook,false);assert.equal(a.switchPanel,false);assert.equal(a.anchor,false);assert.equal(a.reel,true);assert.equal(sim.hook().ok,false);
  assert.ok(sim.setRodMount('hand').ok);a=actions(sim);assert.equal(a.take,false);assert.equal(a.hook,true);assert.equal(a.reel,true);seatHook(sim);assert.equal(sim.state.fishState,'fight');a=actions(sim);assert.equal(a.hook,false);assert.equal(a.mount,false);assert.equal(a.switchPanel,false);assert.equal(a.drag,true);
 });
 
@@ -96,4 +96,14 @@ test('readiness capabilities preserve handheld and mounted speed/neutral thresho
 test('helm and tackle remain available in neutral without ignition',()=>{
  const sim=ready();assert.equal(sim.state.throttle,0);assert.equal(actions(sim).engine,false);assert.equal(actions(sim).switchPanel,true);
  const a=actions(sim,{panel:'helm'});assert.equal(a.helm,true);assert.equal(a.tackle,false);assert.equal(a.switchPanel,true);assert.equal(a.switchLabel,'钓鱼');
+});
+
+test('winding a mounted bite can seat the hook without changing the selected holder',()=>{
+ for(const mount of ['port','starboard']){
+  const sim=ready();sim.setRodMount(mount);sim.lowerRig();sim.state.biteAt=Infinity;sim.state.snagThreshold=Infinity;run(sim,3);sim.state.biteAt=.000001;
+  for(let t=0;t<5&&sim.state.fishState!=='bite';t+=.1)sim.step(.1);
+  assert.equal(sim.state.fishState,'bite');assert.equal(actions(sim).reel,true);
+  for(let t=0;t<5&&sim.state.fishState==='bite';t+=.1)sim.step(.1,{reel:1.2});
+  assert.equal(sim.state.fishState,'fight');assert.equal(sim.state.rodMount,mount);assert.equal(actions(sim).reel,true);
+ }
 });

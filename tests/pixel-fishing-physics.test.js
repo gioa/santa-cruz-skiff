@@ -127,8 +127,8 @@ test('an overloaded drag slips despite cranking; fish remain above seabed and li
 });
 
 test('side holder permits bounded slow trolling, neutral pickup, and actual line towing',()=>{
- const sim=ready();quietDrop(sim);sim.setReelMode('brake');assert.ok(sim.setRodMount('starboard').ok);assert.equal(sim.state.rodAzimuth,100);assert.ok(sim.canOperateHelm);assert.ok(sim.setThrottle(1));assert.ok(sim.state.throttle<=.28);const start={...sim.state.bobber};run(sim,15,{reel:1.2});assert.equal(sim.state.rodMount,'starboard','cannot crank and propel the boat while rod is in its holder');assert.equal(sim.state.crankRate,0);assert.ok(Math.abs(sim.state.speed)<MAX_TROLL_SPEED_MPS+.2);assert.ok(Math.hypot(sim.state.bobber.x-start.x,sim.state.bobber.z-start.z)>1);assert.equal(sim.setRodMount('hand').ok,false);
- sim.setThrottle(0);for(let t=0;t<30&&Math.abs(sim.state.speed)>1.2;t+=.1)sim.step(.1);sim.step(.1,{reel:.7});assert.equal(sim.state.rodMount,'hand');assert.equal(sim.state.engine,false);assert.equal(sim.canOperateHelm,false);assert.equal(sim.state.crankRate,.7);
+ const sim=ready();quietDrop(sim);sim.setReelMode('brake');assert.ok(sim.setRodMount('starboard').ok);assert.equal(sim.state.rodAzimuth,100);assert.ok(sim.canOperateHelm);assert.ok(sim.setThrottle(1));assert.ok(sim.state.throttle<=.28);const start={...sim.state.bobber};run(sim,15);assert.equal(sim.state.rodMount,'starboard');assert.equal(sim.state.crankRate,0);assert.ok(Math.abs(sim.state.speed)<MAX_TROLL_SPEED_MPS+.2);assert.ok(Math.hypot(sim.state.bobber.x-start.x,sim.state.bobber.z-start.z)>1);assert.equal(sim.setRodMount('hand').ok,false);
+ sim.setThrottle(0);for(let t=0;t<30&&Math.abs(sim.state.speed)>1.2;t+=.1)sim.step(.1);const paid=sim.state.paidLineMeters;sim.step(.1,{reel:.7,pump:true});assert.equal(sim.state.rodMount,'starboard');assert.equal(sim.canOperateHelm,true);assert.equal(sim.state.crankRate,.7);assert.ok(sim.state.paidLineMeters<paid);assert.equal(sim.state.pumping,false);assert.equal(sim.state.pumpHeight,0);assert.ok(sim.setRodMount('hand').ok);assert.equal(sim.state.engine,false);assert.equal(sim.canOperateHelm,false);
 });
 
 test('a mounted bite neutralizes propulsion and requires pickup before a hand-operated wind/lift',()=>{
@@ -158,4 +158,13 @@ test('a drifting boat reaches an underwater pendulum equilibrium on fixed braked
  }
  assert.ok(Math.abs(results[0]-results[1])<.1,'the equilibrium is stable across mobile and desktop frame intervals');
  const stuck=pure('bottom',{reelMode:'brake',paidLineMeters:20,lureDepth:0});stuck.bobber.x-=19;pureRun(stuck,20,{environment:{bottomDepth:25}});assert.ok(stuck.lureDepth>5,'an old surface-bound rig can sink again without opening the spool');assert.equal(stuck.paidLineMeters,20);
+});
+
+
+test('port and starboard rods reel while slow trolling without teleporting the rod or halting the boat',()=>{
+ for(const mount of ['port','starboard']){
+  const sim=ready();quietDrop(sim);run(sim,8);sim.setReelMode('brake');sim.setRodMount(mount);sim.setThrottle(.15);
+  const paid=sim.state.paidLineMeters;run(sim,1,{reel:.7,pump:true});
+  assert.equal(sim.state.rodMount,mount);assert.equal(sim.state.throttle,.15);assert.ok(sim.state.crankRate>0);assert.ok(sim.state.paidLineMeters<paid);assert.equal(sim.state.pumping,false);assert.equal(sim.state.pumpHeight,0);
+ }
 });

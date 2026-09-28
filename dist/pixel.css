@@ -472,11 +472,6 @@ html,body,#app,#app *,#app *::before,#app *::after{-webkit-user-select:none;user
 #app #controls #boat-fishing #rod-mount button[aria-pressed=true]{opacity:1;background:#315a55;color:#fff1cc;border-color:#234841;box-shadow:inset 0 -3px #d6b06b}
 .is-fishing-focus #boat-fishing .reel-actions{display:none}
 @media(max-height:500px) and (orientation:landscape){#boat-console #boat-fishing{grid-template-columns:minmax(0,1fr) 144px}}
-@media(max-width:389px) and (orientation:portrait){
- #app:not(.is-fishing-focus) #boat-console #boat-fishing{grid-template-columns:minmax(0,1fr)}
- #app:not(.is-fishing-focus) #boat-fishing .fishing-instruments{grid-column:1;grid-row:3;width:144px;height:144px;justify-self:center}
- #app:not(.is-fishing-focus) #boat-fishing .fishing-toolbar{grid-column:1;grid-row:4}
-}
 /* North-up, equal-scale chart. */
 .chart-controls{display:flex;justify-content:space-between;gap:8px;margin:12px 0 8px}
 .chart-controls>div{display:flex;gap:4px}
@@ -506,3 +501,26 @@ html,body,#app,#app *,#app *::before,#app *::after{-webkit-user-select:none;user
 .chart-destination span{flex:1;font-size:12px;line-height:1.5;color:var(--muted,#617876)}
 .chart-destination button{min-height:44px;min-width:112px;margin:0;flex-shrink:0}
 .chart-controls{flex-wrap:wrap}
+
+/* One rod/rig heading; the paired line controls fill the holder row below. */
+#boat-fishing .rod-identity{flex-wrap:wrap;gap:3px 8px}
+#boat-fishing #active-rod-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;overflow-wrap:normal}
+#boat-fishing #tackle-name{flex:none;font:10px/1.4 ui-monospace,monospace;color:#486857}
+#boat-fishing #active-rod-location{flex-basis:100%;font-weight:normal}
+#app:not(.is-fishing-focus) #boat-console #boat-fishing{grid-template-columns:minmax(44px,1fr) minmax(140px,1.4fr);gap:5px}
+#app:not(.is-fishing-focus) #boat-console #boat-fishing .rod-identity{grid-column:1/-1;grid-row:1}
+#app:not(.is-fishing-focus) #boat-console #boat-fishing .fishing-instruments{grid-column:1;grid-row:2;width:100%;height:96px;align-self:start}
+#app:not(.is-fishing-focus) #boat-fishing .reel-instrument{display:block;min-height:0;height:96px}
+#app:not(.is-fishing-focus) #boat-fishing #reel-wheel{object-fit:contain;background:#d8ccaa}
+#app:not(.is-fishing-focus) #boat-console #boat-fishing .fishing-toolbar{grid-column:2;grid-row:2;display:flex;flex-flow:column;gap:4px;align-content:start}
+#app:not(.is-fishing-focus) #controls #boat-fishing .fishing-toolbar #rod-mount{order:0;flex:none;width:100%;min-width:140px;height:46px;gap:4px}
+#app:not(.is-fishing-focus) #controls #boat-fishing #rod-mount button{height:46px;min-height:46px}
+#app:not(.is-fishing-focus) #boat-fishing .fishing-toolbar .reel-actions{order:1;flex:none;width:100%;height:46px;gap:4px}
+#app:not(.is-fishing-focus) #boat-fishing .reel-actions button{position:static;flex:none;width:100%;height:46px;min-height:46px;border:2px solid #6c8268;box-shadow:none;transform:none;padding:4px;font-size:12px}
+#app:not(.is-fishing-focus) #boat-fishing .reel-actions #reel-btn{background:#527b67;color:#fff0ca;touch-action:none}
+#app:not(.is-fishing-focus) #boat-fishing .reel-actions #spool-toggle[aria-pressed=true]{background:#e9bb7e;color:#654e34}
+#app:not(.is-fishing-focus) #boat-fishing .fishing-toolbar>button{order:2;flex:none;width:100%;min-height:46px;height:46px}
+#app:not(.is-fishing-focus) #boat-console #boat-fishing.no-instruments{grid-template-columns:minmax(0,1fr)}
+#app:not(.is-fishing-focus) #boat-console #boat-fishing.no-instruments .fishing-toolbar{grid-column:1;grid-row:2}
+#app:not(.is-fishing-focus) #boat-console #boat-fishing.no-tools{grid-template-columns:minmax(0,1fr)}
+#app:not(.is-fishing-focus) #boat-console #boat-fishing.no-tools .fishing-instruments{grid-column:1;width:112px;justify-self:center}

@@ -88,8 +88,8 @@ test('losing reel availability clears captured crank travel and keyboard winding
  const {state,ui,elements}=fixture(t,'waiting'),wheel=elements['reel-wheel'];
  wheel.emit('pointerdown',{clientX:150,clientY:68.6});wheel.emit('pointermove',{clientX:92,clientY:125});
  wheel.emit('keydown',{key:'ArrowUp'});assert.ok(ui.input(.01).reel>0);
- state.rodMount='port';ui.update();assert.equal(wheel.attributes.role,'img');assert.equal(wheel.hasPointerCapture(1),false);assert.equal(ui.input(.01).reel,0);
- state.rodMount='hand';ui.update();assert.equal(ui.input(.01).reel,0,'queued travel and a held key must not restart after pickup');
+ state.paused=true;ui.update();assert.equal(wheel.attributes.role,'img');assert.equal(wheel.hasPointerCapture(1),false);assert.equal(ui.input(.01).reel,0);
+ state.paused=false;ui.update();assert.equal(ui.input(.01).reel,0,'queued travel and a held key must not restart after resuming');
  wheel.emit('pointermove',{clientX:35,clientY:68.6});assert.equal(ui.input(.01).reel,0);
  wheel.emit('pointerdown',{pointerId:2,clientX:150,clientY:68.6});wheel.emit('pointermove',{pointerId:2,clientX:92,clientY:125});assert.ok(ui.input(.01).reel>0);
 });
@@ -127,7 +127,7 @@ test('electric recovery appears only on the purchased active set and stops accep
  const retrieve=elements['retrieve-rig'];assert.equal(retrieve.hidden,false);assert.equal(retrieve.textContent,'电动收线');retrieve.onclick();assert.equal(retrieveCalls(),1);
  state.profile.loadout.rod='rod';ui.update();assert.equal(retrieve.hidden,true);retrieve.onclick();assert.equal(retrieveCalls(),1);
  state.profile.loadout.rod='rod_electric';ui.update();assert.equal(retrieve.hidden,false);
- for(const patch of [{paused:true},{rodMount:'port'},{fishState:'bite'},{fishState:'fight'},{fishState:'idle'},{inspection:{phase:'checking'}}]){
+ for(const patch of [{paused:true},{fishState:'bite'},{fishState:'fight'},{fishState:'idle'},{inspection:{phase:'checking'}}]){
   const base={...state};Object.assign(state,patch);ui.update();assert.equal(retrieve.hidden,true);retrieve.onclick();assert.equal(retrieveCalls(),1);Object.assign(state,base);
  }
  state.packed=['rod'];ui.update();assert.equal(retrieve.hidden,true);
@@ -176,4 +176,13 @@ test('icon placement switches directly between hand and either holder, with one 
  state.rodMount='port';ui.update();assert.equal(elements['rod-hand'].hidden,false);assert.equal(elements['rod-starboard'].hidden,true);
  state.speed=2;ui.update();elements['rod-hand'].onclick();assert.equal(state.rodMount,'port');
  state.speed=0;state.paused=true;elements['rod-starboard'].onclick();assert.equal(state.rodMount,'port');
+});
+
+
+test('both side holders keep manual winding and the purchased electric reel available',t=>{
+ const {state,ui,elements}=fixture(t,'waiting',{electric:true});
+ for(const mount of ['port','starboard']){
+  state.rodMount=mount;ui.update();assert.equal(elements['reel-btn'].hidden,false);assert.equal(elements['reel-wheel'].attributes.role,'slider');assert.equal(elements['retrieve-rig'].hidden,false);
+  elements['reel-wheel'].emit('keydown',{key:'ArrowUp'});assert.ok(ui.input(.05).reel>0);assert.equal(state.rodMount,mount);elements['reel-wheel'].emit('keyup',{key:'ArrowUp'});assert.equal(ui.input(.05).reel,0);
+ }
 });

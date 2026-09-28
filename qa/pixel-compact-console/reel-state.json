@@ -1,0 +1,28 @@
+[
+  {
+    "stage": "port-before",
+    "mount": "port",
+    "line": 8.3,
+    "canReel": true
+  },
+  {
+    "stage": "port-winding",
+    "mount": "port",
+    "line": 0,
+    "retrieve": 0,
+    "crank": 0
+  },
+  {
+    "stage": "starboard-before",
+    "mount": "starboard",
+    "line": 8.5,
+    "canReel": true
+  },
+  {
+    "stage": "starboard-winding",
+    "mount": "starboard",
+    "line": 8.4,
+    "retrieve": 0.78,
+    "crank": 1.2
+  }
+]

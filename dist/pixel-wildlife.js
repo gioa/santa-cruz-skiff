@@ -11,8 +11,8 @@
  * illustrative game tuning, NOT measured encounter probabilities or forecasts.
  * Birds and cetaceans never change catches, stock, credits or fishing RNG.
  */
-import {schoolFish} from './pixel-small-fish.js?v=20260928-pixel-v59';
-import {createBaitSchool,followerPosition} from './pixel-bait-schools.js?v=20260928-pixel-v59';
+import {schoolFish} from './pixel-small-fish.js?v=20260928-pixel-v60';
+import {createBaitSchool,followerPosition} from './pixel-bait-schools.js?v=20260928-pixel-v60';
 const TAU=Math.PI*2,clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
 const finite=(x,f=0)=>Number.isFinite(x)?x:f;
 export const WILDLIFE_SOURCES=Object.freeze([
