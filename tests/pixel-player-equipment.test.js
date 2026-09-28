@@ -37,9 +37,9 @@ test('premade hardware rejects loose upgrades while legacy mounted hardware rema
  sim.rodAssembly('rod_light');Object.assign(sim.state.profile.rodLoadouts.rod_light,{reel:'reel_smooth',line:'line_braid'});sim.selectRod('rod_light');assert.equal(sim.stats.smooth,.86);assert.equal(sim.rigEnvironment().lineDiameterMm,.28);sim.selectRod('rod');assert.equal(sim.stats.smooth,1);assert.equal(sim.rigEnvironment().lineDiameterMm,.36);
 });
 
-test('rod activation restores individual bait condition and casting requires its enabled assembly',()=>{
+test('rod activation restores individual bait condition and lowering requires its enabled assembly',()=>{
  const sim=equipped(['rod_light','rig_float','reel_smooth']);sim.setRig({rod:'rod_light',rig:'float',bait:'jig'});sim.state.baitOnHook={kind:'squid',condition:.41};sim.selectRod('rod_light');assert.equal(sim.state.baitOnHook.kind,'jig');sim.state.baitOnHook={kind:'jig',condition:.79};sim.selectRod('rod');assert.deepEqual(sim.state.baitOnHook,{kind:'squid',condition:.41});sim.selectRod('rod_light');assert.deepEqual(sim.state.baitOnHook,{kind:'jig',condition:.79});aboard(sim);
- sim.equip('rig_float');assert.equal(sim.startCast().ok,false);assert.equal(sim.selectRod('rod_light').ok,true);assert.equal(sim.hasGear('rig_float'),true);assert.equal(sim.startCast().ok,true);assert.equal(sim.equip('rod_light').ok,false);assert.equal(sim.setRig({rod:'rod',rig:'bottom'}).ok,false);sim.cancelCast();
+ sim.equip('rig_float');assert.equal(sim.lowerRig().ok,false);assert.equal(sim.selectRod('rod_light').ok,true);assert.equal(sim.hasGear('rig_float'),true);assert.equal(sim.lowerRig().ok,true);assert.equal(sim.equip('rod_light').ok,false);assert.equal(sim.setRig({rod:'rod',rig:'bottom'}).ok,false);sim.retrieve();
 });
 
 test('per-rod configurations, bait and active rod survive save/resume; old global rigs migrate only onto the old active rod',()=>{

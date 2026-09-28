@@ -16,12 +16,12 @@ No build step, API key, backend or account. The pixel edition uses Canvas 2D and
 
 ## The journey
 
-Start at 06:00, a few steps from the rental counter → check the personal backpack (free starter gear is already enabled) → pay the 15-credit boat rental, then watch the empty skiff move from its deck cradle to the davit and water → walk down the real left-side stair alignment → board → unmoor → start the engine and steer, or choose a waypoint after buying and carrying a chart → coast down, deploy a purchased anchor or drift, and select a rig → lower beside the boat or choose a cast → watch the rod and line, then strike → turn the reel and manage drag/tension → keep the fish or record/release → return, dock, walk to the counter and exchange retained catches → buy equipment and assemble each rod independently.
+Start at 06:00, a few steps from the rental counter → check the personal backpack (free starter gear is already enabled) → pay the 15-credit boat rental, then watch the empty skiff move from its deck cradle to the davit and water → walk down the real left-side stair alignment → board → unmoor → start the engine and steer, or choose a waypoint after buying and carrying a chart → coast down, deploy a purchased anchor or drift, and select a rig → lower vertically beside the boat → watch the rod and line, then strike → turn the reel and manage drag/tension → keep the fish or record/release → return, dock, walk to the counter and exchange retained catches → buy equipment and assemble each rod independently.
 
 - **Left joystick / WASD:** walk. Aboard, the bottom console has a retained outboard tiller, twist-throttle touch surface and F/N/R gear selector. Move the tiller opposite the forward turn; slide the ribbed grip up/down to rotate the throttle. Release holds the friction settings. N idles the motor; interruption clears manual power while preserving momentum. WASD is also available for momentary keyboard steering/throttle.
 - **E:** contextual interaction. **G:** walk to the hut or boarding platform.
 - **R:** engine. **Q:** anchor. **I:** equipment. **M:** chart. **J:** catches.
-- **Space / 船边下放:** lower the rig directly beside the boat. The separate 抛投 button charges on hold and casts on release. Tap at a bite to strike; Space while fishing provides a finite lift stroke.
+- **Space / 船边下放:** lower the rig directly beside the boat. Casting is temporarily disabled; every rig enters the water beneath the rod tip. Tap at a bite to strike; Space while fishing provides a finite lift stroke.
 - **Rod posture:** drag the bottom rod vertically to raise/lower it and horizontally to swing it. Rod load changes the bend in both the world and control panel. Arrow keys work when the rod control has focus.
 - **Reel:** turn its handle clockwise or hold the handle / F to retrieve. 打开线杯 releases line; 锁住线杯 stops free spool. Drag the ✳ control up/down to adjust fighting drag. Line is finite and reeling cannot silently feed more line.
 - **Rod holders:** choose 左舷 or 右舷 to place the rod in a side holder and use the outboard for slow trolling. 鱼竿 / 操船 switches controls while a small rod monitor remains on the helm. Idle and take the rod back into your hands to fight or retrieve. Only float rigs display a float; the other rigs show a line entering the water.
@@ -52,7 +52,7 @@ Sources: `dist/SOURCES.html`, `dist/credits.html`, `dist/data/`, and `qa/wharf-c
 
 ## Validation
 
-`npm run check` syntax-checks every shipped JavaScript module. `npm test` covers the pixel full journey, economy, casting/bait, edge blocking, personal inventory, independent rod assemblies, resume recovery, momentary mobile input, rigs and destinations, plus existing vessel/collision/geography/depth/pointer suites. See `qa/pixel/PLAYTEST.md` for actual browser evidence and responsive screenshots. Page-scoped WebMCP tools expose only normal player actions and a read-only state report; they cannot teleport, skip time, force bites or create fish.
+`npm run check` syntax-checks every shipped JavaScript module. `npm test` covers the pixel full journey, economy, vertical lowering/bait, edge blocking, personal inventory, independent rod assemblies, resume recovery, momentary mobile input, rigs and destinations, plus existing vessel/collision/geography/depth/pointer suites. See `qa/pixel/PLAYTEST.md` for actual browser evidence and responsive screenshots. Page-scoped WebMCP tools expose only normal player actions and a read-only state report; they cannot teleport, skip time, force bites or create fish.
 
 ## September 27 gameplay expansion
 
@@ -81,7 +81,7 @@ Primary references:
 - Walking keeps the camera still across a broad screen deadzone. Coastal and building artwork uses cached horizontal/vertical outlines with a shared integer camera offset. The straight wharf shares its exact outline with walking and vessel collision.
 - The calendar runs at 2× active real time, including capture timestamps. Menus pause simulation. Every new or resumed day starts at 06:00.
 - Worker and boarding actions follow their scene targets. Once aboard, engine, purchased anchor, gear, tiller and fishing actions sit in the bottom thumb area.
-- Original 16-bar, 100 BPM background music plus interaction, footsteps, casting, bites, reeling, catches, purchase and engine effects. Music and master sound are separately switchable; music volume is adjustable and saved. Audio starts only after a user gesture, pauses in the background and continues through inventory menus.
+- Original 16-bar, 100 BPM background music plus interaction, footsteps, water entry, bites, reeling, catches, purchase and engine effects. Music and master sound are separately switchable; music volume is adjustable and saved. Audio starts only after a user gesture, pauses in the background and continues through inventory menus.
 
 See `qa/pixel-usability/PLAYTEST.md` for this update’s actual browser checks.
 

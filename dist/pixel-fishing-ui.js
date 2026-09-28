@@ -1,9 +1,9 @@
-import {rigHookSize} from './pixel-hook-label.js?v=20260927-pixel-v20';
-import {formatDepth,metersToFeet} from './units.js?v=20260927-pixel-v20';
-import {getRigProfile} from './fishing-rigs.js?v=20260927-pixel-v20';
-import {bindPointer} from './input.js?v=20260927-pixel-v20';
-import {rodPoseFromDrag,clockwiseTurns,createCrankInput} from './pixel-fishing-input.js?v=20260927-pixel-v20';
-import {fishingFeedback,reelMotion} from './pixel-fishing-feedback.js?v=20260927-pixel-v20';
+import {rigHookSize} from './pixel-hook-label.js?v=20260927-pixel-v21';
+import {formatDepth,metersToFeet} from './units.js?v=20260927-pixel-v21';
+import {getRigProfile} from './fishing-rigs.js?v=20260927-pixel-v21';
+import {bindPointer} from './input.js?v=20260927-pixel-v21';
+import {rodPoseFromDrag,clockwiseTurns,createCrankInput} from './pixel-fishing-input.js?v=20260927-pixel-v21';
+import {fishingFeedback,reelMotion} from './pixel-fishing-feedback.js?v=20260927-pixel-v21';
 
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const rigNames={bottom:'沉底组',dropper:'双支线',slider:'滑铅组',jig:'软饵组',float:'浮漂组',sabiki:'羽毛组'};
@@ -11,7 +11,7 @@ const mountNames={hand:'手持',port:'左舷竿架',starboard:'右舷竿架'};
 const TAU=Math.PI*2;
 
 export function mountFishingConsole(root,{sim,getActions,isRetrieving=()=>false,onFeedback,onMount,onRetrieve,onStopReel=()=>{}}){
- const get=id=>root.querySelector('#'+id),pose=get('rod-pose'),wheel=get('reel-wheel'),drag=get('drag-knob'),mount=get('rod-mount'),spool=get('spool-toggle'),lower=get('lower-rig'),cast=get('cast-btn'),hold=get('reel-btn'),retrieve=get('retrieve-rig'),take=get('take-rod');
+ const get=id=>root.querySelector('#'+id),pose=get('rod-pose'),wheel=get('reel-wheel'),drag=get('drag-knob'),mount=get('rod-mount'),spool=get('spool-toggle'),lower=get('lower-rig'),hold=get('reel-btn'),retrieve=get('retrieve-rig'),take=get('take-rod');
  const crank=createCrankInput();let rodGesture=null,crankAngle=null,dragGesture=null,rotation=0,spoolRotation=0,lastFrame=0,keyboardReel=false;
  drag.innerHTML='<span class="drag-star" aria-hidden="true">✳</span><span class="drag-caption">泄力</span><span class="drag-marks" aria-hidden="true">＋<br>−</span>';
  const actions=()=>getActions();
@@ -75,11 +75,11 @@ export function mountFishingConsole(root,{sim,getActions,isRetrieving=()=>false,
   show(pose,a.pose);pose.setAttribute('role',a.adjustPose?'slider':'img');pose.tabIndex=a.adjustPose?0:-1;pose.style.cursor=a.adjustPose?'move':'default';pose.setAttribute('aria-valuenow',String(Math.round(s.rodElevation??45)));pose.setAttribute('aria-valuetext',`抬竿 ${Math.round(s.rodElevation??45)} 度，朝向 ${Math.round(s.rodAzimuth??70)} 度，${feedback.bendLabel}`);pose.removeAttribute('aria-disabled');
   wheel.setAttribute('role',a.reel?'slider':'img');wheel.tabIndex=a.reel?0:-1;wheel.style.cursor=a.reel?'grab':'default';wheel.setAttribute('aria-valuenow',String(Math.round(metersToFeet(s.paidLineMeters||0)*10)/10));wheel.setAttribute('aria-valuetext',`${feedback.cue}，已放线 ${formatDepth(s.paidLineMeters||0)}`);wheel.removeAttribute('aria-disabled');
   show(get('reel-instrument'),a.reelInstrument);show(hold,a.reel);show(spool,a.spool);spool.textContent=s.reelMode==='free'?'锁住线杯':'打开线杯';spool.setAttribute('aria-pressed',String(s.reelMode==='free'));
-  show(lower,a.lower||a.hook||a.catch);lower.textContent=a.hook?(getRigProfile(s.rig).hookStyle==='circle'?'收紧鱼线':'轻提鱼竿'):a.catch?'鱼获':'船边下放';show(cast,a.cast);
+  show(lower,a.lower||a.hook||a.catch);lower.textContent=a.hook?(getRigProfile(s.rig).hookStyle==='circle'?'收紧鱼线':'轻提鱼竿'):a.catch?'鱼获':'船边下放';
   show(mount,a.mount);mount.value='hand';show(take,a.take);show(retrieve,a.retrieve);retrieve.textContent=isRetrieving()?'停止收竿':'收回钓组';retrieve.setAttribute('aria-pressed',String(isRetrieving()));
   show(drag,a.drag);drag.style.setProperty?.('--drag-angle',`${-100+clamp((s.drag-.2)/.65,0,1)*200}deg`);drag.setAttribute('aria-valuenow',String(Math.round(s.drag*100)));drag.setAttribute('aria-valuetext',`泄力${feedback.dragLabel}，向上拧紧，向下放松`);drag.removeAttribute('aria-disabled');
-  const tools=a.lower||a.hook||a.catch||a.cast||a.mount||a.take||a.retrieve||a.drag;root.querySelector('.fishing-toolbar').hidden=!tools;root.querySelector('.fishing-instruments').hidden=!a.pose&&!a.reelInstrument;
-  root.classList.toggle('rod-only',!a.reelInstrument);root.classList.toggle('no-tools',!tools);root.classList.toggle('has-status',['casting','bite','fight'].includes(s.fishState));
+  const tools=a.lower||a.hook||a.catch||a.mount||a.take||a.retrieve||a.drag;root.querySelector('.fishing-toolbar').hidden=!tools;root.querySelector('.fishing-instruments').hidden=!a.pose&&!a.reelInstrument;
+  root.classList.toggle('rod-only',!a.reelInstrument);root.classList.toggle('no-tools',!tools);root.classList.toggle('has-status',['bite','fight'].includes(s.fishState));
   const mini=document.getElementById('rod-monitor');if(mini){mini.querySelector('span').textContent=`${mountNames[s.rodMount]||'手持'} · ${formatDepth(s.paidLineMeters||0)}`;mini.querySelector('b').textContent=feedback.cue;}
  }
  return{input:dt=>{const a=cancelUnavailable(actions());return{reel:a.reel?Math.max(crank.sample(dt),keyboardReel?1.2:0):0};},reset(){for(const p of pointers)p.reset();crank.stop();keyboardReel=false;rodGesture=null;crankAngle=null;dragGesture=null;},update,draw(dt){const s=sim.state,advance=s.paused?0:clamp(Number.isFinite(dt)?dt:0,0,.1);rotation=(rotation+(s.crankRate||0)*TAU*advance)%TAU;spoolRotation=(spoolRotation+reelMotion(s).spoolRadiansPerSecond*advance)%TAU;lastFrame+=dt;if(lastFrame<1/30)return;lastFrame=0;if(!root.hidden){paintRod(pose,s);paintReel(s);}const mini=document.getElementById('rod-monitor');if(mini&&!mini.hidden)paintRod(mini.querySelector('canvas'),s,true);}};

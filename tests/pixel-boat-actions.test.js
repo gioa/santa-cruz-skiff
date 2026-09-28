@@ -11,14 +11,14 @@ function ready({moored=false}={}){
  for(const item of['anchor','nautical_chart']){assert.ok(sim.buyGear(item).ok);assert.ok(sim.equip(item).ok);}
  assert.ok(sim.launchBoat().ok);run(sim,24.1);Object.assign(sim.state,{playerX:HARBOR.boardingX,playerZ:HARBOR.boardingZ});assert.ok(sim.board().ok);if(!moored)assert.ok(sim.unmoor().ok);return sim;
 }
-function actions(sim,options={}){return boatActions(sim.state,{hasRod:sim.stats.hasRod,hasAnchor:sim.hasGear('anchor'),hasChart:sim.hasGear('nautical_chart'),canLower:sim.fishingReadiness().ok,canCast:sim.fishingReadiness(true).ok,nearDock:false,...options});}
+function actions(sim,options={}){return boatActions(sim.state,{hasRod:sim.stats.hasRod,hasAnchor:sim.hasGear('anchor'),hasChart:sim.hasGear('nautical_chart'),canLower:sim.fishingReadiness().ok,nearDock:false,...options});}
 const actionKeys=['unmoor','dock','engine','anchor','switchPanel','adjustPose','reel','spool','drag','lower','cast','hook','catch','retrieve','mount','take','assemble','return'];
 const offered=a=>actionKeys.filter(key=>a[key]).sort();
 
 test('each reachable fishing phase offers only its permitted actions, distinguishing hand and side holders',()=>{
  const sim=ready(),base=structuredClone(sim.state),cases=[
-  ['idle','hand',['engine','anchor','adjustPose','lower','cast','mount','assemble','return']],
-  ['casting','hand',['adjustPose','cast']],
+  ['idle','hand',['engine','anchor','adjustPose','lower','mount','assemble','return']],
+  ['casting','hand',[]],
   ['flight','hand',[]],
   ['sinking','hand',['adjustPose','reel','spool','retrieve','mount']],
   ['waiting','hand',['adjustPose','reel','spool','retrieve','mount']],
@@ -52,10 +52,10 @@ test('a mounted bite offers pickup rather than strike, and pickup exposes the re
  assert.ok(sim.setRodMount('hand').ok);a=actions(sim);assert.equal(a.take,false);assert.equal(a.hook,true);assert.equal(a.reel,true);seatHook(sim);assert.equal(sim.state.fishState,'fight');a=actions(sim);assert.equal(a.hook,false);assert.equal(a.mount,false);assert.equal(a.engine,false);assert.equal(a.drag,true);
 });
 
-test('the charging cast keeps its release control while incompatible controls stay absent',()=>{
- const sim=ready();assert.equal(actions(sim).cast,true);assert.ok(sim.startCast().ok);run(sim,.8);const charging=actions(sim);assert.equal(sim.fishingReadiness(true).ok,false,'new cast readiness is distinct from completing the current cast');assert.equal(charging.cast,true);
- for(const key of['lower','reel','spool','drag','mount','take','engine','anchor','return','dock','assemble'])assert.equal(charging[key],false,key);
- assert.ok(sim.releaseCast().ok);const flight=actions(sim);assert.equal(flight.cast,false);assert.equal(flight.adjustPose,false);assert.equal(flight.reel,false);assert.equal(flight.mount,false);assert.equal(flight.engine,false);run(sim,3);assert.ok(['sinking','waiting'].includes(sim.state.fishState));assert.equal(actions(sim).reel,true);assert.equal(actions(sim).mount,true);
+test('vertical-only policy offers lowering even when an obsolete caller claims casting is possible',()=>{
+ const sim=ready();assert.equal(actions(sim,{canCast:true}).cast,false);assert.equal(actions(sim).lower,true);
+ for(const fishState of['casting','flight']){const a=boatActions({...sim.state,fishState},{hasRod:true,canLower:true,canCast:true});assert.equal(a.cast,false);assert.equal(a.lower,false);assert.equal(a.adjustPose,false);}
+ assert.ok(sim.lowerRig().ok);assert.equal(sim.state.fishState,'sinking');assert.equal(actions(sim).cast,false);assert.equal(actions(sim).reel,true);assert.equal(actions(sim).mount,true);
 });
 
 test('mooring, inspection, pause and docking suppress the complete active control set',()=>{
@@ -84,7 +84,7 @@ test('readiness is side-effect free and hides missing bait or gear using exactly
  for(let i=0;i<500;i++){assert.equal(sim.fishingReadiness().ok,false);assert.equal(sim.fishingReadiness(true).ok,false);assert.equal(actions(sim).lower,false);assert.equal(actions(sim).cast,false);}assert.deepEqual(sim.state,before,'rendering controls cannot change toasts, inventory, journal or events');
  const readiness=sim.fishingReadiness(),rejected=sim.lowerRig();assert.equal(rejected.ok,false);assert.equal(rejected.message,readiness.message);assert.equal(sim.state.profile.stock.squid,0);assert.equal(sim.state.fishState,'idle');
  sim.state.baitOnHook={kind:'squid',condition:.7};assert.equal(sim.fishingReadiness().ok,true,'usable bait already on the hook needs no fresh stock');assert.equal(actions(sim).lower,true);sim.state.baitOnHook.condition=.08;assert.equal(actions(sim).lower,false);
- sim.state.profile.stock.squid=1;assert.ok(sim.equip('bait').ok);const noBox=sim.fishingReadiness();assert.equal(noBox.ok,false);assert.equal(actions(sim).lower,false);assert.equal(sim.startCast().message,noBox.message);assert.ok(sim.equip('bait').ok);assert.ok(sim.equip('tackle').ok);assert.equal(actions(sim).lower,false);assert.equal(sim.lowerRig().ok,false);assert.ok(sim.equip('tackle').ok);assert.ok(sim.replaceBait().ok);assert.equal(actions(sim).lower,true);assert.ok(sim.lowerRig().ok);assert.equal(sim.state.profile.stock.squid,0);
+ sim.state.profile.stock.squid=1;assert.ok(sim.equip('bait').ok);const noBox=sim.fishingReadiness();assert.equal(noBox.ok,false);assert.equal(actions(sim).lower,false);assert.equal(sim.lowerRig().message,noBox.message);assert.ok(sim.equip('bait').ok);assert.ok(sim.equip('tackle').ok);assert.equal(actions(sim).lower,false);assert.equal(sim.lowerRig().ok,false);assert.ok(sim.equip('tackle').ok);assert.ok(sim.replaceBait().ok);assert.equal(actions(sim).lower,true);assert.ok(sim.lowerRig().ok);assert.equal(sim.state.profile.stock.squid,0);
 });
 
 test('readiness capabilities preserve handheld and mounted speed/engine thresholds without mutating state',()=>{

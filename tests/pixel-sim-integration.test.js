@@ -17,12 +17,12 @@ function prepared(gear=[],options={}){
  assert.equal(sim.launchBoat().ok,true);run(sim,24.1);Object.assign(sim.state,{playerX:HARBOR.boardingX,playerZ:HARBOR.boardingZ});assert.equal(sim.board().ok,true);sim.unmoor();return sim;
 }
 function offshore(sim,index=1){const p=FISHING_SPOTS[index];Object.assign(sim.state,{boatX:p.x,boatZ:p.z,heading:0,speed:0,engine:false,anchor:false,moored:false});syncVessel(sim.vessel,{x:p.x,z:p.z,heading:0,clearMotion:true});}
-function cast(sim){assert.equal(sim.startCast().ok,true);run(sim,.3);assert.equal(sim.releaseCast().ok,true);until(sim,s=>s.fishState==='sinking'||s.fishState==='waiting',5);}
+function lower(sim){assert.equal(sim.lowerRig().ok,true);assert.equal(sim.state.fishState,'sinking');}
 function stored(speciesId,extra={}){return{speciesId,name:speciesId,catchId:`${speciesId}-${Math.random()}`,length:60,kg:1,kept:true,caughtAt:'2026-09-27T13:00:00Z',caughtGPS:{lat:36.9505,lon:-122.0288},hookCount:1,lineCount:1,hasDescendingDevice:true,landingNetDiameterInches:20,...extra};}
 
 test('purchased navigation tools require packing; starting without chart still permits manual boating and fishing',()=>{
  const sim=prepared();assert.equal(sim.selectWaypoint('sand').ok,false);assert.equal(sim.navigationInstruments().chart,false);assert.equal(sim.publicState().gps,null);assert.equal(sim.publicState().referenceDepth,null);assert.equal(sim.publicState().boat.heading,null);assert.equal(sim.publicState().speedKnots,null);
- assert.equal(sim.toggleEngine().ok,true);assert.equal(sim.setThrottle(.25),true);run(sim,3);assert.ok(sim.state.speed>0);sim.toggleEngine();until(sim,s=>Math.abs(s.speed)<.5,30);assert.equal(sim.startCast().ok,true);sim.cancelCast();
+ assert.equal(sim.toggleEngine().ok,true);assert.equal(sim.setThrottle(.25),true);run(sim,3);assert.ok(sim.state.speed>0);sim.toggleEngine();until(sim,s=>Math.abs(s.speed)<.5,30);assert.equal(sim.lowerRig().ok,true);sim.retrieve();
  const equipped=prepared(['nautical_chart','compass','gps','sounder']);equipped.state.heading=.4;const nav=equipped.navigationInstruments();assert.equal(nav.heading,bearingDegrees(.4));assert.deepEqual(nav.gpsPosition,toGPS(equipped.state.boatX,equipped.state.boatZ));assert.equal(typeof nav.depth.value,'number');assert.equal(equipped.selectWaypoint('sand').ok,true);
  equipped.state.packed=equipped.state.packed.filter(id=>!['nautical_chart','compass','gps','sounder'].includes(id));assert.equal(equipped.selectWaypoint('dock').ok,false);assert.equal(equipped.navigationInstruments().gps,false);assert.equal(equipped.publicState().referenceDepth,null);
  equipped.state.packed.push('sounder');equipped.state.profile.owned=equipped.state.profile.owned.filter(id=>id!=='sounder');assert.equal(equipped.navigationInstruments().sounder,false,'packing an unowned item grants no instrument');
@@ -44,14 +44,26 @@ test('premade rig weights and suspended depth selection stay distinct and valid'
  const heavy=prepared(['rig_float','sinker_heavy']);assert.equal(heavy.setRig({weightGrams:170}).ok,false);assert.equal(heavy.setRig({rig:'float',weightGrams:113}).ok,false,'a seven-gram float cannot carry a heavy bottom sinker');assert.equal(heavy.setRig({rig:'float'}).ok,true);
 });
 
-test('lure descent uses water depth and real time, not short horizontal cast length; lift has finite stroke',()=>{
- const sim=prepared(['rig_float','rig_jig']);offshore(sim);cast(sim);sim.state.biteAt=1e6;sim.state.snagThreshold=Infinity;sim.state.lineDistance=.4;const bottom=depthAt(sim.state.bobber.x,sim.state.bobber.z);run(sim,55);assert.ok(sim.state.lureDepth>Math.min(8,bottom-1));assert.ok(sim.state.paidLineMeters>sim.state.lureDepth);assert.ok(sim.state.rigPresentation.bottomContact);
+test('all premade rigs enter the water directly beneath the rod tip by hand or from either side holder',()=>{
+ const sim=prepared(['rig_dropper','rig_slider','rig_jig','rig_float','rig_sabiki']);offshore(sim);
+ for(const rig of['bottom','dropper','slider','jig','float','sabiki']){
+  assert.equal(sim.setRig({rig}).ok,true,rig);if(rig!=='sabiki'&&!sim.state.baitOnHook)assert.equal(sim.replaceBait().ok,true);
+  for(const mount of['hand','port','starboard']){
+   assert.equal(sim.setRodMount(mount).ok,true);const supplies=structuredClone({stock:sim.state.profile.stock,rigStock:sim.state.profile.rigStock,rodSupplies:sim.state.profile.rodSupplies});
+   assert.equal(sim.lowerRig().ok,true,`${rig}/${mount}`);assert.equal(sim.state.fishState,'sinking');assert.equal(sim.state.casting,false);assert.equal(sim.state.castFlight,null);assert.deepEqual(sim.state.bobber,{x:sim.state.rodTip.x,z:sim.state.rodTip.z,height:0});assert.deepEqual(sim.state.lineEntry,sim.state.bobber);assert.ok(sim.state.lineDistance<8,'no projected cast distance');
+   assert.deepEqual({stock:sim.state.profile.stock,rigStock:sim.state.profile.rigStock,rodSupplies:sim.state.profile.rodSupplies},supplies);assert.equal(sim.retrieve().ok,true);
+  }
+ }
+});
+
+test('vertical lure descent uses water depth and real time; lift has finite stroke',()=>{
+ const sim=prepared(['rig_float','rig_jig']);offshore(sim);lower(sim);sim.state.biteAt=1e6;sim.state.snagThreshold=Infinity;sim.state.lineDistance=.4;const bottom=depthAt(sim.state.bobber.x,sim.state.bobber.z);run(sim,55);assert.ok(sim.state.lureDepth>Math.min(8,bottom-1));assert.ok(sim.state.paidLineMeters>sim.state.lureDepth);assert.ok(sim.state.rigPresentation.bottomContact);
  sim.retrieve();assert.ok(sim.lowerRig().ok);sim.state.biteAt=1e6;sim.state.snagThreshold=Infinity;run(sim,30);sim.setReelMode('brake');run(sim,2,{reel:.5});const rest=sim.state.lureDepth;run(sim,2,{pump:true});const lifted=sim.state.lureDepth;run(sim,6,{pump:true});assert.ok(rest-lifted>.4,'a taut vertical rig follows the finite tip stroke');assert.ok(Math.abs(sim.state.lureDepth-lifted)<.3,'held pump cannot lift forever');run(sim,3);assert.ok(sim.state.lureDepth>lifted+.2);
- sim.retrieve();sim.setRig({rig:'float',bait:'squid',fishingDepthMeters:2});cast(sim);sim.state.biteAt=1e6;sim.state.snagThreshold=Infinity;run(sim,20);assert.ok(Math.abs(sim.state.lureDepth-2)<.25);const before=sim.state.paidLineMeters;run(sim,1,{reel:true});assert.ok(sim.state.paidLineMeters<before);assert.equal(sim.state.reeling,true);
+ sim.retrieve();sim.setRig({rig:'float',bait:'squid',fishingDepthMeters:2});lower(sim);sim.state.biteAt=1e6;sim.state.snagThreshold=Infinity;run(sim,20);assert.ok(Math.abs(sim.state.lureDepth-2)<.25);const before=sim.state.paidLineMeters;run(sim,1,{reel:true});assert.ok(sim.state.paidLineMeters<before);assert.equal(sim.state.reeling,true);
 });
 
 test('hook stamps Pacific six-am date, capture position and actual carried tackle; keeping undersized fish is allowed',()=>{
- const sim=prepared(['rig_dropper']);offshore(sim);sim.setRig({rig:'dropper',bait:'squid'});cast(sim);until(sim,s=>s.fishState==='bite',100);const requestedAt=sim.captureTimestamp();seatHook(sim);const stamp=sim.captureTimestamp(),gps=toGPS(sim.state.bobber.x,sim.state.bobber.z);assert.ok(Date.parse(stamp)>Date.parse(requestedAt),'capture evidence must use actual seating time, not the button press');assert.equal(sim.state.dayStartAt,'2026-09-27T13:00:00.000Z');assert.equal(sim.state.fish.caughtAt,stamp);assert.deepEqual(sim.state.fish.caughtGPS,gps);assert.equal(sim.state.fish.hookCount,2);assert.equal(sim.state.fish.rig.id,'dropper');assert.equal(sim.state.fish.hasDescendingDevice,true);assert.equal(sim.state.fish.landingNetDiameterInches,20);
+ const sim=prepared(['rig_dropper']);offshore(sim);sim.setRig({rig:'dropper',bait:'squid'});lower(sim);until(sim,s=>s.fishState==='bite',100);const requestedAt=sim.captureTimestamp();seatHook(sim);const stamp=sim.captureTimestamp(),gps=toGPS(sim.state.bobber.x,sim.state.bobber.z);assert.ok(Date.parse(stamp)>Date.parse(requestedAt),'capture evidence must use actual seating time, not the button press');assert.equal(sim.state.dayStartAt,'2026-09-27T13:00:00.000Z');assert.equal(sim.state.fish.caughtAt,stamp);assert.deepEqual(sim.state.fish.caughtGPS,gps);assert.equal(sim.state.fish.hookCount,2);assert.equal(sim.state.fish.rig.id,'dropper');assert.equal(sim.state.fish.hasDescendingDevice,true);assert.equal(sim.state.fish.landingNetDiameterInches,20);
  Object.assign(sim.state.fish,{name:'加州大比目鱼',latin:'Paralichthys californicus',length:40,kg:1});sim.state.fishState='landed';const credits=sim.state.profile.credits;assert.equal(sim.keepCatch().ok,true);assert.equal(sim.state.profile.credits,credits);assert.equal(sim.state.catches.at(-1).kept,true);assert.equal(sim.state.lastInspection,null);assert.ok(assessCatchLedger(sim.state.catches).violations.some(v=>v.code==='undersize'));
 });
 

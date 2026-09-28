@@ -22,18 +22,29 @@ class Element {
 function fixture(t,fishState='idle'){
  const priorDocument=globalThis.document;globalThis.document={getElementById:()=>null};
  t.after(()=>{if(priorDocument===undefined)delete globalThis.document;else globalThis.document=priorDocument;});
- const buttons=['drag-knob','spool-toggle','lower-rig','cast-btn','reel-btn','retrieve-rig','take-rod'];
+ const buttons=['drag-knob','spool-toggle','lower-rig','reel-btn','retrieve-rig','take-rod'];
  const ids=['rod-pose','reel-wheel','rod-mount','tackle-name','rod-load','reel-instrument',...buttons];
  const elements=Object.fromEntries(ids.map(id=>[id,new Element(id==='rod-mount'?'SELECT':buttons.includes(id)?'BUTTON':'DIV')]));
  elements['.fishing-toolbar']=new Element();elements['.fishing-instruments']=new Element();
  const root=new Element();root.querySelector=query=>elements[query.startsWith('#')?query.slice(1):query];
  const state={mode:'boat',rentalPaid:true,launchStage:'afloat',fishState,rodMount:'hand',rodElevation:45,rodAzimuth:70,drag:.5,rig:'bottom',fuel:80,engine:false};
- const sim={state,setRodPose:pose=>{state.rodElevation=pose.elevation;state.rodAzimuth=pose.azimuth;},changeDrag:delta=>{state.drag+=delta;}};
- const ui=mountFishingConsole(root,{sim,getActions:()=>boatActions(state,{canLower:true,canCast:true}),onFeedback(){},onMount(){},onRetrieve(){}});
+ const sim={state,lowerRig:()=>{state.fishState='sinking';return{ok:true};},setRodPose:pose=>{state.rodElevation=pose.elevation;state.rodAzimuth=pose.azimuth;},changeDrag:delta=>{state.drag+=delta;}};
+ const ui=mountFishingConsole(root,{sim,getActions:()=>boatActions(state,{canLower:true}),onFeedback(){},onMount(){},onRetrieve(){}});
  ui.update();return{state,ui,elements};
 }
 
-test('casting into flight cancels an already held rod and a fresh touch is needed afterwards',t=>{
+
+test('the console without a casting control lowers directly and exposes the reel',t=>{
+ const {state,ui,elements}=fixture(t),lower=elements['lower-rig'];
+ assert.equal(elements['cast-btn'],undefined);assert.equal(lower.hidden,false);
+ assert.equal(lower.textContent,'船边下放');assert.equal(elements['reel-instrument'].hidden,true);
+ lower.onclick();assert.equal(state.fishState,'sinking');ui.update();
+ assert.equal(lower.hidden,true);assert.equal(elements['reel-instrument'].hidden,false);
+ assert.equal(elements['spool-toggle'].hidden,false);assert.equal(elements['reel-btn'].hidden,false);
+ lower.onclick();assert.equal(state.fishState,'sinking','an unavailable lower action cannot restart deployment');
+});
+
+test('legacy flight state cancels an already held rod and a fresh touch is needed afterwards',t=>{
  const {state,ui,elements}=fixture(t),pose=elements['rod-pose'];
  pose.emit('pointerdown');pose.emit('pointermove',{clientY:86});assert.equal(state.rodElevation,53.5);
  state.fishState='flight';ui.update();assert.equal(pose.attributes.role,'img');assert.equal(pose.hasPointerCapture(1),false);

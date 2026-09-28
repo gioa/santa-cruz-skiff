@@ -1,8 +1,8 @@
-import {rigHookLabel} from './pixel-hook-label.js?v=20260927-pixel-v20';
-import {formatSinker} from './units.js?v=20260927-pixel-v20';
-import {GEAR_CATALOG} from './equipment.js?v=20260927-pixel-v20';
-import {RIG_PROFILES,getRigProfile} from './fishing-rigs.js?v=20260927-pixel-v20';
-import {drawItemIcon} from './pixel-item-icons.js?v=20260927-pixel-v20';
+import {rigHookLabel} from './pixel-hook-label.js?v=20260927-pixel-v21';
+import {formatSinker} from './units.js?v=20260927-pixel-v21';
+import {GEAR_CATALOG} from './equipment.js?v=20260927-pixel-v21';
+import {RIG_PROFILES,getRigProfile} from './fishing-rigs.js?v=20260927-pixel-v21';
+import {drawItemIcon} from './pixel-item-icons.js?v=20260927-pixel-v21';
 
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const baits=[['squid','鱿鱼条','bait'],['anchovy','鳀鱼饵','bait_anchovy'],['shrimp','虾饵','bait_shrimp'],['sardine','沙丁鱼饵','bait_sardine'],['jig','软饵','bait_soft']];

@@ -197,8 +197,6 @@
  flex:1 1 64px;width:auto;height:44px;min-height:44px;min-width:44px;border:2px solid #6c8268;background:#f2e3bb;color:#365a48;padding:4px 6px;font:11px ui-monospace,monospace;line-height:1.2;border-radius:0;white-space:nowrap;touch-action:manipulation
 }
 #boat-fishing .fishing-toolbar #lower-rig{flex-basis:82px;background:#527b67;color:#fff0ca;border-color:#345647}
-#boat-fishing .fishing-toolbar #cast-btn{flex-basis:52px;display:block;width:auto;min-height:44px;height:44px;touch-action:none}
-#boat-fishing .fishing-toolbar #cast-btn small{display:block;font-size:8px;line-height:1;margin:2px 0 0;opacity:.7}
 #boat-fishing .fishing-toolbar #retrieve-rig{flex-basis:78px}
 #boat-fishing .fishing-toolbar #take-rod{flex-basis:68px;background:#edc78a}
 #boat-fishing .fishing-toolbar #drag-knob{flex-basis:62px;background:#d5c390;cursor:ns-resize;font:bold 11px monospace;touch-action:none}
@@ -217,7 +215,6 @@
 #boat-fishing .fish-status-head{font-size:10px;gap:5px;white-space:nowrap}
 #boat-fishing #fish-distance,#boat-fishing #fish-detail{display:none}
 #boat-fishing .meter{height:4px;grid-row:2}
-#boat-fishing #cast-row{flex:1;min-width:0}#boat-fishing #cast-row .meter{margin:0;height:6px}#boat-fishing #cast-row small{display:none}
 @media(max-width:380px){
  #boat-console,#boat-console.fishing-open{width:calc(100% - 12px);padding:6px;bottom:calc(6px + env(safe-area-inset-bottom));gap:5px}
  #boat-console.actions-only{width:max-content;max-width:calc(100% - 12px)}
@@ -252,7 +249,7 @@
  #boat-fishing #rod-pose,#boat-fishing .reel-instrument{grid-column:auto;grid-row:auto;height:100%}
  #boat-fishing .fishing-toolbar{grid-column:2;grid-row:1;display:flex;flex-flow:row wrap;align-content:center;gap:4px}
  #boat-fishing .fishing-toolbar button{flex:1 1 48px;height:44px;min-height:44px;font-size:10px;padding:3px}
- #boat-fishing .fishing-toolbar #lower-rig,#boat-fishing .fishing-toolbar #cast-btn{flex-basis:48px}
+ #boat-fishing .fishing-toolbar #lower-rig{flex-basis:48px}
  #boat-fishing .fishing-toolbar #retrieve-rig{flex-basis:64px}
  #boat-fishing .fishing-toolbar #take-rod{flex-basis:56px}
  #boat-fishing .fishing-toolbar #drag-knob{flex-basis:60px;font-size:10px}
