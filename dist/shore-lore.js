@@ -1,5 +1,5 @@
 // Independent, saved random stream: conversations never change fishing or patrol rolls.
-import {shoreZone} from './shore-data.js?v=coast-5';
+import {shoreZone} from './shore-data.js?v=coast-6';
 export const ANGLERS=Object.freeze([
  {name:'戴旧渔帽的老钓友',coat:'#687b62',hat:'#c5b18a'},
  {name:'背帆布包的老钓友',coat:'#586e84',hat:'#9e7960'},

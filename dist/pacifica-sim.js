@@ -1,23 +1,13 @@
-import {createShoreLore,stepShoreLore,talkShoreAngler} from './shore-lore.js?v=coast-5';
+import {BAITS,SHOP_ITEMS,restoreShoreEquipment,shoreReady,shoreSupply,wearShoreSupplies,configureShoreEquipment,shoreSlots,moveShoreSlot} from './shore-equipment.js?v=coast-6';
+import {createShoreLore,stepShoreLore,talkShoreAngler} from './shore-lore.js?v=coast-6';
 // Shared shore-fishing simulation. Geometry and habitats are scene specific;
 // prices, bite rates, inspection odds and fines are authored game tuning.
-import {getShoreScene, sampleShore, onPier} from './shore-data.js?v=coast-5';
+import {getShoreScene, sampleShore, onPier} from './shore-data.js?v=coast-6';
 export const SAVE_KEY = 'pacifica-surf-save-v1';
 export const WORLD = getShoreScene('pacifica').world;
 export const SHOP = getShoreScene('pacifica').shop;
 export const PIER_RULES = Object.freeze({interval: 30, probability: .35, fine: 80});
-export const BAITS = Object.freeze([
-  {id: 'sandcrab', name: '沙蟹', nameEn: 'Sand crabs', kind: 'bait', price: 12, quantity: 8, description: '近岸浪花里的轻巧选择，适合海鲫。'},
-  {id: 'squid', name: '鱿鱼条', nameEn: 'Squid strips', kind: 'bait', price: 20, quantity: 8, description: '耐用的通用鱼饵，三种鱼都可能上钩。'},
-  {id: 'anchovy', name: '鳀鱼块', nameEn: 'Anchovy chunks', kind: 'bait', price: 24, quantity: 6, description: '向外海抛投时更容易遇到条纹鲈和比目鱼。'},
-]);
-export const SHOP_ITEMS = Object.freeze([
-  ...BAITS,
-  {id: 'surf_rod', name: '长节沙滩竿', nameEn: 'Long surf rod', kind: 'upgrade', price: 85, description: '最大抛投距离增加 72 ft。'},
-  {id: 'sealed_reel', name: '密封纺车轮', nameEn: 'Sealed spinning reel', kind: 'upgrade', price: 110, description: '收线更快，张力积累稍慢。'},
-  {id: 'fishfinder_rig', name: '滑铅钓组', nameEn: 'Fish-finder rig', kind: 'rig', price: 65, description: '自动装配；等待咬口的时间缩短。'},
-  {id: 'beach_bait', name: '应急沙蟹', nameEn: 'Emergency beach bait', kind: 'free', price: 0, quantity: 3, description: '所有鱼饵用完后，店主免费补给 3 只。'},
-]);
+export {BAITS,SHOP_ITEMS} from './shore-equipment.js?v=coast-6';
 export const SPECIES = Object.freeze([
   {id: 'surfperch', name: '红尾海鲫', nameEn: 'Redtail surfperch', minKg: .35, maxKg: 1.2, baseValue: 15, valuePerKg: 13, strength: .65, color: '#eac896'},
   {id: 'striped_bass', name: '条纹鲈', nameEn: 'Striped bass', minKg: 1.2, maxKg: 4.6, baseValue: 25, valuePerKg: 12, strength: 1.05, color: '#b9d2cc'},
@@ -28,7 +18,7 @@ const clamp = (value, low, high) => Math.max(low, Math.min(high, value));
 const finite = (value, fallback = 0) => typeof value === 'number' && Number.isFinite(value) ? value : fallback;
 const integer = (value, low, high, fallback = 0) => Math.floor(clamp(finite(value, fallback), low, high));
 const baitIds = BAITS.map(item => item.id);
-const upgradeIds = SHOP_ITEMS.filter(item => item.kind === 'upgrade' || item.kind === 'rig').map(item => item.id);
+const upgradeIds = SHOP_ITEMS.filter(item => ['rod','reel','rig'].includes(item.kind)).map(item => item.id);
 const statKeys = ['caught', 'kept', 'released', 'sold', 'casts', 'missed'];
 const shopBounds = shop => ({left: shop.x - 18, right: shop.x + shop.width + 18, top: shop.y - 18, bottom: shop.y + shop.height + 18});
 const inBuilding = (building, x, y) => x > building.left && x < building.right && y > building.top && y < building.bottom;
@@ -109,7 +99,8 @@ export class PacificaSimulation {
       onPier: false, leavingPier: false, pierExposure: 0, inspectionCount: 0, inspection: null, fineDebt: 0,
       shoreSample: null,
     };
-    if (saved?.scene === this.scene.id && [1, 2].includes(saved.version)) this.restore(saved);
+    if (saved?.scene === this.scene.id && [1, 2, 3].includes(saved.version)) this.restore(saved);
+    restoreShoreEquipment(this.state,saved?.scene===this.scene.id&&[1,2,3].includes(saved.version)?saved:null);
     this.state.shoreLore=createShoreLore(this.scene,saved?.scene===this.scene.id?saved.shoreLore:null,this.state.elapsed,loreSeed);
     this.refreshSample();
   }
@@ -124,7 +115,7 @@ export class PacificaSimulation {
 
   get canCast() {
     const s = this.state, offset = s.player.y - this.world.shoreY(s.player.x);
-    return !s.inspection && s.phase === 'walk' && (s.onPier || offset >= 19.9 && offset <= 130) && s.inventory[s.bait] > 0;
+    return !s.inspection && s.phase === 'walk' && (s.onPier || offset >= 19.9 && offset <= 130) && shoreReady(s);
   }
 
   get nearPier() {
@@ -251,23 +242,23 @@ export class PacificaSimulation {
     const s = this.state;
     if (s.inspection) return this.result(false, '先确认本次检查结果。');
     if (s.phase !== 'walk') return this.result(false, '钓线已经在水里。');
-    if (!s.inventory[s.bait]) return this.result(false, '这个鱼饵用完了。换饵，或回商店领取应急沙蟹。');
+    if (!shoreReady(s)) return this.result(false, '先在鱼竿配置里装好钓组和可用鱼饵。');
     if (!this.canCast) return this.result(false, '再靠近一些浪线，站在干沙上抛投。');
     power = clamp(finite(power, .6), 0, 1); aim = clamp(finite(aim, 0), -1, 1);
-    const maxDistance = 72 + (s.upgrades.includes('surf_rod') ? 22 : 0);
+    const maxDistance = 72 + (s.activeRod==='surf_rod' ? 22 : 0);
     const distance = 18 + power * (maxDistance - 18);
     const origin = point(s.player.x, s.player.y - 18);
     const lateral = s.onPier ? (aim < 0 ? -1 : 1) * Math.max(40, Math.abs(aim) * distance * 2.3) : aim * distance * 2.3;
     const targetX = clamp(origin.x + lateral, 24, this.world.width - 24);
     const targetY = s.onPier ? Math.min(origin.y - distance * 3.2, this.world.shoreY(targetX) - 18) : this.world.shoreY(targetX) - distance * 3.2;
     const target = point(targetX, Math.max(this.world.minY + 20, targetY));
-    s.inventory[s.bait]--; s.stats.casts++;
+    s.stats.casts++;
     s.phase = 'casting'; s.walkTarget = null; s.walkRoute = []; s.player.walking = false; s.player.facing = -1;
     s.cast = {origin, target, power, aim, distance, flight: 0, flightDuration: .72 + power * .5};
     s.lineDistance = distance; s.tension = 0; s.fish = null; s.lastCatch = null;
     const sample = this.refreshSample();
     const habitatWait = {trough: .94, channel: 1.02, bar: 1.27, surf: 1.08, swash: 1.15, offshore: 1.16}[sample.habitat] || 1;
-    s.waitRemaining = (12 + this.random() * 18) * habitatWait * (s.upgrades.includes('fishfinder_rig') ? .78 : 1);
+    s.waitRemaining = (12 + this.random() * 18) * habitatWait * (shoreSupply(s)?.id==='fishfinder_rig' ? .78 : 1);
     s.biteRemaining = 0; this.reeling = false;
     return this.result(true, `${BAITS.find(item => item.id === s.bait).name}随钓组飞向浪外……`);
   }
@@ -312,7 +303,7 @@ export class PacificaSimulation {
   retrieve() {
     if (!['casting', 'waiting', 'bite'].includes(this.state.phase)) return this.result(false, '现在没有可以收回的空钓组。');
     this.clearLine();
-    return this.result(true, '已收回钓组。重新挂饵后可以再次抛投。');
+    return this.result(true, '已收回钓组，钩上余饵保留。');
   }
 
   clearLine() {
@@ -331,27 +322,26 @@ export class PacificaSimulation {
     return this.result(true, keep ? `${fish.name}已放入鱼袋，回店出售可得 ${fish.value} 潮汐点。` : `${fish.name}游回浪里了。`, {fish});
   }
 
-  equipBait(id) {
-    if (!baitIds.includes(id)) return this.result(false, '没有这种鱼饵。');
-    if (this.state.phase !== 'walk' || this.state.inspection) return this.result(false, '先收回钓组并处理当前事件，再换饵。');
-    if (this.state.inventory[id] <= 0) return this.result(false, '这个鱼饵没有库存。');
-    this.state.bait = id;
-    return this.result(true, `已换上${BAITS.find(item => item.id === id).name}。`);
-  }
+  get tackleReady(){return shoreReady(this.state);}
+  equipBait(id){return configureShoreEquipment(this,id);}
+  configureEquipment(id,rodId){return configureShoreEquipment(this,id,rodId);}
+  inventorySlots(){return shoreSlots(this.state);}
+  moveInventory(from,to){return moveShoreSlot(this.state,from,to);}
 
   buy(id) {
     const s = this.state, item = SHOP_ITEMS.find(item => item.id === id);
     if (!this.nearShop) return this.result(false, '走到 Bait & Tackle 门口再交易。');
     if (!item) return this.result(false, '店里没有这件物品。');
-    if (s.upgrades.includes(id)) return this.result(false, '这件装备已经买过并装配好了。');
-    if (item.kind === 'free' && baitIds.some(id => s.inventory[id] > 0)) return this.result(false, '还有鱼饵可以使用；全部用完后再领取应急沙蟹。');
+    if (['rod','reel'].includes(item.kind)&&s.upgrades.includes(id)) return this.result(false, '已经拥有这件装备。');
     if (s.credits < item.price) return this.result(false, '潮汐点不够。可以先带鱼回来出售。');
     if (item.kind === 'bait' && s.inventory[id] + item.quantity > 999) return this.result(false, '鱼饵盒已经装满了。');
+    if(item.kind==='rig'&&s.rigStock[id].length>=999)return this.result(false,'备用钓组已满。');
     s.credits -= item.price;
     if (item.kind === 'bait') s.inventory[id] += item.quantity;
-    else if (item.kind === 'free') {s.inventory.sandcrab += item.quantity; s.bait = 'sandcrab';}
-    else {s.upgrades.push(id); if (item.kind === 'rig') s.rig = 'fishfinder';}
-    return this.result(true, item.kind === 'free' ? '店主送你 3 只沙蟹，再去试试吧。' : `已购入${item.name}${item.kind === 'bait' ? ` ×${item.quantity}` : '，并自动装配'}。`);
+    else if(item.kind==='rig')s.rigStock[id].push({id,condition:1,bait:null});
+    else {s.upgrades.push(id);if(item.kind==='rod')s.rodSupplies[id]=null;}
+    shoreSlots(s);
+    return this.result(true,`已购入${item.name}${item.kind==='bait'?` ×${item.quantity}`:''}，已放入背包。`);
   }
 
   sellCatch() {
@@ -385,10 +375,10 @@ export class PacificaSimulation {
       if (s.cast.flight >= s.cast.flightDuration) {s.cast.flight = s.cast.flightDuration; s.phase = 'waiting'; s.message = '钓组落水。等待竿尖点动，出现咬口后及时扬竿。';}
     } else if (s.phase === 'waiting') {
       s.waitRemaining -= dt;
-      if (s.waitRemaining <= 0) {s.waitRemaining = 0; s.phase = 'bite'; s.biteRemaining = 3.2; s.message = '咬钩了！现在扬竿！';}
+      if (s.waitRemaining <= 0) {s.waitRemaining = 0; s.phase = 'bite'; wearShoreSupplies(s,'bite'); s.biteRemaining = 3.2; s.message = '咬钩了！现在扬竿！';}
     } else if (s.phase === 'bite') {
       s.biteRemaining -= dt;
-      if (s.biteRemaining <= 0) {s.stats.missed++; this.clearLine(); s.message = '这次咬口错过了，鱼带走了鱼饵。再抛一竿吧。';}
+      if (s.biteRemaining <= 0) {s.stats.missed++; this.clearLine(); s.message = '这次咬口错过了，收回后检查余饵。';}
     } else if (s.phase === 'fighting') this.fight(dt, input.reel === undefined ? this.reeling : Boolean(input.reel));
   }
 
@@ -429,7 +419,7 @@ export class PacificaSimulation {
     s.fightElapsed += dt;
     const wave = Math.max(0, Math.sin(s.fightElapsed * .64 + fish.runOffset));
     fish.run = wave * fish.strength * (.3 + .7 * fish.stamina);
-    const upgraded = s.upgrades.includes('sealed_reel');
+    const upgraded = s.activeReel==='sealed_reel';
     const sample = s.shoreSample || this.refreshSample();
     const surfLoad = (sample.breakStrength * .038 + Math.hypot(sample.currentX, sample.currentY) * .027) * (.6 + .4 * Math.sin(s.elapsed * 1.1) ** 2);
     s.tension = clamp(s.tension + ((reel ? .14 - (upgraded ? .025 : 0) : -.235) + fish.run * .155 + surfLoad) * dt, 0, 1);
@@ -439,11 +429,11 @@ export class PacificaSimulation {
     s.lineStress = s.tension > .93 ? s.lineStress + dt : Math.max(0, s.lineStress - dt * 2);
     s.slackTime = s.tension < .045 ? s.slackTime + dt : 0;
     if (s.lineStress > 1.35 || s.lineDistance > 155) {
-      this.clearLine(); s.message = '鱼线绷断了。下一次张力进入红区时，及时松开收线。';
+      wearShoreSupplies(s,'break'); this.clearLine(); s.message = '鱼线绷断，钓组已丢失。下一次张力进入红区时，及时松开收线。';
     } else if (s.slackTime > 3) {
-      this.clearLine(); s.message = '鱼线松弛太久，鱼脱钩了。适时收线，让钓线保持张力。';
+      wearShoreSupplies(s,'escape'); this.clearLine(); s.message = '鱼线松弛太久，鱼脱钩了。适时收线，让钓线保持张力。';
     } else if (s.lineDistance <= 3 && fish.stamina <= .32) {
-      s.phase = 'landed'; s.stats.caught++; s.tension = 0; fish.run = 0; this.reeling = false;
+      wearShoreSupplies(s,'catch'); s.phase = 'landed'; s.stats.caught++; s.tension = 0; fish.run = 0; this.reeling = false;
       s.message = `${fish.name}上岸了！${(fish.weightKg * 2.20462).toFixed(2)} lb。留在鱼袋里，或放回海里。`;
     }
   }
@@ -451,7 +441,8 @@ export class PacificaSimulation {
   snapshot() {
     const s = this.state;
     return JSON.parse(JSON.stringify({
-      scene: this.scene.id, version: 2, elapsed: s.elapsed, credits: s.credits,
+      scene: this.scene.id, version: 3, elapsed: s.elapsed, credits: s.credits,
+      activeRod:s.activeRod,activeReel:s.activeReel,rodSupplies:s.rodSupplies,rigStock:s.rigStock,inventorySlots:s.inventorySlots,
       inventory: s.inventory, bait: s.bait, upgrades: s.upgrades, catches: s.catches,
       stats: s.stats, nextCatchId: s.nextCatchId, player: {x: s.player.x, y: s.player.y},
       pendingCatch: s.phase === 'landed' ? s.fish : null,

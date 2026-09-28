@@ -1,0 +1,26 @@
+{
+  "checkedAt": "2026-09-28T21:07:59.610Z",
+  "pacifica": {
+    "bagMovePersisted": true,
+    "oldRodRetained": true,
+    "newRodIndependentlyAssembled": true,
+    "baitStockAfterOneReplacement": 11,
+    "shopHiddenAway": true,
+    "defaultMapHidden": true,
+    "deployedAssemblyDisabled": true
+  },
+  "halfMoonBay": {
+    "smallPhone": [
+      375,
+      667
+    ],
+    "landscape": [
+      844,
+      390
+    ]
+  },
+  "santaCruz": {
+    "sharedSlotMovement": true
+  },
+  "consoleErrors": []
+}

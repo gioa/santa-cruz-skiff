@@ -1,4 +1,4 @@
-import {knownShoreZones,ANGLERS} from './shore-lore.js?v=coast-5';
+import {knownShoreZones,ANGLERS} from './shore-lore.js?v=coast-6';
 import {inspectionReportMarkup} from './pixel-inspection-report.js?v=20260928-pixel-v80';
 const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 export const habitatName=id=>({swash:'近岸浪脚',bar:'浅沙坝',trough:'深沙槽',channel:'沙坝缺口',offshore:'外侧深水',surf:'浪区'}[id]||'浪区');

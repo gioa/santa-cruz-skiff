@@ -75,9 +75,10 @@ test('a full earned catch, walk back, trade and upgrade cannot reward the same f
   toSurf(sim);
   assert.equal(sim.buy('squid').ok, false);
   hook(sim);
-  assert.equal(sim.state.inventory.sandcrab, 11);
+  assert.equal(sim.state.inventory.sandcrab, 12);
   assert.equal(sim.walkTo(800, 800).ok, false);
   land(sim);
+  assert.equal(sim.state.rodSupplies[sim.state.activeRod].bait.condition,0);
   const fishValue = sim.state.fish.value;
   assert.ok(fishValue > 0);
   assert.equal(sim.state.credits, 120);
@@ -120,7 +121,9 @@ test('casting is charged and aimed, while rod upgrades extend actual offshore re
   sim.cast({power: 1, aim: 1});
   assert.equal(sim.state.cast.distance, 72);
   assert.ok(sim.state.cast.target.x > sim.state.player.x);
-  sim.retrieve(); shop(sim); sim.buy('surf_rod'); toSurf(sim);
+  sim.retrieve(); shop(sim); sim.buy('surf_rod');
+  assert.equal(sim.state.activeRod,'starter_rod');
+  sim.configureEquipment('carolina_rig','surf_rod');sim.configureEquipment('sandcrab','surf_rod');sim.configureEquipment('surf_rod');toSurf(sim);
   sim.cast({power: 1, aim: 0});
   assert.equal(sim.state.cast.distance, 94);
 });
@@ -142,7 +145,7 @@ test('bite window, early strike and retrieval are real-time and recover safely',
   sim.cast({power: .2});
   assert.ok(sim.retrieve().ok);
   assert.equal(sim.state.phase, 'walk');
-  assert.equal(sim.state.inventory.sandcrab, 10);
+  assert.equal(sim.state.inventory.sandcrab, 12);
   assert.equal(sim.retrieve().ok, false);
 });
 
@@ -151,35 +154,23 @@ test('holding reel continuously breaks the line, while prolonged slack loses the
     const sim = new PacificaSimulation({rng: () => .1});
     toSurf(sim); hook(sim);
     until(sim, () => sim.state.phase === 'walk', 30, {reel});
+    assert.equal(sim.state.rodSupplies[sim.state.activeRod]===null,reel,'only a snapped line loses the whole rig');
     assert.equal(sim.state.stats.caught, 0);
     assert.equal(sim.state.catches.length, 0);
     assert.equal(sim.state.credits, 120);
   }
 });
 
-test('shop bait selection, rig upgrade and free fallback prevent a bait softlock', () => {
-  const sim = new PacificaSimulation({rng: () => 0});
-  assert.ok(sim.buy('squid').ok);
-  assert.ok(sim.equipBait('squid').ok);
-  assert.equal(sim.state.inventory.squid, 8);
-  assert.equal(sim.state.credits, 100);
-  assert.ok(sim.buy('fishfinder_rig').ok);
-  assert.equal(sim.state.rig, 'fishfinder');
-  assert.equal(sim.buy('beach_bait').ok, false);
-  toSurf(sim);
-  for (const bait of ['squid', 'sandcrab']) {
-    sim.equipBait(bait);
-    while (sim.state.inventory[bait]) {assert.ok(sim.cast({power: 0}).ok); sim.retrieve();}
-  }
-  assert.equal(sim.canCast, false);
-  shop(sim);
-  const credits = sim.state.credits;
-  assert.ok(sim.buy('beach_bait').ok);
-  assert.equal(sim.state.inventory.sandcrab, 3);
-  assert.equal(sim.state.bait, 'sandcrab');
-  assert.equal(sim.state.credits, credits);
-  assert.equal(sim.buy('beach_bait').ok, false);
-  assert.equal(SHOP_ITEMS.find(item => item.id === 'beach_bait').price, 0);
+test('shop purchases remain in the bag, bait changes consume stock and no free fallback exists', () => {
+  const sim=new PacificaSimulation();
+  assert.ok(sim.buy('squid').ok);assert.ok(sim.equipBait('squid').ok);
+  assert.equal(sim.state.inventory.squid,7);
+  assert.ok(sim.buy('fishfinder_rig').ok);assert.equal(sim.state.rig,'carolina');
+  assert.ok(sim.configureEquipment('fishfinder_rig').ok);assert.equal(sim.state.rig,'fishfinder');
+  assert.equal(sim.state.rigStock.carolina_rig.at(-1).bait.kind,'squid');
+  sim.state.inventory={sandcrab:0,squid:0,anchovy:0};
+  assert.equal(sim.buy('beach_bait').ok,false);
+  assert.equal(SHOP_ITEMS.some(i=>i.kind==='free'||i.price===0),false);
 });
 
 test('save restores settled catch and upgrades, with independent copies and validated data', () => {
@@ -214,7 +205,7 @@ test('pending landed catch survives reload once; deployed lines resume safely on
   toSurf(sim); hook(sim);
   const fighting = new PacificaSimulation({saved: sim.snapshot()});
   assert.equal(fighting.state.phase, 'walk');
-  assert.equal(fighting.state.inventory.sandcrab, 11);
+  assert.equal(fighting.state.inventory.sandcrab, 12);
   land(sim);
   const restored = new PacificaSimulation({saved: sim.snapshot()});
   assert.equal(restored.state.phase, 'landed');

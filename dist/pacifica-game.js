@@ -1,11 +1,11 @@
-import {PacificaSimulation,BAITS} from './pacifica-sim.js?v=coast-5';
-import {createPacificaWorld} from './pacifica-world.js?v=coast-5';
-import {createPacificaMenus} from './pacifica-menus.js?v=coast-5';
+import {PacificaSimulation,BAITS} from './pacifica-sim.js?v=coast-6';
+import {createPacificaWorld} from './pacifica-world.js?v=coast-6';
+import {createPacificaMenus} from './pacifica-menus.js?v=coast-6';
 import {createPixelSprites} from './pixel-sprites.js?v=20260928-pixel-v80';
 
-import {getShoreScene,sampleShore,onPier} from './shore-data.js?v=coast-5';
+import {getShoreScene,sampleShore,onPier} from './shore-data.js?v=coast-6';
 
-import {createShoreNavigation,habitatName} from './shore-navigation.js?v=coast-5';
+import {createShoreNavigation,habitatName} from './shore-navigation.js?v=coast-6';
 
 const $=id=>document.getElementById(id), show=(id,value)=>{$(id).hidden=!value;};
 const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -55,13 +55,13 @@ $('world').addEventListener('pointerdown',e=>{
   shopOnArrival=false;feedback(sim.walkTo(p.x,p.y));
 });
 function primaryAction(){if(sim.state.phase==='bite')feedback(sim.strike());else if(sim.state.phase==='landed')openCatch();}
-function beginCharge(){if(paused())return;if(sim.state.phase!=='walk'){primaryAction();return;}if(!sim.state.inventory[sim.state.bait]){toast('这种鱼饵用完了，打开背包换饵，或去小店补给。');return;}if(!sim.canCast){toast('走到湿沙边缘，面朝海面再抛竿。');return;}chargeStart=performance.now();show('cast-charge',true);}
+function beginCharge(){if(paused())return;if(sim.state.phase!=='walk'){primaryAction();return;}if(!sim.tackleReady){toast('先打开鱼竿配置，装好钓组和鱼饵。');return;}if(!sim.canCast){toast('走到湿沙边缘，面朝海面再抛竿。');return;}chargeStart=performance.now();show('cast-charge',true);}
 function finishCharge(cancel=false){if(!chargeStart)return;const power=Math.min(1,Math.max(.25,(performance.now()-chargeStart)/1400));chargeStart=0;show('cast-charge',false);if(!cancel)feedback(sim.cast({power,aim}));}
 $('beach-cast').addEventListener('pointerdown',e=>{if(e.button>0)return;e.preventDefault();$('beach-cast').setPointerCapture(e.pointerId);beginCharge();});
 $('beach-cast').addEventListener('pointerup',()=>finishCharge());
 $('beach-cast').addEventListener('pointercancel',()=>finishCharge(true));
 $('beach-cast').addEventListener('lostpointercapture',()=>finishCharge(true));
-$('beach-cast').addEventListener('click',e=>{if(e.detail!==0)return;if(sim.state.phase==='walk'){if(sim.canCast)feedback(sim.cast({power:.65,aim}));else toast(!sim.state.inventory[sim.state.bait]?'这种鱼饵用完了，打开背包换饵，或去小店补给。':'先点「前往浪线」，到湿沙边缘抛竿。');}else primaryAction();});
+$('beach-cast').addEventListener('click',e=>{if(e.detail!==0)return;if(sim.state.phase==='walk'){if(sim.canCast)feedback(sim.cast({power:.65,aim}));else toast(!sim.tackleReady?'先打开鱼竿配置，装好钓组和鱼饵。':'先点「前往浪线」，到湿沙边缘抛竿。');}else primaryAction();});
 function setReel(active){reeling=active&&!paused()&&sim.state.phase==='fighting';$('beach-reel').classList.toggle('active',reeling);}
 $('beach-reel').addEventListener('pointerdown',e=>{if(e.button>0)return;e.preventDefault();$('beach-reel').setPointerCapture(e.pointerId);setReel(true);});
 for(const name of ['pointerup','pointercancel','lostpointercapture'])$('beach-reel').addEventListener(name,()=>setReel(false));
@@ -80,7 +80,7 @@ const menus=createPacificaMenus({sim,scene,openDialog,closeDialog,feedback,walkS
 function openShop(){shopOnArrival=false;menus.openShop();}
 const openBag=()=>menus.openBag(),openJournal=()=>menus.openJournal(),openCatch=()=>menus.openCatch();
 function openHelp(){menus.openHelp();const toggle=$('settings-audio');if(toggle){toggle.textContent='总声音：'+(soundEnabled?'开':'关');toggle.onclick=()=>{$('audio-btn').click();openHelp();};}}
-$('gear-btn').onclick=openBag;$('journal-btn').onclick=openJournal;$('credits-btn').onclick=openJournal;$('settings-btn').onclick=openHelp;$('rod-config-btn').onclick=openBag;$('map-btn').onclick=openMap;$('pier-btn').onclick=()=>sim.onPier?feedback(sim.leavePier()):openPier();
+$('gear-btn').onclick=openBag;$('journal-btn').onclick=openJournal;$('credits-btn').onclick=openJournal;$('settings-btn').onclick=openHelp;$('rod-config-btn').onclick=()=>menus.openBag(sim.state.activeRod,'rig');$('map-btn').onclick=openMap;$('pier-btn').onclick=()=>sim.onPier?feedback(sim.leavePier()):openPier();
 
 function updateUI(){
   const s=sim.state,bait=BAITS.find(b=>b.id===s.bait),atShore=sim.onPier||s.player.y-WORLD.shoreY(s.player.x)<=130,fishing=atShore||s.phase!=='walk';
@@ -88,13 +88,13 @@ function updateUI(){
   const e=s.shoreLore.encounter,ep=e?world.worldToScreen(e):null,near=e&&Math.hypot(e.x-s.player.x,e.y-s.player.y)<480;const talkVisible=started&&!modalType&&!scenePickerOpen&&s.phase==='walk'&&!s.onPier&&near&&ep.x>36&&ep.x<innerWidth-36&&ep.y>(innerHeight<500?110:190)&&ep.y<innerHeight-$('boat-console').offsetHeight-50;show('angler-talk',Boolean(talkVisible));if(talkVisible){$('angler-talk').style.left=`${Math.max(64,Math.min(innerWidth-64,ep.x))}px`;$('angler-talk').style.top=`${ep.y-68}px`;const label=e.talked?'再聊两句':'打个招呼';if($('angler-talk').textContent!==label)$('angler-talk').textContent=label;}
   const minutes=360+Math.floor(s.elapsed/30);$('clock').textContent=String(Math.floor(minutes/60)%24).padStart(2,'0')+':'+String(minutes%60).padStart(2,'0');
   $('active-rod-name').textContent=s.upgrades.includes('surf_rod')?'长节沙滩竿':'岸钓竿';
-  $('tackle-name').textContent=`${s.rig==='fishfinder'?'滑铅组':'Carolina'} · ${bait?.name||'鱼饵'} × ${s.inventory[s.bait]||0}`;
+  $('rod-config-btn').disabled=s.phase!=='walk';const supply=s.rodSupplies[s.activeRod];$('tackle-name').textContent=`${s.activeRod==='surf_rod'?'长节沙滩竿':'入门岸钓竿'} · ${supply?s.rig==='fishfinder'?'滑铅 · 2/0':'Carolina · 1':'未装钓组'} · ${supply?.bait?.condition>.08?bait?.name:'需装饵'}`;
   const shore=s.shoreSample||sampleShore(scene,s.player.x,WORLD.shoreY(s.player.x)-90,s.elapsed);$('place').textContent=scene.shortName+(sim.onPier?' · 封闭栈桥':s.shoreLore.notes.some(n=>n.zoneId===shore.zoneId)?' · '+shore.zoneName:'');$('speed').textContent=sim.nearShop?'钓具小店':sim.onPier?'越栏进入 · 巡查风险':atShore?'沙滩岸钓':'沙滩步道';$('weather').textContent=shore.tideLabel+' · 晨雾';show('shore-rig-summary',false);show('pier-btn',Boolean(scene.pier)&&(sim.nearPier||sim.onPier));$('pier-btn').textContent=sim.onPier?'离开栈桥':'封闭栈桥';$('pier-btn').disabled=s.phase!=='walk';$('walk-surf').textContent=sim.onPier?'走向桥端':'前往浪线';
   const states={walk:'准备抛竿',casting:'钓组落水',waiting:'等待鱼讯',bite:'鱼咬钩了 · 现在扬竿',fighting:'中鱼 · 控制张力收线',landed:'鱼已上岸'};
   $('fish-title').textContent=states[s.phase];$('fish-distance').textContent=Math.round(s.lineDistance*3.28084)+' ft';
-  const hints={walk:!s.inventory[s.bait]?'鱼饵用完，打开背包换饵。':atShore?'轻点海面瞄准 · 按住抛竿蓄力':sim.nearShop?'轻点小店补给，或前往浪线。':'轻点沙地行走 · WASD',casting:'钓组飞向浪外…',waiting:`已放线 ${Math.round(s.lineDistance*3.28084)} ft · 留意竿尖`,bite:'现在扬竿 / 空格',fighting:'按住收线 · 高张力时松手',landed:'留下或放流'};
+  const hints={walk:!sim.tackleReady?'打开鱼竿配置，检查钓组和余饵。':atShore?'轻点海面瞄准 · 按住抛竿蓄力':sim.nearShop?'轻点小店补给，或前往浪线。':'轻点沙地行走 · WASD',casting:'钓组飞向浪外…',waiting:`已放线 ${Math.round(s.lineDistance*3.28084)} ft · 留意竿尖`,bite:'现在扬竿 / 空格',fighting:'按住收线 · 高张力时松手',landed:'留下或放流'};
   $('navigation').textContent=hints[s.phase];$('fish-detail').textContent=hints[s.phase];
-  $('walk-shop').textContent=sim.nearShop?'进入小店':'钓具小店';for(const id of ['walk-surf','walk-shop'])$(id).disabled=s.phase!=='walk';
+  show('walk-shop',sim.nearShop);$('walk-shop').textContent='进入小店';for(const id of ['walk-surf','walk-shop'])$(id).disabled=s.phase!=='walk';
   show('boat-action-bar',s.phase==='walk');show('boat-fishing',fishing);show('fish-status',s.phase!=='walk');
   $('boat-console').classList.toggle('actions-only',!fishing);$('boat-console').classList.toggle('fishing-open',fishing);$('boat-fishing').classList.toggle('has-status',s.phase!=='walk');
   show('beach-cast',['walk','bite','landed'].includes(s.phase));$('beach-cast').textContent=s.phase==='bite'?'扬竿':s.phase==='landed'?'查看鱼获':'按住抛竿';

@@ -179,7 +179,7 @@ test('leaving and reloading preserve risk exposure; an inspection is charged onl
   assert.equal(new PacificaSimulation({saved: notice.snapshot()}).state.inspection, null);
 });
 
-test('unpaid fines survive a save, catch sales settle debt once and emergency bait remains available', () => {
+test('unpaid fines survive a save, catch sales settle debt once without free replenishment', () => {
   const sim = new PacificaSimulation({rng: () => 0});
   assert.ok(sim.buy('surf_rod').ok); // 35 points remain.
   enter(sim); advance(sim, 30);
@@ -200,8 +200,8 @@ test('unpaid fines survive a save, catch sales settle debt once and emergency ba
   assert.equal(trader.sellCatch().total, 0);
   assert.equal(trader.state.fineDebt, 17);
   trader.state.inventory = {sandcrab: 0, squid: 0, anchovy: 0};
-  assert.ok(trader.buy('beach_bait').ok);
-  assert.equal(trader.state.inventory.sandcrab, 3);
+  assert.equal(trader.buy('beach_bait').ok,false);
+  assert.equal(trader.state.inventory.sandcrab, 0);
   assert.equal(trader.state.fineDebt, 17);
 });
 
@@ -215,7 +215,7 @@ test('an inspection retrieves an active line and cannot turn its fish into a pai
   assert.ok(sim.state.inspection);
   assert.equal(sim.state.cast, null);
   assert.equal(sim.state.fish, null);
-  assert.equal(sim.state.inventory.sandcrab, 11);
+  assert.equal(sim.state.inventory.sandcrab, 12);
   assert.equal(sim.state.stats.caught, 0);
   assert.equal(sim.state.catches.length, 0);
   assert.equal(sim.resolveCatch(true).ok, false);
@@ -230,7 +230,7 @@ test('version-one saves migrate catch and equipment; inspection and pending catc
     inventory: {sandcrab: 4}, upgrades: ['surf_rod'], catches: [{id: 'surfperch', catchId: 1, weightKg: .8}],
     pendingCatch: {id: 'halibut', catchId: 2, weightKg: 2}};
   const sim = new PacificaSimulation({saved: old});
-  assert.equal(sim.snapshot().version, 2);
+  assert.equal(sim.snapshot().version, 3);
   assert.equal(sim.state.catches.length, 1);
   assert.deepEqual(sim.state.upgrades, ['surf_rod']);
   assert.equal(sim.state.phase, 'landed');

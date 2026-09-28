@@ -1,7 +1,7 @@
-import {ANGLERS} from './shore-lore.js?v=coast-5';
+import {ANGLERS} from './shore-lore.js?v=coast-6';
 // Shared pixel-art shoreline renderer. Fixed bathymetry, animated surf and
 // game collision geometry all use shore-data; the camera follows a long coast.
-import {getShoreScene, sampleShore, shoreProfile, onPier} from './shore-data.js?v=coast-5';
+import {getShoreScene, sampleShore, shoreProfile, onPier} from './shore-data.js?v=coast-6';
 const TAU=Math.PI*2;
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const noise=(x,y=0)=>{let n=Math.imul(x|0,374761393)+Math.imul(y|0,668265263);n=Math.imul(n^(n>>>13),1274126177);return((n^(n>>>16))>>>0)/4294967295;};
