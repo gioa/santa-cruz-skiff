@@ -1,8 +1,6 @@
 import {starterConsumables,ensureConsumables,suppliesWeight} from './pixel-consumables.js?v=20260927-pixel-v28';
-import {SABIKI_ROD,SABIKI_ITEM} from './pixel-sabiki-data.js?v=sabiki-1';
 // Virtual credits and simulation tuning. These are not retail prices or harvest rules.
 export const GEAR_CATALOG=[
- {...SABIKI_ROD},{...SABIKI_ITEM},
  {id:'pfd',slot:'safety',name:'救生衣',price:0,kg:.7,desc:'穿在身上 · 落水时提供浮力',icon:'◈'},
  {id:'rod',slot:'rod',name:'通用船竿与绕线轮',price:0,kg:.65,desc:'7 ft 通用竿 · 初始免费，可应对所有鱼种',icon:'╱',strength:1,retrieve:1,sensitivity:1},
  {id:'tackle',slot:'rig',name:'基础钓组盒',price:12,starter:true,kg:.9,desc:'预组装单钩沉底组 · 每次补购 1 套，开局赠送 2 套备用',icon:'▦',rig:'bottom',hooks:1},
@@ -54,12 +52,12 @@ export function buyGear(profile,id){
  ensureConsumables(profile);profile.credits-=item.price;
  if(item.bait)profile.stock[item.bait]=(profile.stock[item.bait]||0)+item.quantity;
  else if(item.slot==='rig'){profile.rigStock[item.rig].push({condition:1,bait:null});if(!profile.owned.includes(id))profile.owned.push(id);}
- else{profile.owned.push(id);if(item.slot==='rod'){const rig=item.premadeRig||'bottom';profile.rodSupplies[id]={rig,condition:1,bait:null};if(item.premadeRig){const terminal=GEAR_CATALOG.find(g=>g.slot==='rig'&&g.rig===rig);if(terminal&&!profile.owned.includes(terminal.id))profile.owned.push(terminal.id);}}}
+ else{profile.owned.push(id);if(item.slot==='rod')profile.rodSupplies[id]={rig:'bottom',condition:1,bait:null};}
  profile.transactions.unshift({kind:'purchase',id,delta:-item.price,time:new Date().toISOString()});profile.transactions=profile.transactions.slice(0,80);
  return{ok:true,message:`已兑换 ${item.name}，可在装备里选择使用。`};
 }
 export function restock(profile){ensureConsumables(profile);profile.stock.squid=Math.max(12,profile.stock.squid||0);while(profile.rigStock.bottom.length<2)profile.rigStock.bottom.push({condition:1,bait:null});profile.condition=100;return profile;}
-export function fishReward(fish){if(fish.baitfish)return Math.max(1,Math.min(5,Math.ceil((fish.kg||.01)*12)));return Math.round(22*Math.max(.7,Math.min(2.2,Math.sqrt((fish.kg||.5)/.75))))+Math.round((fish.length||20)/5);}
+export function fishReward(fish){return Math.round(22*Math.max(.7,Math.min(2.2,Math.sqrt((fish.kg||.5)/.75))))+Math.round((fish.length||20)/5);}
 export function settleFish(profile,fish){if(!fish.catchId||profile.settled.includes(fish.catchId)||fish.settled)return 0;const first=!profile.seen.includes(fish.name);const reward=fishReward(fish)+(first?15:0);profile.settled.push(fish.catchId);fish.settled=true;fish.reward=reward;profile.credits+=reward;if(first)profile.seen.push(fish.name);profile.transactions.unshift({kind:fish.kept?'fish_trade':'release_record',catchId:fish.catchId,delta:reward,time:new Date().toISOString()});return reward;}
 export function cargoWeight(catches){return catches.filter(f=>f.kept&&!f.settled).reduce((n,f)=>n+(f.kg||0),0);}
 export function carriedWeight(packed,profile){const baitMass=packed.includes('bait')&&profile?Object.values(profile.stock).reduce((a,b)=>a+b,0)*.018:0;return GEAR_CATALOG.filter(g=>packed.includes(g.id)&&g.slot!=='consumable'&&(g.slot!=='rig'||g.id==='tackle')).reduce((n,g)=>n+g.kg,0)+baitMass+suppliesWeight(profile||{},packed);}

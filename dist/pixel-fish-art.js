@@ -5,8 +5,6 @@ const boundsCache=new WeakMap();
 
 export function fishSpriteKind(f={}){
  const latin=f?.latin||'',name=f?.name||'';
- if(/Engraulis/.test(latin))return'anchovy';
- if(/Sardinops/.test(latin))return'sardine';
  if(/Genyonemus/.test(latin))return'croaker';
  if(/Citharichthys sordidus/.test(latin))return'sanddab';
  if(/miniatus/.test(latin))return'vermilion';

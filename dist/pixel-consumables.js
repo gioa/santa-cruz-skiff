@@ -3,16 +3,16 @@
  * Casting never installs supplies. Only explicit replacements transfer stock.
  */
 export const CONSUMABLES_VERSION=1;
-export const RIG_IDS=Object.freeze(['bottom','slider','jig','float','dropper','sabiki','feather40','sabiki6']);
+export const RIG_IDS=Object.freeze(['bottom','slider','jig','float','dropper','sabiki','feather40']);
 export const BAIT_IDS=Object.freeze(['squid','anchovy','shrimp','sardine','jig']);
 export const USABLE_CONDITION=.08;
-const ROD_IDS=['rod','rod_light','rod_boat','rod_electric','rod_sabiki'];
-const RIG_ITEMS={bottom:'tackle',slider:'rig_slider',jig:'rig_jig',float:'rig_float',dropper:'rig_dropper',sabiki:'rig_sabiki',feather40:'rig_feather40',sabiki6:'rig_sabiki6'};
+const ROD_IDS=['rod','rod_light','rod_boat','rod_electric'];
+const RIG_ITEMS={bottom:'tackle',slider:'rig_slider',jig:'rig_jig',float:'rig_float',dropper:'rig_dropper',sabiki:'rig_sabiki',feather40:'rig_feather40'};
 const clone=x=>x==null?null:JSON.parse(JSON.stringify(x));
 const bounded=v=>Number.isFinite(v)?Math.max(0,Math.min(1,v)):0;
 const cleanBait=b=>b&&BAIT_IDS.includes(b.kind)?{kind:b.kind,condition:bounded(b.condition)}:null;
 const cleanSpare=r=>r&&typeof r==='object'?{condition:bounded(r.condition),hookDamage:bounded(r.hookDamage),bait:cleanBait(r.bait)}:null;
-export const rigRequiresBait=rig=>!['sabiki','feather40','sabiki6'].includes(rig);
+export const rigRequiresBait=rig=>!['sabiki','feather40'].includes(rig);
 export function starterConsumables(){return{consumablesVersion:CONSUMABLES_VERSION,rigStock:Object.fromEntries(RIG_IDS.map(id=>[id,id==='bottom'?[{condition:1,hookDamage:0,bait:null},{condition:1,hookDamage:0,bait:null}]:[]])),rodSupplies:{rod:{rig:'bottom',condition:1,hookDamage:0,bait:{kind:'squid',condition:1}}}};}
 export function ensureConsumables(profile,legacy={}){
  if(profile.consumablesVersion!==CONSUMABLES_VERSION){
@@ -60,7 +60,7 @@ export function damageSupplies(profile,rodId,event){
  if(event==='catch')supply.condition=Math.max(0,supply.condition-.025);
 }
 export function suppliesWeight(profile,packed){
- const carry=new Set(packed),mass={bottom:.085,slider:.057,jig:.042,float:.007,dropper:.113,sabiki:.028,feather40:.113,sabiki6:.028};let total=0;
+ const carry=new Set(packed),mass={bottom:.085,slider:.057,jig:.042,float:.007,dropper:.113,sabiki:.028,feather40:.113};let total=0;
  if(carry.has('tackle'))for(const [id,stock] of Object.entries(profile.rigStock||{}))for(const rig of stock)total+=(mass[id]||.05)+.018*Number(Boolean(rig.bait));
  for(const [rod,supply] of Object.entries(profile.rodSupplies||{}))if(carry.has(rod)&&supply)total+=(mass[supply.rig]||.05)+.018*Number(Boolean(supply.bait));
  return total;

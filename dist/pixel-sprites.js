@@ -251,11 +251,7 @@ function palmSprite(){return raster(50,70,({rect:r,line:l,poly:p})=>{
 });}
 
 function fishSprite(kind){return raster(48,24,({rect:r,px,poly:p,line:l})=>{
-  if(kind==='anchovy'||kind==='sardine'){
-    const deep=kind==='sardine';p([[5,12],[15,deep?8:10],[34,deep?7:9],[45,11],[45,13],[34,deep?17:15],[15,deep?17:15],[5,13],[1,18],[3,12],[1,6]],'ink');
-    p([[7,12],[16,deep?9:11],[34,deep?8:10],[44,11],[44,13],[33,deep?16:14],[15,14],[7,13]],'steel');l(10,12,40,12,'white',2);p([[21,10],[25,5],[28,10]],'slate');r(39,10,3,3,'ivory');px(40,11,'ink');
-    if(deep)for(let x=17;x<35;x+=4)px(x,11,'slate');else l(37,13,44,13,'ink');
-  }else if(kind==='croaker'){
+  if(kind==='croaker'){
     // White croaker: silvery/brassy compressed body, blunt snout, subterminal
     // mouth, nearly straight tail and a dark mark at the pectoral-fin base.
     p([[8,10],[18,7],[30,6],[39,8],[44,11],[43,15],[35,17],[19,17],[9,14],[3,17],[3,8]],'ink');
@@ -373,7 +369,7 @@ function iconSprite(kind){return raster(16,16,({rect:r,line:l,poly:p,px,oval:o})
 
 /** All canvases are original art at native pixel resolution. */
 export function createPixelSprites(){
-  const fish=Object.fromEntries(['anchovy','sardine','rockfish','vermilion','halibut','mackerel','lingcod','salmon','seabass','bonito','croaker','sanddab'].map(name=>[name,fishSprite(name)]));
+  const fish=Object.fromEntries(['rockfish','vermilion','halibut','mackerel','lingcod','salmon','seabass','bonito','croaker','sanddab'].map(name=>[name,fishSprite(name)]));
   const icons=Object.fromEntries(['rod','anchor','engine','backpack','fish','coin','tackle','oar','map','sun','bait','reel'].map(name=>[name,iconSprite(name)]));
   const angler=personSprite(),anglerBack=personSprite({back:true});
   const hut=hutSprite();
