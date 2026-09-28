@@ -1,5 +1,5 @@
-import {bindPointer} from './input.js?v=20260928-pixel-v69';
-import {focusRodPoseFromDrag} from './pixel-fight-focus.js?v=20260928-pixel-v69';
+import {bindPointer} from './input.js?v=20260928-pixel-v70';
+import {focusRodPoseFromDrag} from './pixel-fight-focus.js?v=20260928-pixel-v70';
 
 // The view itself is the rod control. Relative movement avoids a jump when
 // touching the water; switching view, pausing or losing capture releases it.

@@ -11,8 +11,8 @@
  * illustrative game tuning, NOT measured encounter probabilities or forecasts.
  * Birds and cetaceans never change catches, stock, credits or fishing RNG.
  */
-import {schoolFish} from './pixel-small-fish.js?v=20260928-pixel-v69';
-import {createBaitSchool,followerPosition} from './pixel-bait-schools.js?v=20260928-pixel-v69';
+import {schoolFish} from './pixel-small-fish.js?v=20260928-pixel-v70';
+import {createBaitSchool,followerPosition} from './pixel-bait-schools.js?v=20260928-pixel-v70';
 const TAU=Math.PI*2,clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
 const finite=(x,f=0)=>Number.isFinite(x)?x:f;
 export const WILDLIFE_SOURCES=Object.freeze([
@@ -113,6 +113,11 @@ export function drawWildlife(ctx,events,{project,scale=5,sprites={},layer='water
   const rect=(x,y,w,h,color)=>{ctx.fillStyle=color;ctx.fillRect(Math.round(x),Math.round(y),Math.max(1,Math.round(w)),Math.max(1,Math.round(h)));};
   const line=(x0,y0,x1,y1,color,width=1)=>{x0=Math.round(x0);y0=Math.round(y0);x1=Math.round(x1);y1=Math.round(y1);const dx=Math.abs(x1-x0),sx=x0<x1?1:-1,dy=-Math.abs(y1-y0),sy=y0<y1?1:-1;let error=dx+dy;for(let i=0;i<1000;i++){rect(x0,y0,width,width,color);if(x0===x1&&y0===y1)break;const e=2*error;if(e>=dy){error+=dy;x0+=sx;}if(e<=dx){error+=dx;y0+=sy;}}};
   const oval=(cx,cy,rx,ry,color)=>{for(let y=Math.ceil(cy-ry);y<=Math.floor(cy+ry);y++){const d=(y-cy)/Math.max(.01,ry),span=Math.sqrt(Math.max(0,1-d*d))*rx;rect(cx-span,y,span*2,1,color);}};
+  // Raster-filled curves preserve the pixel style without stick-like fins.
+  const shape=(points,color)=>{
+    const min=Math.ceil(Math.min(...points.map(p=>p[1]))),max=Math.floor(Math.max(...points.map(p=>p[1])));
+    for(let y=min;y<=max;y++){const xs=[];for(let i=0;i<points.length;i++){const a=points[i],b=points[(i+1)%points.length];if((a[1]<=y&&b[1]>y)||(b[1]<=y&&a[1]>y))xs.push(a[0]+(y-a[1])*(b[0]-a[0])/(b[1]-a[1]));}xs.sort((a,b)=>a-b);for(let i=0;i+1<xs.length;i+=2)rect(xs[i],y,xs[i+1]-xs[i],1,color);}
+  };
   const ripple=(x,y,r,alpha=.5)=>{ctx.globalAlpha=alpha;line(x-r,y,x-r*.6,y-2,'#b3ded0');line(x-r*.6,y-2,x+r*.65,y-2,'#b3ded0');line(x+r*.65,y-2,x+r,y,'#b3ded0');line(x-r*.7,y+2,x+r*.6,y+2,'#a2d5c9');ctx.globalAlpha=1;};
   for(const e of events){
     const p=project(e.x,e.z),fade=clamp(Math.min(e.age/3,(e.duration-e.age)/6),0,1),s=clamp(scale/5.5,.55,1.7);
@@ -143,14 +148,36 @@ export function drawWildlife(ctx,events,{project,scale=5,sprites={},layer='water
     }
     if(layer!=='water')continue;
     for(let i=0;i<e.members;i++){
-      const offset=(i-(e.members-1)/2),wx=e.x+Math.cos(e.heading)*offset*(e.type==='dolphins'?3.1:15),wz=e.z-Math.sin(e.heading)*offset*(e.type==='dolphins'?3.1:15),q=project(wx,wz),phase=e.age/(e.type==='dolphins'?4.6:19)+e.phase+i*.29,cycle=((phase%1)+1)%1;
+      const offset=(i-(e.members-1)/2),stagger=e.type==='dolphins'?Math.sin(i*2.7+e.phase)*4.2:0,spacing=e.type==='dolphins'?3.4:15,wx=e.x+Math.cos(e.heading)*offset*spacing-Math.sin(e.heading)*stagger,wz=e.z-Math.sin(e.heading)*offset*spacing-Math.cos(e.heading)*stagger,q=project(wx,wz),phase=e.age/(e.type==='dolphins'?4.6+i*.17:19)+e.phase+i*.37,cycle=((phase%1)+1)%1;
       if(e.type==='dolphins'){
-        const surf=Math.sin(cycle*Math.PI),visible=cycle<.62;
-        ctx.globalAlpha=(visible?.75:.15)*fade;ctx.save();ctx.translate(q.x,q.y);ctx.rotate(-e.heading);
-        const body=clamp(scale*.75,3,7),length=body*3.6,lift=visible?Math.sin(cycle/.62*Math.PI)*3*s:0;
-        oval(2,3,body*.9,length*.45,'#256b78');
-        if(visible){oval(0,-lift,body*.55,length*.47,'#345d70');oval(-body*.13,-lift-2,body*.3,length*.35,'#82a5a6');rect(-body*.15,-length*.5-lift,body*.3,3*s,'#a4bdbc');line(-body*.3,2-lift,-body*1.05,5-lift,'#34556a',2);line(body*.3,2-lift,body*.95,5-lift,'#34556a',2);line(0,-1-lift,body*.7,4-lift,'#25485d',2);line(0,length*.42-lift,-body*.8,length*.57-lift,'#36566a',2);line(0,length*.42-lift,body*.8,length*.57-lift,'#36566a',2);if(e.species==='pacific-white-sided-dolphin')line(-body*.32,0-lift,-body*.2,6-lift,'#ced6c4');}
-        ctx.restore();ctx.globalAlpha=1;if(cycle>.5&&cycle<.73)ripple(q.x,q.y+5,(cycle-.5)*30*s,.6*fade);
+        const visible=cycle<.57,arch=visible?Math.sin(cycle/.57*Math.PI):0;
+        const length=scale*(e.species==='common-dolphin'?2.35:2.5)*(1-.07*(i%3)),width=length*.18;
+        const nose=project(wx-Math.sin(e.heading),wz-Math.cos(e.heading)),angle=Math.atan2(nose.y-q.y,nose.x-q.x)+Math.PI/2;
+        ctx.save();ctx.translate(q.x,q.y);ctx.rotate(angle);
+        // Submerged animals are a soft tapered shadow. Fins do not stay spread
+        // above the water like wings throughout the whole breathing cycle.
+        ctx.globalAlpha=(visible?.2:.11)*fade;
+        shape([[0,-length*.51],[-width*.5,-length*.29],[-width*.56,0],[-width*.24,length*.3],[0,length*.5],[width*.24,length*.3],[width*.56,0],[width*.5,-length*.29]],'#285d6a');
+        if(visible){
+          const lift=arch*2*s,tailBeat=Math.sin(e.age*5.1+i*1.9)*length*.035;
+          const poly=(pts,color)=>shape(pts.map(([x,y])=>[x*length,y*length-lift]),color);
+          ctx.globalAlpha=.3*fade;
+          poly([[-.075,-.12],[-.17,.035],[-.135,.055],[-.06,-.005]],'#365b66');
+          poly([[.075,-.10],[.155,.04],[.12,.075],[.065,.01]],'#365b66');
+          ctx.globalAlpha=(.7+.2*arch)*fade;
+          // Rounded melon, distinct short beak, broad back, narrow peduncle.
+          poly([[0,-.54],[-.025,-.535],[-.033,-.45],[-.065,-.42],[-.089,-.32],[-.099,-.12],[-.084,.08],[-.055,.25],[-.019,.43],[.019,.43],[.052,.25],[.085,.08],[.098,-.12],[.088,-.32],[.061,-.42],[.026,-.45],[.023,-.535]],'#294954');
+          poly([[-.052,-.40],[-.08,-.25],[-.069,.05],[-.038,.28],[-.015,.36],[-.025,.08],[-.035,-.13],[-.016,-.34]],e.species==='pacific-white-sided-dolphin'?'#b2c6be':'#b4b899');
+          poly([[.028,-.4],[.069,-.28],[.071,-.06],[.041,.19],[.018,.25],[.028,-.04],[.011,-.26]],'#527d83');
+          // Hooked dorsal fin lies along the back, never a transverse bar.
+          poly([[-.008,.025],[.006,-.06],[.035,-.16],[.16,-.22],[.13,-.13],[.10,-.045],[.13,.065],[.046,.04]],'#203e48');
+          ctx.globalAlpha=.38*fade;
+          const t=.44+tailBeat/length;
+          poly([[0,t-.035],[-.058,t-.045],[-.15,t+.01],[-.125,t+.035],[-.055,t+.045],[0,t+.013],[.055,t+.045],[.125,t+.035],[.15,t+.01],[.058,t-.045]],'#365e68');
+        }
+        ctx.restore();ctx.globalAlpha=1;
+        if(cycle>.41&&cycle<.68)ripple(q.x,q.y,(cycle-.41)*24*s,.38*fade);
+        if(visible&&cycle<.12)ripple(q.x,q.y-2,2+cycle*18*s,.35*fade);
       }else{
         const surfaced=cycle<.43,tail=cycle>=.43&&cycle<.57,bodyLength=clamp(scale*(e.species==='blue'?15:10),38,112),bodyWidth=bodyLength*(e.species==='blue'?.18:.23);
         ctx.save();ctx.translate(q.x,q.y);ctx.rotate(-e.heading);ctx.globalAlpha=(surfaced?.72:tail?.5:.075)*fade;oval(2,4,bodyWidth*.6,bodyLength*.51,'#245c6d');
