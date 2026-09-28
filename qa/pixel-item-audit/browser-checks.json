@@ -1,0 +1,588 @@
+[
+  {
+    "check": "select rod",
+    "id": "rod_light",
+    "active": "rod_light",
+    "electric": false
+  },
+  {
+    "check": "select rod",
+    "id": "rod_boat",
+    "active": "rod_boat",
+    "electric": false
+  },
+  {
+    "check": "select rod",
+    "id": "rod_electric",
+    "active": "rod_electric",
+    "electric": true
+  },
+  {
+    "check": "select rod",
+    "id": "rod",
+    "active": "rod",
+    "electric": false
+  },
+  {
+    "check": "install rig",
+    "name": "双支线沉底组",
+    "rig": "dropper",
+    "hookSize": "1/0",
+    "stock": {
+      "bottom": [
+        {
+          "bait": null,
+          "condition": 1,
+          "hookDamage": 0
+        },
+        {
+          "bait": null,
+          "condition": 1,
+          "hookDamage": 0
+        },
+        {
+          "bait": null,
+          "condition": 1,
+          "hookDamage": 0
+        },
+        {
+          "bait": {
+            "condition": 1,
+            "kind": "squid"
+          },
+          "condition": 1,
+          "hookDamage": 0
+        }
+      ],
+      "dropper": [],
+      "feather40": [
+        {
+          "bait": null,
+          "condition": 1,
+          "hookDamage": 0
+        }
+      ],
+      "float": [
+        {
+          "bait": null,
+          "condition": 1,
+          "hookDamage": 0
+        }
+      ],
+      "jig": [
+        {
+          "bait": null,
+          "condition": 1,
+          "hookDamage": 0
+        }
+      ],
+      "sabiki": [
+        {
+          "bait": null,
+          "condition": 1,
+          "hookDamage": 0
+        }
+      ],
+      "slider": [
+        {
+          "bait": null,
+          "condition": 1,
+          "hookDamage": 0
+        }
+      ]
+    }
+  },
+  {
+    "check": "install rig",
+    "name": "滑铅钓组",
+    "rig": "slider",
+    "hookSize": "3/0",
+    "stock": {
+      "bottom": [
+        {
+          "bait": null,
+          "condition": 1,
+          "hookDamage": 0
+        },
+        {
+          "bait": null,
+          "condition": 1,
+          "hookDamage": 0
+        },
+        {
+          "bait": null,
+          "condition": 1,
+          "hookDamage": 0
+        },
+        {
+          "bait": {
+            "condition": 1,
+            "kind": "squid"
+          },
+          "condition": 1,
+          "hookDamage": 0
+        }
+      ],
+      "dropper": [
+        {
+          "bait": null,
+          "condition": 1,
+          "hookDamage": 0
+        }
+      ],
+      "feather40": [
+        {
+          "bait": null,
+          "condition": 1,
+          "hookDamage": 0
+        }
+      ],
+      "float": [
+        {
+          "bait": null,
+          "condition": 1,
+          "hookDamage": 0
+        }
+      ],
+      "jig": [
+        {
+          "bait": null,
+          "condition": 1,
+          "hookDamage": 0
+        }
+      ],
+      "sabiki": [
+        {
+          "bait": null,
+          "condition": 1,
+          "hookDamage": 0
+        }
+      ],
+      "slider": []
+    }
+  },
+  {
+    "check": "install rig",
+    "name": "铅头软饵钓组",
+    "rig": "jig",
+    "hookSize": "4/0",
+    "stock": {
+      "bottom": [
+        {
+          "bait": null,
+          "condition": 1,
+          "hookDamage": 0
+        },
+        {
+          "bait": null,
+          "condition": 1,
+          "hookDamage": 0
+        },
+        {
+          "bait": null,
+          "condition": 1,
+          "hookDamage": 0
+        },
+        {
+          "bait": {
+            "condition": 1,
+            "kind": "squid"
+          },
+          "condition": 1,
+          "hookDamage": 0
+        }
+      ],
+      "dropper": [
+        {
+          "bait": null,
+          "condition": 1,
+          "hookDamage": 0
+        }
+      ],
+      "feather40": [
+        {
+          "bait": null,
+          "condition": 1,
+          "hookDamage": 0
+        }
+      ],
+      "float": [
+        {
+          "bait": null,
+          "condition": 1,
+          "hookDamage": 0
+        }
+      ],
+      "jig": [],
+      "sabiki": [
+        {
+          "bait": null,
+          "condition": 1,
+          "hookDamage": 0
+        }
+      ],
+      "slider": [
+        {
+          "bait": null,
+          "condition": 1,
+          "hookDamage": 0
+        }
+      ]
+    }
+  },
+  {
+    "check": "install rig",
+    "name": "定层浮游钓组",
+    "rig": "float",
+    "hookSize": "#2",
+    "stock": {
+      "bottom": [
+        {
+          "bait": null,
+          "condition": 1,
+          "hookDamage": 0
+        },
+        {
+          "bait": null,
+          "condition": 1,
+          "hookDamage": 0
+        },
+        {
+          "bait": null,
+          "condition": 1,
+          "hookDamage": 0
+        },
+        {
+          "bait": {
+            "condition": 1,
+            "kind": "squid"
+          },
+          "condition": 1,
+          "hookDamage": 0
+        }
+      ],
+      "dropper": [
+        {
+          "bait": null,
+          "condition": 1,
+          "hookDamage": 0
+        }
+      ],
+      "feather40": [
+        {
+          "bait": null,
+          "condition": 1,
+          "hookDamage": 0
+        }
+      ],
+      "float": [],
+      "jig": [
+        {
+          "bait": null,
+          "condition": 1,
+          "hookDamage": 0
+        }
+      ],
+      "sabiki": [
+        {
+          "bait": null,
+          "condition": 1,
+          "hookDamage": 0
+        }
+      ],
+      "slider": [
+        {
+          "bait": null,
+          "condition": 1,
+          "hookDamage": 0
+        }
+      ]
+    }
+  },
+  {
+    "check": "install rig",
+    "name": "双钩羽毛钓组",
+    "rig": "sabiki",
+    "hookSize": "#6",
+    "stock": {
+      "bottom": [
+        {
+          "bait": null,
+          "condition": 1,
+          "hookDamage": 0
+        },
+        {
+          "bait": null,
+          "condition": 1,
+          "hookDamage": 0
+        },
+        {
+          "bait": null,
+          "condition": 1,
+          "hookDamage": 0
+        },
+        {
+          "bait": {
+            "condition": 1,
+            "kind": "squid"
+          },
+          "condition": 1,
+          "hookDamage": 0
+        }
+      ],
+      "dropper": [
+        {
+          "bait": null,
+          "condition": 1,
+          "hookDamage": 0
+        }
+      ],
+      "feather40": [
+        {
+          "bait": null,
+          "condition": 1,
+          "hookDamage": 0
+        }
+      ],
+      "float": [
+        {
+          "bait": null,
+          "condition": 1,
+          "hookDamage": 0
+        }
+      ],
+      "jig": [
+        {
+          "bait": null,
+          "condition": 1,
+          "hookDamage": 0
+        }
+      ],
+      "sabiki": [],
+      "slider": [
+        {
+          "bait": null,
+          "condition": 1,
+          "hookDamage": 0
+        }
+      ]
+    }
+  },
+  {
+    "check": "install rig",
+    "name": "双支线羽毛钓组",
+    "rig": "feather40",
+    "hookSize": "4/0",
+    "stock": {
+      "bottom": [
+        {
+          "bait": null,
+          "condition": 1,
+          "hookDamage": 0
+        },
+        {
+          "bait": null,
+          "condition": 1,
+          "hookDamage": 0
+        },
+        {
+          "bait": null,
+          "condition": 1,
+          "hookDamage": 0
+        },
+        {
+          "bait": {
+            "condition": 1,
+            "kind": "squid"
+          },
+          "condition": 1,
+          "hookDamage": 0
+        }
+      ],
+      "dropper": [
+        {
+          "bait": null,
+          "condition": 1,
+          "hookDamage": 0
+        }
+      ],
+      "feather40": [],
+      "float": [
+        {
+          "bait": null,
+          "condition": 1,
+          "hookDamage": 0
+        }
+      ],
+      "jig": [
+        {
+          "bait": null,
+          "condition": 1,
+          "hookDamage": 0
+        }
+      ],
+      "sabiki": [
+        {
+          "bait": null,
+          "condition": 1,
+          "hookDamage": 0
+        }
+      ],
+      "slider": [
+        {
+          "bait": null,
+          "condition": 1,
+          "hookDamage": 0
+        }
+      ]
+    }
+  },
+  {
+    "check": "bait consumes one",
+    "name": "鱿鱼条",
+    "before": {
+      "anchovy": 12,
+      "jig": 11,
+      "sardine": 12,
+      "shrimp": 12,
+      "squid": 24
+    },
+    "after": {
+      "anchovy": 12,
+      "jig": 11,
+      "sardine": 12,
+      "shrimp": 12,
+      "squid": 23
+    },
+    "bait": {
+      "condition": 1,
+      "kind": "squid"
+    }
+  },
+  {
+    "check": "bait consumes one",
+    "name": "鳀鱼饵",
+    "before": {
+      "anchovy": 12,
+      "jig": 11,
+      "sardine": 12,
+      "shrimp": 12,
+      "squid": 23
+    },
+    "after": {
+      "anchovy": 11,
+      "jig": 11,
+      "sardine": 12,
+      "shrimp": 12,
+      "squid": 23
+    },
+    "bait": {
+      "condition": 1,
+      "kind": "anchovy"
+    }
+  },
+  {
+    "check": "bait consumes one",
+    "name": "虾饵",
+    "before": {
+      "anchovy": 11,
+      "jig": 11,
+      "sardine": 12,
+      "shrimp": 12,
+      "squid": 23
+    },
+    "after": {
+      "anchovy": 11,
+      "jig": 11,
+      "sardine": 12,
+      "shrimp": 11,
+      "squid": 23
+    },
+    "bait": {
+      "condition": 1,
+      "kind": "shrimp"
+    }
+  },
+  {
+    "check": "bait consumes one",
+    "name": "沙丁鱼饵",
+    "before": {
+      "anchovy": 11,
+      "jig": 11,
+      "sardine": 12,
+      "shrimp": 11,
+      "squid": 23
+    },
+    "after": {
+      "anchovy": 11,
+      "jig": 11,
+      "sardine": 11,
+      "shrimp": 11,
+      "squid": 23
+    },
+    "bait": {
+      "condition": 1,
+      "kind": "sardine"
+    }
+  },
+  {
+    "check": "bait consumes one",
+    "name": "软饵",
+    "before": {
+      "anchovy": 11,
+      "jig": 11,
+      "sardine": 11,
+      "shrimp": 11,
+      "squid": 23
+    },
+    "after": {
+      "anchovy": 11,
+      "jig": 10,
+      "sardine": 11,
+      "shrimp": 11,
+      "squid": 23
+    },
+    "bait": {
+      "condition": 1,
+      "kind": "jig"
+    }
+  },
+  {
+    "check": "reload keeps inventory",
+    "active": "rod_electric",
+    "credits": 1456,
+    "stock": {
+      "anchovy": 11,
+      "jig": 10,
+      "sardine": 11,
+      "shrimp": 11,
+      "squid": 22
+    },
+    "navigation": {
+      "chart": true,
+      "compass": true,
+      "depth": {
+        "datum": "MHW",
+        "measured": true,
+        "resolutionMeters": 20.655,
+        "source": "NOAA NCEI Monterey 2012 Coastal DEM, 1/3 arc-second MHW (DEM 3545), ArcGIS raster 93",
+        "value": 8.182517320063743
+      },
+      "gps": true,
+      "gpsPosition": {
+        "lat": 36.95982278148536,
+        "lon": -122.01923917882566
+      },
+      "heading": 133.99505151606064,
+      "sounder": true,
+      "speedKnots": 0.0018167482987524164
+    }
+  },
+  {
+    "check": "electric retrieval",
+    "beforeLine": 10,
+    "afterLine": 3.5,
+    "afterState": "waiting",
+    "retrieveRate": 0.78
+  }
+]

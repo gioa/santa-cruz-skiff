@@ -1,0 +1,9 @@
+<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>道具测试 · 独立存档</title>
+<style>body{font:18px system-ui;background:#fcf1d5;color:#173f43;padding:32px;line-height:1.8}button{padding:20px;font:inherit;background:#173f43;color:#fff;border:0}p{max-width:600px}</style>
+<h1>道具测试 · 独立存档</h1><p>仅用于本机 4180 端口。基础开局，额外提供 3000 测试潮汐点。所有道具必须在实际商店购买并启用。不会修改正式站点存档。</p><button id="seed">创建测试存档并进入游戏</button>
+<script type="module">
+import {PixelSimulation} from '../../dist/pixel-sim.js';
+const button=document.querySelector('#seed');
+button.disabled=location.hostname!=='localhost'||location.port!=='4180';
+button.onclick=()=>{const sim=new PixelSimulation();sim.start();sim.state.profile.credits=3000;localStorage.setItem('santa-cruz-pixel-v1',JSON.stringify(sim.snapshot()));location.href='/dist/?edition=pixel';};
+</script>

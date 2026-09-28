@@ -1,7 +1,9 @@
+import {GEAR_CATALOG} from './equipment.js?v=20260927-pixel-v28';
+import {pixelGearAvailable} from './pixel-gear-availability.js?v=20260927-pixel-v28';
 /** Persistent personal bag positions. Activating gear never removes ownership. */
 export const INVENTORY_SLOTS=30;
 export function inventorySlots(profile,packed=[]){
- const owned=[...new Set(profile.owned||[])],allowed=new Set(owned),seen=new Set();
+ const owned=[...new Set((profile.owned||[]).filter(id=>pixelGearAvailable(GEAR_CATALOG.find(g=>g.id===id))))],allowed=new Set(owned),seen=new Set();
  const previous=profile.inventorySlots||{},size=Math.max(INVENTORY_SLOTS,Math.ceil(owned.length/6)*6);
  const slots=Array.from({length:size},(_,i)=>{const id=previous.pack?.[i];if(!allowed.has(id)||seen.has(id))return null;seen.add(id);return id;});
  // Former shore-locker items migrate into the same personal backpack.

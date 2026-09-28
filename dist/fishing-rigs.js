@@ -6,6 +6,7 @@
  * measured catch probabilities, calibrated hydrodynamics or fishing advice.
  * The caller owns inventory, regulations, fish retention and random events.
  */
+import {SABIKI_RIG} from './pixel-sabiki-data.js?v=sabiki-1';
 export const RIG_SOURCES=Object.freeze([
   Object.freeze({id:'odfw-bottomfish',title:'ODFW — Oregon marine shore fishing',url:'https://myodfw.com/articles/oregon-marine-shore-fishing',basis:'Bottomfish take natural bait and leadhead soft plastics; sinker choice changes with current; lift, take in slack, and let the rig settle. Pacific-coast technique, not California regulations.'}),
   Object.freeze({id:'noaa-lingcod',title:'NOAA Fisheries — Lingcod',url:'https://www.fisheries.noaa.gov/species/lingcod',basis:'Adults associate with rocky and vegetated habitat and consume bottom fish, squid, octopus and crab.'}),
@@ -27,6 +28,7 @@ const profile=p=>Object.freeze({...p,targetSpecies:Object.freeze(p.targetSpecies
  * not a universal size conversion or manufacturer-tested breaking strength.
  * Barbs remain unspecified. Eligibility remains a separate rules concern. */
 export const RIG_PROFILES=Object.freeze({
+  sabiki6:profile(SABIKI_RIG),
   bottom:profile({id:'bottom',hookSize:'2/0',hookGapMm:13,hookWire:'standard',hookWireStrengthN:65,hookStyle:'circle',item:'tackle',name:'单钩沉底组',english:'Single-hook bottom rig',hooks:1,defaultWeightGrams:85,baitAboveBottom:.3,sinkFactor:1,dragArea:.00012,snagFactor:.8,layer:'bottom',technique:'圆形钩；放到底后略提竿，鱼讯时稳定收线。',targetSpecies:['rockfish','halibut'],speciesBias:{blue:1.12,copper:1.18,halibut:1.06,mackerel:.74,lingcod:1.02}}),
   dropper:profile({id:'dropper',hookSize:'1/0',hookGapMm:11,hookWire:'standard',hookWireStrengthN:48,hookStyle:'circle',item:'rig_dropper',name:'双支线沉底组',english:'Two-hook dropper-loop / paternoster',hooks:2,defaultWeightGrams:113,baitAboveBottom:.65,sinkFactor:.91,dragArea:.00022,snagFactor:.73,layer:'bottom',technique:'双圆形钩，短支线托饵离底；鱼讯时稳收。',targetSpecies:['rockfish'],speciesBias:{blue:1.62,copper:1.72,halibut:.79,mackerel:.92,lingcod:1.08}}),
   slider:profile({id:'slider',hookSize:'3/0',hookGapMm:14.5,hookWire:'standard',hookWireStrengthN:78,hookStyle:'circle',item:'rig_slider',name:'滑铅钓组',english:'Sliding-sinker fish-finder rig',hooks:1,defaultWeightGrams:57,baitAboveBottom:.12,sinkFactor:1.1,dragArea:.00014,snagFactor:1.16,layer:'bottom',technique:'圆形钩配长子线，沙底慢漂；稳收使鱼线拉紧。',targetSpecies:['halibut'],speciesBias:{blue:.94,copper:1,halibut:1.85,mackerel:.74,lingcod:1.1}}),
@@ -69,7 +71,7 @@ export function lureAttraction(options={}){
   const pumping=options.pumping?1:0,drift=Math.abs(bounded(options.currentMps,0,-4,4));
   const swimming=Math.min(1,speed/.25)*bell(speed,.45,.65);
   if(rig.id==='jig')return clamp(.48+swimming*1.08+pumping*.58-speed*.05,.32,2.05);
-  if(rig.id==='sabiki')return clamp(.7+swimming*.5+pumping*.48-speed*.06,.4,1.7);
+  if(rig.id==='sabiki'||rig.id==='sabiki6')return clamp(.7+swimming*.5+pumping*.48-speed*.06,.4,1.7);
   if(rig.id==='feather40')return clamp(.64+swimming*.72+pumping*.58-speed*.08,.38,1.85);
   if(rig.id==='slider')return clamp(.92+.24*bell(drift,.2,.19)+swimming*.12-pumping*.12-speed*.16,.5,1.3);
   if(rig.id==='float')return clamp(1.04-speed*.3-pumping*.06,.45,1.04);

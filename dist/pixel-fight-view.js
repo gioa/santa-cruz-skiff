@@ -1,7 +1,7 @@
 // First-person artwork uses the same rod pose, load, surface intersection and
 // crank speed as the simulation. It is a camera change, never another fight.
-import {reelMotion} from './pixel-fishing-feedback.js?v=20260927-pixel-v27';
-import {fishSpriteKind,fishSpriteBounds} from './pixel-fish-art.js?v=20260927-pixel-v27';
+import {reelMotion} from './pixel-fishing-feedback.js?v=20260927-pixel-v28';
+import {fishSpriteKind,fishSpriteBounds} from './pixel-fish-art.js?v=20260927-pixel-v28';
 const TAU=Math.PI*2;
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 const finite=(n,f=0)=>Number.isFinite(n)?n:f;
@@ -125,7 +125,7 @@ export function createFightView(canvas,{sprites}={}){
   if(g.showFloat){rect(x-1,y-5,3,4,'#e4bb79');rect(x-1,y-7,3,3,'#c7624a');rect(x,y-9,1,2,'#273e41');}
  }
  function surfaceFish(g,s){
-  fishVisible=false;const p=g.fishProjection,asset=p&&sprites?.fish?.[fishSpriteKind(s.fish)];if(!asset)return;
+  fishVisible=false;if(s.rig==='sabiki6'&&s.sabiki){const occupied=s.sabiki.hooks.filter(h=>h.fish),depth=finite(s.lureDepth);if(depth<2&&s.paidLineMeters<8){for(const h of occupied){const hookDepth=Math.max(0,depth-h.index*.28);if(hookDepth>=1.15)continue;const asset=sprites?.fish?.[fishSpriteKind(h.fish)];if(!asset)continue;const crop=fishSpriteBounds(asset),length=h.fish.length/100*g.width/(2*Math.tan(31*Math.PI/180))/Math.hypot(1.6,1.35+hookDepth),height=length*crop.height/crop.width,x=g.waterEntry.x+(h.index%2?8:-8)*g.scale,y=g.waterEntry.y-(h.index*.28)*20*g.scale;line(g.waterEntry,{x,y},'#bdc7ac');c.save();c.globalAlpha=1-hookDepth/1.15*.42;c.drawImage(asset,crop.x,crop.y,crop.width,crop.height,x-length,y-height/2,length,height);c.restore();fishVisible=true;}}return;}const p=g.fishProjection,asset=p&&sprites?.fish?.[fishSpriteKind(s.fish)];if(!asset)return;
   const crop=fishSpriteBounds(asset);if(!crop.width||!crop.height)return;
   const length=p.lengthPixels,height=length*crop.height/crop.width;
   // The line meets the head, not the centre of a scaled icon. Species artwork

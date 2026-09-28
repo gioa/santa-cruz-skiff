@@ -5,7 +5,7 @@
  * pay line out, while turning the handle takes it in. Rod movement never
  * manufactures more line. This module has no inventory, UI or random events.
  */
-import {getRigProfile,stepRigLure} from './fishing-rigs.js?v=20260927-pixel-v27';
+import {getRigProfile,stepRigLure} from './fishing-rigs.js?v=20260927-pixel-v28';
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 const finite=(n,f=0)=>Number.isFinite(n)?n:f;
 export const MAX_PAID_LINE_METERS=120;
@@ -42,16 +42,17 @@ function constrainLure(lure,tip,length){
  const ratio=length/d;
  return{x:tip.x+(lure.x-tip.x)*ratio,z:tip.z+(lure.z-tip.z)*ratio,height:tip.height+(lure.height-tip.height)*ratio};
 }
-function smoothRod(s,load,dt,strength=1){
+function smoothRod(s,load,dt,strength=1,sensitivity=1){
  const force=clamp(finite(load),0,150),response=1-Math.exp(-dt*7);
  const loadN=finite(s.rodLoadN)+(force-finite(s.rodLoadN))*response;
  const lever=.45+.55*Math.cos(clamp(finite(s.rodElevation,45),5,85)*Math.PI/180);
- const target=clamp(Math.pow(loadN*lever/(11*Math.max(.4,strength)),.68),0,1);
+ const tipResponse=1+(clamp(finite(sensitivity,1),.5,1.5)-1)*Math.exp(-loadN/6);
+ const target=clamp(Math.pow(loadN*tipResponse*lever/(11*Math.max(.4,strength)),.68),0,1);
  return{rodLoadN:loadN,rodBend:clamp(finite(s.rodBend)+(target-finite(s.rodBend))*response,0,1)};
 }
 
 /** Returns an update; the caller owns fish-state transitions and bait. */
-export function stepFishingLine(s,{dt,environment={},current={x:0,z:0},velocity={},retrieve=1,strength=1,smooth=1,fishPullN=null,fishMotion=null}={}){
+export function stepFishingLine(s,{dt,environment={},current={x:0,z:0},velocity={},retrieve=1,strength=1,sensitivity=1,smooth=1,fishPullN=null,fishMotion=null}={}){
  dt=clamp(finite(dt),0,.25);const rig=getRigProfile(s.rig),crankRate=reelTurnsPerSecond(s.crankRate),reelMode=crankRate>0?'brake':s.reelMode==='free'?'free':'brake';
  environment={...environment,rig:s.rig,weightGrams:finite(s.rigWeightGrams,rig.defaultWeightGrams)};
  const oldTip=rodTipPosition(s),oldPump=clamp(finite(s.pumpHeight),0,.8),pumpHeight=s.pumping?Math.min(.8,oldPump+dt*.95):Math.max(0,oldPump-dt*.6);
@@ -175,6 +176,6 @@ export function stepFishingLine(s,{dt,environment={},current={x:0,z:0},velocity=
    else if(delta>payoutRate-retrieveRate)retrieveRate=Math.max(0,payoutRate-delta);
   }
   const entry=lineWaterEntry(tip,lure),slack=Math.max(0,paid-separation(tip,lure));
-  return{paidLineMeters:paid,bobber:lure,lureDepth:depth,lineDistance:Math.hypot(lure.x-finite(s.boatX),lure.z-finite(s.boatZ)),pumpHeight,reelMode,crankRate,rodTip:tip,lineEntry:entry,floatPosition:rig.id==='float'?{x:lure.x,z:lure.z,height:0}:null,rigPresentation:presentation,lineSlackMeters:slack,snagStretchMeters,payoutRate,retrieveRate,dragThresholdN,relativeFlowMps:flow,...smoothRod(s,load,dt,strength)};
+  return{paidLineMeters:paid,bobber:lure,lureDepth:depth,lineDistance:Math.hypot(lure.x-finite(s.boatX),lure.z-finite(s.boatZ)),pumpHeight,reelMode,crankRate,rodTip:tip,lineEntry:entry,floatPosition:rig.id==='float'?{x:lure.x,z:lure.z,height:0}:null,rigPresentation:presentation,lineSlackMeters:slack,snagStretchMeters,payoutRate,retrieveRate,dragThresholdN,relativeFlowMps:flow,...smoothRod(s,load,dt,strength,sensitivity)};
  }
 }

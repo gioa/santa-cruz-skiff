@@ -56,7 +56,7 @@ export function createWildlife({seed=defaultSeed(),month=currentMonth(),habitat=
     if(!p)return false;
     const nearbyBait=events.find(e=>e.type==='bait'&&Math.hypot(e.x-p.x,e.z-p.z)<55);
     let species,name,members,speed,duration;
-    if(type==='bait'){species='anchovy-school';name='饵鱼群与觅食海鸟';members=5+Math.floor(random()*6);speed=.12+random()*.11;duration=50+random()*55;}
+    if(type==='bait'){species=['anchovy-school','anchovy-school','anchovy-school','sardine-school','mackerel-school'][serial%5];name='饵鱼群与觅食海鸟';members=5+Math.floor(random()*6);speed=.12+random()*.11;duration=50+random()*55;}
     if(type==='dolphins'){species=random()<.55?'pacific-white-sided-dolphin':'common-dolphin';name=species==='common-dolphin'?'普通海豚群':'太平洋斑纹海豚群';members=3+Math.floor(random()*5);speed=1.25+random()*.9;duration=65+random()*35;}
     if(type==='whale'){
       const weights=[['humpback','座头鲸',season.humpback],['gray','灰鲸',season.gray],['blue','蓝鲸',env.depth>55&&env.distanceFromHarbor>1250?season.blue:0]],total=weights.reduce((sum,e)=>sum+e[2],0);

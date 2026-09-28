@@ -1,3 +1,4 @@
+import {RETIRED_PIXEL_GEAR} from '../dist/pixel-gear-availability.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
@@ -10,7 +11,7 @@ function equipped(items=[]){const sim=new PixelSimulation({now,rng:()=>.05,patro
 function aboard(sim){Object.assign(sim.state,{playerX:HARBOR.counterX,playerZ:HARBOR.counterZ});assert.equal(sim.launchBoat().ok,true);run(sim,24.1);Object.assign(sim.state,{playerX:HARBOR.boardingX,playerZ:HARBOR.boardingZ});assert.equal(sim.board().ok,true);sim.unmoor();}
 
 test('fresh base gear is enabled and backpack changes are portable without granting supplies or shop access',()=>{
- const sim=equipped(['gps']);assert.deepEqual(sim.state.packed,BASE_GEAR.map(g=>g.id));assert.equal(sim.state.pfd,true);assert.equal(sim.atCounter,false);assert.equal(sim.equip('gps').ok,true);assert.equal(sim.hasGear('gps'),true);sim.state.fuel=37;sim.state.profile.stock.squid=2;sim.equip('rod');assert.equal(sim.packStarter().ok,true);assert.equal(sim.hasGear('rod'),true);assert.equal(sim.state.fuel,37);assert.equal(sim.state.profile.stock.squid,2);assert.equal(sim.buyGear('rig_float').ok,false);assert.equal(sim.restock().ok,false);assert.equal(sim.trade().ok,false);
+ const sim=equipped(['gps']);assert.deepEqual(sim.state.packed,BASE_GEAR.filter(g=>!RETIRED_PIXEL_GEAR.has(g.id)).map(g=>g.id));assert.equal(sim.state.pfd,true);assert.equal(sim.atCounter,false);assert.equal(sim.equip('gps').ok,true);assert.equal(sim.hasGear('gps'),true);sim.state.fuel=37;sim.state.profile.stock.squid=2;sim.equip('rod');assert.equal(sim.packStarter().ok,true);assert.equal(sim.hasGear('rod'),true);assert.equal(sim.state.fuel,37);assert.equal(sim.state.profile.stock.squid,2);assert.equal(sim.buyGear('rig_float').ok,false);assert.equal(sim.restock().ok,false);assert.equal(sim.trade().ok,false);
  aboard(sim);assert.equal(sim.equip('gps').ok,true);assert.equal(sim.hasGear('gps'),false);assert.equal(sim.equip('gps').ok,true);assert.equal(sim.hasGear('gps'),true);
 });
 
