@@ -1,14 +1,14 @@
-import {rodTipPosition,MAX_PAID_LINE_METERS} from './pixel-fishing-physics.js?v=20260927-pixel-v50';
-import {getRigProfile} from './fishing-rigs.js?v=20260927-pixel-v50';
+import {rodTipPosition,MAX_PAID_LINE_METERS} from './pixel-fishing-physics.js?v=20260927-pixel-v51';
+import {getRigProfile} from './fishing-rigs.js?v=20260927-pixel-v51';
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 const distance=(a,b)=>Math.hypot(a.x-b.x,a.z-b.z,(a.height||0)-(b.height||0));
 // Short, controlled boat casts. These ranges are gameplay calibration, not
 // casting ratings for real tackle. Heavy two-dropper rigs travel less far.
 export function castRange(s){
  const rig=getRigProfile(s.rig),grams=s.rigWeightGrams??rig.defaultWeightGrams;
- const range=({bottom:22,slider:25,jig:30,float:15,dropper:18,sabiki:14,feather40:18})[rig.id]||16;
+ const range=({bottom:7,slider:8,jig:8,float:5,dropper:5,sabiki:5,feather40:5})[rig.id]||5;
  const rod=({rod_light:.9,rod_boat:1.06,rod_electric:.8})[s.profile?.loadout?.rod]||1;
- return clamp(range*rod*Math.sqrt(rig.defaultWeightGrams/Math.max(7,grams)),8,32);
+ return clamp(range*rod*Math.sqrt(rig.defaultWeightGrams/Math.max(7,grams)),4,8);
 }
 export function planCast(s,target,{isWater=()=>true}={}){
  if(!target||!Number.isFinite(target.x)||!Number.isFinite(target.z))return{ok:false,message:''};
@@ -21,11 +21,11 @@ export function planCast(s,target,{isWater=()=>true}={}){
  for(let d=.5;d<=travel+.5;d+=.5){const u=Math.min(1,d/travel);if(!isWater(s.boatX+(end.x-s.boatX)*u,s.boatZ+(end.z-s.boatZ)*u))return{ok:false,message:'这条抛投路线被岸边挡住了。'};}
  const direction=Math.atan2(-dx,-dz),angle=Math.atan2(Math.sin(s.heading-direction),Math.cos(s.heading-direction)),azimuth=angle*180/Math.PI;
  const tip=rodTipPosition({...s,rodAzimuth:azimuth,rodElevation:50}),start={...tip,height:tip.height-.25};
- // Use a gentle lob instead of the old flat, near-instant throw. Solve
- // flight time from the real tip-to-target distance and release height at
- // 60 degrees, then retain Earth gravity throughout the parabolic flight.
- // The chosen launch angle is gameplay calibration, not a tackle rating.
- const horizontal=Math.hypot(end.x-start.x,end.z-start.z),launchAngle=Math.PI/3;
+ // A controlled underhand pitch, not a high overhead cast. At real gravity,
+ // making the old long throw last longer raised the apex and launch speed.
+ // Shorten the physical range together with lowering the arc; never slow only
+ // the line counter or let a far-away sinker float through the air unnaturally.
+ const horizontal=Math.hypot(end.x-start.x,end.z-start.z),launchAngle=Math.PI/6;
  const duration=Math.sqrt(2*(start.height+horizontal*Math.tan(launchAngle))/9.81),arc=9.81*duration*duration/8;
  return{ok:true,limited:requested>range,azimuth,range,flight:{version:1,t:0,duration,start,end,arc},tip,paid:distance(tip,start)+.08};
 }

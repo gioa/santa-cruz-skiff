@@ -1,4 +1,4 @@
-import {fishFightKind} from './pixel-fish-fight.js?v=20260927-pixel-v50';
+import {fishFightKind} from './pixel-fish-fight.js?v=20260927-pixel-v51';
 
 /** Mouth fit, initial purchase and wire strength are separate constraints.
  * Every dimension/force/curve here is GAME TUNING, not measured morphology,

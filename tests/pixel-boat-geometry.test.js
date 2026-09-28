@@ -80,16 +80,16 @@ test('cast clicks share geographic metres at every camera zoom, with readable hu
  }
 });
 
-test('a 30-foot cast retains geographic distance and real diagonal paid line through flight and zoom',async()=>{
+test('a 20-foot cast retains geographic distance and real diagonal paid line through flight and zoom',async()=>{
  const {planCast,stepCast}=await import('../dist/pixel-casting.js');
  const world=createPixelWorld(fakeCanvas());world.resize(390,844);
  const state={...base,mode:'boat',launchStage:'afloat',boatX:1300,boatZ:-320,heading:0,engine:false,moored:false,rodMount:'hand',rodElevation:50,rig:'bottom',paidLineMeters:0};
- const target={x:state.boatX+30*.3048,z:state.boatZ},plan=planCast(state,target);assert.ok(plan.ok);
+ const target={x:state.boatX+20*.3048,z:state.boatZ},plan=planCast(state,target);assert.ok(plan.ok);
  Object.assign(state,{castFlight:plan.flight,rodAzimuth:plan.azimuth,fishState:'flight',paidLineMeters:plan.paid});
  Object.assign(state,stepCast(state,plan.flight.duration));
  const separation=Math.hypot(state.bobber.x-state.rodTip.x,state.bobber.z-state.rodTip.z,state.rodTip.height);
  assert.ok(Math.abs(state.paidLineMeters-separation-.08)<1e-8,'payout is measured from the rod tip, not a scaled screen length');
- for(const zoom of[3,6,9]){world.setZoom(zoom);world.draw(state,0);const hull=world.publicState().boats.player,boat=world.cssWorldToScreen(state.boatX,state.boatZ),lure=world.fishingWorldToScreen(state.bobber.x,state.bobber.z,state);assert.ok(Math.abs(Math.hypot(lure.x-boat.x,lure.y-boat.y)/hull.hullLength-(30*.3048/(77*.18)))<.06);}
+ for(const zoom of[3,6,9]){world.setZoom(zoom);world.draw(state,0);const hull=world.publicState().boats.player,boat=world.cssWorldToScreen(state.boatX,state.boatZ),lure=world.fishingWorldToScreen(state.bobber.x,state.bobber.z,state);assert.ok(Math.abs(Math.hypot(lure.x-boat.x,lure.y-boat.y)/hull.hullLength-(20*.3048/(77*.18)))<.06);}
 });
 
 test('boarding and waiting labels clear the entire boat and crane animation on mobile viewports',async()=>{

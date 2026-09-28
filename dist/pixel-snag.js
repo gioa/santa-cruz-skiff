@@ -1,7 +1,7 @@
 // Authored gameplay hazards, not measured Santa Cruz snag percentages.
 // Integrating exposure against one exponential threshold makes risk independent
 // of frame rate. Bottom contact is recoverable; hooking rock is a separate state.
-import {rigSnagRisk} from './fishing-rigs.js?v=20260927-pixel-v50';
+import {rigSnagRisk} from './fishing-rigs.js?v=20260927-pixel-v51';
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 const finite=(n,f=0)=>Number.isFinite(n)?n:f;
 export const BOTTOM_SNAG_GRACE_SECONDS=4;

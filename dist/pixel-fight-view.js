@@ -1,10 +1,10 @@
-import {drawCloseTackle} from './pixel-fight-tackle.js?v=20260927-pixel-v50';
-import {fishBodyPose,drawFishBody} from './pixel-fish-motion.js?v=20260927-pixel-v50';
-import {rodFlexPoint} from './pixel-rod-response.js?v=20260927-pixel-v50';
+import {drawCloseTackle} from './pixel-fight-tackle.js?v=20260927-pixel-v51';
+import {fishBodyPose,drawFishBody} from './pixel-fish-motion.js?v=20260927-pixel-v51';
+import {rodFlexPoint} from './pixel-rod-response.js?v=20260927-pixel-v51';
 // First-person artwork uses the same rod pose, load, surface intersection and
 // crank speed as the simulation. It is a camera change, never another fight.
-import {reelMotion} from './pixel-fishing-feedback.js?v=20260927-pixel-v50';
-import {fishSpriteKind,fishSpriteBounds} from './pixel-fish-art.js?v=20260927-pixel-v50';
+import {reelMotion} from './pixel-fishing-feedback.js?v=20260927-pixel-v51';
+import {fishSpriteKind,fishSpriteBounds} from './pixel-fish-art.js?v=20260927-pixel-v51';
 const TAU=Math.PI*2;
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 const finite=(n,f=0)=>Number.isFinite(n)?n:f;
