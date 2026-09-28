@@ -1,7 +1,8 @@
 /**
  * Unannounced, legality-independent game inspections. This is illustrative
  * game behaviour, not a claim about CDFW patrol schedules or enforcement rates.
- * Only state.inspection is mutated here. The caller handles engine controls,
+ * State.inspection and the persisted landing-clearance marker are mutated here.
+ * Mandatory dock checks are separate from random sea patrols. The caller handles engine controls,
  * legal assessment, confiscation, credits, sound and the trip journal.
  */
 const TAU=Math.PI*2,clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
@@ -53,6 +54,18 @@ export class FishingPatrol {
     if(this.random()>=.25)return false;
     return this.spawn(state,'dock');
   }
+  /** Dock officers inspect every actual landing, independently of sea patrols.
+   * force is used only when a new docking finishes. Counter/reload recovery
+   * reuses an already pending check instead of restarting its clock. */
+  beginLanding(state,{force=false}={}){
+    if(!force&&state.inspection?.reason==='landing'&&state.inspection.phase==='checking')return false;
+    const serial=Math.max(0,number(state.landingInspectionSerial))+1;
+    state.landingInspectionSerial=serial;
+    const id=`landing-${serial}`;
+    state.landingInspection={id,status:'checking'};
+    state.inspection={id,reason:'landing',phase:'checking',x:number(state.boatX),z:number(state.boatZ),heading:number(state.heading),progress:0,elapsed:0,announced:false};
+    return true;
+  }
   navigate(p,target,speed,dt){
     const dx=target.x-p.x,dz=target.z-p.z,d=Math.hypot(dx,dz);if(d<.02)return true;
     const desired=Math.atan2(-dx,-dz),step=Math.min(d,speed*dt);
@@ -77,6 +90,19 @@ export class FishingPatrol {
       }
       const p=state.inspection;if(!p)continue;
       p.elapsed=number(p.elapsed)+step;
+      // A shore check cannot be skipped because a patrol boat cannot find a
+      // navigable approach or because this is an older saved dockside game.
+      if(p.reason==='landing'){
+        if(!p.announced){p.announced=true;events.push({type:'inspection-start',id:p.id,reason:p.reason});}
+        p.progress=clamp(p.elapsed/8,0,1);
+        if(p.elapsed>=8){
+          const result=typeof assessment==='function'?assessment(state):assessment;
+          const violations=Array.isArray(result?.violations)?result.violations.map(v=>typeof v==='object'&&v!==null?{...v}:v):[];
+          events.push({type:'inspection-result',id:p.id,reason:p.reason,violations});
+          state.inspection=null;this.completed++;events.push({type:'inspection-ended',id:p.id});
+        }
+        continue;
+      }
       const bx=number(state.boatX),bz=number(state.boatZ),heading=number(state.heading);
       // Keep two enlarged pixel hulls separate while displaying the check.
       const targets=this.sideTargets(state),target=targets.find(t=>t.side===p.side)||targets.sort((a,b)=>Math.hypot(a.x-p.x,a.z-p.z)-Math.hypot(b.x-p.x,b.z-p.z))[0];

@@ -66,3 +66,23 @@ test('unknownspecies, future rules, absentcapturehistory and unstudied MPA areas
 test('prohibited rockfish are correctly separate species, results do not mutate catches, and duplicateIDs do not inflate limits',()=>{
  for(const s of REGULATED_SPECIES.filter(s=>s.prohibited))assert.equal(has(assessCatch(fish(s.id)),'prohibited_species'),true);const a=fish('copper_rockfish',{catchId:'same'}),before=structuredClone(a),r=assessCatchLedger([a,a]);assert.deepEqual(a,before);assert.equal(r.daily['2026-09-27'].species.copper_rockfish,1);assert.ok(r.unsupported.some(u=>u.code==='duplicate_catch_id'));assert.equal(has(r,'daily_species_bag'),false);
 });
+
+test('white croaker has no minimum, a ten-fish bag and its own classification; sanddab is unlimited and exempt from RCG season/gear',()=>{
+ for(const [name,id]of[['白石首鱼','white_croaker'],['Genyonemus lineatus','white_croaker'],['太平洋沙鲽','pacific_sanddab'],['Citharichthys sordidus','pacific_sanddab']])assert.equal(identifyRegulatedSpecies(name)?.id,id);
+ for(const id of['white_croaker','pacific_sanddab'])for(const caughtAt of['2026-01-01','2026-03-31','2026-12-31'])assert.equal(assessCatch(fish(id,{length:8,caughtAt,hookCount:6,lineCount:2,depth:300})).status,'supported');
+ const croaker=assessCatchLedger(ledger('white_croaker',11));assert.equal(has(croaker,'daily_species_bag'),true);assert.equal(has(croaker,'species_possession'),true);assert.equal(has(croaker,'daily_rcg_bag'),false);assert.equal(has(croaker,'daily_general_bag'),false);
+ const sanddab=assessCatchLedger(ledger('pacific_sanddab',30));assert.equal(sanddab.status,'supported');assert.equal(sanddab.possession.general,0);assert.equal(sanddab.possession.rcg,0);
+ assert.equal(assessCatch(fish('white_croaker',{hasDescendingDevice:false})).status,'supported');
+ assert.equal(has(assessCatch(fish('pacific_sanddab',{hasDescendingDevice:false})),'descending_device_required'),true);
+ const restricted=assessCatch(fish('pacific_sanddab',{hookCount:6,lineCount:2,groundfishAboardAtCapture:true}));assert.equal(has(restricted,'groundfish_hook_limit'),true);assert.equal(has(restricted,'groundfish_line_limit'),true);
+ for(const id of['white_croaker','pacific_sanddab'])assert.equal(has(assessCatch(fish(id,{caughtGPS:{lat:36.83,lon:-122.0}})),'protected_area_take'),true);
+});
+
+test('general twenty-fish limit counts white croaker independently from species/RCG bags and excludes sanddab and mackerel',()=>{
+ const twenty=[...ledger('white_croaker',10),...ledger('blue_rockfish',10)],unlimited=[...ledger('pacific_sanddab',30),...ledger('pacific_mackerel',30)];
+ const allowed=assessCatchLedger([...twenty,...unlimited]);assert.equal(allowed.status,'supported');assert.equal(allowed.possession.general,20);assert.equal(allowed.daily['2026-09-27'].general,20);assert.equal(allowed.possession.rcg,10);
+ const halibut=fish('california_halibut',{catchId:'twenty-first',caughtAt:'2026-09-27T15:00:00Z'}),excess=assessCatchLedger([...twenty,...unlimited,halibut]);
+ assert.equal(has(excess,'daily_general_bag'),true);assert.equal(has(excess,'general_possession'),true);assert.equal(has(excess,'daily_species_bag'),false);assert.equal(has(excess,'daily_rcg_bag'),false);
+ const last=excess.results.find(r=>r.catchId==='twenty-first');assert.deepEqual(last.violations.map(v=>v.code).sort(),['daily_general_bag','general_possession']);
+ const traded=assessCatchLedger([...twenty.map(f=>({...f,settled:true})),halibut]);assert.equal(has(traded,'daily_general_bag'),true);assert.equal(has(traded,'general_possession'),false);
+});

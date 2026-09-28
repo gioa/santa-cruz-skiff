@@ -1,4 +1,4 @@
-import {fishFightKind} from './pixel-fish-fight.js?v=20260927-pixel-v21';
+import {fishFightKind} from './pixel-fish-fight.js?v=20260927-pixel-v22';
 
 /** Mouth fit, initial purchase and wire strength are separate constraints.
  * Every dimension/force/curve here is GAME TUNING, not measured morphology,
@@ -11,7 +11,7 @@ const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 const finite=(n,fallback)=>Number.isFinite(n)?n:fallback;
 const smooth=(a,b,x)=>{const t=clamp((x-a)/(b-a),0,1);return t*t*(3-2*t);};
 // Calibrated effective mouth opening per cm of fish length, not survey data.
-const mouthScale={rockfish:1.1,mackerel:.5,lingcod:1.6,halibut:1.3,salmon:.8,seabass:1.1,bonito:.9};
+const mouthScale={rockfish:1.1,mackerel:.5,lingcod:1.6,halibut:1.3,salmon:.8,seabass:1.1,bonito:.9,croaker:.75,sanddab:.7};
 
 export function hookSizeFit(fish={},rig={}){
  const gap=rig?.hookGapMm,wire=rig?.hookWireStrengthN;

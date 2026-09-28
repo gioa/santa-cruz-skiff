@@ -142,6 +142,24 @@ function dockWorkerSprite(){return raster(16,26,({rect:r,px,poly:p,line:l})=>{
   r(7,3,3,2,'gold');px(8,3,'cream');
 });}
 
+function wardenSprite(){return raster(16,26,({rect:r,px,poly:p})=>{
+  r(2,24,12,1,'#20364266');r(4,18,4,6,'greenDark');r(9,18,4,6,'greenDark');
+  r(3,23,5,2,'ink');r(9,23,5,2,'ink');r(5,19,1,4,'green');r(10,19,1,4,'green');
+  p([[4,10],[11,10],[14,13],[14,19],[2,19],[2,13]],'ink');
+  r(3,11,10,7,'greenDark');r(4,11,7,6,'green');r(4,11,7,1,'jade');r(7,12,1,6,'mint');
+  r(3,18,10,2,'ink');r(7,18,2,1,'gold');r(2,13,2,5,'green');r(2,17,2,3,'skin');
+  // Gold shield, shoulder patch, radio and duty belt distinguish the officer.
+  r(9,12,2,2,'gold');px(10,14,'gold');px(9,12,'cream');r(3,12,2,2,'sand');
+  r(4,14,2,3,'ink');r(4,12,1,3,'ink');px(5,15,'steel');r(10,18,3,3,'deep');
+  r(10,15,6,7,'woodDark');r(11,16,4,5,'cream');r(12,15,2,2,'steel');
+  r(12,18,2,1,'slate');r(12,20,2,1,'slate');r(9,16,3,2,'skin');px(10,16,'skinLight');
+  r(6,9,4,2,'skinDark');r(4,4,8,5,'hair');r(5,5,6,5,'skin');r(5,5,5,2,'skinLight');
+  px(6,7,'ink');px(10,7,'ink');px(8,9,'skinDark');
+  // Broad dark-green field hat and band; same 16 × 26 foot anchor as the player.
+  r(5,1,6,3,'greenDark');r(5,1,5,1,'green');r(4,3,8,2,'greenDark');r(4,3,8,1,'ink');
+  r(1,5,14,1,'ink');r(2,4,12,1,'greenDark');r(3,4,9,1,'green');px(8,2,'gold');
+});}
+
 function hutSprite(){return raster(128,108,({rect:r,px,line:l,poly:p})=>{
   // A coastal timber rental cottage, with a low teal roof, deck and side wall.
   p([[12,54],[112,54],[124,95],[117,102],[10,102],[4,96]],'#223a463d');
@@ -224,7 +242,26 @@ function palmSprite(){return raster(50,70,({rect:r,line:l,poly:p})=>{
 });}
 
 function fishSprite(kind){return raster(48,24,({rect:r,px,poly:p,line:l})=>{
-  if(kind==='halibut'){
+  if(kind==='croaker'){
+    // White croaker: silvery/brassy compressed body, blunt snout, subterminal
+    // mouth, nearly straight tail and a dark mark at the pectoral-fin base.
+    p([[8,10],[18,7],[30,6],[39,8],[44,11],[43,15],[35,17],[19,17],[9,14],[3,17],[3,8]],'ink');
+    p([[9,11],[18,8],[30,7],[39,9],[43,11],[42,14],[35,16],[19,16],[9,13],[4,15],[4,10]],'sand');
+    p([[12,12],[24,10],[39,10],[42,12],[39,15],[25,16],[15,14]],'ivory');
+    p([[17,8],[20,3],[21,6],[23,3],[25,6],[32,4],[35,7]],'woodMid');
+    p([[20,16],[24,20],[28,16]],'gold');p([[31,16],[34,20],[36,16]],'sand');
+    p([[35,12],[28,13],[29,17]],'gold');r(34,12,2,2,'ink');
+    l(12,11,31,9,'woodMid');l(16,13,31,12,'white');l(37,10,36,14,'slate');
+    r(39,9,3,3,'white');px(40,10,'ink');l(40,14,42,14,'woodDark');
+  }else if(kind==='sanddab'){
+    // Small left-eyed flatfish with a mottled eyed side and a square tail.
+    p([[12,11],[19,5],[29,3],[37,6],[42,11],[40,15],[32,20],[22,21],[13,15],[5,17],[5,8]],'ink');
+    p([[13,11],[19,6],[29,4],[37,7],[41,11],[39,14],[31,19],[22,20],[14,14],[6,15],[6,10]],'woodMid');
+    p([[15,11],[21,7],[30,6],[37,9],[38,13],[30,17],[23,18],[16,14]],'sand');
+    l(18,8,26,5,'wood');l(18,17,29,19,'woodDark');l(12,12,31,12,'wood');
+    [[19,9],[24,7],[28,14],[22,15],[33,8],[34,14],[17,12],[28,10],[31,16]].forEach(([x,y])=>{r(x,y,2,1,'woodDark');px(x+1,y+1,'wood');});
+    r(34,8,3,3,'gold');r(37,11,3,3,'gold');px(35,9,'ink');px(38,12,'ink');l(39,14,40,13,'ink');
+  }else if(kind==='halibut'){
     p([[7,11],[14,5],[29,3],[40,8],[44,12],[40,16],[29,21],[14,19],[7,14],[1,18],[3,12],[1,6]],'ink');
     p([[8,11],[15,6],[29,4],[39,9],[43,12],[39,15],[29,20],[15,18],[8,13],[3,16],[5,12],[3,8]],'woodDark');
     p([[11,11],[18,7],[31,6],[39,10],[40,13],[30,17],[17,17],[10,13]],'wood');
@@ -323,7 +360,7 @@ function iconSprite(kind){return raster(16,16,({rect:r,line:l,poly:p,px,oval:o})
 
 /** All canvases are original art at native pixel resolution. */
 export function createPixelSprites(){
-  const fish=Object.fromEntries(['rockfish','vermilion','halibut','mackerel','lingcod','salmon','seabass','bonito'].map(name=>[name,fishSprite(name)]));
+  const fish=Object.fromEntries(['rockfish','vermilion','halibut','mackerel','lingcod','salmon','seabass','bonito','croaker','sanddab'].map(name=>[name,fishSprite(name)]));
   const icons=Object.fromEntries(['rod','anchor','engine','backpack','fish','coin','tackle','oar','map','sun','bait','reel'].map(name=>[name,iconSprite(name)]));
   const angler=personSprite(),anglerBack=personSprite({back:true});
   const hut=hutSprite();
@@ -331,7 +368,7 @@ export function createPixelSprites(){
     boat:boatSprite(),angler,anglerBack,anglerWalk1:personSprite({step:1}),anglerWalk2:personSprite({step:2}),
     anglerFish:personSprite({fish:true}),anglerHold:personSprite({hold:true}),anglerDrive:personSprite({back:true,drive:true}),
     anglerLeft:personSprite({side:-1}),anglerRight:personSprite({side:1}),
-    dockWorker:dockWorkerSprite(),hut,tackleShop:hut,
+    dockWorker:dockWorkerSprite(),warden:wardenSprite(),hut,tackleShop:hut,
     crate:crateSprite(),cooler:coolerSprite(),buoy:buoySprite(),kelp:kelpSprite(),rock:rockSprite(),
     gull:gullSprite(),gull2:gullSprite(true),palm:palmSprite(),fish,icons,
     directions:{

@@ -1,5 +1,5 @@
-import {fishFightKind} from './pixel-fish-fight.js?v=20260927-pixel-v21';
-import {hookSizeFit} from './pixel-hook-size.js?v=20260927-pixel-v21';
+import {fishFightKind} from './pixel-fish-fight.js?v=20260927-pixel-v22';
+import {hookSizeFit} from './pixel-hook-size.js?v=20260927-pixel-v22';
 
 /** Hook-seat and retention approximation, in active real seconds.
  * EVERY force threshold, duration and hazard below is gameplay calibration,
@@ -15,7 +15,7 @@ import {hookSizeFit} from './pixel-hook-size.js?v=20260927-pixel-v21';
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 const number=(n,fallback=0)=>Number.isFinite(n)?n:fallback;
 const bounded=(n,fallback,a,b)=>clamp(number(n,fallback),a,b);
-const kinds=new Set(['rockfish','mackerel','lingcod','halibut','salmon','seabass','bonito']);
+const kinds=new Set(['rockfish','mackerel','lingcod','halibut','salmon','seabass','bonito','croaker','sanddab']);
 const settings={
  rockfish:{hold:25,holdScale:7,engage:.43,bite:.008,slack:.002,overload:.025,shake:.25},
  mackerel:{hold:19,holdScale:6,engage:.46,bite:.02,slack:.0035,overload:.03,shake:.45},
@@ -24,12 +24,14 @@ const settings={
  salmon:{hold:26,holdScale:6.5,engage:1.06,bite:.045,slack:.022,overload:.055,shake:1.5},
  seabass:{hold:12,holdScale:4,engage:1.21,bite:.025,slack:.017,overload:.09,shake:1},
  bonito:{hold:25,holdScale:7,engage:.94,bite:.05,slack:.024,overload:.06,shake:1.6},
+ croaker:{hold:18,holdScale:5,engage:.45,bite:.012,slack:.0025,overload:.03,shake:.3},
+ sanddab:{hold:16,holdScale:5,engage:.42,bite:.009,slack:.002,overload:.025,shake:.2},
 };
 
 export function hookProfile(fish={},rig={}){
  const kind=fishFightKind(fish||{}),p=settings[kind],mass=bounded(fish?.kg,.6,.05,80);
  const circle=rig?.circleHook===true||rig?.hookStyle==='circle'||rig?.hookType==='circle';
- const easy=kind==='rockfish'&&mass<=1.5||kind==='mackerel'&&mass<=.9;
+ const easy=kind==='rockfish'&&mass<=1.5||kind==='mackerel'&&mass<=.9||['croaker','sanddab'].includes(kind)&&mass<=.7;
  const growth=kind==='rockfish'?clamp((mass-1.5)/6,0,1):kind==='mackerel'?clamp((mass-.9)/3,0,1):0;
  const sizeRisk=1+clamp(Math.log1p(mass)/12,0,.25),stableSeat=circle?.72:1,fit=hookSizeFit(fish,rig);
  return{kind,easy,hookSize:fit.hookSize,mouthFit:fit.mouthFit,purchase:fit.purchase,seatChance:fit.seatChance,wireStrengthN:fit.wireStrengthN,

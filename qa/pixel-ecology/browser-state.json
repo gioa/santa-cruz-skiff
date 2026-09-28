@@ -1,0 +1,470 @@
+{
+  "activeRod": "rod",
+  "activeSeconds": 612,
+  "anchor": false,
+  "arrival": "counter",
+  "audio": {
+    "activeVoices": 2,
+    "contextState": "running",
+    "enabled": true,
+    "masterVolume": 0.55,
+    "musicBar": 11,
+    "musicDuck": 1,
+    "musicEnabled": true,
+    "musicVoices": 9,
+    "musicVolume": 0.34,
+    "paused": false,
+    "reel": {
+      "active": false,
+      "crank": 0,
+      "crankFrequency": 0,
+      "crankVolume": 0,
+      "feedFrequency": 0,
+      "feedVolume": 0,
+      "gearFrequency": 0,
+      "lineVolume": 0,
+      "mode": "brake",
+      "payout": 0,
+      "ratchetFrequency": 0,
+      "ratchetHz": 0,
+      "ratchetVolume": 0,
+      "retrieve": 0,
+      "totalTicks": 0,
+      "voices": 0
+    },
+    "scheduledNotes": 8,
+    "scoreBPM": 100,
+    "totalEffects": 88,
+    "totalMusicNotes": 7673
+  },
+  "autoWalking": false,
+  "availableActions": {
+    "adjustPose": false,
+    "anchor": false,
+    "assemble": false,
+    "cast": false,
+    "catch": false,
+    "console": false,
+    "dock": false,
+    "drag": false,
+    "engine": false,
+    "helm": false,
+    "hook": false,
+    "lower": false,
+    "monitor": false,
+    "mount": false,
+    "mounted": false,
+    "pose": false,
+    "reel": false,
+    "reelInstrument": false,
+    "retrieve": false,
+    "return": false,
+    "spool": false,
+    "switchLabel": "操船",
+    "switchPanel": false,
+    "tackle": false,
+    "take": false,
+    "unmoor": false
+  },
+  "boat": {
+    "heading": null,
+    "x": -34.2,
+    "z": -55
+  },
+  "boats": {
+    "parked": [
+      {
+        "afloat": false,
+        "bounds": {
+          "bottom": 681.0485633802816,
+          "left": 169.4121951219512,
+          "right": 282.4170731707317,
+          "top": 619.4246760563381
+        },
+        "heading": 1.5707963267948966,
+        "height": 112.97712676056338,
+        "lift": 0,
+        "phase": "rack",
+        "scale": 1.08,
+        "screenX": 225.91463414634143,
+        "screenY": 650.2366197183098,
+        "stage": "stored",
+        "width": 61.639024390243904,
+        "x": -19,
+        "z": -33
+      },
+      {
+        "afloat": false,
+        "bounds": {
+          "bottom": 759.5049014084507,
+          "left": 169.4121951219512,
+          "right": 282.4170731707317,
+          "top": 697.8810140845071
+        },
+        "heading": 1.5707963267948966,
+        "height": 112.97712676056338,
+        "lift": 0,
+        "phase": "rack",
+        "scale": 1.08,
+        "screenX": 225.91463414634143,
+        "screenY": 728.6929577464789,
+        "stage": "stored",
+        "width": 61.639024390243904,
+        "x": -19,
+        "z": -22
+      }
+    ],
+    "player": {
+      "afloat": true,
+      "bounds": {
+        "bottom": 551.0012394366197,
+        "left": 86.89390243902439,
+        "right": 148.5329268292683,
+        "top": 438.02411267605635
+      },
+      "heading": 0,
+      "height": 112.97712676056338,
+      "lift": 0,
+      "phase": "water",
+      "scale": 1.08,
+      "screenX": 117.71341463414632,
+      "screenY": 494.512676056338,
+      "stage": "afloat",
+      "width": 61.639024390243904,
+      "x": -34.2,
+      "z": -55
+    }
+  },
+  "breaks": 0,
+  "camera": {
+    "deadzone": {
+      "bottom": 540,
+      "left": 59,
+      "right": 269,
+      "top": 149
+    },
+    "framing": {
+      "all": null,
+      "playfield": {
+        "bottom": 562.2704225352113,
+        "left": 23.78048780487805,
+        "right": 366.219512195122,
+        "top": 120.06197183098593
+      },
+      "primary": null
+    },
+    "height": 710,
+    "mode": "deadzone",
+    "scale": 6,
+    "width": 328,
+    "x": -23.33,
+    "z": -68.55
+  },
+  "canOperateHelm": true,
+  "castPower": 0,
+  "casting": false,
+  "casts": 2,
+  "catches": [
+    {
+      "caughtAt": "2026-09-27T13:12:10.274Z",
+      "confiscated": false,
+      "hookCount": 1,
+      "kept": true,
+      "kg": 0.31,
+      "length": 30,
+      "name": "白石首鱼",
+      "rig": {
+        "bait": true,
+        "breakawayWeight": false,
+        "circleHook": true,
+        "fishingDepthMeters": null,
+        "hookCount": 1,
+        "hookSize": "2/0",
+        "hookStyle": "circle",
+        "id": "bottom",
+        "leader": null,
+        "line": null,
+        "lineCount": 1,
+        "reel": null,
+        "rod": "rod",
+        "rodCount": 1,
+        "sinkerLb": 0.18739307571562108,
+        "trolling": false,
+        "weightGrams": 85,
+        "wireLeader": false
+      },
+      "settled": true
+    }
+  ],
+  "conditions": {
+    "clockMode": "morning",
+    "customHour": 8,
+    "daylight": 0.1,
+    "fresh": false,
+    "mode": "real",
+    "period": 9,
+    "tideMLLW": 0.1398377131392987,
+    "waterTemp": 15,
+    "waveDirection": 295,
+    "waveHeight": 1.3,
+    "windDirection": 320,
+    "windKnots": 11.66304
+  },
+  "consumables": {
+    "bait": {
+      "condition": 0,
+      "kind": "squid"
+    },
+    "baitStock": {
+      "anchovy": 0,
+      "jig": 3,
+      "sardine": 0,
+      "shrimp": 0,
+      "squid": 11
+    },
+    "requiresBait": true,
+    "rig": {
+      "condition": 0.975,
+      "hookDamage": 0,
+      "id": "bottom",
+      "present": true
+    },
+    "rigStock": {
+      "bottom": 2,
+      "dropper": 0,
+      "feather40": 1,
+      "float": 0,
+      "jig": 0,
+      "sabiki": 0,
+      "slider": 0
+    }
+  },
+  "crankRate": 0,
+  "dayStartAt": "2026-09-27T13:00:00.000Z",
+  "dragThresholdN": 13.56,
+  "ecology": {
+    "active": [],
+    "counts": {
+      "bait": 0,
+      "dolphins": 0,
+      "whale": 0
+    },
+    "encounters": [],
+    "illustrativeRates": true
+  },
+  "edition": "pixel",
+  "engine": false,
+  "fish": null,
+  "fishMotion": null,
+  "fishPullN": 0,
+  "fishState": "idle",
+  "fishingDepthMeters": null,
+  "focusView": {
+    "active": false,
+    "bend": 0.31955006406643127,
+    "crankAngle": 4.900884539600202,
+    "floatVisible": false,
+    "height": 844,
+    "lineEntry": {
+      "x": 264,
+      "y": 644
+    },
+    "lineVisible": false,
+    "mount": "hand",
+    "phase": "landed",
+    "rodAzimuth": 70,
+    "rodElevation": 45,
+    "rodTip": {
+      "x": 264,
+      "y": 429
+    },
+    "spoolAngle": 4.088941790291154,
+    "surfaceFish": false,
+    "view": "first-person",
+    "width": 390
+  },
+  "fps": 60,
+  "fuel": 100,
+  "gameSeconds": 1224,
+  "gps": null,
+  "hasAnchor": false,
+  "helm": {
+    "gear": "N",
+    "lever": 0,
+    "manual": false,
+    "steer": 0,
+    "throttle": 0
+  },
+  "hookCount": 1,
+  "hookFit": null,
+  "hookHold": null,
+  "hookSize": "2/0",
+  "inspection": null,
+  "interaction": "码头小屋",
+  "lastInspection": {
+    "checkedAt": "2026-09-27T13:18:38.410Z",
+    "confiscated": [],
+    "debt": 0,
+    "fine": 0,
+    "id": "landing-2",
+    "paid": 0,
+    "reason": "landing",
+    "ruleset": "cdfw-santa-cruz-2026-09-27",
+    "unsupported": [],
+    "violations": []
+  },
+  "launchProgress": 0,
+  "launchStage": "afloat",
+  "lineDistance": 2.8,
+  "lineSlackMeters": 0,
+  "loaded": false,
+  "lureDepth": null,
+  "maxPaidLineMeters": 120,
+  "menu": "staff",
+  "misses": 0,
+  "mode": "walk",
+  "moored": true,
+  "navigation": {
+    "chart": false,
+    "compass": false,
+    "depth": null,
+    "gps": false,
+    "gpsPosition": null,
+    "heading": null,
+    "sounder": false,
+    "speedKnots": null
+  },
+  "navigationScale": 1,
+  "packed": [
+    "pfd",
+    "rod",
+    "tackle",
+    "bait",
+    "cooler",
+    "net",
+    "descending_device",
+    "water",
+    "safety",
+    "rig_feather40"
+  ],
+  "paidLineMeters": 0,
+  "paused": true,
+  "payoutRate": 0,
+  "phase": "complete",
+  "position": {
+    "x": -7.8,
+    "z": -54
+  },
+  "profile": {
+    "credits": 81,
+    "fineDebt": 0,
+    "loadout": {
+      "cooler": "cooler",
+      "leader": null,
+      "line": null,
+      "reel": null,
+      "rod": "rod"
+    },
+    "owned": [
+      "pfd",
+      "rod",
+      "tackle",
+      "bait",
+      "cooler",
+      "net",
+      "descending_device",
+      "water",
+      "safety",
+      "rig_feather40"
+    ],
+    "stock": {
+      "anchovy": 0,
+      "jig": 3,
+      "sardine": 0,
+      "shrimp": 0,
+      "squid": 11
+    }
+  },
+  "reelMode": "brake",
+  "referenceDepth": null,
+  "renderer": "Canvas 2D",
+  "rentalPaid": true,
+  "rentalPrice": 15,
+  "retrieveRate": 0,
+  "rig": "bottom",
+  "rigPresentation": null,
+  "rigStock": {
+    "bottom": [
+      {
+        "bait": null,
+        "condition": 1,
+        "hookDamage": 0
+      },
+      {
+        "bait": {
+          "condition": 1,
+          "kind": "squid"
+        },
+        "condition": 1,
+        "hookDamage": 0
+      }
+    ],
+    "dropper": [],
+    "feather40": [
+      {
+        "bait": null,
+        "condition": 1,
+        "hookDamage": 0
+      }
+    ],
+    "float": [],
+    "jig": [],
+    "sabiki": [],
+    "slider": []
+  },
+  "rigWeightGrams": 85,
+  "rodAssemblies": {
+    "rod": {
+      "bait": "squid",
+      "drag": 0.48,
+      "fishingDepthMeters": null,
+      "leader": null,
+      "line": null,
+      "reel": null,
+      "rig": "bottom",
+      "weightGrams": 85
+    }
+  },
+  "rodAzimuth": 70,
+  "rodBend": 0,
+  "rodElevation": 45,
+  "rodLoadN": 0,
+  "rodMount": "hand",
+  "rodSupplies": {
+    "rod": {
+      "bait": {
+        "condition": 0,
+        "kind": "squid"
+      },
+      "condition": 0.975,
+      "hookDamage": 0,
+      "rig": "bottom"
+    }
+  },
+  "sailedMeters": 140,
+  "speedKnots": null,
+  "stamina": 3,
+  "standing": false,
+  "swim": null,
+  "tension": 0,
+  "throttle": 0,
+  "time": "06:20:24",
+  "timeScale": 2,
+  "tripComplete": true,
+  "version": 5,
+  "view": "overhead",
+  "walkDestination": null,
+  "walkPending": false,
+  "walkedMeters": 84,
+  "waypoint": null
+}

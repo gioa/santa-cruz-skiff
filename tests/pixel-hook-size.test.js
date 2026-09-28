@@ -12,7 +12,7 @@ const advance=(hold,seconds,load,dt=.1)=>{
 };
 
 test('all premade rigs specify their US hook number and virtual hook product properties',()=>{
- assert.deepEqual(Object.values(RIG_PROFILES).map(r=>r.hookSize),['2/0','1/0','3/0','4/0','#2','#6']);
+ assert.deepEqual(Object.values(RIG_PROFILES).map(r=>r.hookSize),['2/0','1/0','3/0','4/0','#2','#6','4/0']);
  for(const rig of Object.values(RIG_PROFILES)){assert.ok(rig.hookGapMm>0);assert.ok(rig.hookWireStrengthN>0);assert.match(rig.hookWire,/^(fine|standard|heavy)$/);}
 });
 

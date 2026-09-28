@@ -42,6 +42,11 @@ const species=[
  {id:'pacific_bonito',names:['太平洋鲣','太平洋狐鲣','pacific bonito','sarda chiliensis','sarda lineolata'],latin:'Sarda chiliensis lineolata',pelagic:true,minimumCm:0,bag:10,smallBag:5,minimumForkCm:24*2.54,minimumKg:5*.45359237,source:SOURCE.booklet},
  {id:'california_halibut',names:['加州大比目鱼','加州比目鱼','california halibut'],latin:'Paralichthys californicus',minimumCm:22*2.54,bag:2,source:SOURCE.halibut},
  {id:'pacific_mackerel',names:['太平洋鲭鱼','pacific mackerel','pacific chub mackerel'],latin:'Scomber japonicus',minimumCm:0,bag:null,excludedGeneralBag:true,pelagic:true,source:SOURCE.general},
+ {id:'white_croaker',names:['白石首鱼','white croaker'],latin:'Genyonemus lineatus',minimumCm:0,bag:10,source:SOURCE.general},
+ // 27.60(b) excludes sanddabs from the general bag; 28.48 flatfish are
+ // not in the 28.65(d) one-line/two-hook list. Federal descending-device
+ // requirements still apply, separately from RCG seasons and gear limits.
+ {id:'pacific_sanddab',names:['太平洋沙鲽','pacific sanddab'],latin:'Citharichthys sordidus',groundfish:true,groundfishSeasonExempt:true,groundfishGearExempt:true,minimumCm:0,bag:null,excludedGeneralBag:true,source:SOURCE.general},
  {id:'lingcod',names:['长蛇齿单线鱼','灵鳕','lingcod'],latin:'Ophiodon elongatus',groundfish:true,minimumCm:22*2.54,bag:2,source:SOURCE.groundfish},
  {id:'yelloweye_rockfish',names:['黄眼岩鱼','yelloweye rockfish'],latin:'Sebastes ruberrimus',groundfish:true,rcg:true,prohibited:true,bag:0,source:SOURCE.groundfish},
  {id:'quillback_rockfish',names:['刺背岩鱼','quillback rockfish'],latin:'Sebastes maliger',groundfish:true,rcg:true,prohibited:true,bag:0,source:SOURCE.groundfish},
@@ -130,13 +135,13 @@ export function assessCatch(fish={},context={}){
   salmonGear(fish,context,result);
  }
  if(sp.salmon&&kept&&fish.filleted===true)result.violations.push(issue('salmon_fillet_on_vessel','retention','鲑鱼上岸前不得在船上切成鱼片。',SOURCE.salmon));
- if(sp.groundfish&&!sp.prohibited&&date.slice(5)<RULESET_2026.groundfishSeason.open)result.violations.push(issue('closed_groundfish_season','season','当前日期在船钓岩鱼与灵鳕关闭期。',SOURCE.groundfish,{seasonOpens:`${date.slice(0,4)}-04-01`,seasonCloses:`${date.slice(0,4)}-12-31`}));
+ if(sp.groundfish&&!sp.groundfishSeasonExempt&&!sp.prohibited&&date.slice(5)<RULESET_2026.groundfishSeason.open)result.violations.push(issue('closed_groundfish_season','season','当前日期在船钓岩鱼与灵鳕关闭期。',SOURCE.groundfish,{seasonOpens:`${date.slice(0,4)}-04-01`,seasonCloses:`${date.slice(0,4)}-12-31`}));
  const protection=marineProtectionAt(gps);if(!protection.supported)result.unsupported.push(unsupported(protection.reason));for(const p of protection.uncertain)result.unsupported.push(unsupported('mpa_boundary_uncertain',p));for(const p of protection.areas)if(p.type==='no_take'||p.type==='pelagic_only'&&!sp.pelagic)result.violations.push(issue('protected_area_take','location','该保护区不允许捕捞这类鱼。',p.source,{areaId:p.id,areaName:p.name}));
- const groundfishAboard=Boolean(fish.groundfishAboardAtCapture??context.groundfishAboard)||Boolean(sp.groundfish);
+ const groundfishAboard=Boolean(fish.groundfishAboardAtCapture??context.groundfishAboard)||Boolean(sp.groundfish&&!sp.groundfishGearExempt);
  if(groundfishAboard){
   if(![rig.lineCount,rig.hookCount].every(n=>n!=null&&Number.isInteger(Number(n))&&Number(n)>=1))result.unsupported.push(unsupported('missing_hook_or_line_count'));
-  if(Number.isFinite(Number(rig.lineCount))&&Number(rig.lineCount)>1)result.violations.push(issue('groundfish_line_limit','rig','捕捞或持有底栖鱼时最多使用一条钓线。',SOURCE.general,{actual:Number(rig.lineCount),maximum:1}));
-  if(Number.isFinite(Number(rig.hookCount))&&Number(rig.hookCount)>2)result.violations.push(issue('groundfish_hook_limit','rig','捕捞或持有底栖鱼时最多使用两个钩。',SOURCE.general,{actual:Number(rig.hookCount),maximum:2}));
+  if(Number.isFinite(Number(rig.lineCount))&&Number(rig.lineCount)>1)result.violations.push(issue('groundfish_line_limit','rig','捕捞或持有岩鱼等受限底栖鱼时最多使用一条钓线。',SOURCE.general,{actual:Number(rig.lineCount),maximum:1}));
+  if(Number.isFinite(Number(rig.hookCount))&&Number(rig.hookCount)>2)result.violations.push(issue('groundfish_hook_limit','rig','捕捞或持有岩鱼等受限底栖鱼时最多使用两个钩。',SOURCE.general,{actual:Number(rig.hookCount),maximum:2}));
  }
  if(sp.groundfish){if(rig.hasDescendingDevice===false)result.violations.push(issue('descending_device_required','rig','船上需要可立即使用的降鱼器。',SOURCE.groundfish));else if(rig.hasDescendingDevice!==true)result.unsupported.push(unsupported('descending_device_not_recorded'));}
  if(rig.landingNetDiameterInches===false||Number.isFinite(rig.landingNetDiameterInches)&&rig.landingNetDiameterInches<18)result.violations.push(issue('landing_net_required','rig','船钓需要可立即使用且开口至少 18 in 的抄网。',SOURCE.general,{minimumInches:18}));else if(!Number.isFinite(rig.landingNetDiameterInches))result.unsupported.push(unsupported('landing_net_not_recorded'));

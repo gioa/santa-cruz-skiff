@@ -6,6 +6,7 @@ globalThis.fetch=async url=>new Response(await readFile(url));
 const {PixelSimulation,HARBOR,FISHING_SPOTS}=await import('../dist/pixel-sim.js');
 const {syncVessel}=await import('../dist/vessel-physics.js');
 const {MAX_PAID_LINE_METERS,MAX_TROLL_SPEED_MPS,rodTipPosition,relativeFishingFlow,stepFishingLine}=await import('../dist/pixel-fishing-physics.js');
+const {fishEncounter}=await import('../dist/pixel-fish-ecology.js');
 const run=(sim,seconds,input={})=>{for(let t=0;t<seconds-1e-8;t+=.1)sim.step(Math.min(.1,seconds-t),input);};
 function ready(gear=[]){
  const sim=new PixelSimulation({rng:()=>.05,patrolRng:()=>.9,conditions:{currentMps:0},profile:{version:2,credits:2000}});sim.start();Object.assign(sim.state,{playerX:HARBOR.counterX,playerZ:HARBOR.counterZ});
@@ -46,6 +47,22 @@ test('rod lift changes a taut rig position but held pose has a finite stroke',()
  assert.ok(before-lifted>.3);assert.ok(before-lifted<2.1);assert.ok(sim.state.lureDepth>=lifted-.01,'a held tip may settle the rig toward vertical but cannot continue lifting it');assert.equal(sim.state.paidLineMeters,paid);assert.ok(sim.state.rodBend>0);assert.ok(sim.state.rodLoadN>0);
 });
 
+test('ecological jig action follows real lure movement and stops at the physical stroke limit',()=>{
+ const sim=ready(['rig_feather40']);assert.ok(sim.setRig({rig:'feather40'}).ok);quietDrop(sim);run(sim,30);sim.setReelMode('brake');run(sim,2,{reel:.4});
+ let moving=sim.rigEnvironment();for(let i=0;i<8;i++){sim.step(.1,{pump:true});const e=sim.rigEnvironment();if(e.lureVerticalSpeedMps>moving.lureVerticalSpeedMps)moving=e;}
+ assert.ok(moving.lureVerticalSpeedMps>.1);
+ const fish=[{id:'copper'}];
+ assert.ok(fishEncounter(fish,moving).ratePerSecond>fishEncounter(fish,{...moving,lureVerticalSpeedMps:0}).ratePerSecond*2);
+ run(sim,10,{pump:true});const held=sim.rigEnvironment();
+ assert.equal(sim.state.pumping,true);
+ assert.ok(Math.abs(held.lureVerticalSpeedMps)<1e-8);
+ assert.equal(fishEncounter(fish,held).ratePerSecond,fishEncounter(fish,{...held,pumping:false,lureVerticalSpeedMps:0}).ratePerSecond);
+ sim.setRodPose({elevation:75});sim.step(.1,{});
+ assert.equal(sim.state.pumping,false);
+ assert.ok(sim.rigEnvironment().lureVerticalSpeedMps>.1,'mobile rod-angle changes move the bait without a pumping button');
+ run(sim,10);assert.ok(Math.abs(sim.rigEnvironment().lureVerticalSpeedMps)<.005,'a held mobile rod angle also stops supplying jig action');
+});
+
 test('only a real float mechanically holds the selected depth; sabiki free spool continues below its reference layer',()=>{
  const float=pure('float',{rigWeightGrams:7,fishingDepthMeters:2}),sabiki=pure('sabiki',{rigWeightGrams:28,fishingDepthMeters:6});pureRun(float,60);pureRun(sabiki,60);
  assert.ok(Math.abs(float.lureDepth-2)<.1);assert.ok(float.floatPosition);assert.equal(float.floatPosition.height,0);assert.ok(sabiki.lureDepth>10);assert.equal(sabiki.floatPosition,null);assert.equal(sabiki.bobber.height,-sabiki.lureDepth);
@@ -73,7 +90,8 @@ test('side holder permits bounded slow trolling, neutral pickup, and actual line
 });
 
 test('a mounted bite neutralizes propulsion and requires pickup before a hand-operated wind/lift',()=>{
- const sim=ready();assert.ok(sim.setRodMount('port').ok);assert.ok(sim.lowerRig().ok);sim.state.biteAt=.4;assert.ok(sim.toggleEngine().ok);assert.ok(sim.setThrottle(.15));run(sim,2);assert.equal(sim.state.fishState,'bite');assert.equal(sim.state.throttle,0);assert.equal(sim.canOperateHelm,false);assert.equal(sim.hook().ok,false);assert.ok(sim.setRodMount('hand').ok);assert.equal(sim.state.engine,false);seatHook(sim);assert.equal(sim.state.fishState,'fight');
+ const sim=ready();assert.ok(sim.setRodMount('port').ok);assert.ok(sim.lowerRig().ok);sim.state.biteAt=Infinity;sim.state.snagThreshold=Infinity;assert.ok(sim.toggleEngine().ok);assert.ok(sim.setThrottle(.15));run(sim,3);assert.ok(sim.state.lureDepth>.15);sim.state.biteAt=.000001;
+ for(let t=0;t<5&&sim.state.fishState!=='bite';t+=.1)sim.step(.1);assert.equal(sim.state.fishState,'bite');assert.equal(sim.state.throttle,0);assert.equal(sim.canOperateHelm,false);assert.equal(sim.hook().ok,false);assert.ok(sim.setRodMount('hand').ok);assert.equal(sim.state.engine,false);seatHook(sim);assert.equal(sim.state.fishState,'fight');
 });
 
 test('pause freezes line and posture; resume resets old live tackle without duplicating bait or cargo',()=>{

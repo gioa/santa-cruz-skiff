@@ -12,7 +12,8 @@ function ready(){
 test('a deployed hand-held rod blocks both anchor directions until the rod is secured in a side holder',()=>{
  const sim=ready();assert.ok(sim.lowerRig().ok);assert.equal(sim.toggleAnchor().ok,false);assert.equal(sim.state.anchor,false);assert.ok(sim.setRodMount('port').ok);assert.ok(sim.toggleAnchor().ok);assert.equal(sim.state.anchor,true);
  assert.ok(sim.setRodMount('hand').ok);assert.equal(sim.toggleAnchor().ok,false);assert.equal(sim.state.anchor,true);assert.ok(sim.setRodMount('starboard').ok);assert.ok(sim.toggleAnchor().ok);assert.equal(sim.state.anchor,false);
- sim.state.fishState='bite';assert.equal(sim.toggleAnchor().ok,false,'a bite needs rod attention even in the holder');assert.ok(sim.setRodMount('hand').ok);seatHook(sim);assert.equal(sim.toggleAnchor().ok,false,'fighting fish cannot be interrupted by hauling anchor');
+ sim.state.biteAt=Infinity;sim.state.snagThreshold=Infinity;run(sim,3);assert.ok(sim.state.lureDepth>.15,'the hook must actually be underwater before an encounter');sim.state.biteAt=.000001;
+ for(let t=0;t<5&&sim.state.fishState!=='bite';t+=.1)sim.step(.1);assert.equal(sim.state.fishState,'bite');assert.equal(sim.toggleAnchor().ok,false,'a bite needs rod attention even in the holder');assert.ok(sim.setRodMount('hand').ok);seatHook(sim);assert.equal(sim.toggleAnchor().ok,false,'fighting fish cannot be interrupted by hauling anchor');
 });
 
 test('anchor obeys pause, inspection, mooring and docking state, preserving engine/speed rules',()=>{

@@ -48,7 +48,8 @@ test('a hand-held deployed rig hides boat operation until a real reel retrieve o
 });
 
 test('a mounted bite offers pickup rather than strike, and pickup exposes the real hook action',()=>{
- const sim=ready();assert.ok(sim.setRodMount('starboard').ok);assert.ok(sim.lowerRig().ok);sim.state.biteAt=.5;run(sim,2);assert.equal(sim.state.fishState,'bite');let a=actions(sim);assert.equal(a.take,true);assert.equal(a.hook,false);assert.equal(a.engine,false);assert.equal(a.anchor,false);assert.equal(a.reel,false);assert.equal(sim.hook().ok,false);
+ const sim=ready();assert.ok(sim.setRodMount('starboard').ok);assert.ok(sim.lowerRig().ok);sim.state.biteAt=Infinity;sim.state.snagThreshold=Infinity;run(sim,3);assert.ok(sim.state.lureDepth>.15);sim.state.biteAt=.000001;
+ for(let t=0;t<5&&sim.state.fishState!=='bite';t+=.1)sim.step(.1);assert.equal(sim.state.fishState,'bite');let a=actions(sim);assert.equal(a.take,true);assert.equal(a.hook,false);assert.equal(a.engine,false);assert.equal(a.anchor,false);assert.equal(a.reel,false);assert.equal(sim.hook().ok,false);
  assert.ok(sim.setRodMount('hand').ok);a=actions(sim);assert.equal(a.take,false);assert.equal(a.hook,true);assert.equal(a.reel,true);seatHook(sim);assert.equal(sim.state.fishState,'fight');a=actions(sim);assert.equal(a.hook,false);assert.equal(a.mount,false);assert.equal(a.engine,false);assert.equal(a.drag,true);
 });
 

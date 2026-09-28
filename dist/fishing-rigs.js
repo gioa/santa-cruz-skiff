@@ -12,6 +12,7 @@ export const RIG_SOURCES=Object.freeze([
   Object.freeze({id:'noaa-mackerel',title:'NOAA Fisheries — Pacific mackerel',url:'https://www.fisheries.noaa.gov/species/pacific-mackerel',basis:'Schooling coastal pelagic fish; adults use a broad water column and feed on plankton and young fish.'}),
   Object.freeze({id:'seagrant-halibut',title:'California Sea Grant — California fisheries research final report',url:'https://caseagrant.ucsd.edu/sites/default/files/7MG_PomeroyEtAl_FinalReport.pdf',basis:'California halibut commonly occupy sandy bottom; availability varies in space and time.'}),
   Object.freeze({id:'cdfw-pier-archive',title:'Santa Cruz and Capitola wharves — CDFW training archive',url:'https://filelib.wildlife.ca.gov/FileLib/CRFS/CRFS%20Training%20Materials/Sites/Pier_Info/SCR_piers.pdf',basis:'Historical first-hand Ken Jones accounts archived by CDFW: bottom bait and high/low rigs, midwater bait leaders, and surface floats. Not a current rules source; game feather rigs use two hooks only.'}),
+  Object.freeze({id:'pitbull-feather-bottomfish',title:'Pitbull Tackle — UV Feather Bottomfish Rig',url:'https://pitbulltackle.com/uv-feather-bottomfish-rig/',basis:'Manufacturer offers a two-hook bottomfish rig with 4/0 feather/mylar flies. The game adds its own 4 oz sinker and tuned hook-wire, motion and catch parameters; these are not manufacturer-tested specifications.'}),
 ]);
 
 const clamp=(n,min,max)=>Math.max(min,Math.min(max,n));
@@ -32,6 +33,7 @@ export const RIG_PROFILES=Object.freeze({
   jig:profile({id:'jig',hookSize:'4/0',hookGapMm:16,hookWire:'heavy',hookWireStrengthN:85,hookStyle:'j',item:'rig_jig',name:'铅头软饵钓组',english:'Single-hook leadhead swimbait',hooks:1,defaultWeightGrams:42,baitAboveBottom:.04,sinkFactor:.82,dragArea:.00026,snagFactor:1.05,layer:'bottom',technique:'沉到底层，轻提后放落，或缓慢收线搜索。',targetSpecies:['lingcod','rockfish'],speciesBias:{blue:1.14,copper:1.32,halibut:1.19,mackerel:1.02,lingcod:1.7}}),
   float:profile({id:'float',hookSize:'#2',hookGapMm:8,hookWire:'standard',hookWireStrengthN:30,hookStyle:'circle',item:'rig_float',name:'定层浮游钓组',english:'Single-hook slip-float rig',hooks:1,defaultWeightGrams:7,baitAboveBottom:0,sinkFactor:.6,dragArea:.00008,snagFactor:.28,layer:'suspended',defaultFishingDepth:2.5,technique:'圆形钩；挡豆限定饵层，鱼讯时稳定收线。',targetSpecies:['mackerel'],speciesBias:{blue:1.03,copper:.7,halibut:.6,mackerel:1.72,lingcod:.62}}),
   sabiki:profile({id:'sabiki',hookSize:'#6',hookGapMm:5.5,hookWire:'fine',hookWireStrengthN:17,hookStyle:'j',item:'rig_sabiki',name:'双钩羽毛钓组',english:'Two-hook feather bait rig',hooks:2,defaultWeightGrams:28,baitAboveBottom:.8,sinkFactor:.76,dragArea:.00018,snagFactor:.95,layer:'midwater',defaultFishingDepth:6,technique:'只有两枚小钩；停在中层，短促轻提寻找鱼群。',targetSpecies:['mackerel'],speciesBias:{blue:1.1,copper:.72,halibut:.49,mackerel:2.03,lingcod:.56}}),
+  feather40:profile({id:'feather40',hookSize:'4/0',hookGapMm:16,hookWire:'heavy',hookWireStrengthN:85,hookStyle:'j',item:'rig_feather40',name:'双支线羽毛钓组',english:'Two-dropper 4/0 feather rig',hooks:2,defaultWeightGrams:113,baitAboveBottom:.7,sinkFactor:.85,dragArea:.00028,snagFactor:.84,layer:'bottom',technique:'两条短支线各一枚 4/0 羽毛 J 型钩；4 oz 底坠，垂直下放后离底轻提，无需另挂鱼饵。',targetSpecies:['rockfish','lingcod'],speciesBias:{blue:1.25,copper:1.6,halibut:.74,mackerel:.7,lingcod:1.5,vermilion:1.65,salmon:.4,seabass:.65,bonito:.75}}),
 });
 
 export function getRigProfile(rig='bottom'){
@@ -68,6 +70,7 @@ export function lureAttraction(options={}){
   const swimming=Math.min(1,speed/.25)*bell(speed,.45,.65);
   if(rig.id==='jig')return clamp(.48+swimming*1.08+pumping*.58-speed*.05,.32,2.05);
   if(rig.id==='sabiki')return clamp(.7+swimming*.5+pumping*.48-speed*.06,.4,1.7);
+  if(rig.id==='feather40')return clamp(.64+swimming*.72+pumping*.58-speed*.08,.38,1.85);
   if(rig.id==='slider')return clamp(.92+.24*bell(drift,.2,.19)+swimming*.12-pumping*.12-speed*.16,.5,1.3);
   if(rig.id==='float')return clamp(1.04-speed*.3-pumping*.06,.45,1.04);
   return clamp(.96+swimming*.13+pumping*.12-speed*.14,.5,1.18);
@@ -135,6 +138,8 @@ const SPECIES=Object.freeze({
 /** Accept existing PIXEL_FISH objects, latin names or future stable IDs. */
 export function rigSpeciesKey(fish){
   const s=typeof fish==='string'?fish:`${fish?.id||''} ${fish?.latin||''} ${fish?.name||''}`;
+  if(/Genyonemus|croaker|白石首/i.test(s))return'croaker';
+  if(/Citharichthys sordidus|sanddab|太平洋沙鲽/i.test(s))return'sanddab';
   if(/miniatus|vermilion|朱红/i.test(s))return'vermilion';
   if(/tshawytscha|chinook|帝王鲑/i.test(s))return'salmon';
   if(/nobilis|seabass|白海鲈/i.test(s))return'seabass';

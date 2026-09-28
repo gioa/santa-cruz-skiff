@@ -1,11 +1,11 @@
-import {pierRings,landPolygons,coastLines,buildingFootprints,FISHING_SPOTS,onLand,onPier} from './pixel-geography.js?v=20260927-pixel-v21';
-import {HARBOR} from './harbor-layout.js?v=20260927-pixel-v21';
-import {depthInfoAt} from './bathymetry.js?v=20260927-pixel-v21';
-import {createWildlife,drawWildlife} from './pixel-wildlife.js?v=20260927-pixel-v21';
-import {cameraOffset,projectPixel,unprojectPixel,stepDeadzoneCamera,cameraDeadzone,cameraPlayfield,fitCameraBounds,zoomCameraAt,rectilinearOutline} from './pixel-camera.js?v=20260927-pixel-v21';
-import {ladderPoint} from './swimming.js?v=20260927-pixel-v21';
-import {SKIFF_RACKS,boatRenderPose,parkedSkiffPoses,skiffScreenPose,hitSkiff} from './pixel-boat-geometry.js?v=20260927-pixel-v21';
-import {getRodCurve,getReelPose,getFishingLine,getFishingPresentation} from './pixel-rod-geometry.js?v=20260927-pixel-v21';
+import {pierRings,landPolygons,coastLines,buildingFootprints,FISHING_SPOTS,onLand,onPier} from './pixel-geography.js?v=20260927-pixel-v22';
+import {HARBOR} from './harbor-layout.js?v=20260927-pixel-v22';
+import {depthInfoAt} from './bathymetry.js?v=20260927-pixel-v22';
+import {createWildlife,drawWildlife} from './pixel-wildlife.js?v=20260927-pixel-v22';
+import {cameraOffset,projectPixel,unprojectPixel,stepDeadzoneCamera,cameraDeadzone,cameraPlayfield,fitCameraBounds,zoomCameraAt,rectilinearOutline} from './pixel-camera.js?v=20260927-pixel-v22';
+import {ladderPoint} from './swimming.js?v=20260927-pixel-v22';
+import {SKIFF_RACKS,boatRenderPose,parkedSkiffPoses,skiffScreenPose,hitSkiff} from './pixel-boat-geometry.js?v=20260927-pixel-v22';
+import {getRodCurve,getReelPose,getFishingLine,getFishingPresentation} from './pixel-rod-geometry.js?v=20260927-pixel-v22';
 
 // The map keeps the same metre coordinates as the sailing simulation. The
 // people and boat are deliberately enlarged, like a handheld-era RPG, so that
@@ -244,6 +244,12 @@ export function createPixelWorld(canvas,{sprites={},conditions={}}={}){
     }
   }
   function patrol(state){
+    if(state.inspection?.reason==='landing'){
+      if(state.inspection.phase!=='checking')return;
+      const p=point(state.playerX+2.5,state.playerZ),scale=clamp(camera.scale*.2,.7,1.3);
+      if(sprites.warden)ctx.drawImage(sprites.warden,Math.round(p.x-8*scale),Math.round(p.y-25*scale),Math.round(16*scale),Math.round(26*scale));
+      const progress=clamp(state.inspection.progress||0,0,1);ctx.fillStyle='#284d47';ctx.fillRect(p.x-12,p.y-34*scale,24,4);ctx.fillStyle='#f5d69c';ctx.fillRect(p.x-11,p.y-34*scale+1,Math.round(22*progress),2);return;
+    }
     const patrol=state.inspection;if(!patrol||!Number.isFinite(patrol.x)||!Number.isFinite(patrol.z)||!visible(patrol.x,patrol.z,100))return;
     const p=point(patrol.x,patrol.z),scale=clamp(camera.scale*.19,.8,1.3),moving=patrol.phase==='approaching'||patrol.phase==='departing';
     ctx.save();ctx.translate(p.x,p.y+Math.round(Math.sin(clock*1.4)*.6));ctx.rotate(-(patrol.heading||0));ctx.scale(scale,scale);

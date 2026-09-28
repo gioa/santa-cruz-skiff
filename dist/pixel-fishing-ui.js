@@ -1,12 +1,12 @@
-import {rigHookSize} from './pixel-hook-label.js?v=20260927-pixel-v21';
-import {formatDepth,metersToFeet} from './units.js?v=20260927-pixel-v21';
-import {getRigProfile} from './fishing-rigs.js?v=20260927-pixel-v21';
-import {bindPointer} from './input.js?v=20260927-pixel-v21';
-import {rodPoseFromDrag,clockwiseTurns,createCrankInput} from './pixel-fishing-input.js?v=20260927-pixel-v21';
-import {fishingFeedback,reelMotion} from './pixel-fishing-feedback.js?v=20260927-pixel-v21';
+import {rigHookSize} from './pixel-hook-label.js?v=20260927-pixel-v22';
+import {formatDepth,metersToFeet} from './units.js?v=20260927-pixel-v22';
+import {getRigProfile} from './fishing-rigs.js?v=20260927-pixel-v22';
+import {bindPointer} from './input.js?v=20260927-pixel-v22';
+import {rodPoseFromDrag,clockwiseTurns,createCrankInput} from './pixel-fishing-input.js?v=20260927-pixel-v22';
+import {fishingFeedback,reelMotion} from './pixel-fishing-feedback.js?v=20260927-pixel-v22';
 
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
-const rigNames={bottom:'沉底组',dropper:'双支线',slider:'滑铅组',jig:'软饵组',float:'浮漂组',sabiki:'羽毛组'};
+const rigNames={bottom:'沉底组',dropper:'双支线',slider:'滑铅组',jig:'软饵组',float:'浮漂组',sabiki:'羽毛组',feather40:'双支羽毛'};
 const mountNames={hand:'手持',port:'左舷竿架',starboard:'右舷竿架'};
 const TAU=Math.PI*2;
 

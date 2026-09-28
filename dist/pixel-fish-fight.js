@@ -14,9 +14,13 @@ export const FISH_FIGHT_PROFILES=Object.freeze({
  salmon:{base:2.3,burst:8.2,run:8.8,rest:7.4,speed:1.65,lateral:.7,dive:.18,budget:235,shake:3.1},
  seabass:{base:2.0,burst:7.6,run:7.2,rest:9.5,speed:1.22,lateral:.27,dive:.56,budget:190,shake:2.1},
  bonito:{base:2.4,burst:9.0,run:5.4,rest:3.1,speed:1.5,lateral:.9,dive:.12,budget:280,shake:4.5},
+ croaker:{base:.65,burst:3.2,run:1.1,rest:4.8,speed:.36,lateral:.16,dive:.08,budget:42,shake:4.1},
+ sanddab:{base:.45,burst:2.5,run:.8,rest:6.4,speed:.24,lateral:.18,dive:.06,budget:32,shake:2.8},
 });
 export function fishFightKind(fish={}){
  const key=`${fish.fightKind||''} ${fish.latin||''} ${fish.name||''}`;
+ if(/croaker|Genyonemus|白石首/i.test(key))return'croaker';
+ if(/sanddab|Citharichthys sordidus|太平洋沙鲽/i.test(key))return'sanddab';
  if(/salmon|tshawytscha|鲑/i.test(key))return'salmon';
  if(/seabass|nobilis|白海鲈/i.test(key))return'seabass';
  if(/bonito|Sarda|鲣/i.test(key))return'bonito';
