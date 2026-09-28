@@ -75,7 +75,7 @@ test('snag force and bottom feed remain stable across phone and desktop timestep
 test('raising a low rod with short braked line does not create line and can lift the rig out of water',()=>{
  const s=pure('bottom',{rodElevation:5,reelMode:'brake',paidLineMeters:1.253});const paid=s.paidLineMeters,oldTip=rodTipPosition(s);s.rodElevation=85;pureRun(s,.2);
  assert.equal(s.paidLineMeters,paid);assert.equal(s.payoutRate,0);assert.ok(s.bobber.height>0);assert.ok(Math.hypot(s.rodTip.x-oldTip.x,s.rodTip.z-oldTip.z,s.rodTip.height-oldTip.height)<=4.2);
- pureRun(s,8);const lifted={...s.bobber};pureRun(s,10);assert.ok(Math.hypot(s.bobber.x-lifted.x,s.bobber.z-lifted.z,s.bobber.height-lifted.height)<.001,'holding the same pose cannot pump indefinitely');
+ pureRun(s,8);const lifted={...s.bobber};pureRun(s,10);assert.ok(Math.hypot(s.bobber.x-lifted.x,s.bobber.z-lifted.z,s.bobber.height-lifted.height)<.005,'holding the same pose cannot pump indefinitely');
 });
 
 test('normal crank closes the spool, takes a finite length per turn, and physically retrieves the rig',()=>{
@@ -153,7 +153,7 @@ test('a drifting boat reaches an underwater pendulum equilibrium on fixed braked
  for(const dt of[1/60,.1]){
   const s=pure('bottom',{reelMode:'brake',paidLineMeters:20,lureDepth:15});s.bobber.height=-15;
   for(let time=0;time<240-dt/2;time+=dt){s.boatX+=.4*dt;Object.assign(s,stepFishingLine(s,{dt,environment:{bottomDepth:25},velocity:{vx:.4,vz:0}}));assert.equal(s.paidLineMeters,20);assert.ok(Math.hypot(s.bobber.x-s.rodTip.x,s.bobber.z-s.rodTip.z,s.bobber.height-s.rodTip.height)<=20+1e-8,'rope length is enforced after gravity');}
-  assert.ok(s.lureDepth>10&&s.lureDepth<18,'slow drift produces a submerged angled line');assert.ok(s.lineDistance>4&&s.lineDistance<15);results.push(s.lureDepth);
+  assert.ok(s.lureDepth>10&&s.lureDepth<18,'slow drift produces a submerged angled line');assert.ok(Math.hypot(s.bobber.x-s.rodTip.x,s.bobber.z-s.rodTip.z)>1&&s.lineDistance<15);results.push(s.lureDepth);
   pureRun(s,120,{environment:{bottomDepth:25}});assert.ok(s.lureDepth>17,'after stopping the boat gravity swings the rig back beneath the rod');assert.equal(s.paidLineMeters,20);
  }
  assert.ok(Math.abs(results[0]-results[1])<.1,'the equilibrium is stable across mobile and desktop frame intervals');

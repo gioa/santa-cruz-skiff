@@ -2,6 +2,7 @@
 """Refresh attributed public NOAA observations. Keep dated last-known data on failure."""
 import argparse,json,urllib.request,datetime,math
 from pathlib import Path
+from surface_current import URL as CURRENT_URL,parse_surface_current
 parser=argparse.ArgumentParser();parser.add_argument('--offline',type=Path);args=parser.parse_args()
 root=Path(__file__).resolve().parents[1];out=root/'dist/data/marine.json';now=datetime.datetime.now(datetime.timezone.utc)
 old=json.loads(out.read_text()) if out.exists() else {}
@@ -32,4 +33,6 @@ try:
  if 'predictions' not in tide:raise ValueError('No predictions')
  result['tide']={'station':'9413745','name':'Santa Cruz, Monterey Bay','datum':'MLLW','type':'predicted high/low','timezone':'UTC','url':url,'predictions':tide['predictions']}
 except Exception as e:result['errors'].append('tide: '+type(e).__name__)
+try:result['surfaceCurrent']=parse_surface_current(load(CURRENT_URL,'surface-current.csv'),now)
+except Exception as e:result['errors'].append('surfaceCurrent: '+type(e).__name__)
 out.write_text(json.dumps(result,ensure_ascii=False,separators=(',',':')));print('Marine snapshot:',out,'failures:',result['errors'])

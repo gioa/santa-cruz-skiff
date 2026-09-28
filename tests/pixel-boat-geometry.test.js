@@ -67,20 +67,20 @@ test('mobile and desktop targets/anchors/metadata use the same dry and launching
   }
 });
 
-test('one, two and four on-screen hull lengths convert to 15, 30 and 60 feet at every camera zoom',()=>{
+test('cast clicks share geographic metres at every camera zoom, with readable hull art preserved',()=>{
  for(const [width,height]of[[390,844],[320,568],[844,390]])for(const zoom of[3,6,9])for(const heading of[0,.7,Math.PI/2]){
   const world=createPixelWorld(fakeCanvas());world.resize(width,height);world.setZoom(zoom);
   const state={...base,mode:'boat',launchStage:'afloat',boatX:1300,boatZ:-320,heading,engine:false,moored:false,fishState:'idle'};world.draw(state,0);
   const boat=world.publicState().boats.player,centre=world.cssWorldToScreen(state.boatX,state.boatZ);
   for(const lengths of[1,2,4]){
    const click={x:centre.x+Math.cos(heading)*boat.hullLength*lengths,y:centre.y-Math.sin(heading)*boat.hullLength*lengths},target=world.screenToFishingWorld(click.x,click.y,state);
-   assert.ok(Math.abs(Math.hypot(target.x-state.boatX,target.z-state.boatZ)-lengths*15*.3048)<1/zoom,`${width}/${zoom}/${lengths}: click must use the same metres as the hull`);
+   assert.ok(Math.abs(Math.hypot(target.x-state.boatX,target.z-state.boatZ)-lengths*77*.18)<1/zoom,`${width}/${zoom}/${lengths}: click must use map metres`);
    const back=world.fishingWorldToScreen(target.x,target.z,state);assert.ok(Math.hypot(back.x-click.x,back.y-click.y)<2);
   }
  }
 });
 
-test('a 30-foot cast and its real diagonal paid line keep the same hull ratio through flight and zoom',async()=>{
+test('a 30-foot cast retains geographic distance and real diagonal paid line through flight and zoom',async()=>{
  const {planCast,stepCast}=await import('../dist/pixel-casting.js');
  const world=createPixelWorld(fakeCanvas());world.resize(390,844);
  const state={...base,mode:'boat',launchStage:'afloat',boatX:1300,boatZ:-320,heading:0,engine:false,moored:false,rodMount:'hand',rodElevation:50,rig:'bottom',paidLineMeters:0};
@@ -89,7 +89,7 @@ test('a 30-foot cast and its real diagonal paid line keep the same hull ratio th
  Object.assign(state,stepCast(state,plan.flight.duration));
  const separation=Math.hypot(state.bobber.x-state.rodTip.x,state.bobber.z-state.rodTip.z,state.rodTip.height);
  assert.ok(Math.abs(state.paidLineMeters-separation-.08)<1e-8,'payout is measured from the rod tip, not a scaled screen length');
- for(const zoom of[3,6,9]){world.setZoom(zoom);world.draw(state,0);const hull=world.publicState().boats.player,boat=world.cssWorldToScreen(state.boatX,state.boatZ),lure=world.fishingWorldToScreen(state.bobber.x,state.bobber.z,state);assert.ok(Math.abs(Math.hypot(lure.x-boat.x,lure.y-boat.y)/hull.hullLength-2)<.06);}
+ for(const zoom of[3,6,9]){world.setZoom(zoom);world.draw(state,0);const hull=world.publicState().boats.player,boat=world.cssWorldToScreen(state.boatX,state.boatZ),lure=world.fishingWorldToScreen(state.bobber.x,state.bobber.z,state);assert.ok(Math.abs(Math.hypot(lure.x-boat.x,lure.y-boat.y)/hull.hullLength-(30*.3048/(77*.18)))<.06);}
 });
 
 test('boarding and waiting labels clear the entire boat and crane animation on mobile viewports',async()=>{
@@ -110,5 +110,5 @@ test('fishing conversion does not change walking/helm map targets and rejects vi
  const dock=world.cssWorldToScreen(HARBOR.counterX,HARBOR.counterZ);
  assert.equal(world.screenToFishingWorld(dock.x,dock.y,state),null,'visual land must not become a valid shorter cast');
  const ocean=world.cssWorldToScreen(state.boatX-30,state.boatZ),map=world.screenToWorld(ocean.x,ocean.y),cast=world.screenToFishingWorld(ocean.x,ocean.y,state);
- assert.ok(Math.abs(map.x-(state.boatX-30))<.2);assert.ok(cast);assert.ok(Math.abs(cast.x-state.boatX)<Math.abs(map.x-state.boatX)/3);
+ assert.ok(Math.abs(map.x-(state.boatX-30))<.2);assert.ok(cast);assert.ok(Math.abs(cast.x-map.x)<1e-9);
 });

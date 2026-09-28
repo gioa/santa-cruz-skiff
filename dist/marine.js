@@ -1,4 +1,5 @@
 export const marine=await fetch(new URL('./data/marine.json',import.meta.url)).then(r=>r.json()).catch(()=>({errors:['snapshot unavailable']}));
+import {surfaceCurrentConditions} from './surface-current.js?v=20260927-pixel-v42';
 export const sea={mode:'real',windKnots:0,windDirection:315,waveHeight:0,period:9,waveDirection:294,waterTemp:14,tideMLLW:null,fresh:false,daylight:.1,clockMode:'morning',customHour:8};
 export function localDateParts(date=new Date()){const parts=new Intl.DateTimeFormat('en-US',{timeZone:'America/Los_Angeles',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hourCycle:'h23'}).formatToParts(date);return Object.fromEntries(parts.map(p=>[p.type,p.value]));}
 export function clockText(date=new Date()){const p=localDateParts(date);return `${p.hour}:${p.minute}:${p.second}`;}
@@ -12,6 +13,7 @@ export function updateSea(now=Date.now()){
  const wind=observation('46042','WSPD'),wave=observation('46236','WVHT');
  sea.fresh=Boolean(wind&&wave&&now-Date.parse(wind.observedAt)<6*3600e3&&now-Date.parse(wave.observedAt)<6*3600e3&&now>=Date.parse(wave.observedAt)&&now>=Date.parse(wind.observedAt));
  if(sea.mode==='real'){
+  Object.assign(sea,surfaceCurrentConditions(marine.surfaceCurrent,now));
   sea.windKnots=(wind?.value??0)*1.94384;sea.windDirection=observation('46042','WDIR')?.value??315;
   sea.waveHeight=wave?.value??0;sea.period=observation('46236','DPD')?.value??9;sea.waveDirection=observation('46236','MWD')?.value??294;sea.waterTemp=observation('46236','WTMP')?.value??14;
  }
@@ -31,7 +33,7 @@ export function solarPosition(date=new Date(),lat=36.9605644,lon=-122.0207135){
  const east=-Math.cos(dec)*Math.sin(hourAngle),north=Math.cos(phi)*Math.sin(dec)-Math.sin(phi)*Math.cos(dec)*Math.cos(hourAngle);
  return {east,north,up,altitude:Math.asin(Math.max(-1,Math.min(1,up)))};
 }
-export function marineSummary(){const updated=marine['46236']?.values?.WVHT?.observedAt;return{label:sea.mode==='real'?(sea.fresh?'NOAA 区域观测':'历史观测 / 非实时'):'自定义海况',waveHeight:sea.waveHeight,period:sea.period,windKnots:sea.windKnots,waterTemp:sea.waterTemp,observedAt:updated||null,waveStation:marine['46236']?.name,stationDistanceKm:marine['46236']?.distanceKm,tideMLLW:sea.tideMLLW,tideStatus:sea.tideMLLW===null?'无可用预报':'现实时间 · 高低潮之间近似插值 · MLLW',clock:sea.clockMode==='morning'?'06:00 开始 · 1:1 航程时间':'America/Los_Angeles · 1:1',lighting:sea.clockMode==='morning'?'航程昼夜':sea.clockMode==='real'?'真实昼夜':'自定义晨光'};}
+export function marineSummary(){const updated=marine['46236']?.values?.WVHT?.observedAt;return{label:sea.mode==='real'?(sea.fresh?'NOAA 区域观测':'历史观测 / 非实时'):'自定义海况',currentStatus:sea.currentStatus,currentObservedAt:sea.currentObservedAt,currentSource:sea.currentSource,waveHeight:sea.waveHeight,period:sea.period,windKnots:sea.windKnots,waterTemp:sea.waterTemp,observedAt:updated||null,waveStation:marine['46236']?.name,stationDistanceKm:marine['46236']?.distanceKm,tideMLLW:sea.tideMLLW,tideStatus:sea.tideMLLW===null?'无可用预报':'现实时间 · 高低潮之间近似插值 · MLLW',clock:sea.clockMode==='morning'?'06:00 开始 · 1:1 航程时间':'America/Los_Angeles · 1:1',lighting:sea.clockMode==='morning'?'航程昼夜':sea.clockMode==='real'?'真实昼夜':'自定义晨光'};}
 updateSea();
 
 // Same-origin snapshot refresh; failed updates retain the original observation timestamps.

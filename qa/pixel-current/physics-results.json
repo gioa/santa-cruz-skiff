@@ -1,0 +1,134 @@
+[
+  {
+    "scenario": "codrift",
+    "dt": 0.016666666666666666,
+    "seconds": 600,
+    "boatX": 209.99999999987236,
+    "lureX": 124.1208019038794,
+    "lureDepth": 79.69988657739188,
+    "maxLoadN": 0.49018706099999987,
+    "maxSlackM": 27.58207575950825,
+    "paidLineM": 120
+  },
+  {
+    "scenario": "codrift",
+    "dt": 0.1,
+    "seconds": 600,
+    "boatX": 209.99999999998278,
+    "lureX": 124.11709015739737,
+    "lureDepth": 79.6959300903013,
+    "maxLoadN": 0.4901870610000001,
+    "maxSlackM": 27.517075759508252,
+    "paidLineM": 120
+  },
+  {
+    "scenario": "codrift",
+    "dt": 0.25,
+    "seconds": 600,
+    "boatX": 210.00000000000875,
+    "lureX": 124.09749357209117,
+    "lureDepth": 79.67503542598025,
+    "maxLoadN": 0.4901870610000001,
+    "maxSlackM": 27.400075759508248,
+    "paidLineM": 120
+  },
+  {
+    "scenario": "bottom",
+    "dt": 0.016666666666666666,
+    "seconds": 600,
+    "boatX": 0,
+    "lureX": 1.6353723512162168,
+    "lureDepth": 9.7,
+    "maxLoadN": 0.0002596453124999998,
+    "maxSlackM": 27.895075759508252,
+    "paidLineM": 40
+  },
+  {
+    "scenario": "bottom",
+    "dt": 0.1,
+    "seconds": 600,
+    "boatX": 0,
+    "lureX": 1.6353723512162168,
+    "lureDepth": 9.7,
+    "maxLoadN": 0.0002596453125,
+    "maxSlackM": 27.895075759508252,
+    "paidLineM": 40
+  },
+  {
+    "scenario": "bottom",
+    "dt": 0.25,
+    "seconds": 600,
+    "boatX": 0,
+    "lureX": 1.6353723512162168,
+    "lureDepth": 9.7,
+    "maxLoadN": 0.0002596453125,
+    "maxSlackM": 27.895075759508252,
+    "paidLineM": 40
+  },
+  {
+    "scenario": "wind",
+    "dt": 0.016666666666666666,
+    "seconds": 600,
+    "boatX": 389.9999999997811,
+    "lureX": 384.4994209293515,
+    "lureDepth": 36.95340648259546,
+    "maxLoadN": 1.1976448335812309,
+    "maxSlackM": 27.582782817980814,
+    "paidLineM": 40
+  },
+  {
+    "scenario": "wind",
+    "dt": 0.1,
+    "seconds": 600,
+    "boatX": 389.9999999999878,
+    "lureX": 384.3474293623238,
+    "lureDepth": 36.92554597015831,
+    "maxLoadN": 1.096149474095077,
+    "maxSlackM": 27.521317879812624,
+    "paidLineM": 40
+  },
+  {
+    "scenario": "wind",
+    "dt": 0.25,
+    "seconds": 600,
+    "boatX": 390.00000000001245,
+    "lureX": 383.90062269472423,
+    "lureDepth": 36.84012191505767,
+    "maxLoadN": 0.982131604410054,
+    "maxSlackM": 27.4106745499067,
+    "paidLineM": 40
+  },
+  {
+    "scenario": "snag",
+    "dt": 0.016666666666666666,
+    "seconds": 600,
+    "boatX": 59.99999999996167,
+    "lureX": 1.6353723512162168,
+    "lureDepth": 9.7,
+    "maxLoadN": 0.1800000000000358,
+    "maxSlackM": 27.895075644770742,
+    "paidLineM": 61.1977783568427
+  },
+  {
+    "scenario": "snag",
+    "dt": 0.1,
+    "seconds": 600,
+    "boatX": 59.99999999999663,
+    "lureX": 1.6353723512162168,
+    "lureDepth": 9.7,
+    "maxLoadN": 0.18000000000005326,
+    "maxSlackM": 27.895071628958526,
+    "paidLineM": 61.1977791735852
+  },
+  {
+    "scenario": "snag",
+    "dt": 0.25,
+    "seconds": 600,
+    "boatX": 59.99999999999766,
+    "lureX": 1.6353723512162168,
+    "lureDepth": 9.7,
+    "maxLoadN": 0.18000000000006475,
+    "maxSlackM": 27.895049943595605,
+    "paidLineM": 61.197780643649864
+  }
+]

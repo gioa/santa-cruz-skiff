@@ -5,7 +5,8 @@
  * pay line out, while turning the handle takes it in. Rod movement never
  * manufactures more line. This module has no inventory, UI or random events.
  */
-import {getRigProfile,stepRigLure} from './fishing-rigs.js?v=20260927-pixel-v41';
+import {getRigProfile,stepRigLure} from './fishing-rigs.js?v=20260927-pixel-v42';
+import {rigHydrodynamics} from './pixel-rig-hydrodynamics.js?v=20260927-pixel-v42';
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 const finite=(n,f=0)=>Number.isFinite(n)?n:f;
 export const MAX_PAID_LINE_METERS=120;
@@ -58,15 +59,17 @@ export function stepFishingLine(s,{dt,environment={},current={x:0,z:0},velocity=
  const oldTip=rodTipPosition(s),oldPump=clamp(finite(s.pumpHeight),0,.8),pumpHeight=s.pumping?Math.min(.8,oldPump+dt*.95):Math.max(0,oldPump-dt*.6);
  const tip=rodTipPosition({...s,pumpHeight}),lure={...(s.bobber||{x:tip.x,z:tip.z,height:0})};
  let paid=clamp(finite(s.paidLineMeters),0,MAX_PAID_LINE_METERS),payoutRate=0,retrieveRate=crankRate*.65*Math.max(.2,retrieve),load=0,snagStretchMeters=0;
- const flow=relativeFishingFlow(current,velocity),bottom=Math.max(.1,finite(environment.bottomDepth,12));
+ let rigVelocity={vx:finite(s.rigVelocity?.vx,finite(velocity.vx)),vz:finite(s.rigVelocity?.vz,finite(velocity.vz))};
+ const flow=relativeFishingFlow(current,rigVelocity),bottom=Math.max(.1,finite(environment.bottomDepth,12));
  const dragThresholdN=(3+clamp(finite(s.drag,.48),.2,.85)*22)*Math.max(.4,strength);
  const fullDepth=Math.min(Math.max(0,bottom-rig.baitAboveBottom),rig.layer==='suspended'?finite(s.fishingDepthMeters,rig.defaultFishingDepth):bottom);
- const lineDrag=.5*1025*(finite(environment.lineDiameterMm,.36)*.001*Math.min(paid,35)*.45+rig.dragArea)*flow*flow;
+ let lineDrag=.5*1025*(finite(environment.lineDiameterMm,.36)*.001*Math.min(paid,35)*.45+rig.dragArea)*flow*flow;
+ const startLure={...lure};
  if(s.snagged){
   // A caught hook cannot be reeled through the seabed. First take up the
   // loose loop, then stretch the line / bend the rod against a fixed point.
   // Drag limits the force; abrasion and any eventual break belong to the sim.
-  if(s.snagPoint)Object.assign(lure,s.snagPoint);
+  if(s.snagPoint)Object.assign(lure,s.snagPoint);rigVelocity={vx:0,vz:0};
   const distance=separation(tip,lure),springNPerMeter=36/(1+Math.max(0,paid)*.02);
   const desiredPaid=clamp(paid-retrieveRate*dt,.08,MAX_PAID_LINE_METERS);
   const threshold=reelMode==='free'?.18:dragThresholdN;
@@ -87,11 +90,16 @@ export function stepFishingLine(s,{dt,environment={},current={x:0,z:0},velocity=
  if(fishPullN==null){
   const resting=finite(s.lureDepth)>=fullDepth-.12;
   const seabedResting=bottom-finite(s.lureDepth)-rig.baitAboveBottom<=.12;
+  const water=rigHydrodynamics({dt,current:lure.height>0?{x:0,z:0}:current,velocity:lure.height>0?{vx:rigVelocity.vx*Math.exp(-6*dt),vz:rigVelocity.vz*Math.exp(-6*dt)}:rigVelocity,boatVelocity:velocity,weightGrams:environment.weightGrams,dragArea:rig.dragArea,lineDiameterMm:finite(environment.lineDiameterMm,.36),lineMeters:paid,contact:seabedResting,habitat:environment.habitat});
+  rigVelocity={vx:water.vx,vz:water.vz};lineDrag=water.lineForce+water.rigForce;
   const gravity=stepRigLure({...environment,dt:0,depth:finite(s.lureDepth),currentMps:flow,boatSpeedMps:0});
+  const terminal=lure.height>0?1.47:gravity.sinkRate,weight=environment.weightGrams*.001*9.81*.91,mass=Math.max(.04,environment.weightGrams*.002+paid*.003);
+  const response=1-Math.exp(-dt*weight/(mass*Math.max(.05,terminal)));
+  const fallSpeed=finite(s.rigFallSpeed,terminal)+(terminal-finite(s.rigFallSpeed,terminal))*response;
   // Feed the line the descending weight actually draws, rather than alternating
   // full-speed bursts and a large loose loop. Light spool resistance remains
   // visible in the rod until the sinker transfers its weight to the bottom.
-  const proposed={x:lure.x+finite(current.x)*dt,z:lure.z+finite(current.z)*dt,height:lure.height>0?Math.max(0,lure.height-1.47*dt):-Math.min(fullDepth,Math.max(0,finite(s.lureDepth)+gravity.sinkRate*dt))};
+  const proposed={x:lure.x+water.x,z:lure.z+water.z,height:Math.max(-fullDepth,lure.height-fallSpeed*dt)};
   if(reelMode==='free'&&dt>0){
    payoutRate=clamp((separation(tip,proposed)+.025-paid)/dt,0,resting?2.4:1.65);
    if(seabedResting){
@@ -107,7 +115,7 @@ export function stepFishingLine(s,{dt,environment={},current={x:0,z:0},velocity=
    }
   }
   paid=clamp(paid+(payoutRate-retrieveRate)*dt,.08,MAX_PAID_LINE_METERS);
-  lure.x+=finite(current.x)*dt;lure.z+=finite(current.z)*dt;
+  lure.x+=water.x;lure.z+=water.z;
   const horizontal=Math.hypot(lure.x-tip.x,lure.z-tip.z),verticalBudget=Math.max(0,Math.sqrt(Math.max(0,paid*paid-horizontal*horizontal))-tip.height);
   const presentation=stepRigLure({...environment,fishingDepthMeters:rig.layer==='midwater'?bottom:s.fishingDepthMeters??environment.fishingDepthMeters,dt,depth:finite(s.lureDepth),currentMps:flow,boatSpeedMps:0,lineOutMeters:verticalBudget+rig.baitAboveBottom,retrieveSpeedMps:0,pumping:false,pumpHeight:0});
   // Integrate gravity BEFORE enforcing the fixed rope length. Capping the
@@ -115,9 +123,10 @@ export function stepFishingLine(s,{dt,environment={},current={x:0,z:0},velocity=
   // the surface: it never gets a downward step to swing beneath the rod.
   // The following 3D projection is the sole geometric line-length constraint;
   // the integration cannot pay out a single centimetre from a braked spool.
-  lure.height=lure.height>0?Math.max(0,lure.height-1.47*dt):-Math.min(fullDepth,Math.max(0,finite(s.lureDepth)+presentation.sinkRate*dt));
+  lure.height=Math.max(-fullDepth,lure.height-fallSpeed*dt);
   // Moving the actual tip upward takes slack first, then raises the rig.
   const constrained=constrainLure(lure,tip,paid);Object.assign(lure,constrained);
+  if(dt>0)rigVelocity={vx:water.vx+(lure.x-proposed.x)/dt,vz:water.vz+(lure.z-proposed.z)/dt};
   const depth=Math.max(0,-lure.height),taut=separation(tip,lure)>paid-.45;
   const contact=bottom-depth-rig.baitAboveBottom<=.18;
   load=(finite(s.rigWeightGrams,rig.defaultWeightGrams)*.001*9.81*.91+lineDrag)*(taut?.95:.15)*(reelMode==='free'?.68:1);
@@ -175,7 +184,8 @@ export function stepFishingLine(s,{dt,environment={},current={x:0,z:0},velocity=
    if(delta<payoutRate-retrieveRate)payoutRate=Math.max(0,delta+retrieveRate);
    else if(delta>payoutRate-retrieveRate)retrieveRate=Math.max(0,payoutRate-delta);
   }
+  if(dt>0&&!s.snagged&&fishPullN!=null)rigVelocity={vx:(lure.x-startLure.x)/dt,vz:(lure.z-startLure.z)/dt};
   const entry=lineWaterEntry(tip,lure),slack=Math.max(0,paid-separation(tip,lure));
-  return{paidLineMeters:paid,bobber:lure,lureDepth:depth,lineDistance:Math.hypot(lure.x-finite(s.boatX),lure.z-finite(s.boatZ)),pumpHeight,reelMode,crankRate,rodTip:tip,lineEntry:entry,floatPosition:rig.id==='float'?{x:lure.x,z:lure.z,height:0}:null,rigPresentation:presentation,lineSlackMeters:slack,snagStretchMeters,payoutRate,retrieveRate,dragThresholdN,relativeFlowMps:flow,...smoothRod(s,load,dt,strength,sensitivity)};
+  return{rigFallSpeed:dt>0?(startLure.height-lure.height)/dt:finite(s.rigFallSpeed),rigVelocity,paidLineMeters:paid,bobber:lure,lureDepth:depth,lineDistance:Math.hypot(lure.x-finite(s.boatX),lure.z-finite(s.boatZ)),pumpHeight,reelMode,crankRate,rodTip:tip,lineEntry:entry,floatPosition:rig.id==='float'?{x:lure.x,z:lure.z,height:0}:null,rigPresentation:presentation,lineSlackMeters:slack,snagStretchMeters,payoutRate,retrieveRate,dragThresholdN,relativeFlowMps:flow,...smoothRod(s,load,dt,strength,sensitivity)};
  }
 }

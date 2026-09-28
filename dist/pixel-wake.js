@@ -1,4 +1,4 @@
-import {SKIFF_DISPLAY_METERS_PER_PIXEL} from './skiff-dimensions.js?v=20260927-pixel-v41';
+import {SKIFF_DISPLAY_METERS_PER_PIXEL} from './skiff-dimensions.js?v=20260927-pixel-v42';
 // Metres / seconds, using measured hull speed rather than throttle demand.
 // Each emitted crest keeps its own strength while the vessel accelerates.
 export function wakeProfile(speed=0){
@@ -14,29 +14,29 @@ export function wakeOrigin(x,z,heading,speed){
 
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),finite=v=>Number.isFinite(v)?v:0;
 const angleDelta=(a,b)=>Math.atan2(Math.sin(b-a),Math.cos(b-a));
-// World-space samples remain where the hull passed. Camera motion and later
+// World-space samples drift with the water after the hull passes. Camera motion and later
 // steering cannot rotate an already emitted wake around the boat.
 export function createWakeTrail(){
  const crests=[],foam=[];let previous=null,distanceCarry=0,foamCarry=0,serial=0;
  function clear(){crests.length=0;foam.length=0;previous=null;distanceCarry=foamCarry=0;}
- function update(state,dt){
+ function update(state,dt,current={x:0,z:0}){
   if(state.launchStage!=='afloat'||state.mode==='walk'){clear();return;}
   if(state.paused||!Number.isFinite(dt)||dt<=0)return;
   dt=Math.min(dt,.25);
-  for(const list of[crests,foam])for(let i=list.length-1;i>=0;i--){list[i].age+=dt;if(list[i].age>=list[i].duration)list.splice(i,1);}
+  for(const list of[crests,foam])for(let i=list.length-1;i>=0;i--){list[i].age+=dt;list[i].x+=finite(current.x)*dt;list[i].z+=finite(current.z)*dt;if(list[i].age>=list[i].duration)list.splice(i,1);}
   const now={x:finite(state.boatX),z:finite(state.boatZ),h:finite(state.heading)},old=previous||now;
-  const dx=now.x-old.x,dz=now.z-old.z,d=Math.hypot(dx,dz),speed=finite(state.speed),profile=wakeProfile(speed);
+  const dx=now.x-old.x,dz=now.z-old.z,waterDx=dx-(previous?finite(current.x)*dt:0),waterDz=dz-(previous?finite(current.z)*dt:0),d=Math.hypot(waterDx,waterDz),speed=finite(state.speed),profile=wakeProfile(speed);
   if(d>Math.max(12,dt*60)){clear();previous=now;return;}
   const pose=t=>({x:old.x+dx*t,z:old.z+dz*t,h:old.h+angleDelta(old.h,now.h)*t});
   if(profile.active&&d>1e-8){
-   const direction={x:-dx/d,z:-dz/d};let next=profile.spacing-distanceCarry;
-   while(next<=d){const t=next/d,p=pose(t),origin=wakeOrigin(p.x,p.z,p.h,speed);crests.push({...origin,...profile,age:dt*(1-t),direction,reverse:speed<0,id:serial++});next+=profile.spacing;}
+   const direction={x:-waterDx/d,z:-waterDz/d};let next=profile.spacing-distanceCarry;
+   while(next<=d){const t=next/d,p=pose(t),origin=wakeOrigin(p.x,p.z,p.h,speed);crests.push({...origin,x:origin.x+finite(current.x)*dt*(1-t),z:origin.z+finite(current.z)*dt*(1-t),...profile,age:dt*(1-t),direction,reverse:speed<0,id:serial++});next+=profile.spacing;}
    distanceCarry=(distanceCarry+d)%profile.spacing;
   }else if(!profile.active)distanceCarry=0;
   // Propeller wash responds to thrust and motor angle, separately from the
   // speed-driven hull wake. Neutral coasting produces no new propeller foam.
   const power=state.engine===false?0:Math.abs(finite(state.throttle)),rate=power>.01?8+power*12:0;
-  if(rate){let next=1/rate-foamCarry;while(next<=dt){const t=next/dt,p=pose(t),origin=wakeOrigin(p.x,p.z,p.h,1),h=p.h-clamp(finite(state.tiller),-1,1)*.5,sign=state.throttle<0?-1:1;foam.push({...origin,x:origin.x+Math.sin(p.h)*1.1,z:origin.z+Math.cos(p.h)*1.1,direction:{x:Math.sin(h)*sign,z:Math.cos(h)*sign},age:dt-next,duration:1.1+power*2.1,power,id:serial++});next+=1/rate;}foamCarry=(foamCarry+dt)%(1/rate);}else foamCarry=0;
+  if(rate){let next=1/rate-foamCarry;while(next<=dt){const t=next/dt,p=pose(t),origin=wakeOrigin(p.x,p.z,p.h,1),h=p.h-clamp(finite(state.tiller),-1,1)*.5,sign=state.throttle<0?-1:1;foam.push({...origin,x:origin.x+Math.sin(p.h)*1.1+finite(current.x)*(dt-next),z:origin.z+Math.cos(p.h)*1.1+finite(current.z)*(dt-next),direction:{x:Math.sin(h)*sign,z:Math.cos(h)*sign},age:dt-next,duration:1.1+power*2.1,power,id:serial++});next+=1/rate;}foamCarry=(foamCarry+dt)%(1/rate);}else foamCarry=0;
   if(crests.length>220)crests.splice(0,crests.length-220);if(foam.length>120)foam.splice(0,foam.length-120);previous=now;
  }
  return{update,clear,crests,foam};
