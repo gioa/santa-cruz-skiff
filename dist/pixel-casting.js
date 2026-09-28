@@ -1,5 +1,5 @@
-import {rodTipPosition,MAX_PAID_LINE_METERS} from './pixel-fishing-physics.js?v=20260927-pixel-v46';
-import {getRigProfile} from './fishing-rigs.js?v=20260927-pixel-v46';
+import {rodTipPosition,MAX_PAID_LINE_METERS} from './pixel-fishing-physics.js?v=20260927-pixel-v47';
+import {getRigProfile} from './fishing-rigs.js?v=20260927-pixel-v47';
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 const distance=(a,b)=>Math.hypot(a.x-b.x,a.z-b.z,(a.height||0)-(b.height||0));
 // Short, controlled boat casts. These ranges are gameplay calibration, not
@@ -21,7 +21,12 @@ export function planCast(s,target,{isWater=()=>true}={}){
  for(let d=.5;d<=travel+.5;d+=.5){const u=Math.min(1,d/travel);if(!isWater(s.boatX+(end.x-s.boatX)*u,s.boatZ+(end.z-s.boatZ)*u))return{ok:false,message:'这条抛投路线被岸边挡住了。'};}
  const direction=Math.atan2(-dx,-dz),angle=Math.atan2(Math.sin(s.heading-direction),Math.cos(s.heading-direction)),azimuth=angle*180/Math.PI;
  const tip=rodTipPosition({...s,rodAzimuth:azimuth,rodElevation:50}),start={...tip,height:tip.height-.25};
- const arc=1+travel*.085,duration=Math.sqrt(8*arc/9.81);
+ // Use a gentle lob instead of the old flat, near-instant throw. Solve
+ // flight time from the real tip-to-target distance and release height at
+ // 60 degrees, then retain Earth gravity throughout the parabolic flight.
+ // The chosen launch angle is gameplay calibration, not a tackle rating.
+ const horizontal=Math.hypot(end.x-start.x,end.z-start.z),launchAngle=Math.PI/3;
+ const duration=Math.sqrt(2*(start.height+horizontal*Math.tan(launchAngle))/9.81),arc=9.81*duration*duration/8;
  return{ok:true,limited:requested>range,azimuth,range,flight:{version:1,t:0,duration,start,end,arc},tip,paid:distance(tip,start)+.08};
 }
 export function stepCast(s,dt){

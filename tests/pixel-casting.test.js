@@ -12,7 +12,7 @@ function ready(){const sim=new PixelSimulation({rng:()=>.5,patrolRng:()=>.99,con
 function splash(sim,dt=.05){for(let t=0;t<5&&sim.state.fishState==='flight';t+=dt)sim.step(dt);assert.equal(sim.state.fishState,'sinking');}
 test('tap cast flies to a chosen water point; pays actual diagonal line incrementally without duplicating bait',()=>{
  const sim=ready(),s=sim.state,target={x:s.boatX-15,z:s.boatZ+4},stock=structuredClone(s.profile.stock);assert.ok(sim.castTo(target).ok);assert.equal(s.fishState,'flight');assert.ok(s.paidLineMeters<1);let last=s.paidLineMeters,air=false;
- for(let i=0;i<80&&s.fishState==='flight';i++){sim.step(.025);assert.ok(s.paidLineMeters>=last);assert.ok(s.paidLineMeters<=MAX_PAID_LINE_METERS);assert.ok(s.paidLineMeters>=dist(s.rodTip,s.bobber)-1e-6);if(s.bobber.height>3)air=true;last=s.paidLineMeters;}
+ for(let i=0;i<200&&s.fishState==='flight';i++){sim.step(.025);assert.ok(s.paidLineMeters>=last);assert.ok(s.paidLineMeters<=MAX_PAID_LINE_METERS);assert.ok(s.paidLineMeters>=dist(s.rodTip,s.bobber)-1e-6);if(s.bobber.height>3)air=true;last=s.paidLineMeters;}
  assert.ok(air);assert.equal(s.fishState,'sinking');assert.deepEqual({x:s.bobber.x,z:s.bobber.z},target);assert.equal(s.bobber.height,0);assert.equal(s.floatPosition,null);assert.ok(Math.abs(s.paidLineMeters-dist(s.rodTip,s.bobber)-.08)<.02);assert.deepEqual(s.profile.stock,stock);assert.equal(s.casts,1);
 });
 test('spool length depends on three-dimensional tackle position, not horizontal distance plus full seabed depth',()=>{
@@ -47,4 +47,22 @@ test('cast presentation stays at the real water endpoint when flight becomes a s
 });
 test('reeling a cast back returns to idle and vertical lowering still starts beside the tip',()=>{
  const sim=ready(),s=sim.state;sim.castTo({x:s.boatX-10,z:s.boatZ});splash(sim);s.biteAt=Infinity;s.snagThreshold=Infinity;for(let i=0;i<1600&&s.fishState!=='idle';i++)sim.step(.05,{reel:1.2});assert.equal(s.fishState,'idle');assert.equal(s.paidLineMeters,0);assert.equal(s.castLine,false);assert.ok(sim.lowerRig().ok);assert.equal(s.castLine,false);assert.equal(s.bobber.x,s.rodTip.x);assert.equal(s.bobber.z,s.rodTip.z);
+});
+
+
+test('controlled lobs pay out progressively with a gravity-consistent trajectory',()=>{
+ for(const range of [4,15,22,32]){
+  const s=ready().state;if(range===32){s.rig='jig';s.rigWeightGrams=28;}
+  const plan=planCast(s,{x:s.boatX-range,z:s.boatZ}),f=plan.flight;
+  if(range>=15)assert.ok(f.duration>2,'normal boat casts must be readable over multiple seconds');
+  assert.ok(Math.abs(8*f.arc/(f.duration*f.duration)-9.81)<1e-10,'slower flight still uses real gravity');
+  Object.assign(s,{rodElevation:50,rodAzimuth:plan.azimuth,castFlight:f,paidLineMeters:plan.paid});
+  const dt=1/60;let peak=0;for(let elapsed=0;elapsed<.5;elapsed+=dt){Object.assign(s,stepCast(s,dt));peak=Math.max(peak,s.payoutRate);}
+  assert.equal(s.fishState,'flight');assert.ok(s.paidLineMeters<dist(plan.tip,f.end)*.55,'first half-second cannot dump most of the cast line');
+  assert.ok(peak<18,'even the longest available cast has bounded release speed');
+  while(s.castFlight)Object.assign(s,stepCast(s,dt));
+  const splashLine=s.paidLineMeters;Object.assign(s,stepFishingLine(s,{dt,environment:{bottomDepth:40}}));
+  assert.ok(s.payoutRate<=1.65,'airborne payout does not continue after splashdown');
+  assert.ok(s.paidLineMeters-splashLine<=1.65*dt+1e-8);
+ }
 });
