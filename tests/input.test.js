@@ -80,3 +80,15 @@ test('stick dead zone is stable, diagonal is bounded, and small motion stays ana
   const slow=stickVector(0,-15,40);assert.ok(slow.y<0&&slow.y>-.5);assert.equal(slow.x,0);
   assert.deepEqual(stickVector(0,0,40),{x:0,y:0});
 });
+
+
+test('native long-press suppression leaves held pointer input and cancellation intact',()=>{
+  const surface=new Surface();let starts=0,moves=0,ends=0,aborts=0;
+  const input=bindPointer(surface,{start:()=>starts++,move:()=>moves++,end:()=>ends++,cancel:()=>aborts++});
+  surface.send('pointerdown');assert.equal(surface.send('touchstart').defaultPrevented,true);
+  assert.equal(surface.send('contextmenu').defaultPrevented,true);
+  surface.send('pointermove');surface.send('pointerup');
+  assert.deepEqual([starts,moves,ends,aborts],[1,1,1,0]);assert.equal(input.owner,null);
+  surface.send('pointerdown');surface.send('touchstart');surface.send('pointercancel');
+  assert.equal(aborts,1);assert.equal(surface.captured.size,0);
+});

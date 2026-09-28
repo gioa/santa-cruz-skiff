@@ -9,6 +9,12 @@ export function bindPointer(element, {start, move, end, cancel}) {
     if (aborted) cancel?.(event); else end?.(event);
     try { if (element.hasPointerCapture(id)) element.releasePointerCapture(id); } catch {}
   };
+  // Safari can show its selection loupe despite user-select:none and a
+  // canceled pointerdown. Cancel the native touch gesture on these custom
+  // hold/drag surfaces only; menus, native selects and scroll trays stay native.
+  element.addEventListener('touchstart', event => {
+    if (event.cancelable) event.preventDefault();
+  }, {passive: false});
   element.addEventListener('pointerdown', event => {
     if (owner !== null || (event.pointerType === 'mouse' && event.button !== 0)) return;
     if (start?.(event) === false) return;
