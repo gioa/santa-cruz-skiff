@@ -434,13 +434,17 @@ html,body,#app,#app *,#app *::before,#app *::after{-webkit-user-select:none;user
 /* Thumb-reachable mode rail, outside the instrument panel. */
 #boat-panel-tabs{position:absolute;left:max(10px,env(safe-area-inset-left));bottom:calc(12px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:6px;width:56px;pointer-events:auto}
 #boat-panel-tabs button{width:56px;min-width:44px;min-height:48px;padding:8px 4px;border-radius:0;touch-action:manipulation}
-.is-fishing-focus #boat-panel-tabs{display:none}
+#boat-panel-tabs{z-index:3}
+#boat-panel-tabs button:disabled{opacity:.45;cursor:default}
+@media(max-height:500px) and (orientation:landscape){
+ .is-fishing-focus #boat-fishing .fishing-toolbar{left:calc(max(10px,env(safe-area-inset-left)) + 72px)}
+}
 @media(max-width:660px){
- #app #controls:has(#boat-panel-tabs:not([hidden])) #boat-console{left:calc(50% + 34px);width:calc(100% - 92px);max-width:540px}
- #app #controls:has(#boat-panel-tabs:not([hidden])) #boat-console.fishing-open{width:min(300px,calc(100% - 92px))}
- #app #controls:has(#boat-panel-tabs:not([hidden])) #helm{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:5px}
- #app #controls:has(#boat-panel-tabs:not([hidden])) .helm-label{left:5px;font-size:9px;letter-spacing:0}
- #app #controls:has(#boat-panel-tabs:not([hidden])) #boat-fishing .fishing-toolbar #rod-mount{min-width:0;width:100%;font-size:14px}
+ #app:not(.is-fishing-focus) #controls:has(#boat-panel-tabs:not([hidden])) #boat-console{left:calc(50% + 34px);width:calc(100% - 92px);max-width:540px}
+ #app:not(.is-fishing-focus) #controls:has(#boat-panel-tabs:not([hidden])) #boat-console.fishing-open{width:min(300px,calc(100% - 92px))}
+ #app:not(.is-fishing-focus) #controls:has(#boat-panel-tabs:not([hidden])) #helm{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:5px}
+ #app:not(.is-fishing-focus) #controls:has(#boat-panel-tabs:not([hidden])) .helm-label{left:5px;font-size:9px;letter-spacing:0}
+ #app:not(.is-fishing-focus) #controls:has(#boat-panel-tabs:not([hidden])) #boat-fishing .fishing-toolbar #rod-mount{min-width:0;width:100%;font-size:14px}
 }
 
 /* The selected physical rod and its holder remain visible in every rod view. */
