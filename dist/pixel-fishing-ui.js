@@ -1,24 +1,26 @@
-import {rodSelectionStatus} from './pixel-rod-selection.js?v=20260928-pixel-v68';
-import {drawAnglerArm} from './pixel-angler-arms.js?v=20260928-pixel-v68';
-import {rodFlexPoint} from './pixel-rod-response.js?v=20260928-pixel-v68';
-import {rigHookSize} from './pixel-hook-label.js?v=20260928-pixel-v68';
-import {formatDepth,metersToFeet} from './units.js?v=20260928-pixel-v68';
-import {getRigProfile} from './fishing-rigs.js?v=20260928-pixel-v68';
-import {bindPointer} from './input.js?v=20260928-pixel-v68';
-import {clockwiseTurns,createCrankInput} from './pixel-fishing-input.js?v=20260928-pixel-v68';
-import {fishingFeedback,reelMotion} from './pixel-fishing-feedback.js?v=20260928-pixel-v68';
+import {rodSelectionStatus} from './pixel-rod-selection.js?v=20260928-pixel-v69';
+import {drawAnglerArm} from './pixel-angler-arms.js?v=20260928-pixel-v69';
+import {rodFlexPoint} from './pixel-rod-response.js?v=20260928-pixel-v69';
+import {rigHookSize} from './pixel-hook-label.js?v=20260928-pixel-v69';
+import {formatDepth,metersToFeet} from './units.js?v=20260928-pixel-v69';
+import {getRigProfile} from './fishing-rigs.js?v=20260928-pixel-v69';
+import {bindPointer} from './input.js?v=20260928-pixel-v69';
+import {clockwiseTurns,createCrankInput} from './pixel-fishing-input.js?v=20260928-pixel-v69';
+import {fishingFeedback,reelMotion} from './pixel-fishing-feedback.js?v=20260928-pixel-v69';
 
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const rigNames={bottom:'沉底组',dropper:'双支线',slider:'滑铅组',jig:'软饵组',float:'浮漂组',sabiki:'羽毛组',feather40:'双支羽毛'};
 const mountNames={hand:'手持',port:'左舷竿架',starboard:'右舷竿架'};
 const TAU=Math.PI*2;
 
-export function mountFishingConsole(root,{sim,getActions,getFocusView=()=>null,isRetrieving=()=>false,onFeedback,onMount,onRetrieve,onStopReel=()=>{},onSelectRod=()=>{}}){
+export function mountFishingConsole(root,{sim,getActions,getFocusView=()=>null,isRetrieving=()=>false,onFeedback,onMount,onRetrieve,onStopReel=()=>{},onSelectRod=()=>{},onConfigure=()=>{}}){
  const get=id=>root.querySelector('#'+id),wheel=get('reel-wheel'),drag=get('drag-knob'),mount=get('rod-mount'),spool=get('spool-toggle'),lower=get('lower-rig'),hold=get('reel-btn'),retrieve=get('retrieve-rig'),reelActions=get('reel-actions');
  const mountButtons=Object.fromEntries(['port','hand','starboard'].map(value=>[value,get('rod-'+value)]));
  const canStow=a=>a.mount||(a.take&&['idle','sinking','waiting'].includes(sim.state.fishState));
  const rodSelect=get('active-rod-select'),rodName=get('active-rod-name'),rodLocation=get('active-rod-location');let rodSignature='';
  if(rodSelect)rodSelect.onchange=()=>{if(rodSelectionStatus(sim.state).switchable){onStopReel();onSelectRod(rodSelect.value);}};
+ const configure=get('rod-config-btn');
+ if(configure)configure.onclick=()=>{if(getActions().assemble){onStopReel();onConfigure();}};
  const crank=createCrankInput();let crankAngle=null,dragGesture=null,rotation=0,spoolRotation=0,lastFrame=0,keyboardReel=false,focusHold=false,crankOrigin=null,crankMoved=false;
  drag.innerHTML='<span class="drag-star" aria-hidden="true">✳</span><span class="drag-caption">泄力</span><span class="drag-marks" aria-hidden="true">＋<br>−</span><span class="drag-focus-up" aria-hidden="true">收紧 ↑</span><span class="drag-focus-track" aria-hidden="true"><i></i></span><span class="drag-focus-down" aria-hidden="true">放松 ↓</span><span class="drag-focus-value"></span>';
  const actions=()=>getActions();
@@ -77,6 +79,7 @@ export function mountFishingConsole(root,{sim,getActions,getFocusView=()=>null,i
   c.fillStyle=focus?'#fff0c6':'#355e50';c.font='11px monospace';c.textAlign='left';c.fillText(formatDepth(s.paidLineMeters||0),8,15);c.fillStyle=s.reelMode==='free'?'#aa654c':'#4c7261';c.fillRect(w-13,7,6,6);if(sim.hasElectricReel){c.fillStyle='#253e42';c.fillRect(w-34,h-22,26,15);c.fillStyle='#acdcd0';c.font='10px monospace';c.fillText(isRetrieving()?'ON':'E',w-30,h-11);}
  }
  function update(){
+  if(configure){configure.disabled=!getActions().assemble;configure.title=configure.disabled?'收起钓组后可配置':'配置当前鱼竿';}
   const s=sim.state,a=cancelUnavailable(actions()),focus=Boolean(getFocusView()?.active),feedback=fishingFeedback(s),show=(el,visible)=>{el.hidden=!visible;if(el.tagName==='BUTTON'||el.tagName==='SELECT')el.disabled=!visible;};
   if(rodSelect&&rodName&&rodLocation){
    const selection=rodSelectionStatus(s),signature=selection.rods.map(r=>r.id).join('|');

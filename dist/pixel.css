@@ -546,3 +546,10 @@ html,body,#app,#app *,#app *::before,#app *::after{-webkit-user-select:none;user
  #app:not(.is-fishing-focus) #controls:has(#boat-panel-tabs:not([hidden])) #boat-console{left:calc(50% + 64px);width:calc(100% - 152px);max-width:620px}
  #app:not(.is-fishing-focus) #controls:has(#boat-panel-tabs:not([hidden])) #boat-console.fishing-open{width:min(360px,calc(100% - 152px))}
 }
+
+/* A stable, thumb-sized configuration shortcut on the active rod header. */
+#boat-fishing .rod-identity{position:relative;padding-right:52px;min-height:54px;box-sizing:border-box}
+#boat-fishing #rod-config-btn{position:absolute;right:4px;top:50%;transform:translateY(-50%);width:44px;height:44px;min-width:44px;min-height:44px;padding:9px;display:grid;place-items:center;background:#e6d7b4;border:1px solid #718775;color:#315a55;box-shadow:none;touch-action:manipulation}
+#boat-fishing #rod-config-btn:disabled{opacity:.35;cursor:default}
+#rod-config-btn svg{pointer-events:none}
+.is-fishing-focus #boat-fishing .rod-identity{position:absolute}

@@ -1,0 +1,2 @@
+// Local-only synthetic boat fixture; no production save is read or written.
+start(false);Object.assign(sim.state,{playerX:HARBOR.counterX,playerZ:HARBOR.counterZ});sim.launchBoat();const p=FISHING_SPOTS[1];Object.assign(sim.state,{mode:'boat',launchStage:'afloat',loaded:true,boatX:p.x,boatZ:p.z,moored:false});syncVessel(sim.vessel,{x:p.x,z:p.z,heading:0,clearMotion:true});sim.state.biteAt=Infinity;sim.state.snagThreshold=Infinity;updateUI();

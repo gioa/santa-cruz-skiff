@@ -22,16 +22,16 @@ class Element {
 function fixture(t,fishState='idle',{electric=false,focus=false}={}){
  const priorDocument=globalThis.document;globalThis.document={getElementById:()=>null};
  t.after(()=>{if(priorDocument===undefined)delete globalThis.document;else globalThis.document=priorDocument;});
- const buttons=['drag-knob','spool-toggle','lower-rig','reel-btn','retrieve-rig','rod-hand','rod-port','rod-starboard'];
+ const buttons=['rod-config-btn','drag-knob','spool-toggle','lower-rig','reel-btn','retrieve-rig','rod-hand','rod-port','rod-starboard'];
  const ids=['reel-wheel','rod-mount','tackle-name','rod-load','reel-instrument','reel-actions',...buttons];
  const elements=Object.fromEntries(ids.map(id=>[id,new Element(buttons.includes(id)?'BUTTON':'DIV')]));
  elements['.fishing-toolbar']=new Element();elements['.fishing-instruments']=new Element();
  const root=new Element();root.querySelector=query=>elements[query.startsWith('#')?query.slice(1):query];
  const state={mode:'boat',rentalPaid:true,launchStage:'afloat',fishState,rodMount:'hand',rodElevation:45,rodAzimuth:70,drag:.5,rig:'bottom',fuel:80,engine:false,paused:false,inspection:null,profile:{owned:['rod',...(electric?['rod_electric']:[])],loadout:{rod:electric?'rod_electric':'rod'}},packed:['rod',...(electric?['rod_electric']:[])]};
  const sim={state,lowerRig:()=>{state.fishState='sinking';return{ok:true};},setRodPose:pose=>{state.rodElevation=pose.elevation;state.rodAzimuth=pose.azimuth;},changeDrag:delta=>{state.drag+=delta;}};
- let retrieveCalls=0;
- const ui=mountFishingConsole(root,{sim,getFocusView:()=>({active:focus}),getActions:()=>boatActions(state,{canLower:true}),onFeedback(){},onMount:value=>{state.rodMount=value;},onRetrieve(){retrieveCalls++;}});
- ui.update();return{state,ui,elements,retrieveCalls:()=>retrieveCalls};
+ let retrieveCalls=0,configureCalls=0;
+ const ui=mountFishingConsole(root,{sim,getFocusView:()=>({active:focus}),getActions:()=>boatActions(state,{canLower:true}),onFeedback(){},onMount:value=>{state.rodMount=value;},onRetrieve(){retrieveCalls++;},onConfigure(){configureCalls++;}});
+ ui.update();return{state,ui,elements,retrieveCalls:()=>retrieveCalls,configureCalls:()=>configureCalls};
 }
 
 
@@ -185,4 +185,15 @@ test('both side holders keep manual winding and the purchased electric reel avai
   state.rodMount=mount;ui.update();assert.equal(elements['reel-btn'].hidden,false);assert.equal(elements['reel-wheel'].attributes.role,'slider');assert.equal(elements['retrieve-rig'].hidden,false);
   elements['reel-wheel'].emit('keydown',{key:'ArrowUp'});assert.ok(ui.input(.05).reel>0);assert.equal(state.rodMount,mount);elements['reel-wheel'].emit('keyup',{key:'ArrowUp'});assert.equal(ui.input(.05).reel,0);
  }
+});
+
+
+test('rod configuration only opens after retrieval and guards stale clicks during deployment',t=>{
+ const f=fixture(t),button=f.elements['rod-config-btn'];
+ assert.equal(button.disabled,false);button.onclick();assert.equal(f.configureCalls(),1);
+ for(const phase of ['casting','flight','sinking','waiting','bite','fight','landed']){
+  f.state.fishState=phase;button.onclick();assert.equal(f.configureCalls(),1,'stale UI must not open configuration');
+  f.ui.update();assert.equal(button.disabled,true,phase);
+ }
+ f.state.fishState='idle';f.state.rodMount='port';f.ui.update();assert.equal(button.disabled,false);button.onclick();assert.equal(f.configureCalls(),2);
 });
