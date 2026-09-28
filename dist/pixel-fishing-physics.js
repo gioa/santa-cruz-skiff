@@ -5,7 +5,7 @@
  * pay line out, while turning the handle takes it in. Rod movement never
  * manufactures more line. This module has no inventory, UI or random events.
  */
-import {getRigProfile,stepRigLure} from './fishing-rigs.js?v=20260927-pixel-v28';
+import {getRigProfile,stepRigLure} from './fishing-rigs.js?v=20260927-pixel-v29';
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 const finite=(n,f=0)=>Number.isFinite(n)?n:f;
 export const MAX_PAID_LINE_METERS=120;
@@ -18,7 +18,7 @@ export const reelTurnsPerSecond=value=>value===true?1.2:clamp(finite(value),0,2)
 export function rodTipPosition(s){
  const heading=finite(s.heading),mount=s.rodMount||'hand',side=mount==='port'?-.79:mount==='starboard'?.79:.24;
  const fore=mount==='hand'?.32:.62,baseHeight=mount==='hand'?.92:.69;
- const elevation=clamp(finite(s.rodElevation,45),5,85)*Math.PI/180,azimuth=clamp(finite(s.rodAzimuth,70),-110,110)*Math.PI/180;
+ const elevation=clamp(finite(s.rodElevation,45),5,85)*Math.PI/180,azimuth=clamp(finite(s.rodAzimuth,70),-180,180)*Math.PI/180;
  const angle=heading-azimuth,horizontal=ROD_LENGTH_METERS*Math.cos(elevation);
  return{x:finite(s.boatX)+side*Math.cos(heading)+fore*Math.sin(heading)-Math.sin(angle)*horizontal,
   z:finite(s.boatZ)-side*Math.sin(heading)+fore*Math.cos(heading)-Math.cos(angle)*horizontal,

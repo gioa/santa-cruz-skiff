@@ -1,4 +1,4 @@
-import {OceanAudio} from './audio.js?v=20260927-pixel-v28';
+import {OceanAudio} from './audio.js?v=20260927-pixel-v29';
 
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 const valid=(n,fallback)=>Number.isFinite(n)?n:fallback;
@@ -50,7 +50,7 @@ export function musicEventsForStep(step){
 }
 
 const EVENT_GAPS={interaction:.07,step:.14,cast:.16,plop:.15,bite:.3,reel:.085,catch:.8,engine:.5,purchase:.3,denied:.3,swim:.4};
-const REEL_STATES=new Set(['sinking','waiting','bite','fight']);
+const REEL_STATES=new Set(['flight','sinking','waiting','bite','fight']);
 
 /** Sound follows actual motion, not the reel button or a generic fish alarm.
  * Payout/retrieve are metres per second, crank is handle turns per second.

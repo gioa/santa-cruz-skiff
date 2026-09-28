@@ -1,11 +1,11 @@
-import {pierRings,landPolygons,coastLines,buildingFootprints,FISHING_SPOTS,onLand,onPier} from './pixel-geography.js?v=20260927-pixel-v28';
-import {HARBOR} from './harbor-layout.js?v=20260927-pixel-v28';
-import {depthInfoAt} from './bathymetry.js?v=20260927-pixel-v28';
-import {createWildlife,drawWildlife} from './pixel-wildlife.js?v=20260927-pixel-v28';
-import {cameraOffset,projectPixel,unprojectPixel,stepDeadzoneCamera,cameraDeadzone,cameraPlayfield,fitCameraBounds,zoomCameraAt,rectilinearOutline} from './pixel-camera.js?v=20260927-pixel-v28';
-import {ladderPoint} from './swimming.js?v=20260927-pixel-v28';
-import {SKIFF_RACKS,boatRenderPose,parkedSkiffPoses,skiffScreenPose,hitSkiff,outboardPose} from './pixel-boat-geometry.js?v=20260927-pixel-v28';
-import {getRodCurve,getReelPose,getFishingLine,getFishingPresentation} from './pixel-rod-geometry.js?v=20260927-pixel-v28';
+import {pierRings,landPolygons,coastLines,buildingFootprints,FISHING_SPOTS,onLand,onPier} from './pixel-geography.js?v=20260927-pixel-v29';
+import {HARBOR} from './harbor-layout.js?v=20260927-pixel-v29';
+import {depthInfoAt} from './bathymetry.js?v=20260927-pixel-v29';
+import {createWildlife,drawWildlife} from './pixel-wildlife.js?v=20260927-pixel-v29';
+import {cameraOffset,projectPixel,unprojectPixel,stepDeadzoneCamera,cameraDeadzone,cameraPlayfield,fitCameraBounds,zoomCameraAt,rectilinearOutline} from './pixel-camera.js?v=20260927-pixel-v29';
+import {ladderPoint} from './swimming.js?v=20260927-pixel-v29';
+import {SKIFF_RACKS,boatRenderPose,parkedSkiffPoses,skiffScreenPose,hitSkiff,outboardPose} from './pixel-boat-geometry.js?v=20260927-pixel-v29';
+import {getRodCurve,getReelPose,getFishingLine,getFishingPresentation} from './pixel-rod-geometry.js?v=20260927-pixel-v29';
 
 // The map keeps the same metre coordinates as the sailing simulation. The
 // people and boat are deliberately enlarged, like a handheld-era RPG, so that
@@ -276,6 +276,7 @@ export function createPixelWorld(canvas,{sprites={},conditions={}}={}){
       ctx.fillStyle='#244d50';ctx.fillRect(p.x-r-1,p.y-4,5,2);ctx.fillRect(p.x+r-3,p.y-4,5,2);ctx.fillRect(p.x-r-1,p.y+3,5,2);ctx.fillRect(p.x+r-3,p.y+3,5,2);
       ctx.fillStyle='#ffe3a0';for(const side of[-1,1]){ctx.fillRect(p.x+side*r-(side>0?3:0),p.y-4,4,1);ctx.fillRect(p.x+side*r,p.y-4,1,3);ctx.fillRect(p.x+side*r-(side>0?3:0),p.y+3,4,1);ctx.fillRect(p.x+side*r,p.y+1,1,3);}return;
     }
+    if(state.castFlight?.end){const p=point(state.castFlight.end.x,state.castFlight.end.z);ctx.strokeStyle='#f4df9c';ctx.lineWidth=1;ctx.strokeRect(p.x-4,p.y-2,8,4);return;}
     // Offshore courses keep their small destination pennant.
     const w=state.waypoint;if(!w||!visible(w.x,w.z,10))return;const p=point(w.x,w.z);ctx.globalAlpha=.55;ctx.strokeStyle='#e9dc9a';ctx.lineWidth=1;ctx.strokeRect(p.x-5,p.y-2,10,4);ctx.globalAlpha=1;pixelLine(p.x,p.y,p.x,p.y-14,'#efdfaa',1);ctx.fillStyle='#e4b762';ctx.fillRect(p.x+1,p.y-14,7,4);
   }

@@ -22,7 +22,7 @@ export function getFishingPresentation(state){
 export function getRodCurve(state,{origin={x:0,y:0},scale=1,heading=finite(state.heading,0),bodyX=0,bodyY=0,segments=20}={}){
   segments=Math.round(clamp(finite(segments,20),4,64));
   const mount=['port','starboard'].includes(state.rodMount)?state.rodMount:'hand',mounted=mount!=='hand';
-  const elevation=clamp(finite(state.rodElevation,45),5,85),azimuth=clamp(finite(state.rodAzimuth,mount==='port'?-70:70),-110,110),bend=clamp(finite(state.rodBend,0),0,1);
+  const elevation=clamp(finite(state.rodElevation,45),5,85),azimuth=clamp(finite(state.rodAzimuth,mount==='port'?-70:70),-180,180),bend=clamp(finite(state.rodBend,0),0,1);
   const localBase=mounted?{x:mount==='port'?-17:17,y:7}:{x:bodyX+4,y:bodyY+7};
   const rotate=(x,y)=>({x:origin.x+scale*(x*Math.cos(heading)+y*Math.sin(heading)),y:origin.y+scale*(-x*Math.sin(heading)+y*Math.cos(heading))});
   const base=rotate(localBase.x,localBase.y),a=heading-radians(azimuth),dx=-Math.sin(a),dy=-Math.cos(a),e=radians(elevation),length=52,points=[];
@@ -61,10 +61,11 @@ export function getFishingLine(state,rod,{project=(x,z)=>({x,y:z}),cameraScale=6
   const target=presentation.showFloat&&presentation.kind!=='flight'?(state.floatPosition||state.bobber):state.bobber;
   const lure=project(target.x,target.z),height=presentation.kind==='flight'?Math.max(0,finite(target.height,0)):0;
   let end={x:lure.x,y:lure.y-height*cameraScale},underwater=[],entrySource=null;
+  if(presentation.kind==='flight'&&state.castFlight?.version===1){const f=state.castFlight,start=project(f.start.x,f.start.z),fade=1-clamp(f.t/f.duration,0,1);end.x+=(rod.tip.x-start.x)*fade;end.y+=(rod.tip.y-(start.y-f.start.height*cameraScale))*fade;}
   if(presentation.kind==='submerged'){
     let underwaterTarget=lure;
     if(Number.isFinite(state.lineEntry?.x)&&Number.isFinite(state.lineEntry?.z)&&Number.isFinite(state.rodTip?.x)&&Number.isFinite(state.rodTip?.z)){
-      const physicalTip=project(state.rodTip.x,state.rodTip.z),physicalEntry=project(state.lineEntry.x,state.lineEntry.z),offset={x:rod.waterBase.x-physicalTip.x,y:rod.waterBase.y-physicalTip.y};
+      const physicalTip=project(state.rodTip.x,state.rodTip.z),physicalEntry=project(state.lineEntry.x,state.lineEntry.z),offset=state.castLine?{x:0,y:0}:{x:rod.waterBase.x-physicalTip.x,y:rod.waterBase.y-physicalTip.y};
       // The boat and rod are enlarged pixel art. Translate the model's real
       // tip-to-surface displacement onto that artwork, keeping the physical
       // entry angle while preventing a line through the boat's open interior.

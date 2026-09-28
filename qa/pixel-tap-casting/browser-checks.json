@@ -1,0 +1,77 @@
+[
+  {
+    "check": "drag and backpack do not cast",
+    "before": 1,
+    "after": 1,
+    "state": "idle"
+  },
+  {
+    "check": "tap launches",
+    "state": "flight",
+    "flight": {
+      "arc": 2.476865524660126,
+      "duration": 1.4212212877502346,
+      "end": {
+        "height": 0,
+        "x": 1287.9957264957266,
+        "z": -334.3988941548183
+      },
+      "start": {
+        "height": 2.278693330549854,
+        "x": 1301.5495031416867,
+        "z": -342.98899942640907
+      },
+      "t": 0.26659999999999856,
+      "version": 1
+    },
+    "paidLine": 3.2,
+    "boat": {
+      "heading": null,
+      "x": 1302.4,
+      "z": -344.1
+    }
+  },
+  {
+    "check": "landed and locked",
+    "state": "waiting",
+    "endpoint": {
+      "height": -5.608201122901075,
+      "x": 1287.9957264957266,
+      "z": -334.3988941548183
+    },
+    "paidLine": 20.3,
+    "mode": "brake"
+  },
+  {
+    "check": "manual reeling reduces line",
+    "before": 20.3,
+    "after": 3.6,
+    "rate": 0.78,
+    "state": "waiting"
+  },
+  {
+    "check": "far tap capped",
+    "boat": {
+      "heading": null,
+      "x": 1302.9,
+      "z": -364.8
+    },
+    "flight": {
+      "arc": 2.87,
+      "duration": 1.529859114191973,
+      "end": {
+        "height": 0,
+        "x": 1283.6577975883029,
+        "z": -353.9568682307053
+      },
+      "start": {
+        "height": 2.278693330549854,
+        "x": 1301.9387043429715,
+        "z": -363.6692104061748
+      },
+      "t": 0.2825,
+      "version": 1
+    },
+    "paidLine": 4.1
+  }
+]

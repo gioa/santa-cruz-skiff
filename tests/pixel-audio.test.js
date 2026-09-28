@@ -115,7 +115,7 @@ test('drag teeth follow actual payout, with distinct open-spool and crank sounds
 });
 
 test('stale rates, pause, slack and nonfinite physics cannot produce phantom reel motion',()=>{
-  for(const fishState of['idle','landed','charging','flight',undefined]){
+  for(const fishState of['idle','landed','charging',undefined]){
     const f=reelFeedbackForState({...runState,fishState,crankRate:2,retrieveRate:1});
     assert.equal(f.active,false);assert.equal(f.ratchetHz+f.feedVolume+f.crankVolume+f.lineVolume,0);
   }
@@ -170,3 +170,5 @@ test('spool latch plays once on mode change and an open spool never emits drag r
   advanceAudio(audio,.2,{...runState,reelMode:'brake',payoutRate:0});assert.equal(audio.ctx.starts.length-before,2);
   audio.dispose();
 });
+
+test('airborne casting spools produce feed sound without drag chatter',()=>{const f=reelFeedbackForState({fishState:'flight',reelMode:'free',payoutRate:12,rodLoadN:.2});assert.ok(f.feedVolume>0);assert.equal(f.ratchetHz,0);});

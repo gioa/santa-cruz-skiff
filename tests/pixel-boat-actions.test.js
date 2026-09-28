@@ -17,7 +17,7 @@ const offered=a=>actionKeys.filter(key=>a[key]).sort();
 
 test('each reachable fishing phase offers only its permitted actions, distinguishing hand and side holders',()=>{
  const sim=ready(),base=structuredClone(sim.state),cases=[
-  ['idle','hand',['engine','adjustPose','lower','mount','assemble','return']],
+  ['idle','hand',['engine','adjustPose','lower','cast','mount','assemble','return']],
   ['casting','hand',[]],
   ['flight','hand',[]],
   ['sinking','hand',['adjustPose','reel','spool','mount']],
@@ -53,8 +53,8 @@ test('a mounted bite offers pickup rather than strike, and pickup exposes the re
  assert.ok(sim.setRodMount('hand').ok);a=actions(sim);assert.equal(a.take,false);assert.equal(a.hook,true);assert.equal(a.reel,true);seatHook(sim);assert.equal(sim.state.fishState,'fight');a=actions(sim);assert.equal(a.hook,false);assert.equal(a.mount,false);assert.equal(a.engine,false);assert.equal(a.drag,true);
 });
 
-test('vertical-only policy offers lowering even when an obsolete caller claims casting is possible',()=>{
- const sim=ready();assert.equal(actions(sim,{canCast:true}).cast,false);assert.equal(actions(sim).lower,true);
+test('tap casting and vertical lowering share readiness, with no input during flight',()=>{
+ const sim=ready();assert.equal(actions(sim,{canCast:true}).cast,true);assert.equal(actions(sim).lower,true);
  for(const fishState of['casting','flight']){const a=boatActions({...sim.state,fishState},{hasRod:true,canLower:true,canCast:true});assert.equal(a.cast,false);assert.equal(a.lower,false);assert.equal(a.adjustPose,false);}
  assert.ok(sim.lowerRig().ok);assert.equal(sim.state.fishState,'sinking');assert.equal(actions(sim).cast,false);assert.equal(actions(sim).reel,true);assert.equal(actions(sim).mount,true);
 });

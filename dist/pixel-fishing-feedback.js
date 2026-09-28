@@ -3,7 +3,7 @@ const finite=(n,f=0)=>Number.isFinite(n)?n:f;
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 
 export function reelMotion(state={}){
- const active=['sinking','waiting','bite','fight'].includes(state.fishState)&&!state.paused;
+ const active=['flight','sinking','waiting','bite','fight'].includes(state.fishState)&&!state.paused;
  const payout=active?Math.max(0,finite(state.payoutRate)):0,retrieve=active?Math.max(0,finite(state.retrieveRate)):0;
  const net=retrieve-payout;
  // A 27 mm working spool radius; the crank remains independently driven by
@@ -12,13 +12,14 @@ export function reelMotion(state={}){
 }
 
 export function fishingFeedback(state={}){
- const deployed=['sinking','waiting','bite','fight'].includes(state.fishState);
+ const deployed=['flight','sinking','waiting','bite','fight'].includes(state.fishState);
  const bend=deployed?clamp(finite(state.rodBend),0,1):0,slack=Math.max(0,finite(state.lineSlackMeters));
  const {payout,retrieve}=reelMotion(state);
  const bendLabel=bend>.82?'竿身深弯':bend>.4?'鱼竿受力':bend>.1?'竿尖轻弯':'竿尖舒展';
  const drag=clamp(finite(state.drag,.48),.2,.85),dragLabel=drag<.38?'偏松':drag>.66?'偏紧':'适中';
  let cue='';
  if(state.paused)cue='';
+ else if(state.fishState==='flight')cue='抛投出线';
  else if(state.fishState==='bite')cue='咬钩了';
  else if(state.fishState==='landed')cue='鱼在船边';
  else if(['sinking','waiting','fight'].includes(state.fishState)){

@@ -69,7 +69,7 @@ test('guided stair arrival never clips open water and remains still for a minute
 
 test('obsolete cast APIs cannot deploy tackle, consume supplies or set a hook',()=>{
  const sim=new PixelSimulation({rng:()=>.05});departure(sim);const before=structuredClone(sim.state);
- assert.equal(sim.fishingReadiness(true).ok,false);assert.equal(sim.startCast().ok,false);assert.equal(sim.releaseCast().ok,false);assert.deepEqual(sim.state,before,'rejected casting must not charge, bait, roll fish or alter supplies');
+ assert.equal(sim.fishingReadiness(true).ok,true);assert.equal(sim.startCast().ok,false);assert.equal(sim.releaseCast().ok,false);assert.deepEqual(sim.state,before,'rejected casting must not charge, bait, roll fish or alter supplies');
  assert.equal(sim.lowerRig().ok,true);assert.equal(sim.state.fishState,'sinking');assert.equal(sim.state.castFlight,null);assert.equal(sim.state.bobber.height,0);assert.equal(sim.state.bobber.x,sim.state.rodTip.x);assert.equal(sim.state.bobber.z,sim.state.rodTip.z);assert.deepEqual(sim.state.profile.stock,before.profile.stock);
  runUntil(sim,s=>s.fishState==='bite',100);const bite=structuredClone(sim.state);assert.equal(sim.startCast().ok,false);assert.equal(sim.releaseCast().ok,false);assert.deepEqual(sim.state,bite,'old cast calls cannot strike or reroll a bite');
 });
