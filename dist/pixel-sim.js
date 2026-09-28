@@ -1,31 +1,31 @@
-import {fishMassKg} from './pixel-fish-mass.js?v=20260927-pixel-v53';
-import {stepRodTip,fishTipSignal} from './pixel-rod-response.js?v=20260927-pixel-v53';
-import {baitFishCandidates} from './pixel-small-fish.js?v=20260927-pixel-v53';
-import {baitSchoolInfluence} from './pixel-bait-schools.js?v=20260927-pixel-v53';
-import {planCast,stepCast} from './pixel-casting.js?v=20260927-pixel-v53';
-import {RETIRED_PIXEL_GEAR} from './pixel-gear-availability.js?v=20260927-pixel-v53';
-import {fishCommonName,fishDisplayName} from './pixel-fish-names.js?v=20260927-pixel-v53';
-import {stepBottomSnag,stepSnagAbrasion} from './pixel-snag.js?v=20260927-pixel-v53';
-import {formatLength,formatWeight} from './units.js?v=20260927-pixel-v53';
+import {fishMassKg} from './pixel-fish-mass.js?v=20260927-pixel-v54';
+import {stepRodTip,fishTipSignal} from './pixel-rod-response.js?v=20260927-pixel-v54';
+import {baitFishCandidates} from './pixel-small-fish.js?v=20260927-pixel-v54';
+import {baitSchoolInfluence} from './pixel-bait-schools.js?v=20260927-pixel-v54';
+import {planCast,stepCast} from './pixel-casting.js?v=20260927-pixel-v54';
+import {RETIRED_PIXEL_GEAR} from './pixel-gear-availability.js?v=20260927-pixel-v54';
+import {fishCommonName,fishDisplayName} from './pixel-fish-names.js?v=20260927-pixel-v54';
+import {stepBottomSnag,stepSnagAbrasion} from './pixel-snag.js?v=20260927-pixel-v54';
+import {formatLength,formatWeight} from './units.js?v=20260927-pixel-v54';
 /** Pixel gameplay. Offshore travel uses a 1:2 map scale and the calendar clock runs at 2x. Input, fishing and animations use active real seconds. */
-import {GEAR_CATALOG,BASE_GEAR,createProfile,equipmentStats,cargoWeight,settleFish,buyGear as purchaseGear,hasElectricReel as electricReelEquipped} from './equipment.js?v=20260927-pixel-v53';
-import {HARBOR,BOARDING_WALK_PATH,walkHeight,walkAllowed,canBoardFrom,harborWaterBlocked} from './pixel-harbor-layout.js?v=20260927-pixel-v53';
-import {walkingBlocked as walkBlocked,walkingPointOpen,walkingSegmentOpen as safeWalkSegment,createGroundWalkSearch,advanceGroundWalk} from './pixel-walking-path.js?v=20260927-pixel-v53';
-import {FISHING_SPOTS,toGPS,bearingDegrees,onLand,onPier,MAP_BOUNDS} from './pixel-geography.js?v=20260927-pixel-v53';
-import {fishingHabitatAt} from './pixel-seafloor.js?v=20260927-pixel-v53';
-import {depthAt,depthInfoAt} from './bathymetry.js?v=20260927-pixel-v53';
-import {waterRoute,resolveVesselContact,contactAwareControl,clearResumeVesselPose} from './pixel-navigation.js?v=20260927-pixel-v53';
-import {createVesselState,stepVessel,syncVessel,vesselWind,vesselAutopilot} from './vessel-physics.js?v=20260927-pixel-v53';
-import {fishEncounter,weightedEncounterFish} from './pixel-fish-ecology.js?v=20260927-pixel-v53';
-import {RIG_PROFILES,getRigProfile} from './fishing-rigs.js?v=20260927-pixel-v53';
-import {MAX_PAID_LINE_METERS,MAX_TROLL_SPEED_MPS,MAX_TROLL_THROTTLE,reelTurnsPerSecond,rodTipPosition,fishingCurrent,relativeFishingFlow,stepFishingLine} from './pixel-fishing-physics.js?v=20260927-pixel-v53';
-import {createFishFight,stepFishFight,canLandFish} from './pixel-fish-fight.js?v=20260927-pixel-v53';
-import {createHookHold,createBiteHold,stepHookHold} from './pixel-hooking.js?v=20260927-pixel-v53';
-import {consumableStatus,installBait,installRig,loseRig,damageSupplies,rigRequiresBait,USABLE_CONDITION} from './pixel-consumables.js?v=20260927-pixel-v53';
-import {ensureRodLoadouts,getRodAssembly,setRodAssembly,syncActiveRodLoadout} from './pixel-rod-loadouts.js?v=20260927-pixel-v53';
-import {assessCatchLedger,identifyRegulatedSpecies} from './fishing-regulations.js?v=20260927-pixel-v53';
-import {FishingPatrol} from './fish-patrol.js?v=20260927-pixel-v53';
-import {NAVIGATION_COMPRESSION,navigationStepScale} from './pixel-navigation-scale.js?v=20260927-pixel-v53';
+import {GEAR_CATALOG,BASE_GEAR,createProfile,equipmentStats,cargoWeight,settleFish,buyGear as purchaseGear,hasElectricReel as electricReelEquipped} from './equipment.js?v=20260927-pixel-v54';
+import {HARBOR,BOARDING_WALK_PATH,walkHeight,walkAllowed,canBoardFrom,harborWaterBlocked} from './pixel-harbor-layout.js?v=20260927-pixel-v54';
+import {walkingBlocked as walkBlocked,walkingPointOpen,walkingSegmentOpen as safeWalkSegment,createGroundWalkSearch,advanceGroundWalk} from './pixel-walking-path.js?v=20260927-pixel-v54';
+import {FISHING_SPOTS,toGPS,bearingDegrees,onLand,onPier,MAP_BOUNDS} from './pixel-geography.js?v=20260927-pixel-v54';
+import {fishingHabitatAt} from './pixel-seafloor.js?v=20260927-pixel-v54';
+import {depthAt,depthInfoAt} from './bathymetry.js?v=20260927-pixel-v54';
+import {waterRoute,resolveVesselContact,contactAwareControl,clearResumeVesselPose} from './pixel-navigation.js?v=20260927-pixel-v54';
+import {createVesselState,stepVessel,syncVessel,vesselWind,vesselAutopilot} from './vessel-physics.js?v=20260927-pixel-v54';
+import {fishEncounter,weightedEncounterFish} from './pixel-fish-ecology.js?v=20260927-pixel-v54';
+import {RIG_PROFILES,getRigProfile} from './fishing-rigs.js?v=20260927-pixel-v54';
+import {MAX_PAID_LINE_METERS,MAX_TROLL_SPEED_MPS,MAX_TROLL_THROTTLE,reelTurnsPerSecond,rodTipPosition,fishingCurrent,relativeFishingFlow,stepFishingLine} from './pixel-fishing-physics.js?v=20260927-pixel-v54';
+import {createFishFight,stepFishFight,canLandFish} from './pixel-fish-fight.js?v=20260927-pixel-v54';
+import {createHookHold,createBiteHold,stepHookHold} from './pixel-hooking.js?v=20260927-pixel-v54';
+import {consumableStatus,installBait,installRig,loseRig,damageSupplies,rigRequiresBait,USABLE_CONDITION} from './pixel-consumables.js?v=20260927-pixel-v54';
+import {ensureRodLoadouts,getRodAssembly,setRodAssembly,syncActiveRodLoadout} from './pixel-rod-loadouts.js?v=20260927-pixel-v54';
+import {assessCatchLedger,identifyRegulatedSpecies} from './fishing-regulations.js?v=20260927-pixel-v54';
+import {FishingPatrol} from './fish-patrol.js?v=20260927-pixel-v54';
+import {NAVIGATION_COMPRESSION,navigationStepScale} from './pixel-navigation-scale.js?v=20260927-pixel-v54';
 export const GAME_TIME_SCALE=1/NAVIGATION_COMPRESSION;
 export const WALK_SPEED=2.90;
 export const BOAT_RENTAL_PRICE=15; // Virtual game credits, not a real rental quote.
@@ -34,17 +34,17 @@ const pacificMonth=new Intl.DateTimeFormat('en-US',{timeZone:'America/Los_Angele
 const pacificClock=new Intl.DateTimeFormat('en-GB',{timeZone:'America/Los_Angeles',hour:'2-digit',minute:'2-digit',second:'2-digit',hourCycle:'h23'});
 export {GEAR_CATALOG,BASE_GEAR,HARBOR,BOARDING_WALK_PATH,FISHING_SPOTS};
 export const PIXEL_FISH=[
- {name:'蓝岩鱼',latin:'Sebastes mystinus',color:'#718ba8',min:22,max:39,weight:.7,referenceLength:30.5,power:.86,spot:'kelp',bait:'squid'},
- {name:'铜岩鱼',latin:'Sebastes caurinus',color:'#cc9869',min:27,max:58,weight:1.3,referenceLength:37.5,power:1.03,spot:'reef',bait:'squid'},
- {name:'加州大比目鱼',latin:'Paralichthys californicus',color:'#a6aa74',min:38,max:69,weight:2.5,power:1.2,spot:'sand',bait:'anchovy'},
- {name:'太平洋鲭鱼',latin:'Scomber japonicus',color:'#73b8c1',min:25,max:38,weight:.6,referenceLength:31.5,power:.8,spot:'sand',bait:'jig'},
- {name:'长蛇齿单线鱼',latin:'Ophiodon elongatus',color:'#8ba878',min:40,max:65,weight:1.34,referenceLength:53,power:1.32,spot:'reef',bait:'jig'},
- {name:'朱红岩鱼',latin:'Sebastes miniatus',color:'#d78062',min:25,max:68,weight:1.35,referenceLength:41.2,rarity:.36,spot:'reef',bait:'squid'},
- {name:'帝王鲑',latin:'Oncorhynchus tshawytscha',color:'#a8c8ce',min:45,max:100,weight:5.5,referenceLength:70,rarity:.09,spot:'sand',bait:'anchovy'},
- {name:'白海鲈',latin:'Atractoscion nobilis',color:'#b2b5a6',min:55,max:140,weight:8.6,referenceLength:98.5,rarity:.025,spot:'kelp',bait:'squid'},
- {name:'太平洋狐鲣',latin:'Sarda chiliensis lineolata',color:'#75a4b6',min:30,max:75,weight:1.8,referenceLength:50,lengthType:'fork',rarity:.12,spot:'sand',bait:'sardine'},
- {name:'白石首鱼',latin:'Genyonemus lineatus',color:'#c4bb95',min:18,max:30,weight:.19,referenceLength:25,spot:'sand',bait:'squid'},
- {name:'太平洋沙鲽',latin:'Citharichthys sordidus',color:'#b19771',min:15,max:28,weight:.16,referenceLength:24.6,spot:'sand',bait:'squid'},
+ {name:'蓝岩鱼',latin:'Sebastes mystinus',color:'#718ba8',min:22,max:39,power:.86,spot:'kelp',bait:'squid'},
+ {name:'铜岩鱼',latin:'Sebastes caurinus',color:'#cc9869',min:27,max:58,power:1.03,spot:'reef',bait:'squid'},
+ {name:'加州大比目鱼',latin:'Paralichthys californicus',color:'#a6aa74',min:38,max:69,power:1.2,spot:'sand',bait:'anchovy'},
+ {name:'太平洋鲭鱼',latin:'Scomber japonicus',color:'#73b8c1',min:25,max:38,power:.8,spot:'sand',bait:'jig'},
+ {name:'长蛇齿单线鱼',latin:'Ophiodon elongatus',color:'#8ba878',min:40,max:65,power:1.32,spot:'reef',bait:'jig'},
+ {name:'朱红岩鱼',latin:'Sebastes miniatus',color:'#d78062',min:25,max:68,rarity:.36,spot:'reef',bait:'squid'},
+ {name:'帝王鲑',latin:'Oncorhynchus tshawytscha',color:'#a8c8ce',min:45,max:100,rarity:.09,spot:'sand',bait:'anchovy'},
+ {name:'白海鲈',latin:'Atractoscion nobilis',color:'#b2b5a6',min:55,max:140,rarity:.025,spot:'kelp',bait:'squid'},
+ {name:'太平洋狐鲣',latin:'Sarda chiliensis lineolata',color:'#75a4b6',min:30,max:75,lengthType:'fork',rarity:.12,spot:'sand',bait:'sardine'},
+ {name:'白石首鱼',latin:'Genyonemus lineatus',color:'#c4bb95',min:18,max:30,spot:'sand',bait:'squid'},
+ {name:'太平洋沙鲽',latin:'Citharichthys sordidus',color:'#b19771',min:15,max:28,spot:'sand',bait:'squid'},
 ].map(f=>({...f,commonName:fishCommonName(f)}));
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),finite=(v,fallback=0)=>Number.isFinite(v)?v:fallback;
 const distance=(a,b)=>Math.hypot(a.x-b.x,a.z-b.z);

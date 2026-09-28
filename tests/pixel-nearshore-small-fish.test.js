@@ -3,17 +3,18 @@ import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import {createFishFight,stepFishFight,canLandFish,fishFightKind} from '../dist/pixel-fish-fight.js';
 import {hookProfile,createHookHold,stepHookHold} from '../dist/pixel-hooking.js';
+import {fishMassKg} from '../dist/pixel-fish-mass.js';
 import {hookSizeFit} from '../dist/pixel-hook-size.js';
 import {RIG_PROFILES} from '../dist/fishing-rigs.js';
 import {rodTipPosition,stepFishingLine} from '../dist/pixel-fishing-physics.js';
 globalThis.fetch=async url=>new Response(await readFile(url));
 const {PIXEL_FISH}=await import('../dist/pixel-sim.js');
-const fishFor=latin=>{const fish=PIXEL_FISH.find(f=>f.latin===latin);return{...fish,length:fish.referenceLength,kg:fish.weight};};
+const fishFor=latin=>{const fish=PIXEL_FISH.find(f=>f.latin===latin),length=latin==='Genyonemus lineatus'?25:24.6;return{...fish,length,kg:fishMassKg(fish,length)};};
 const species=['Genyonemus lineatus','Citharichthys sordidus'];
 
 test('documented sand-bottom fish have small conservative sizes and distinct identities',()=>{
  const fish=species.map(fishFor);assert.deepEqual(fish.map(fishFightKind),['croaker','sanddab']);
- for(const f of fish){assert.equal(f.spot,'sand');assert.equal(f.bait,'squid');assert.ok(f.min>=15&&f.max<=30);assert.ok(f.kg>0&&f.kg<.3);assert.ok(f.referenceLength>=f.min&&f.referenceLength<=f.max);assert.ok(hookProfile(f,RIG_PROFILES.bottom).easy);}
+ for(const f of fish){assert.equal(f.spot,'sand');assert.equal(f.bait,'squid');assert.ok(f.min>=15&&f.max<=30);assert.ok(f.kg>0&&f.kg<.3);assert.ok(f.length>=f.min&&f.length<=f.max);assert.ok(hookProfile(f,RIG_PROFILES.bottom).easy);}
 });
 
 test('ordinary croaker and sanddab wind directly up without required exhaustion or arbitrary hook loss',()=>{

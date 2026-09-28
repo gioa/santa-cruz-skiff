@@ -2,14 +2,14 @@
  * Sizes, search radii and rates are bounded game approximations, not surveys.
  * NOAA species sources and CDFW 27.60 are recorded in docs/visible-baitfish.md.
  */
-import {getRigProfile} from './fishing-rigs.js?v=20260927-pixel-v53';
-import {hookSizeFit} from './pixel-hook-size.js?v=20260927-pixel-v53';
-import {fishMassKg} from './pixel-fish-mass.js?v=20260927-pixel-v53';
+import {getRigProfile} from './fishing-rigs.js?v=20260927-pixel-v54';
+import {hookSizeFit} from './pixel-hook-size.js?v=20260927-pixel-v54';
+import {fishMassKg} from './pixel-fish-mass.js?v=20260927-pixel-v54';
 const finite=(v,f=0)=>Number.isFinite(v)?v:f,clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 export const SMALL_FISH=Object.freeze({
- 'anchovy-school':{id:'anchovy',name:'北方鳀鱼',commonName:'Northern Anchovy',latin:'Engraulis mordax',color:'#a9cccb',min:8,max:15,referenceLength:12,weight:.015,baitfish:true},
- 'sardine-school':{id:'sardine',name:'太平洋沙丁鱼',commonName:'Pacific Sardine',latin:'Sardinops sagax',color:'#9fbec1',min:12,max:23,referenceLength:18,weight:.055,baitfish:true},
- 'mackerel-school':{id:'mackerel',name:'太平洋鲭鱼',commonName:'Pacific Mackerel',latin:'Scomber japonicus',color:'#73b8c1',min:15,max:26,referenceLength:22,weight:.12,baitfish:true},
+ 'anchovy-school':{id:'anchovy',name:'北方鳀鱼',commonName:'Northern Anchovy',latin:'Engraulis mordax',color:'#a9cccb',min:8,max:15,baitfish:true},
+ 'sardine-school':{id:'sardine',name:'太平洋沙丁鱼',commonName:'Pacific Sardine',latin:'Sardinops sagax',color:'#9fbec1',min:12,max:23,baitfish:true},
+ 'mackerel-school':{id:'mackerel',name:'太平洋鲭鱼',commonName:'Pacific Mackerel',latin:'Scomber japonicus',color:'#73b8c1',min:15,max:26,baitfish:true},
 });
 export function schoolFish(school){
  const template=SMALL_FISH[school?.species];

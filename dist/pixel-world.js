@@ -1,13 +1,13 @@
-import {pierRings,landPolygons,coastLines,buildingFootprints,FISHING_SPOTS,onLand,onPier} from './pixel-geography.js?v=20260927-pixel-v53';
-import {FISHING_SCENE_SCALE,fishingProjector,fishingPhysicalPoint} from './pixel-fishing-projection.js?v=20260927-pixel-v53';
-import {HARBOR,harborWaterBlocked} from './harbor-layout.js?v=20260927-pixel-v53';
-import {depthInfoAt} from './bathymetry.js?v=20260927-pixel-v53';
-import {createWildlife,drawWildlife} from './pixel-wildlife.js?v=20260927-pixel-v53';
-import {cameraOffset,projectPixel,unprojectPixel,stepDeadzoneCamera,cameraDeadzone,cameraPlayfield,fitCameraBounds,zoomCameraAt,rectilinearOutline} from './pixel-camera.js?v=20260927-pixel-v53';
-import {ladderPoint} from './swimming.js?v=20260927-pixel-v53';
-import {SKIFF_HULL_OUTLINE,SKIFF_RACKS,boatRenderPose,parkedSkiffPoses,skiffScreenPose,hitSkiff,outboardPose} from './pixel-boat-geometry.js?v=20260927-pixel-v53';
-import {createWakeTrail,crestPoints,foamPoint} from './pixel-wake.js?v=20260927-pixel-v53';
-import {getRodCurve,getReelPose,getFishingLine,getFishingPresentation} from './pixel-rod-geometry.js?v=20260927-pixel-v53';
+import {pierRings,landPolygons,coastLines,buildingFootprints,FISHING_SPOTS,onLand,onPier} from './pixel-geography.js?v=20260927-pixel-v54';
+import {FISHING_SCENE_SCALE,fishingProjector,fishingPhysicalPoint} from './pixel-fishing-projection.js?v=20260927-pixel-v54';
+import {HARBOR,harborWaterBlocked} from './harbor-layout.js?v=20260927-pixel-v54';
+import {depthInfoAt} from './bathymetry.js?v=20260927-pixel-v54';
+import {createWildlife,drawWildlife} from './pixel-wildlife.js?v=20260927-pixel-v54';
+import {cameraOffset,projectPixel,unprojectPixel,stepDeadzoneCamera,cameraDeadzone,cameraPlayfield,fitCameraBounds,zoomCameraAt,rectilinearOutline} from './pixel-camera.js?v=20260927-pixel-v54';
+import {ladderPoint} from './swimming.js?v=20260927-pixel-v54';
+import {SKIFF_HULL_OUTLINE,SKIFF_RACKS,boatRenderPose,parkedSkiffPoses,skiffScreenPose,hitSkiff,outboardPose} from './pixel-boat-geometry.js?v=20260927-pixel-v54';
+import {createWakeTrail,crestPoints,foamPoint} from './pixel-wake.js?v=20260927-pixel-v54';
+import {getRodCurve,getReelPose,getFishingLine,getFishingPresentation} from './pixel-rod-geometry.js?v=20260927-pixel-v54';
 
 // Boat and wharf art retain readable proportions. Fishing and visible fish
 // share the same geographic projection as the seabed.

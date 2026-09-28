@@ -24,9 +24,8 @@ from exactly 20.9 × 2.54 cm instead gives 1.35 kg / 2.98 lb.
 Also replace California halibut's midpoint anchor with the sex-averaged
 coefficients in [CDFW's 2024 assessment, Table 12, printed page 59](https://nrm.dfg.ca.gov/FileHandler.ashx?DocumentID=229693):
 W = mean(0.00000621, 0.00000607) × L^3.14. These are California halibut, not
-Pacific halibut. All other fish retain their existing reference specimens and
-approximate 2.7 scaling; those are not newly claimed empirical population fits.
-Mackerel's previous midpoint is made an explicit 31.5 cm reference.
+Pacific halibut. The subsequent [all-species audit](fish-mass-audit.md) replaces the remaining
+reference specimens / generic 2.7 scaling with species-specific source curves.
 New catches use the corrected model. Historical settled catch weights/credits
 are not rewritten. Weight also feeds the existing force/energy model.
 
