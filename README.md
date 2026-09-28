@@ -168,3 +168,9 @@ Fish artwork uses the catch's stored length in centimetres. Catch cards and jour
 The first-person surface fish uses the same species artwork, actual fish length, and physical fish-to-boat distance with a fixed 62-degree horizontal camera field of view and 1.35 m eye-height approximation. It appears only near the water surface, with the mouth at the line entry; deep fish do not become visible markers. Size is never inflated to a minimum icon width. Fish size rendering does not alter catch generation, line mechanics, fight strength, consumables or credits.
 
 Fish cards and catch records show Chinese names and English common names, resolved for old catches as well. Feather rigs accept optional natural or soft-plastic tips: fresh tips affect species encounter weights and wear normally, while bare feathers remain usable. Soft-plastic action bonuses are illustrative simulation parameters, not measured catch-rate data.
+
+## Pacifica Beach — second destination
+
+Choose **选择钓场** on the opening page, or the in-game location link, to visit [Pacifica Beach](https://joyx.design/santa-cruz-skiff/pacifica.html). Walk Linda Mar’s stylized beach, shop at the fictional Bait & Tackle store, charge and aim a surf cast, strike a bite, and manage line tension to bring a fish ashore. Bait, rod/reel/rig upgrades, retained catches, and shop exchange form a complete shore-fishing loop. Both destinations retain independent saved progress.
+
+See [scene details and reference](docs/pacifica-beach.md) and `qa/pacifica/` for validation.

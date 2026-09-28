@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#234e50">
+  <meta name="description" content="潮汐之间的第二站：Pacifica Beach。走过沙滩，在浪边抛竿，再去 Bait & Tackle 小店补给。">
+  <title>Pacifica Beach · 潮汐之间</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath fill='%23234e50' d='M0 0h32v32H0z'/%3E%3Cpath fill='none' stroke='%23f1d9a8' stroke-width='3' d='M4 18q6-10 12 0t12 0M4 25q6-10 12 0t12 0'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="./pacifica.css?v=pacifica-1">
+  <link rel="stylesheet" href="./pixel-locations.css?v=pacifica-1">
+</head>
+<body>
+<main id="beach-app" class="welcome-open">
+  <canvas id="beach-world" aria-label="Pacifica 沙滩钓场，轻点沙地行走，轻点海面瞄准" tabindex="0"></canvas>
+  <header class="beach-hud">
+    <a href="./index.html" class="beach-brand" aria-label="潮汐之间，返回 Santa Cruz"><span class="wave-mark">≈</span><span>潮汐之间<small>A LITTLE CLOSER TO THE OCEAN</small></span></a>
+    <div class="beach-weather"><span>☁</span><div><time id="beach-clock">06:00</time><small>薄雾 · 涨潮</small></div></div>
+    <div class="beach-tools"><span class="beach-wallet" aria-label="游戏积分">✦ <b id="beach-credits">120</b></span><button id="beach-sound" aria-label="开启海浪声音" title="声音">♪</button><button id="beach-help" aria-label="操作说明">?</button></div>
+  </header>
+  <section class="beach-postmark"><span>第二站 / THE COAST COLLECTION</span><h1>PACIFICA <em>BEACH</em></h1><p>LINDA MAR, CALIFORNIA <i>37°36′ N · 122°30′ W</i></p></section>
+  <section id="beach-welcome" class="beach-welcome">
+    <span class="eyebrow">一根岸钓竿，一整个清晨。</span>
+    <h2>今天，<br>从浪边开始。</h2>
+    <p>踩过细沙，向白浪外抛一竿。<br>饵不够了？步道旁的小店刚开门。</p>
+    <button id="beach-start" class="primary">走进沙滩 <span>↗</span></button>
+    <small>免费岸钓套装已装入背包 · 自动保存</small>
+  </section>
+  <nav id="beach-nav" class="beach-nav" aria-label="沙滩工具" hidden>
+    <button id="beach-bag"><span>▤</span>背包</button><button id="beach-journal"><span>♧</span>鱼获 <b id="catch-count">0</b></button><button data-scene-picker><span>⌁</span>钓场</button>
+  </nav>
+  <section id="beach-console" class="beach-console" hidden aria-label="岸钓控制台">
+    <div class="console-top"><div><span class="eyebrow" id="beach-location">BEACHSIDE PATH</span><h2 id="beach-status">先去浪线边看看</h2></div><div class="quick-walk"><button id="walk-surf">去浪线 ↗</button><button id="walk-shop">去小店 ↗</button></div></div>
+    <p id="beach-instruction">轻点沙地行走，也可以使用 WASD。</p>
+    <div id="beach-tension" class="tension-wrap" hidden><label>鱼线张力 <strong id="tension-value">0%</strong></label><div class="tension-track"><i id="tension-fill"></i></div><small id="fight-advice">平稳收线，红区时松手让线。</small></div>
+    <div class="cast-controls"><label class="aim-control" id="aim-control"><span>抛投方向 <b id="aim-label">正前方</b></span><input id="beach-aim" type="range" min="-1" max="1" value="0" step=".05" aria-label="抛投方向，左至右"></label><div class="rig-label" id="rig-label"><span>岸钓套装</span><b id="beach-bait">沙蟹 × 12</b></div><button id="beach-cast" class="primary cast-button">按住蓄力 · 松手抛竿</button><button id="beach-reel" class="primary" hidden>按住收线</button><button id="beach-retrieve" class="secondary" hidden>收回钓组</button></div>
+    <div class="cast-charge" id="cast-charge" hidden><i id="charge-fill"></i><span id="charge-label">蓄力 0%</span></div>
+  </section>
+  <div id="beach-toast" role="status" aria-live="polite"></div>
+  <dialog id="beach-dialog" aria-labelledby="dialog-title"><button id="dialog-close" class="dialog-close" aria-label="关闭窗口">×</button><div id="dialog-content"></div></dialog>
+  <output id="beach-state" hidden></output>
+</main>
+<script type="module" src="./pacifica-game.js?v=pacifica-1"></script>
+<script type="module" src="./pixel-locations.js?v=pacifica-1"></script>
+</body></html>

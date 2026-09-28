@@ -1,0 +1,69 @@
+{
+  "activeWallMs": 602746,
+  "catches": 8,
+  "errors": [],
+  "state": {
+    "scene": "pacifica",
+    "started": true,
+    "paused": false,
+    "player": {
+      "x": 833.4712290107357,
+      "y": 471.58759630673825,
+      "facing": -1,
+      "walking": false
+    },
+    "phase": "walk",
+    "elapsed": 603.4255999998433,
+    "credits": 155,
+    "inventory": {
+      "sandcrab": 27,
+      "squid": 0,
+      "anchovy": 0
+    },
+    "bait": "sandcrab",
+    "rig": "carolina",
+    "upgrades": [
+      "surf_rod"
+    ],
+    "catches": [],
+    "lastCatch": null,
+    "stats": {
+      "caught": 8,
+      "kept": 6,
+      "released": 2,
+      "sold": 6,
+      "casts": 9,
+      "missed": 0
+    },
+    "cast": null,
+    "lineDistance": 0,
+    "tension": 0,
+    "fish": null,
+    "biteRemaining": 0,
+    "waitRemaining": 0,
+    "fightElapsed": 0,
+    "lineStress": 0,
+    "slackTime": 0,
+    "walkTarget": null,
+    "walkRoute": [],
+    "message": "欢迎回到 Pacifica。装备和渔获已恢复，沿浪线继续沙滩钓吧。",
+    "nextCatchId": 10,
+    "canCast": true,
+    "nearShop": false
+  },
+  "checks": [
+    "shop purchase charged once",
+    "upgrade applied",
+    "natural walk around shop",
+    "menu pauses simulation",
+    "normal charged pointer cast",
+    "natural random bite",
+    "timed strike",
+    "pointer-controlled tension fight",
+    "keep and release",
+    "walk return and sale",
+    "desktop/phone/landscape screenshots",
+    "no horizontal overflow",
+    "save reload"
+  ]
+}

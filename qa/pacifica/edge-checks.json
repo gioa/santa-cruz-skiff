@@ -1,0 +1,12 @@
+{
+  "checks": [
+    "full fish bag keeps pending catch available",
+    "release still works at capacity",
+    "empty selected bait correctly prompts refill",
+    "switching available bait restores casting",
+    "visible-window blur pauses active fishing",
+    "focus resumes active fishing",
+    "Santa Cruz save untouched"
+  ],
+  "errors": []
+}

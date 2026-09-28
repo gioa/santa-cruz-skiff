@@ -1,0 +1,73 @@
+{
+  "base": "http://127.0.0.1:4177/",
+  "checks": [
+    "Santa Cruz to Pacifica through location picker",
+    "buy bait at shop",
+    "return to Santa Cruz",
+    "return to Pacifica with purchase retained",
+    "walk to beach and cast",
+    "desktop and phone render"
+  ],
+  "errors": [],
+  "state": {
+    "scene": "pacifica",
+    "started": true,
+    "paused": false,
+    "player": {
+      "x": 890.0921972398876,
+      "y": 461.07672256186675,
+      "facing": -1,
+      "walking": false
+    },
+    "phase": "waiting",
+    "elapsed": 5.53320000000001,
+    "credits": 100,
+    "inventory": {
+      "sandcrab": 11,
+      "squid": 8,
+      "anchovy": 0
+    },
+    "bait": "sandcrab",
+    "rig": "carolina",
+    "upgrades": [],
+    "catches": [],
+    "lastCatch": null,
+    "stats": {
+      "caught": 0,
+      "kept": 0,
+      "released": 0,
+      "sold": 0,
+      "casts": 1,
+      "missed": 0
+    },
+    "cast": {
+      "origin": {
+        "x": 890.0921972398876,
+        "y": 443.07672256186675
+      },
+      "target": {
+        "x": 890.0921972398876,
+        "y": 303.0354840006052
+      },
+      "power": 0.25,
+      "aim": 0,
+      "distance": 31.5,
+      "flight": 0.845,
+      "flightDuration": 0.845
+    },
+    "lineDistance": 31.5,
+    "tension": 0,
+    "fish": null,
+    "biteRemaining": 0,
+    "waitRemaining": 17.259340509877294,
+    "fightElapsed": 0,
+    "lineStress": 0,
+    "slackTime": 0,
+    "walkTarget": null,
+    "walkRoute": [],
+    "message": "钓组落水。等待竿尖点动，出现咬口后及时扬竿。",
+    "nextCatchId": 1,
+    "canCast": false,
+    "nearShop": false
+  }
+}
