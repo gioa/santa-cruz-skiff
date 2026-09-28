@@ -12,6 +12,15 @@ export const SKIFF_RACKS=Object.freeze([
 // A minimum screen size would let dry boats grow beyond their rack/pier.
 export const skiffScale=scale=>Math.max(0,scale)*.18;
 
+// Canvas-local, bow-up coordinates. Match stepVessel's actual propeller
+// deflection (±0.5 rad): the forward tiller moves toward the stern's thrust,
+// opposite the bow's turn. Reverse gear changes thrust, not motor orientation.
+export function outboardPose(tiller=0){
+  const angle=clamp(Number.isFinite(tiller)?tiller:0,-1,1)*.5,pivot={x:0,y:34},c=Math.cos(angle),s=Math.sin(angle);
+  const point=(x,y)=>({x:pivot.x+x*c-y*s,y:pivot.y+x*s+y*c});
+  return{angle,pivot,grip:point(-5,-11),forward:{x:s,y:-c}};
+}
+
 export function boatRenderPose(state,harbor){
   const stage=state.launchStage||'afloat',rack=SKIFF_RACKS[0];
   const water={x:state.boatX??harbor.boatX,z:state.boatZ??harbor.boatZ};

@@ -6,10 +6,10 @@ globalThis.fetch=async url=>new Response(await readFile(url));
 const {PixelSimulation,HARBOR}=await import('../dist/pixel-sim.js');
 const {boatActions}=await import('../dist/pixel-boat-actions.js');
 const run=(sim,seconds,input={})=>{for(let t=0;t<seconds-1e-8;t+=.1)sim.step(Math.min(.1,seconds-t),input);};
-function ready({moored=false}={}){
+function ready(){
  const sim=new PixelSimulation({rng:()=>.05,patrolRng:()=>.9,profile:{version:2,credits:500}});sim.start();Object.assign(sim.state,{playerX:HARBOR.counterX,playerZ:HARBOR.counterZ});
- for(const item of['anchor','nautical_chart']){assert.ok(sim.buyGear(item).ok);assert.ok(sim.equip(item).ok);}
- assert.ok(sim.launchBoat().ok);run(sim,24.1);Object.assign(sim.state,{playerX:HARBOR.boardingX,playerZ:HARBOR.boardingZ});assert.ok(sim.board().ok);if(!moored)assert.ok(sim.unmoor().ok);return sim;
+ for(const item of['nautical_chart']){assert.ok(sim.buyGear(item).ok);assert.ok(sim.equip(item).ok);}
+ assert.ok(sim.launchBoat().ok);run(sim,24.1);Object.assign(sim.state,{playerX:HARBOR.boardingX,playerZ:HARBOR.boardingZ});assert.ok(sim.board().ok);assert.equal(sim.state.moored,false);return sim;
 }
 function actions(sim,options={}){return boatActions(sim.state,{hasRod:sim.stats.hasRod,hasAnchor:sim.hasGear('anchor'),hasChart:sim.hasGear('nautical_chart'),canLower:sim.fishingReadiness().ok,nearDock:false,...options});}
 const actionKeys=['unmoor','dock','engine','anchor','switchPanel','adjustPose','reel','spool','drag','lower','cast','hook','catch','retrieve','mount','take','assemble','return'];
@@ -17,7 +17,7 @@ const offered=a=>actionKeys.filter(key=>a[key]).sort();
 
 test('each reachable fishing phase offers only its permitted actions, distinguishing hand and side holders',()=>{
  const sim=ready(),base=structuredClone(sim.state),cases=[
-  ['idle','hand',['engine','anchor','adjustPose','lower','mount','assemble','return']],
+  ['idle','hand',['engine','adjustPose','lower','mount','assemble','return']],
   ['casting','hand',[]],
   ['flight','hand',[]],
   ['sinking','hand',['adjustPose','reel','spool','mount']],
@@ -27,9 +27,9 @@ test('each reachable fishing phase offers only its permitted actions, distinguis
   ['landed','hand',['catch']],
  ];
  for(const mount of['port','starboard'])cases.push(
-  ['idle',mount,['engine','anchor','adjustPose','lower','take','assemble','return']],
-  ['sinking',mount,['engine','anchor','adjustPose','spool','take','return']],
-  ['waiting',mount,['engine','anchor','adjustPose','spool','take','return']],
+  ['idle',mount,['engine','adjustPose','lower','take','assemble','return']],
+  ['sinking',mount,['engine','adjustPose','spool','take','return']],
+  ['waiting',mount,['engine','adjustPose','spool','take','return']],
   ['bite',mount,['adjustPose','spool','take']],
   ['fight',mount,['adjustPose','spool','drag','take']],
  );
@@ -59,8 +59,8 @@ test('vertical-only policy offers lowering even when an obsolete caller claims c
  assert.ok(sim.lowerRig().ok);assert.equal(sim.state.fishState,'sinking');assert.equal(actions(sim).cast,false);assert.equal(actions(sim).reel,true);assert.equal(actions(sim).mount,true);
 });
 
-test('mooring, inspection, pause and docking suppress the complete active control set',()=>{
- const sim=ready({moored:true});assert.deepEqual(offered(actions(sim,{nearDock:true})),['assemble','unmoor']);assert.equal(actions(sim).tackle,false);assert.equal(actions(sim).helm,false);assert.ok(sim.unmoor().ok);assert.equal(actions(sim).unmoor,false);
+test('boarding offers immediate controls while inspection, pause and docking suppress actions',()=>{
+ const sim=ready();assert.equal(actions(sim).engine,true);assert.equal(actions(sim,{nearDock:true}).dock,true);assert.equal(actions(sim).tackle,true);assert.equal(actions(sim).unmoor,false);assert.equal(actions(sim).anchor,false);
  const base=structuredClone(sim.state);for(const patch of[{paused:true},{inspection:{phase:'checking'}},{docking:{progress:.5}},{rentalPaid:false},{launchStage:'lowering'},{mode:'walk'}]){
   const a=boatActions({...base,...patch},{hasRod:true,hasAnchor:true,hasChart:true,canLower:true,canCast:true,nearDock:true});assert.deepEqual(offered(a),[],JSON.stringify(patch));assert.equal(a.console,false);assert.equal(a.tackle,false);assert.equal(a.helm,false);
  }
@@ -74,10 +74,10 @@ test('legacy standing flags cannot trap rod controls and a landed fish offers on
  sim.state.fishState='landed';sim.state.fish={name:'test',latin:'Scomber japonicus',length:30,kg:.6};assert.deepEqual(offered(actions(sim,{nearDock:true})),['catch']);assert.ok(sim.keepCatch().ok);assert.equal(actions(sim).catch,false);assert.equal(actions(sim).assemble,true);assert.equal(actions(sim).engine,true);
 });
 
-test('anchor and chart routes require their actual equipment and near-dock is an explicit contextual capability',()=>{
+test('chart routes remain equipment-gated while retired anchor and fuel never block boat controls',()=>{
  const sim=ready();assert.equal(actions(sim).dock,false);assert.equal(actions(sim,{nearDock:true}).dock,true);sim.state.speed=.85;assert.equal(actions(sim,{nearDock:true}).dock,false);sim.state.speed=0;
- assert.equal(actions(sim).anchor,true);assert.ok(sim.toggleAnchor().ok);assert.equal(actions(sim).anchor,true,'raising an existing anchor stays available');assert.equal(actions(sim).engine,false);assert.equal(actions(sim).return,false);assert.ok(sim.toggleAnchor().ok);assert.ok(sim.equip('anchor').ok);assert.equal(actions(sim).anchor,false);assert.ok(sim.equip('nautical_chart').ok);assert.equal(actions(sim).return,false);
- sim.state.fuel=0;assert.equal(actions(sim).engine,false);sim.state.engine=true;assert.equal(actions(sim).engine,true,'engine stop remains available even when fuel is empty');assert.equal(actions(sim,{panel:'helm'}).switchPanel,true);
+ assert.equal(actions(sim).anchor,false);assert.equal(sim.toggleAnchor().ok,false);assert.equal(actions(sim).engine,true);assert.equal(actions(sim).return,true);assert.ok(sim.equip('nautical_chart').ok);assert.equal(actions(sim).return,false);
+ Object.assign(sim.state,{fuel:0,anchor:true,moored:true});assert.equal(actions(sim).engine,true);assert.equal(actions(sim).anchor,false);assert.equal(actions(sim).unmoor,false);sim.state.engine=true;assert.equal(actions(sim,{panel:'helm'}).switchPanel,true);
 });
 
 test('readiness is side-effect free and hides missing bait or gear using exactly the same validation as deployment',()=>{

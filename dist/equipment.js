@@ -1,10 +1,10 @@
-import {starterConsumables,ensureConsumables,suppliesWeight} from './pixel-consumables.js?v=20260927-pixel-v25';
+import {starterConsumables,ensureConsumables,suppliesWeight} from './pixel-consumables.js?v=20260927-pixel-v26';
 // Virtual credits and simulation tuning. These are not retail prices or harvest rules.
 export const GEAR_CATALOG=[
  {id:'pfd',slot:'safety',name:'救生衣',price:0,kg:.7,desc:'穿在身上 · 落水时提供浮力',icon:'◈'},
  {id:'rod',slot:'rod',name:'通用船竿与绕线轮',price:0,kg:.65,desc:'7 ft 通用竿 · 初始免费，可应对所有鱼种',icon:'╱',strength:1,retrieve:1,sensitivity:1},
- {id:'tackle',slot:'rig',name:'基础钓组盒',price:0,kg:.9,desc:'预组装单钩沉底组 · 2 套备用',icon:'▦',rig:'bottom',hooks:1},
- {id:'bait',slot:'bait',name:'基础鱼饵盒',price:0,kg:.45,desc:'12 份备用鱿鱼条 · 小屋免费补给',icon:'≋'},
+ {id:'tackle',slot:'rig',name:'基础钓组盒',price:12,starter:true,kg:.9,desc:'预组装单钩沉底组 · 每次补购 1 套，开局赠送 2 套备用',icon:'▦',rig:'bottom',hooks:1},
+ {id:'bait',slot:'bait',name:'基础鱼饵盒',price:12,starter:true,kg:.45,desc:'鱿鱼条 · 每次补购 12 份，开局赠送 12 份备用',icon:'≋',bait:'squid',quantity:12},
  {id:'cooler',slot:'cooler',name:'基础冷藏箱',price:0,kg:3.5,desc:'17.6 lb 虚拟鱼获容量 · 含冰袋',icon:'▱',capacity:8},
  {id:'net',slot:'tool',name:'抄网与摘钩钳',price:0,kg:.8,desc:'20 in 开口抄网 · 摘钩放流',icon:'♧',openingInches:20},
  {id:'descending_device',slot:'tool',name:'降鱼器',price:0,kg:.35,desc:'将需要减压放流的岩鱼送回水下',icon:'↧'},
@@ -35,7 +35,7 @@ export const GEAR_CATALOG=[
  {id:'anchor',slot:'utility',name:'小艇船锚与锚绳',price:65,kg:4.2,desc:'停机减速后下锚 · 锚绳与短链约束船位'},
  {id:'sea_anchor',slot:'utility',name:'漂流伞',price:80,kg:1.8,desc:'关闭发动机漂钓时减慢受风漂移'},
 ];
-export const BASE_GEAR=GEAR_CATALOG.filter(g=>g.price===0);
+export const BASE_GEAR=GEAR_CATALOG.filter(g=>g.starter||g.price===0);
 // Electric retrieval belongs to the selected, carried rod, never to ownership alone.
 export function hasElectricReel(profile,packed){const id=profile?.loadout?.rod;return Boolean(id&&Array.isArray(profile?.owned)&&profile.owned.includes(id)&&Array.isArray(packed)&&packed.includes(id)&&GEAR_CATALOG.some(g=>g.id===id&&g.slot==='rod'&&g.electricRetrieve===true));}
 export function createProfile(previous){
@@ -46,9 +46,9 @@ export function createProfile(previous){
 }
 export function buyGear(profile,id){
  const item=GEAR_CATALOG.find(g=>g.id===id);if(!item)return{ok:false,message:'装备不存在。'};
- const repeatable=item.slot==='consumable'||item.slot==='rig';
+ const repeatable=Boolean(item.bait)||item.slot==='consumable'||item.slot==='rig';
  if(!repeatable&&profile.owned.includes(id))return{ok:false,message:'储物柜里已经有这件装备。'};
- if(profile.credits<item.price)return{ok:false,message:'潮汐点不足。基础装备和补给始终免费。'};
+ if(profile.credits<item.price)return{ok:false,message:'潮汐点不足。'};
  ensureConsumables(profile);profile.credits-=item.price;
  if(item.bait)profile.stock[item.bait]=(profile.stock[item.bait]||0)+item.quantity;
  else if(item.slot==='rig'){profile.rigStock[item.rig].push({condition:1,bait:null});if(!profile.owned.includes(id))profile.owned.push(id);}

@@ -1,6 +1,6 @@
-import {bindPointer} from './input.js?v=20260927-pixel-v25';
-import {tillerFromPointer} from './pixel-tiller-input.js?v=20260927-pixel-v25';
-import {createSingleLeverControl,leverFromDrag,leverForThrottle,LEVER_NEUTRAL_DEADBAND} from './pixel-single-lever.js?v=20260927-pixel-v25';
+import {bindPointer} from './input.js?v=20260927-pixel-v26';
+import {tillerFromPointer} from './pixel-tiller-input.js?v=20260927-pixel-v26';
+import {createSingleLeverControl,leverFromDrag,leverForThrottle,LEVER_NEUTRAL_DEADBAND} from './pixel-single-lever.js?v=20260927-pixel-v26';
 
 // Steering stays on the tiller; a single retained push/pull lever selects both
 // direction and power. Touching it alone never changes the propulsion source.
@@ -18,7 +18,7 @@ export function mountHelm(root,{getState,onIdle,onFeedback}){
  const travel=()=>Math.max(24,(lever.getBoundingClientRect().height-62)/2);
  const render=()=>{
   const s=safeState(),c=control.state,l=limits(s),enabled=active(s)&&!root.hidden;
-  arm.style.setProperty('--handle-angle',`${c.steer*35}deg`);lever.style.setProperty('--lever-position',String(c.lever));lever.style.setProperty('--lever-travel',`${travel()}px`);
+  arm.style.setProperty('--handle-angle',`${c.steer*35}deg`);handle.style.setProperty('--handle-angle',`${c.steer*35}deg`);lever.style.setProperty('--lever-position',String(c.lever));lever.style.setProperty('--lever-travel',`${travel()}px`);
   meter.textContent=`${Math.round(c.throttle*100)}%`;if(gearLabel)gearLabel.textContent=c.gear;
   for(const[g,name]of[['N','in-neutral'],['F','in-forward'],['R','in-reverse']])lever.classList.toggle(name,c.gear===g);
   lever.classList.toggle('trolling',!l.reverseAllowed);lever.classList.toggle('shift-blocked',blocked);

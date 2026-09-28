@@ -69,9 +69,9 @@ test('shop rig purchases repeat, charge credits and remain separate from numeric
  p.credits=0;assert.equal(buyGear(p,'rig_slider').ok,false);assert.equal(p.rigStock.slider.length,2);
 });
 
-test('dock restock is explicit and never repairs or baits a deployed rod; reserve-rent guard covers repeats',()=>{
+test('retired free restock cannot replenish depleted stock at sea or in the shop; purchases preserve rent',()=>{
  const sim=ready();sim.escape('break');sim.state.profile.stock.squid=0;sim.state.profile.rigStock.bottom=[];assert.equal(sim.restock().ok,false);
- shop(sim);assert.ok(sim.restock().ok);assert.equal(sim.state.profile.stock.squid,12);assert.equal(sim.state.profile.rigStock.bottom.length,2);assert.equal(sim.rodConsumableStatus().rig.present,false);
+ shop(sim);const before=copy(sim.state.profile);assert.equal(sim.restock().ok,false);assert.deepEqual(sim.state.profile,before);assert.equal(sim.state.profile.stock.squid,0);assert.equal(sim.state.profile.rigStock.bottom.length,0);assert.equal(sim.rodConsumableStatus().rig.present,false);
  assert.ok(sim.buyGear('rig_slider').ok);sim.state.rentalPaid=false;sim.state.profile.credits=30;assert.equal(sim.buyGear('rig_slider').ok,false);assert.equal(sim.state.profile.credits,30);
 });
 
@@ -86,5 +86,5 @@ test('pre-hook-size saves default to intact wire without repairing recorded part
  const sim=ready();delete sim.state.profile.rodSupplies.rod.hookDamage;for(const rig of sim.state.profile.rigStock.bottom)delete rig.hookDamage;
  assert.equal(sim.rodConsumableStatus().rig.hookDamage,0);assert.ok(sim.state.profile.rigStock.bottom.every(r=>r.hookDamage===0));
  sim.state.profile.rodSupplies.rod.hookDamage=.45;const before=copy(sim.state.profile.stock);assert.ok(sim.replaceBait().ok);assert.equal(sim.rodConsumableStatus().rig.hookDamage,.45);assert.equal(sim.state.profile.stock.squid,before.squid-1,'fresh bait cannot repair hook wire');
- shop(sim);assert.ok(sim.restock().ok);assert.equal(sim.rodConsumableStatus().rig.hookDamage,.45,'restock cannot repair the mounted rig');
+ shop(sim);assert.equal(sim.restock().ok,false);assert.equal(sim.rodConsumableStatus().rig.hookDamage,.45,'retired restock cannot repair the mounted rig');
 });

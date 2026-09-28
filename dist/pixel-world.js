@@ -1,11 +1,11 @@
-import {pierRings,landPolygons,coastLines,buildingFootprints,FISHING_SPOTS,onLand,onPier} from './pixel-geography.js?v=20260927-pixel-v25';
-import {HARBOR} from './harbor-layout.js?v=20260927-pixel-v25';
-import {depthInfoAt} from './bathymetry.js?v=20260927-pixel-v25';
-import {createWildlife,drawWildlife} from './pixel-wildlife.js?v=20260927-pixel-v25';
-import {cameraOffset,projectPixel,unprojectPixel,stepDeadzoneCamera,cameraDeadzone,cameraPlayfield,fitCameraBounds,zoomCameraAt,rectilinearOutline} from './pixel-camera.js?v=20260927-pixel-v25';
-import {ladderPoint} from './swimming.js?v=20260927-pixel-v25';
-import {SKIFF_RACKS,boatRenderPose,parkedSkiffPoses,skiffScreenPose,hitSkiff} from './pixel-boat-geometry.js?v=20260927-pixel-v25';
-import {getRodCurve,getReelPose,getFishingLine,getFishingPresentation} from './pixel-rod-geometry.js?v=20260927-pixel-v25';
+import {pierRings,landPolygons,coastLines,buildingFootprints,FISHING_SPOTS,onLand,onPier} from './pixel-geography.js?v=20260927-pixel-v26';
+import {HARBOR} from './harbor-layout.js?v=20260927-pixel-v26';
+import {depthInfoAt} from './bathymetry.js?v=20260927-pixel-v26';
+import {createWildlife,drawWildlife} from './pixel-wildlife.js?v=20260927-pixel-v26';
+import {cameraOffset,projectPixel,unprojectPixel,stepDeadzoneCamera,cameraDeadzone,cameraPlayfield,fitCameraBounds,zoomCameraAt,rectilinearOutline} from './pixel-camera.js?v=20260927-pixel-v26';
+import {ladderPoint} from './swimming.js?v=20260927-pixel-v26';
+import {SKIFF_RACKS,boatRenderPose,parkedSkiffPoses,skiffScreenPose,hitSkiff,outboardPose} from './pixel-boat-geometry.js?v=20260927-pixel-v26';
+import {getRodCurve,getReelPose,getFishingLine,getFishingPresentation} from './pixel-rod-geometry.js?v=20260927-pixel-v26';
 
 // The map keeps the same metre coordinates as the sailing simulation. The
 // people and boat are deliberately enlarged, like a handheld-era RPG, so that
@@ -168,10 +168,15 @@ export function createPixelWorld(canvas,{sprites={},conditions={}}={}){
     ctx.save();ctx.translate(g.screenX,g.screenY);ctx.rotate(-heading);
     if(typeof sprites.drawBoat==='function')sprites.drawBoat(ctx,0,0,{scale,occupied,pose:occupantPose,time:clock,tiller:state.tiller||0,reeling:state.reeling,castPower:state.castPower||0,fishState:state.fishState});
     else{
-      const asset=sprites.boat?.image||sprites.boat?.canvas||sprites.boat;
+      const hull=sprites.boatHull||sprites.boat,asset=hull?.image||hull?.canvas||hull;
       if(asset?.width)ctx.drawImage(asset,-asset.width*scale/2,-asset.height*scale/2,asset.width*scale,asset.height*scale);
       else{
         ctx.scale(scale,scale);ctx.fillStyle='#3a625c';ctx.beginPath();ctx.moveTo(0,-39);ctx.lineTo(14,-24);ctx.lineTo(20,-2);ctx.lineTo(18,34);ctx.lineTo(-18,34);ctx.lineTo(-20,-2);ctx.lineTo(-14,-24);ctx.closePath();ctx.fill();ctx.lineWidth=3;ctx.strokeStyle='#f3deb1';ctx.stroke();ctx.fillStyle='#d7bd81';ctx.fillRect(-14,-7,28,5);ctx.fillRect(-15,18,30,5);ctx.fillStyle='#335c5c';ctx.fillRect(-4,35,9,10);ctx.fillStyle='#659c83';ctx.fillRect(-12,-23,24,13);ctx.fillStyle='#cfaa71';for(let i=-11;i<15;i+=6)ctx.fillRect(i,-4,1,23);ctx.scale(1/scale,1/scale);
+      }
+      const motor=outboardPose(pose.afloat?state.tiller||0:0);
+      if(sprites.outboard){
+        ctx.save();ctx.scale(scale,scale);ctx.translate(motor.pivot.x,motor.pivot.y);ctx.rotate(motor.angle);
+        ctx.drawImage(sprites.outboard,-10,-16);ctx.restore();
       }
       if(occupied&&(sprites.anglerFish||sprites.anglerDrive||sprites.angler)){
         ctx.save();ctx.scale(scale,scale);
@@ -181,8 +186,8 @@ export function createPixelWorld(canvas,{sprites={},conditions={}}={}){
         ctx.drawImage(personAsset,px,py);
         if(driver){
           // One connected hand-to-tiller segment, ending at the outboard grip.
-          const hand={x:-3,y:py+18},grip={x:-5+Math.sin((state.tiller||0)*.45)*4,y:24};
-          pixelLine(-2,34,grip.x,grip.y,'#304956',2);pixelLine(hand.x,hand.y,grip.x,grip.y,'#e8ac79',2);ctx.fillStyle='#ffd5a0';ctx.fillRect(grip.x-1,grip.y-1,3,2);
+          const hand={x:-3,y:py+18},grip={x:motor.grip.x-bodyX,y:motor.grip.y-bodyY};
+          pixelLine(hand.x,hand.y,grip.x,grip.y,'#e8ac79',2);ctx.fillStyle='#ffd5a0';ctx.fillRect(Math.round(grip.x)-1,Math.round(grip.y)-1,3,2);
         }
         ctx.restore();
       }else if(occupied){
@@ -195,8 +200,6 @@ export function createPixelWorld(canvas,{sprites={},conditions={}}={}){
     // Three bright rungs at the port stern make the reboarding target visible.
     pixelLine(-19*scale,22*scale,-25*scale,22*scale,'#c4d5c6',1);pixelLine(-19*scale,31*scale,-25*scale,31*scale,'#93b0b1',1);pixelLine(-25*scale,22*scale,-25*scale,31*scale,'#c4d5c6',1);pixelLine(-21*scale,25*scale,-25*scale,25*scale,'#dce3ca',1);pixelLine(-21*scale,28*scale,-25*scale,28*scale,'#dce3ca',1);
     ctx.restore();
-    if(state.moored&&pose.afloat){const cleat=point(HARBOR.mooringX,HARBOR.mooringZ),bow={x:p.x-32*scale*Math.sin(heading),y:p.y-32*scale*Math.cos(heading)+bob};ctx.strokeStyle='#e3d49b';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(cleat.x,cleat.y);ctx.quadraticCurveTo((cleat.x+bow.x)/2,(cleat.y+bow.y)/2+4,bow.x,bow.y);ctx.stroke();}
-    if(state.anchor&&pose.afloat){const a=point(x-2.4,z+4);pixelLine(p.x-4,p.y+12,a.x,a.y,'#c6d7b6',1);ctx.fillStyle='#377b82';ctx.fillRect(a.x-3,a.y,6,2);}
     if(rod)drawFishingRig(state,rod);
   }
   function drawFishingRig(state,rod){

@@ -59,8 +59,8 @@ test('version-two saved lockers gain the free descending device while keeping ea
   assert.deepEqual(createProfile(migrated).owned,migrated.owned,'repeated load does not duplicate starter gear');
 });
 
-test('each of the six rig profiles corresponds to a purchasable carried rig with matching hook count',()=>{
-  const profile=createProfile();profile.credits=200;
+test('each rig profile corresponds to a purchasable carried rig with matching hook count',()=>{
+  const profile=createProfile();profile.credits=GEAR_CATALOG.filter(g=>g.rig).reduce((total,g)=>total+g.price,0);
   for(const rig of Object.values(RIG_PROFILES)){
     const item=GEAR_CATALOG.find(g=>g.id===rig.item);
     assert.ok(item);assert.equal(item.rig,rig.id);assert.equal(item.hooks,rig.hooks);

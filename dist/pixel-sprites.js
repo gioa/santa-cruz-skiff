@@ -36,7 +36,7 @@ function raster(width,height,paint) {
   paint({canvas,ctx,rect,px,line,poly,oval,dot});return canvas;
 }
 
-function boatSprite(){return raster(48,88,({rect:r,px,line:l,poly:p})=>{
+function boatSprite({outboard=true}={}){return raster(48,88,({rect:r,px,line:l,poly:p})=>{
   // Narrow open clinker skiff, viewed from above; the trim has separate light faces.
   p([[24,1],[29,4],[34,10],[39,21],[42,36],[42,66],[39,78],[9,78],[6,66],[6,36],[9,21],[14,10],[19,4]],'ink');
   p([[24,3],[28,6],[33,12],[37,23],[40,37],[40,66],[37,76],[11,76],[8,66],[8,37],[11,23],[15,13],[20,6]],'woodDark');
@@ -67,12 +67,21 @@ function boatSprite(){return raster(48,88,({rect:r,px,line:l,poly:p})=>{
   r(7,43,4,2,'slate');px(8,42,'gold');r(37,43,4,2,'slate');px(39,42,'gold');
   // Transom, polished brackets, outboard cowl and an actual forward-pointing tiller.
   r(11,71,26,5,'woodDark');r(12,71,24,2,'gold');r(13,74,22,1,'peach');
-  r(19,75,10,2,'steel');r(21,76,6,7,'ink');r(19,79,10,6,'ink');
+  r(19,75,10,2,'steel');
+  if(outboard){r(21,76,6,7,'ink');r(19,79,10,6,'ink');
   r(20,78,8,6,'slate');r(20,78,8,2,'light');r(20,80,2,3,'steel');r(23,81,5,2,'navy');
   r(23,84,3,3,'ink');r(20,86,9,1,'slate');r(22,85,5,1,'steel');
-  l(22,78,19,68,'ink',2);l(22,77,19,69,'steel');r(18,66,3,5,'ink');
+  l(22,78,19,68,'ink',2);l(22,77,19,69,'steel');r(18,66,3,5,'ink');}
   // Fasteners and rope rub marks stay below the visual scale of equipment.
   [[12,68],[35,68],[9,52],[38,52],[13,22],[34,22]].forEach(([x,y])=>px(x,y,'cream'));
+});}
+
+// Separate swivel assembly. Pivot is (10,16); brackets stay on the hull.
+function outboardSprite(){return raster(20,28,({rect:r,line:l})=>{
+  r(7,14,6,7,'ink');r(5,17,10,6,'ink');
+  r(6,16,8,6,'slate');r(6,16,8,2,'light');r(6,18,2,3,'steel');r(9,19,5,2,'navy');
+  r(9,22,3,3,'ink');r(6,24,9,1,'slate');r(8,23,5,1,'steel');
+  l(8,16,5,6,'ink',2);l(8,15,5,7,'steel');r(4,3,3,5,'ink');r(4,4,1,3,'slate');
 });}
 
 function personSprite({worker=false,back=false,step=0,fish=false,hold=false,drive=false,side=0}={}){
@@ -365,7 +374,7 @@ export function createPixelSprites(){
   const angler=personSprite(),anglerBack=personSprite({back:true});
   const hut=hutSprite();
   return {
-    boat:boatSprite(),angler,anglerBack,anglerWalk1:personSprite({step:1}),anglerWalk2:personSprite({step:2}),
+    boat:boatSprite(),boatHull:boatSprite({outboard:false}),outboard:outboardSprite(),angler,anglerBack,anglerWalk1:personSprite({step:1}),anglerWalk2:personSprite({step:2}),
     anglerFish:personSprite({fish:true}),anglerHold:personSprite({hold:true}),anglerDrive:personSprite({back:true,drive:true}),
     anglerLeft:personSprite({side:-1}),anglerRight:personSprite({side:1}),
     dockWorker:dockWorkerSprite(),warden:wardenSprite(),hut,tackleShop:hut,

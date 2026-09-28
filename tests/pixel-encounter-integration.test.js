@@ -10,7 +10,7 @@ function ready(rig='bottom'){
  const sim=new PixelSimulation({rng:()=>.5,patrolRng:()=>.9,conditions:{windKnots:0,currentMps:0},now:()=>new Date('2026-09-27T16:00:00Z')});sim.start();
  Object.assign(sim.state,{playerX:HARBOR.counterX,playerZ:HARBOR.counterZ});
  if(rig==='feather40'){assert.ok(sim.buyGear('rig_feather40').ok);assert.ok(sim.replaceRig(undefined,'feather40').ok);}
- Object.assign(sim.state,{mode:'boat',rentalPaid:true,launchStage:'afloat',moored:false,boatX:-60,boatZ:-80,anchor:true});syncVessel(sim.vessel,{x:-60,z:-80,heading:0,clearMotion:true});
+ Object.assign(sim.state,{mode:'boat',rentalPaid:true,launchStage:'afloat',moored:false,boatX:-60,boatZ:-80,anchor:false});syncVessel(sim.vessel,{x:-60,z:-80,heading:0,clearMotion:true});
  return sim;
 }
 
@@ -36,7 +36,7 @@ test('the simulation integrates species encounter hazards instead of generic att
 test('actual bait form and ground drift are distinct from relative hydrodynamic flow',()=>{
  const sim=ready();Object.assign(sim.vessel,{vx:.3,vz:.4});Object.assign(sim.conditions,{currentX:.6,currentZ:.4});sim.state.anchor=false;
  let env=sim.rigEnvironment();assert.equal(env.bait,'squid');assert.equal(env.baitForm,'strip');assert.equal(env.month,9);assert.equal(env.driftSpeedMps,.5);assert.equal(env.currentMps,.3);assert.equal(env.boatSpeedMps,0,'relative flow already includes vessel motion');
- sim.state.anchor=true;env=sim.rigEnvironment();assert.equal(env.driftSpeedMps,0,'anchored current is not a seabed search drift');
+ sim.state.anchor=true;env=sim.rigEnvironment();assert.equal(env.driftSpeedMps,.5,'a retired anchor flag cannot remove the actual seabed search drift');assert.equal(env.anchored,false);
  const feather=ready('feather40');env=feather.rigEnvironment();assert.equal(env.bait,'feather');assert.equal(env.baitTipped,false);assert.equal(env.tipFreshness,0);
  assert.ok(feather.replaceBait(undefined,'squid').ok);env=feather.rigEnvironment();assert.equal(env.bait,'squid');assert.equal(env.baitTipped,true);assert.equal(env.tipFreshness,1);
 });

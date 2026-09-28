@@ -47,26 +47,18 @@ test('per-rod configurations, bait and active rod survive save/resume; old globa
  const old=structuredClone(saved);delete old.profile.rodLoadouts;delete old.profile.rodLoadoutsVersion;delete old.profile.consumablesVersion;delete old.profile.rodSupplies;delete old.profile.rigStock;delete old.rodBaitOnHooks;old.rig='float';old.bait='jig';old.rigWeightGrams=7;old.fishingDepthMeters=5;old.drag=.71;const migrated=new PixelSimulation({saved:old,now});migrated.start(true);assert.equal(migrated.rodAssembly('rod_light').rig,'float');assert.equal(migrated.rodAssembly('rod_light').fishingDepthMeters,5);assert.equal(migrated.rodAssembly('rod_light').drag,.71);assert.equal(migrated.rodAssembly('rod').rig,'bottom');assert.equal(migrated.state.profile.loadout.rod,'rod_light');assert.deepEqual(migrated.state.packed,old.packed);
 });
 
-test('new players and drift-sock owners cannot lower an unpurchased physical anchor',()=>{
- const fresh=equipped();assert.equal(BASE_GEAR.some(g=>g.id==='anchor'),false);assert.equal(fresh.state.profile.owned.includes('anchor'),false);assert.equal(fresh.stats.hasAnchor,false);assert.equal(fresh.publicState().hasAnchor,false);aboard(fresh);assert.equal(fresh.toggleAnchor().ok,false);assert.equal(fresh.state.anchor,false);fresh.packStarter();assert.equal(fresh.state.profile.owned.includes('anchor'),false);assert.equal(fresh.toggleAnchor().ok,false);
- const drift=equipped(['sea_anchor']);drift.equip('sea_anchor');aboard(drift);assert.equal(drift.toggleAnchor().ok,false);assert.equal(drift.hasGear('sea_anchor'),true);assert.equal(drift.publicState().hasAnchor,false);
+test('retired anchors cannot be purchased or enabled and cannot affect carried weight',()=>{
+ const sim=equipped(),credits=sim.state.profile.credits;Object.assign(sim.state,{playerX:HARBOR.counterX,playerZ:HARBOR.counterZ});const weight=sim.stats.weight;
+ for(const id of ['anchor','sea_anchor']){assert.equal(sim.buyGear(id).ok,false);sim.state.profile.owned.push(id);sim.state.packed.push(id);assert.equal(sim.equip(id).ok,false);}
+ assert.equal(sim.state.profile.credits,credits);assert.equal(sim.stats.weight,weight);assert.equal(sim.stats.hasAnchor,false);assert.equal(sim.publicState().hasAnchor,false);sim.syncLoadout();assert.ok(!sim.state.packed.includes('anchor'));assert.ok(!sim.state.packed.includes('sea_anchor'));
+ aboard(sim);assert.equal(sim.toggleAnchor().ok,false);assert.equal(sim.state.anchor,false);assert.equal(sim.state.moored,false);assert.ok(sim.toggleEngine().ok);
 });
 
-test('purchased anchors require activation and safe lowering; deployed anchors must be raised before stowing',()=>{
- const sim=equipped(['anchor']);assert.equal(sim.state.profile.credits,4935);aboard(sim);assert.equal(sim.toggleAnchor().ok,false,'owned but stowed equipment is unavailable');assert.equal(sim.equip('anchor').ok,true);assert.equal(sim.stats.hasAnchor,true);assert.equal(sim.publicState().hasAnchor,true);
- assert.equal(sim.toggleEngine().ok,true);assert.equal(sim.toggleAnchor().ok,false);assert.equal(sim.state.anchor,false);sim.toggleEngine();sim.state.speed=1;assert.equal(sim.toggleAnchor().ok,false);sim.state.speed=0;
- assert.equal(sim.toggleAnchor().ok,true);assert.equal(sim.state.anchor,true);assert.equal(sim.equip('anchor').ok,false);assert.equal(sim.hasGear('anchor'),true);assert.equal(sim.state.anchor,true);assert.equal(sim.toggleEngine().ok,false);
- assert.equal(sim.toggleAnchor().ok,true);assert.equal(sim.state.anchor,false);assert.equal(sim.equip('anchor').ok,true);assert.equal(sim.publicState().hasAnchor,false);assert.equal(sim.toggleAnchor().ok,false);
+test('old deployed anchors, ropes and empty tanks resume as a usable boat without losing equipment or catches',()=>{
+ const sim=equipped();aboard(sim);const saved=sim.snapshot();saved.profile.owned.push('anchor','sea_anchor');saved.packed.push('anchor','sea_anchor');Object.assign(saved,{anchor:true,moored:true,fuel:0});
+ const restored=new PixelSimulation({saved,now});assert.ok(restored.start(true).ok);assert.equal(restored.state.anchor,false);assert.equal(restored.state.moored,false);assert.equal(restored.state.fuel,100);assert.equal(restored.publicState().hasAnchor,false);assert.equal(restored.stats.hasAnchor,false);assert.equal(restored.state.profile.credits,saved.profile.credits);assert.deepEqual(restored.state.catches,saved.catches);assert.deepEqual(restored.state.packed,saved.packed.filter(id=>!['anchor','sea_anchor'].includes(id)));assert.ok(restored.state.profile.owned.includes('anchor'));assert.ok(restored.toggleEngine().ok);assert.ok(restored.setThrottle(.4));
 });
 
-test('legacy deployed-anchor saves do not grant anchors; a purchased carried anchor survives resume',()=>{
- for(const owned of[false,true]){
-  const sim=equipped(owned?['anchor']:[]);aboard(sim);const saved=sim.snapshot();saved.anchor=true;const restored=new PixelSimulation({saved,now});restored.start(true);
-  assert.equal(restored.state.anchor,false);assert.equal(restored.publicState().hasAnchor,false);assert.equal(restored.state.profile.owned.includes('anchor'),owned);assert.equal(restored.state.profile.credits,saved.profile.credits);assert.deepEqual(restored.state.packed,saved.packed);
- }
- const sim=equipped(['anchor']);sim.equip('anchor');aboard(sim);sim.toggleAnchor();const restored=new PixelSimulation({saved:sim.snapshot(),now});restored.start(true);assert.equal(restored.state.anchor,true);assert.equal(restored.publicState().hasAnchor,true);assert.equal(restored.toggleAnchor().ok,true);assert.equal(restored.state.anchor,false);
-});
-
-test('raising an already-deployed anchor remains possible when its old equipment flag is missing',()=>{
- const sim=equipped();aboard(sim);sim.state.anchor=true;assert.equal(sim.hasGear('anchor'),false);assert.equal(sim.toggleAnchor().ok,true);assert.equal(sim.state.anchor,false);assert.equal(sim.state.profile.owned.includes('anchor'),false);assert.equal(sim.toggleAnchor().ok,false);
+test('running the engine consumes no fuel and an empty legacy tank never stops propulsion',()=>{
+ const sim=equipped();aboard(sim);sim.state.fuel=0;assert.ok(sim.toggleEngine().ok);assert.ok(sim.setThrottle(.25));run(sim,60);assert.equal(sim.state.engine,true);assert.equal(sim.state.fuel,0);assert.ok(sim.state.sailed>20);assert.ok(sim.toggleEngine().ok);assert.ok(sim.toggleEngine().ok);
 });

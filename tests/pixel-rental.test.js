@@ -67,3 +67,11 @@ test('a poor player cannot overwrite a usable paid voyage by starting an unaffor
  }
  const unpaid={...original,version:4,launchStage:'stored'},sim=new PixelSimulation({saved:unpaid,now});assert.equal(hasSavedBoatRental(unpaid),false);assert.equal(sim.start(false).ok,true);counter(sim);assert.equal(sim.launchBoat().ok,false);assert.equal(sim.state.profile.credits,0);assert.equal(sim.state.rentalPaid,false);
 });
+
+
+test('repeatable starter supplies preserve unpaid rental funds and never refill a worn installed rig',()=>{
+ for(const id of ['bait','tackle']){
+  const sim=begin(26);counter(sim);sim.state.profile.stock.squid=0;sim.state.profile.rigStock.bottom=[];const before=structuredClone(sim.state.profile);assert.equal(sim.buyGear(id).ok,false);assert.deepEqual(sim.state.profile,before);
+  sim.state.profile.credits=27;assert.equal(sim.buyGear(id).ok,true);assert.equal(sim.state.profile.credits,15);assert.equal(sim.state.profile.stock.squid,id==='bait'?12:0);assert.equal(sim.state.profile.rigStock.bottom.length,id==='tackle'?1:0);assert.equal(sim.launchBoat().ok,true);assert.equal(sim.state.profile.credits,0);assert.equal(sim.buyGear(id).ok,false);
+ }
+});

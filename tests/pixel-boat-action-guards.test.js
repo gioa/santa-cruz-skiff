@@ -1,33 +1,29 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {seatHook} from './helpers/pixel-hook.js';
 import {readFile} from 'node:fs/promises';
 globalThis.fetch=async url=>new Response(await readFile(url));
 const {PixelSimulation,HARBOR}=await import('../dist/pixel-sim.js');
 const run=(sim,seconds,input={})=>{for(let t=0;t<seconds-1e-8;t+=.1)sim.step(Math.min(.1,seconds-t),input);};
 function ready(){
- const sim=new PixelSimulation({rng:()=>.05,patrolRng:()=>.9,profile:{version:2,credits:200}});sim.start();Object.assign(sim.state,{playerX:HARBOR.counterX,playerZ:HARBOR.counterZ});assert.ok(sim.buyGear('anchor').ok);assert.ok(sim.equip('anchor').ok);assert.ok(sim.launchBoat().ok);run(sim,24.1);Object.assign(sim.state,{playerX:HARBOR.boardingX,playerZ:HARBOR.boardingZ});assert.ok(sim.board().ok);assert.ok(sim.unmoor().ok);return sim;
+ const sim=new PixelSimulation({rng:()=>.05,patrolRng:()=>.9,profile:{version:2,credits:200}});sim.start();Object.assign(sim.state,{playerX:HARBOR.counterX,playerZ:HARBOR.counterZ});assert.ok(sim.launchBoat().ok);run(sim,24.1);Object.assign(sim.state,{playerX:HARBOR.boardingX,playerZ:HARBOR.boardingZ});assert.ok(sim.board().ok);assert.ok(sim.unmoor().ok);return sim;
 }
 
-test('a deployed hand-held rod blocks both anchor directions until the rod is secured in a side holder',()=>{
- const sim=ready();assert.ok(sim.lowerRig().ok);assert.equal(sim.toggleAnchor().ok,false);assert.equal(sim.state.anchor,false);assert.ok(sim.setRodMount('port').ok);assert.ok(sim.toggleAnchor().ok);assert.equal(sim.state.anchor,true);
- assert.ok(sim.setRodMount('hand').ok);assert.equal(sim.toggleAnchor().ok,false);assert.equal(sim.state.anchor,true);assert.ok(sim.setRodMount('starboard').ok);assert.ok(sim.toggleAnchor().ok);assert.equal(sim.state.anchor,false);
- sim.state.biteAt=Infinity;sim.state.snagThreshold=Infinity;run(sim,3);assert.ok(sim.state.lureDepth>.15,'the hook must actually be underwater before an encounter');sim.state.biteAt=.000001;
- for(let t=0;t<5&&sim.state.fishState!=='bite';t+=.1)sim.step(.1);assert.equal(sim.state.fishState,'bite');assert.equal(sim.toggleAnchor().ok,false,'a bite needs rod attention even in the holder');assert.ok(sim.setRodMount('hand').ok);seatHook(sim);assert.equal(sim.toggleAnchor().ok,false,'fighting fish cannot be interrupted by hauling anchor');
-});
-
-test('anchor obeys pause, inspection, mooring and docking state, preserving engine/speed rules',()=>{
- const sim=ready(),s=sim.state;
- for(const patch of[{paused:true},{inspection:{phase:'checking'}},{moored:true},{docking:{progress:.2}},{fishState:'casting'},{fishState:'flight'},{fishState:'landed'}]){
-  const before={};for(const key of Object.keys(patch))before[key]=s[key];Object.assign(s,patch);assert.equal(sim.toggleAnchor().ok,false,JSON.stringify(patch));assert.equal(s.anchor,false);Object.assign(s,before);
+test('retired anchor calls cannot change navigation or deployed tackle in any fishing phase',()=>{
+ const sim=ready(),s=sim.state;assert.ok(sim.lowerRig().ok);run(sim,2);
+ for(const fishState of ['sinking','waiting','bite','fight','landed'])for(const rodMount of ['hand','port','starboard']){
+  Object.assign(s,{fishState,rodMount});const paid=s.paidLineMeters,point={...s.bobber};
+  assert.equal(sim.toggleAnchor().ok,false);assert.equal(s.anchor,false);assert.equal(s.paidLineMeters,paid);assert.deepEqual(s.bobber,point);
  }
- assert.ok(sim.toggleEngine().ok);assert.equal(sim.toggleAnchor().ok,false);assert.ok(sim.toggleEngine().ok);s.speed=.86;assert.equal(sim.toggleAnchor().ok,false);s.speed=0;assert.ok(sim.toggleAnchor().ok);assert.equal(s.anchor,true);
- sim.pause(true);assert.equal(sim.toggleAnchor().ok,false);assert.equal(s.anchor,true);sim.pause(false);assert.ok(sim.toggleAnchor().ok);assert.equal(s.anchor,false);
 });
 
-test('dock rejects duplicate, moored, paused or inspection attempts without restarting a live approach',()=>{
+test('legacy rope, anchor and empty fuel flags do not block helm and clear on the next frame',()=>{
+ const sim=ready(),s=sim.state;Object.assign(s,{anchor:true,moored:true,fuel:0});
+ assert.ok(sim.toggleEngine().ok);assert.ok(sim.setThrottle(.3));sim.step(.1);assert.equal(s.anchor,false);assert.equal(s.moored,false);assert.equal(s.engine,true);assert.equal(s.throttle,.3);assert.equal(s.fuel,0);
+});
+
+test('dock rejects duplicate, paused or inspection attempts without restarting a live approach',()=>{
  const sim=ready(),s=sim.state;
- for(const patch of[{moored:true},{paused:true},{inspection:{phase:'checking'}}]){const before={};for(const key of Object.keys(patch))before[key]=s[key];Object.assign(s,patch);assert.equal(sim.dock().ok,false);assert.equal(s.docking,null);Object.assign(s,before);}
+ for(const patch of[{paused:true},{inspection:{phase:'checking'}}]){const before={};for(const key of Object.keys(patch))before[key]=s[key];Object.assign(s,patch);assert.equal(sim.dock().ok,false);assert.equal(s.docking,null);Object.assign(s,before);}
  assert.ok(sim.dock().ok);run(sim,1);const approach=s.docking,progress=approach.progress;assert.ok(progress>0);assert.equal(sim.dock().ok,false);assert.equal(s.docking,approach);assert.equal(s.docking.progress,progress);run(sim,4);assert.equal(s.mode,'walk');assert.equal(s.moored,true);
 });
 
@@ -44,6 +40,6 @@ test('legacy deck posture clears during a paused boat frame without dropping the
  }
 });
 
-test('stale standing flags never block helm or anchor access',()=>{
- const sim=ready(),s=sim.state;s.standing=true;assert.ok(sim.toggleEngine().ok);assert.equal(sim.setThrottle(.2),true);assert.ok(sim.toggleEngine().ok);assert.ok(sim.toggleAnchor().ok);assert.ok(sim.toggleAnchor().ok);sim.step(.1);assert.equal(s.standing,false);
+test('stale standing flags never block helm access',()=>{
+ const sim=ready(),s=sim.state;s.standing=true;assert.ok(sim.toggleEngine().ok);assert.equal(sim.setThrottle(.2),true);assert.ok(sim.toggleEngine().ok);assert.equal(sim.toggleAnchor().ok,false);sim.step(.1);assert.equal(s.standing,false);
 });
