@@ -34,7 +34,7 @@ import {ensureRodLoadouts,getRodAssembly,setRodAssembly,syncActiveRodLoadout} fr
 import {assessCatchLedger,identifyRegulatedSpecies} from './fishing-regulations.js?v=20260928-pixel-v80';
 import {FishingPatrol} from './fish-patrol.js?v=20260928-pixel-v80';
 import {navigationStepScale} from './pixel-navigation-scale.js?v=20260928-pixel-v80';
-export const GAME_TIME_SCALE=5;
+export const GAME_TIME_SCALE=10;
 export const WALK_SPEED=2.90;
 export const BOAT_RENTAL_PRICE=15; // Virtual game credits, not a real rental quote.
 export function hasSavedBoatRental(saved){return saved?.edition==='pixel'&&(Number(saved.version)<5||saved.version==null?saved.mode==='boat'||['lowering','raising','afloat'].includes(saved.launchStage):saved.rentalPaid===true);}
