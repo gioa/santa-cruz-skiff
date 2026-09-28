@@ -1,5 +1,5 @@
 export const marine=await fetch(new URL('./data/marine.json',import.meta.url)).then(r=>r.json()).catch(()=>({errors:['snapshot unavailable']}));
-import {surfaceCurrentConditions} from './surface-current.js?v=20260928-pixel-v64';
+import {surfaceCurrentConditions} from './surface-current.js?v=20260928-pixel-v65';
 export const sea={mode:'real',windKnots:0,windDirection:315,waveHeight:0,period:9,waveDirection:294,waterTemp:14,tideMLLW:null,fresh:false,daylight:.1,clockMode:'morning',customHour:8};
 export function localDateParts(date=new Date()){const parts=new Intl.DateTimeFormat('en-US',{timeZone:'America/Los_Angeles',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hourCycle:'h23'}).formatToParts(date);return Object.fromEntries(parts.map(p=>[p.type,p.value]));}
 export function clockText(date=new Date()){const p=localDateParts(date);return `${p.hour}:${p.minute}:${p.second}`;}

@@ -2,6 +2,7 @@
  * not measured GZ curves or operating limits. Integrate in active REAL seconds. */
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 export const RESCUE_FEE=50;
+export const HOSPITAL_FEE=250; // Fictional game credits; not a medical cost estimate.
 export function createStability(saved={}){return {waterLitres:0,sloshing:0,overturnSeconds:0,capsized:false,ingressLps:0,impact:0,...saved};}
 export function rightingArm(angle,waterLitres=0,payloadKg=0){
  const wet=clamp(waterLitres/220,0,1),gm=Math.max(.08,.62-wet*.49-payloadKg*.00065),limit=(105-wet*42)*Math.PI/180;

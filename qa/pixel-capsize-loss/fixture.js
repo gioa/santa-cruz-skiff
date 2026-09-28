@@ -1,0 +1,5 @@
+// Local synthetic save, isolated from user storage. UI controls exercise normal model actions.
+import {syncVessel} from './vessel-physics.js?v=20260928-pixel-v65';
+start(false);sim.randomWeather=false;Object.assign(sim.state,{mode:'boat',rentalPaid:true,launchStage:'afloat',loaded:true,moored:false,boatX:HARBOR.boatX-100,boatZ:HARBOR.boatZ-150});syncVessel(sim.vessel,{x:sim.state.boatX,z:sim.state.boatZ,heading:0,clearMotion:true});sim.state.profile.credits=500;updateUI();
+const qa=document.createElement('div');qa.style.cssText='position:fixed;top:135px;left:12px;z-index:110;display:flex;gap:4px';
+for(const [label,action] of [['QA:翻覆',()=>{closeModal();sim.beginCapsize();updateUI();}],['QA:医院定格',()=>{closeModal();if(!sim.state.capsize){if(sim.state.pfd)sim.equip('pfd');sim.beginCapsize();}sim.state.capsize.elapsed=8;sim.pause(true);updateUI();}],['QA:继续',()=>sim.pause(false)]]){const b=document.createElement('button');b.textContent=label;b.style.cssText='font-size:10px;min-height:24px;padding:4px';b.onclick=action;qa.appendChild(b);}document.body.appendChild(qa);

@@ -1,5 +1,5 @@
-import {GEAR_CATALOG} from './equipment.js?v=20260928-pixel-v64';
-import {pixelGearAvailable} from './pixel-gear-availability.js?v=20260928-pixel-v64';
+import {GEAR_CATALOG} from './equipment.js?v=20260928-pixel-v65';
+import {pixelGearAvailable} from './pixel-gear-availability.js?v=20260928-pixel-v65';
 /** Persistent personal bag positions. Activating gear never removes ownership. */
 export const INVENTORY_SLOTS=30;
 export function inventorySlots(profile,packed=[]){
