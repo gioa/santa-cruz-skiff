@@ -29,7 +29,7 @@ test('focus selection never changes fish, line, engine or pause state',()=>{
 
 test('a natural hand-held bite enters focus and stays through hooking, real reeling and the keep decision',()=>{
  const sim=ready();bite(sim,{natural:true});const paid=sim.state.paidLineMeters,bait=sim.state.profile.stock.squid;assert.ok(sim.hook().ok);assert.equal(sim.state.paidLineMeters,paid);assert.equal(isFishingFocus(sim.state),true);
- until(sim,s=>s.fishState==='landed',240,{reel:1.2});assert.ok(sim.state.fightTime>1,'the view must not replace real fish physics with an instant catch');assert.equal(isFishingFocus(sim.state),true);assert.equal(sim.retrieve().ok,false,'the catch decision is still pending');assert.equal(isFishingFocus(sim.state),true);
+ until(sim,s=>s.fishState==='landed',240,{reel:1.2});assert.ok(sim.state.fightTime>0,'a shallow small fish may land quickly, but focus cannot skip the physical fight');assert.ok(sim.state.paidLineMeters<paid,'actual winding must shorten the line before landing');assert.equal(isFishingFocus(sim.state),true);assert.equal(sim.retrieve().ok,false,'the catch decision is still pending');assert.equal(isFishingFocus(sim.state),true);
  assert.ok(sim.keepCatch().ok);assert.equal(isFishingFocus(sim.state),false);assert.equal(sim.state.catches.length,1);assert.equal(sim.state.catches[0].kept,true);assert.equal(sim.state.profile.stock.squid,bait);
 });
 

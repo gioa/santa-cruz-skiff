@@ -30,6 +30,48 @@ test('free spool has a finite feed rate; a braked spool cannot give unlimited si
  pureRun(free,500);assert.ok(free.paidLineMeters<=MAX_PAID_LINE_METERS);assert.ok(free.paidLineMeters<25,'open spool stops spilling line once the sinker is resting with slack');
 });
 
+test('a descending sinker keeps light steady rod load, then the seabed unloads it and only a slow loose loop pays out',()=>{
+ const s=pure();pureRun(s,5,{environment:{bottomDepth:12}});
+ assert.ok(s.lureDepth>3&&s.lureDepth<5);assert.ok(s.rodBend>.1&&s.rodBend<.2);assert.ok(s.rodLoadN>.4&&s.rodLoadN<.8);assert.ok(s.payoutRate>.5&&s.payoutRate<1);assert.ok(s.lineSlackMeters<.05);
+ const fallingBend=s.rodBend;pureRun(s,14,{environment:{bottomDepth:12}});
+ assert.ok(s.rigPresentation.bottomContact);assert.ok(s.rodBend<fallingBend*.1);assert.ok(s.lineSlackMeters>.12);assert.ok(s.payoutRate>.01&&s.payoutRate<.1);
+ const bottomDepth=s.lureDepth,paid=s.paidLineMeters;pureRun(s,3,{environment:{bottomDepth:12}});
+ assert.equal(s.lureDepth,bottomDepth);assert.ok(s.paidLineMeters>paid);assert.ok(s.paidLineMeters-paid<.2,'resting weight cannot keep drawing descending-speed line');
+ s.reelMode='brake';const braked=s.paidLineMeters;pureRun(s,3,{environment:{bottomDepth:12}});assert.equal(s.paidLineMeters,braked);assert.equal(s.payoutRate,0);
+ s.crankRate=1.2;pureRun(s,2,{environment:{bottomDepth:12}});assert.ok(s.lureDepth<bottomDepth-.4,'taking in the loose loop lets the real rig lift clear of bottom');assert.ok(s.rodBend>fallingBend);
+});
+
+test('a snag holds its real hook point: winding first takes slack, then deeply loads the rod and stalls at drag',()=>{
+ const s=pure();pureRun(s,50,{environment:{bottomDepth:12}});s.snagged=true;s.snagPoint={...s.bobber};s.crankRate=1.2;const point={...s.bobber},paid=s.paidLineMeters;
+ pureRun(s,.4,{environment:{bottomDepth:12}});assert.deepEqual(s.bobber,point);assert.ok(s.paidLineMeters<paid);assert.ok(s.lineSlackMeters>.4);assert.ok(s.rodLoadN<.05,'a loose line cannot load the snagged rod');
+ pureRun(s,5,{environment:{bottomDepth:12}});assert.deepEqual(s.bobber,point);assert.equal(s.lureDepth,11.7);assert.ok(s.snagStretchMeters>.3);assert.ok(s.rodBend>.9);assert.ok(Math.abs(s.rodLoadN-s.dragThresholdN)<.01);assert.ok(s.retrieveRate<.001);
+ const loadedPaid=s.paidLineMeters;pureRun(s,5,{environment:{bottomDepth:12}});assert.ok(Math.abs(s.paidLineMeters-loadedPaid)<.001,'turning a slipping handle cannot reel a rock up to the tip');
+ s.crankRate=0;s.reelMode='free';pureRun(s,3,{environment:{bottomDepth:12}});assert.deepEqual(s.bobber,point);assert.ok(s.paidLineMeters>loadedPaid+.3);assert.ok(s.rodLoadN<.3);assert.ok(s.rodBend<.1,'opening the spool releases the heavy snag load');
+ s.snagged=false;s.snagPoint=null;pureRun(s,.1,{environment:{bottomDepth:12}});assert.equal(s.snagStretchMeters,0);
+});
+
+test('ordinary boat drift still lets residual seabed feed accumulate slack instead of spending it all on changing line distance',()=>{
+ const results=[];
+ for(const dt of[1/60,.1,.25]){
+  const s=pure(),environment={bottomDepth:12,waveHeight:1};
+  for(let time=0;time<16-dt/2;time+=dt)Object.assign(s,stepFishingLine(s,{dt,environment}));
+  assert.ok(s.rigPresentation.bottomContact);const initialSlack=s.lineSlackMeters;
+  for(let time=0;time<10-dt/2;time+=dt){s.boatX+=.6*dt;Object.assign(s,stepFishingLine(s,{dt,environment,current:{x:.1,z:0},velocity:{vx:.6,vz:0}}));}
+  assert.ok(s.rigPresentation.bottomContact);assert.ok(s.lineSlackMeters>initialSlack+.4,'slow overrun is added to geometric feed, so a bottom loop also grows under drift');assert.ok(s.lineSlackMeters>.4&&s.lineSlackMeters<1.2);assert.ok(s.payoutRate>.1&&s.payoutRate<.5);assert.ok(s.rodBend<.1);results.push(s.lineSlackMeters);
+ }
+ for(const value of results.slice(1))assert.ok(Math.abs(value-results[0])<.03,'bottom-loop growth is stable at mobile timesteps');
+});
+
+test('snag force and bottom feed remain stable across phone and desktop timesteps, with finite line when a boat pulls away',()=>{
+ const results=[];
+ for(const dt of[1/60,.1,.25]){
+  const s=pure(),advance=(seconds,options={})=>{for(let time=0;time<seconds-dt/2;time+=dt)Object.assign(s,stepFishingLine(s,{dt,environment:{bottomDepth:12},...options}));};
+  advance(20);const bottomPaid=s.paidLineMeters;s.snagged=true;s.snagPoint={...s.bobber};s.crankRate=1.2;advance(5);results.push({bottomPaid,paid:s.paidLineMeters,load:s.rodLoadN});
+  const point={...s.bobber};s.crankRate=0;s.boatX+=4;advance(5);assert.deepEqual(s.bobber,point);assert.ok(s.paidLineMeters>results.at(-1).paid);assert.ok(s.rodLoadN<=s.dragThresholdN+.05);assert.ok(s.paidLineMeters<=MAX_PAID_LINE_METERS);
+ }
+ for(const r of results.slice(1)){assert.ok(Math.abs(r.bottomPaid-results[0].bottomPaid)<.03);assert.ok(Math.abs(r.paid-results[0].paid)<.01);assert.ok(Math.abs(r.load-results[0].load)<.01);}
+});
+
 test('raising a low rod with short braked line does not create line and can lift the rig out of water',()=>{
  const s=pure('bottom',{rodElevation:5,reelMode:'brake',paidLineMeters:1.253});const paid=s.paidLineMeters,oldTip=rodTipPosition(s);s.rodElevation=85;pureRun(s,.2);
  assert.equal(s.paidLineMeters,paid);assert.equal(s.payoutRate,0);assert.ok(s.bobber.height>0);assert.ok(Math.hypot(s.rodTip.x-oldTip.x,s.rodTip.z-oldTip.z,s.rodTip.height-oldTip.height)<=4.2);

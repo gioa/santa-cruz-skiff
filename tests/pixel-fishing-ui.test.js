@@ -82,6 +82,18 @@ test('a lost fish cancels a held drag gesture even before the next UI refresh',t
  state.fishState='fight';drag.emit('pointermove',{clientY:28});assert.equal(state.drag,.6);
 });
 
+test('a waiting-state snag exposes drag adjustment and releasing the snag cancels a held gesture',t=>{
+ const {state,ui,elements}=fixture(t,'waiting'),drag=elements['drag-knob'];
+ state.snagged=true;state.rodBend=.95;state.lineSlackMeters=0;ui.update();
+ assert.equal(drag.hidden,false);assert.equal(elements['rod-load'].textContent,'钓组卡住了');
+ assert.ok(elements['rod-pose'].attributes['aria-valuetext'].includes('竿身深弯'));
+ drag.emit('pointerdown');drag.emit('pointermove',{clientY:82});assert.equal(state.drag,.6);
+ state.snagged=false;drag.emit('pointermove',{clientY:46});assert.equal(state.drag,.6);assert.equal(drag.hasPointerCapture(1),false);
+ ui.update();assert.equal(drag.hidden,true);
+ state.snagged=true;ui.update();drag.emit('pointermove',{clientY:28});assert.equal(state.drag,.6,'a released snag must not revive its old finger input');
+ drag.emit('pointerdown',{pointerId:2});drag.emit('pointermove',{pointerId:2,clientY:118});assert.equal(state.drag,.5,'fresh downward drag loosens the drag');
+});
+
 test('losing reel availability clears captured crank travel and keyboard winding, not just output',t=>{
  const {state,ui,elements}=fixture(t,'waiting'),wheel=elements['reel-wheel'];
  wheel.emit('pointerdown',{clientX:150,clientY:68.6});wheel.emit('pointermove',{clientX:92,clientY:125});

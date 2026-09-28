@@ -150,3 +150,13 @@ as the active rod before **电动收线** appears. Ownership alone does not unlo
 for other rods. Rigs and bait remain independently consumable premade assemblies.
 Automatic recovery winds real line and stops on cancellation, menus, a bite,
 rod-holder changes or loss of the electric set. Fish fighting remains manual.
+
+## Bottom contact, slack and rock snags
+
+The controlled free-spool descent follows the sinker's actual demand with light rod loading. On seabed contact the sinker unloads the rod; only slow residual feed and line demanded by drift remain. The slack loop is bounded rather than dumping the entire spool. Closing the spool and winding/lifting clears slack and raises the rig.
+
+Bottom contact now has a four-second grace period followed by gradually increasing snag exposure. Risk uses the actual hook-position substrate (USGS reef, mixed hard bottom and artificial structure), rig, relative current, slack, wind and waves. Clean mapped sand/mud and unknown cells are not invented rock. Lifting promptly resets unattended contact. Rates and the grace period are authored simulation tuning, not measured Santa Cruz catch or snag probabilities.
+
+A snag fixes the terminal tackle to a world-space point; it does not immediately delete equipment or trigger a fish fight. Winding consumes slack, bends the rod, then stalls/slips at the selected drag. Loaded repeated winding or boat drift abrades the leader until remaining strength is insufficient and the line breaks. Opening the spool unloads the rod; stopping unloaded movement arrests abrasion. A broken rig and its bait are actually lost, and the player must fit replacement consumables. Pauses freeze the sequence and resumed voyages clear transient snag/force state.
+
+Mechanical references: [ODFW bottom-fishing technique](https://myodfw.com/articles/oregon-marine-shore-fishing), [Shimano controlled fall mechanism](https://fish.shimano.com/ja-JP/content/technology/baitreel/fallever/index.html), [Temple Reef descent, drift and snag guidance](https://templereef.com/deep-dropping/), and [Shimano drag / snag precautions](https://www.shimanofishingservice.jp/img/product/manual/manual_13BIOMASTER_SW.pdf). Deep-dropping advice is used for mechanical principles only, not as a claim about Santa Cruz water depth or empirical risk.
