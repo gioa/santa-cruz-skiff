@@ -3,8 +3,8 @@
  * measured bite percentages. Seasons describe availability, never legality.
  * Every species uses the same unnormalised weight for both encounter timing
  * and conditional selection; poor presentations therefore mean fewer bites. */
-import {getRigProfile,rigSpeciesKey} from './fishing-rigs.js?v=20260927-pixel-v47';
-import {USABLE_CONDITION} from './pixel-consumables.js?v=20260927-pixel-v47';
+import {getRigProfile,rigSpeciesKey} from './fishing-rigs.js?v=20260927-pixel-v48';
+import {USABLE_CONDITION} from './pixel-consumables.js?v=20260927-pixel-v48';
 
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const finite=(v,f=0)=>Number.isFinite(v)?v:f;
@@ -59,9 +59,12 @@ function environment(options){
  // A held button/rod angle is not continuing jig motion after the finite
  // physical stroke. The simulation supplies measured bait movement instead.
  const action=clamp(Math.max(Math.abs(finite(options.lureVerticalSpeedMps))/.65,retrieve/.45),0,1);
- const artificial=['jig','sabiki','feather40'].includes(rig.id);
- return{rig,bottom,depth,above:bottom-depth,speed,slowDrift,troll,action,artificial,
-  tip:artificial&&options.baitTipped?options.bait:null,tipFreshness:clamp(finite(options.tipFreshness),0,1),
+ // Bait identity and rig geometry are independent: a soft plastic on a
+ // plain 2/0 hook is still a lure. Only built-in lures can receive a tip bonus.
+ const lureRig=['jig','sabiki','feather40'].includes(rig.id);
+ const softPlastic=!lureRig&&options.bait==='jig',artificial=lureRig||softPlastic;
+ return{rig,bottom,depth,above:bottom-depth,speed,slowDrift,troll,action,artificial,softPlastic,
+  tip:lureRig&&options.baitTipped?options.bait:null,tipFreshness:clamp(finite(options.tipFreshness),0,1),
   live:options.baitForm==='live'||options.liveBait===true,
   bait:artificial?'artificial':options.bait||'squid',month:clamp(Math.floor(finite(options.month,9)),1,12)};
 }
@@ -98,7 +101,7 @@ function presentationAffinity(key,e){
   return baitFactor*rigFactor*(.8+.15*e.slowDrift)*(.1+.9*bell(e.speed,0,.7));
  }
  if(key==='halibut'){
-  let baitFactor=e.artificial?(r==='jig'?.85:r==='feather40'?.14:.045):e.live?1.3:fishBait?.88:bait==='squid'?.24:bait==='shrimp'?.11:.08;
+  let baitFactor=e.artificial?((r==='jig'||e.softPlastic)?.85:r==='feather40'?.14:.045):e.live?1.3:fishBait?.88:bait==='squid'?.24:bait==='shrimp'?.11:.08;
   // Whole/dead squid can work, especially in autumn; a stationary strip is
   // still a markedly less productive search method than a moving baitfish.
   if(bait==='squid'&&[9,10,11].includes(e.month))baitFactor*=1.3;
@@ -118,19 +121,19 @@ function presentationAffinity(key,e){
   return baitFactor*rigFactor*(e.artificial?.55+.6*e.action:.85)*(.25+.75*bell(e.speed,.2,1.25));
  }
  if(key==='salmon'){
-  const baitFactor=e.artificial?(r==='jig'?.8:.14):fishBait?1:bait==='squid'?.13:.025;
+  const baitFactor=e.artificial?((r==='jig'||e.softPlastic)?.8:.14):fishBait?1:bait==='squid'?.13:.025;
   const rigFactor={bottom:.6,dropper:.25,slider:.85,jig:.8,float:.3,sabiki:.06,feather40:.18}[r]??.2;
   // Mooching/retrieving an anchovy in the right water column remains viable
   // without the engine; static squid on bottom remains an incidental chance.
   return baitFactor*rigFactor*(.025+.85*e.troll+.7*e.action+(e.live?.35:0));
  }
  if(key==='seabass'){
-  const baitFactor=e.artificial?(r==='jig'?.55:.12):bait==='squid'?.75:fishBait?.9:.03;
+  const baitFactor=e.artificial?((r==='jig'||e.softPlastic)?.55:.12):bait==='squid'?.75:fishBait?.9:.03;
   const rigFactor={slider:1,bottom:.65,float:.7,dropper:.35,jig:.7,sabiki:.04,feather40:.2}[r]??.2;
   return baitFactor*rigFactor*(e.live?1.2:.55+.35*e.slowDrift+.2*e.action)*(.2+.8*bell(e.speed,.2,.8));
  }
  if(key==='bonito'){
-  const baitFactor=e.artificial?(r==='jig'?1.15:r==='sabiki'?.35:.55):fishBait?.9:bait==='squid'?.13:.03;
+  const baitFactor=e.artificial?((r==='jig'||e.softPlastic)?1.15:r==='sabiki'?.35:.55):fishBait?.9:bait==='squid'?.13:.03;
   const rigFactor={jig:1.1,float:.6,feather40:.5,sabiki:.35,bottom:.15,dropper:.12,slider:.18}[r]??.15;
   return baitFactor*rigFactor*(.035+.8*e.troll+.95*e.action+(e.live?.6:0));
  }

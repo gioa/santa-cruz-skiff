@@ -165,3 +165,42 @@ test('new local soft-bottom fish map correctly from latin names',()=>{
  assert.equal(rigSpeciesKey({latin:'Genyonemus lineatus'}),'croaker');
  assert.equal(rigSpeciesKey({latin:'Citharichthys sordidus'}),'sanddab');
 });
+
+
+test('soft plastic on the starter 2/0 rig responds to real lure movement in reef water',()=>{
+ const base={rig:'bottom',bait:'jig',habitat:'reef',bottomDepth:20,lureDepth:19.2};
+ for(const id of ['blue','copper','vermilion','lingcod']){
+  const still=rate(id,base),moving=rate(id,{...base,lureVerticalSpeedMps:.52});
+  assert.ok(still>0,id);
+  assert.ok(moving>still*2.5,`${id}: a moving soft plastic must not use the unknown-bait fallback`);
+  const leadhead=rate(id,{...base,rig:'jig',lureVerticalSpeedMps:.52});
+  assert.ok(moving>leadhead*.5&&moving<leadhead,id);
+ }
+});
+
+test('soft plastics remain viable on bait rigs without inheriting feather-only species penalties',()=>{
+ for(const [id,habitat,lureDepth] of [['halibut','sand',19.7],['salmon','sand',12],['seabass','kelp',8],['bonito','sand',5]]){
+  const base={bait:'jig',habitat,bottomDepth:20,lureDepth,lureVerticalSpeedMps:.52};
+  const leadhead=rate(id,{...base,rig:'jig'});
+  const rig=id==='bonito'?'float':'slider';
+  assert.ok(rate(id,{...base,rig})>leadhead*.4,id);
+ }
+});
+
+test('soft plastic on a plain hook is the primary attractant, not its own bonus tip',()=>{
+ const base={rig:'bottom',bait:'jig',habitat:'reef',lureVerticalSpeedMps:.52};
+ assert.equal(rate('copper',{...base,baitTipped:true,tipFreshness:1}),rate('copper',base));
+ for(const id of ids)assert.equal(rate(id,{...base,rig:'feather40'}),rate(id,{...base,rig:'feather40',bait:'squid'}),id);
+ // A plastic added to an existing feather lure still contributes as a tip.
+ assert.ok(rate('copper',{...base,rig:'feather40',baitTipped:true,tipFreshness:1})>rate('copper',{...base,rig:'feather40'}));
+});
+
+test('soft plastics do not bypass habitat, layer, motion or remaining bait condition',()=>{
+ const base={rig:'bottom',bait:'jig',habitat:'reef',bottomDepth:25,lureDepth:24,lureVerticalSpeedMps:.52};
+ const good=rate('copper',base);
+ assert.ok(good>rate('copper',{...base,habitat:'sand'})*50);
+ assert.ok(good>rate('copper',{...base,lureDepth:3})*50);
+ assert.equal(rate('copper',{...base,freshness:0}),0);
+ assert.equal(rate('copper',{...base,freshness:.5}),good*.5);
+ assert.ok(rate('halibut',{...base,habitat:'sand'})>rate('halibut',{...base,habitat:'sand',lureVerticalSpeedMps:0})*4);
+});

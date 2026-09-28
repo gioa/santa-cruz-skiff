@@ -88,3 +88,25 @@ test('pre-hook-size saves default to intact wire without repairing recorded part
  sim.state.profile.rodSupplies.rod.hookDamage=.45;const before=copy(sim.state.profile.stock);assert.ok(sim.replaceBait().ok);assert.equal(sim.rodConsumableStatus().rig.hookDamage,.45);assert.equal(sim.state.profile.stock.squid,before.squid-1,'fresh bait cannot repair hook wire');
  shop(sim);assert.equal(sim.restock().ok,false);assert.equal(sim.rodConsumableStatus().rig.hookDamage,.45,'retired restock cannot repair the mounted rig');
 });
+
+
+test('installed starter 2/0 soft plastic reaches ecology with real movement and finite supplies',async()=>{
+ const {fishEncounter}=await import('../dist/pixel-fish-ecology.js');
+ const {getRigProfile}=await import('../dist/fishing-rigs.js');
+ const {hookSizeFit}=await import('../dist/pixel-hook-size.js');
+ const sim=ready();sim.state.profile.stock.jig=2;
+ assert.ok(sim.replaceBait(undefined,'jig').ok);
+ assert.equal(sim.state.rig,'bottom');assert.equal(getRigProfile(sim.state.rig).hookSize,'2/0');
+ assert.equal(sim.state.profile.stock.jig,1);assert.ok(sim.lowerRig().ok);
+ Object.assign(sim.state,{lureDepth:19.2,lureVerticalSpeedMps:.52});
+ const env=sim.rigEnvironment();assert.equal(env.bait,'jig');assert.equal(env.baitTipped,true);
+ // Hold habitat constant to isolate the equipment -> ecology boundary.
+ const water={...env,habitat:'reef',bottomDepth:20};
+ const fish={id:'copper',latin:'Sebastes caurinus',length:30,kg:.5};
+ const active=fishEncounter([fish],water).ratePerSecond;
+ assert.ok(active>fishEncounter([fish],{...water,lureVerticalSpeedMps:0}).ratePerSecond*2.5);
+ assert.ok(hookSizeFit(fish,getRigProfile(sim.state.rig)).seatChance>.8);
+ sim.state.baitOnHook.condition=0;
+ assert.equal(fishEncounter([fish],{...water,freshness:sim.rigEnvironment().freshness}).ratePerSecond,0);
+ assert.equal(sim.state.profile.stock.jig,1);
+});

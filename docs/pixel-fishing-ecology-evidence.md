@@ -136,3 +136,31 @@ Mapped artificial structure is treated as mixed habitat for encounters only;
 unmapped cells remain unknown. A regression test also evaluates a single fish
 with a 100% conditional share in unsuitable unknown habitat: its absolute bite
 rate remains more than 1,000 times lower than a suitable reef presentation.
+
+
+## Soft-plastic bait identity correction (v48)
+
+[ODFW's marine shore fishing guidance](https://myodfw.com/articles/oregon-marine-shore-fishing)
+identifies rubber-worm/minnow jigs as rockfish/lingcod presentations and describes
+working bottomfish tackle near the bottom and slowly retrieving a leadhead lure.
+This supports lure motion and habitat, not a measured Santa Cruz bite rate or a
+universal hook-number recommendation. A 2/0 designation alone does not specify
+plastic length, hook pattern, gap or rigging quality.
+
+Previously only the *rig* IDs jig/sabiki/feather40 were classified as artificial.
+The installed soft-plastic bait (`jig`) on a bottom, dropper, slider or float rig
+fell through to unknown-bait coefficients and missed lure-action responses.
+Soft-plastic bait now selects artificial presentation independently of the rig.
+Halibut and other predator bait affinities likewise recognize the plastic rather
+than applying a feather-only fallback. Each rig keeps its own presentation
+multiplier; hook size/pattern still apply when a bite is seated. A plain hook's
+plastic is its primary attractant and cannot earn an extra tipping bonus for
+itself. Built-in feather rigs preserve their existing optional-tip behavior.
+
+A controlled 20 m reef, bait 0.8 m off bottom, September, fresh 2/0 bottom-rig
+plastic moving vertically at 0.52 m/s gives copper rockfish hazard 0.0110904156/s,
+versus 0.0018569998/s before correction (5.97 times). These are synthetic game
+parameters, not field measurements or a promised wait for a catch. Still plastics
+are weaker, incorrect substrate/depth remain poor, and exhausted bait contributes
+no encounters. Regression tests cover those distinctions and installation through
+PixelSimulation's real consumable/environment interface.
