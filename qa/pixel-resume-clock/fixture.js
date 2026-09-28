@@ -1,0 +1,2 @@
+// Seed a legacy 12:34:56 voyage under an isolated QA key, only on first load.
+if(!localStorage.getItem(SAVE)){const fixture=new PixelSimulation({now:()=>new Date('2026-09-28T13:00:00Z'),dailyWeather:true,weatherSeed:42});fixture.start();Object.assign(fixture.state,{gameElapsed:23696,time:1200,elapsed:1200,dayNumber:4});fixture.state.clock=fixture.clock();const data=fixture.snapshot();delete data.dayCycleVersion;localStorage.setItem(SAVE,JSON.stringify(data));}
