@@ -1,5 +1,6 @@
+import {stepStability} from './pixel-stability.js?v=20260928-pixel-v64';
 /**
- * Compact rigid-body approximation for the 4.8 m, 8 hp displacement skiff.
+ * Compact rigid-body approximation for the 4.572 m, 8 hp displacement skiff.
  * SI units: metres, seconds, kilograms, newtons and radians throughout.
  * This is a tuned game model, not CFD, a stability assessment or a sea trial.
  * No DOM/Three dependency: water sampling is the same callback used to draw waves.
@@ -8,7 +9,7 @@ const clamp=(v,a,b)=>Math.min(b,Math.max(a,v));
 const finite=(v,fallback=0)=>Number.isFinite(v)?v:fallback;
 const wrap=a=>Math.atan2(Math.sin(a),Math.cos(a));
 const G=9.81,RHO=1025,STEP=1/120,MAX_DT=.25;
-import {SKIFF_LENGTH_METERS} from './skiff-dimensions.js?v=20260928-pixel-v63';
+import {SKIFF_LENGTH_METERS} from './skiff-dimensions.js?v=20260928-pixel-v64';
 export const VESSEL_SPEC=Object.freeze({length:SKIFF_LENGTH_METERS,beam:1.72,dryMassKg:263,defaultCrewKg:82,waterplaneM2:2.8,engineWatts:5966,maxStepSeconds:STEP});
 
 export function createVesselState({x=0,z=0,heading=0,speed=0,y=0}={}){
@@ -45,13 +46,13 @@ export function sampleHullWater(v,sampleWater,time=0){
 
 function parameters(o){
  const crewKg=clamp(finite(o.crewKg,VESSEL_SPEC.defaultCrewKg),0,240),payloadKg=clamp(finite(o.payloadKg),0,350);
- return {crewKg,payloadKg,mass:VESSEL_SPEC.dryMassKg+crewKg+payloadKg};
+ return {crewKg,payloadKg,mass:VESSEL_SPEC.dryMassKg+crewKg+payloadKg+Math.max(0,finite(o.floodKg))};
 }
 
 function hullMotion(v,o,h,time,p){
  const w=sampleHullWater(v,o.sampleWater,time),mass=p.mass;
  // Displacement change from the authored reference waterline: an 82 kg occupant.
- const targetY=w.height-(p.crewKg+p.payloadKg-VESSEL_SPEC.defaultCrewKg)/(RHO*VESSEL_SPEC.waterplaneM2);
+ const targetY=w.height-(p.crewKg+p.payloadKg+finite(o.floodKg)-VESSEL_SPEC.defaultCrewKg)/(RHO*VESSEL_SPEC.waterplaneM2);
  const derivative=v.lastWater===null?0:(w.height-v.lastWater)/h;
  v.waterVelocity+=(clamp(derivative,-3,3)-v.waterVelocity)*(1-Math.exp(-h*10));
  v.lastWater=w.height;v.waterHeight=w.height;v.waterPitch=w.pitch;v.waterRoll=w.roll;
@@ -64,10 +65,10 @@ function hullMotion(v,o,h,time,p){
  const targetRoll=clamp(w.roll-p.crewKg*G*clamp(finite(o.crewX),-.8,.8)/rollK-v.speed*v.yawRate*.024,-.5,.5);
  const targetPitch=clamp(w.pitch+p.crewKg*G*clamp(finite(o.crewZ),-1.8,1.8)/pitchK+Math.max(0,v.speed)**2*.0028,-.4,.4);
  const rollI=mass*.43+145,pitchI=mass*1.9+480;
- v.rollRate+=(rollK*(targetRoll-v.roll)-2*.86*Math.sqrt(rollK*rollI)*v.rollRate)/rollI*h;
+ if(!o.stability)v.rollRate+=(rollK*(targetRoll-v.roll)-2*.86*Math.sqrt(rollK*rollI)*v.rollRate)/rollI*h;
  v.pitchRate+=(pitchK*(targetPitch-v.pitch)-2*.88*Math.sqrt(pitchK*pitchI)*v.pitchRate)/pitchI*h;
  v.rollRate=clamp(v.rollRate,-1.5,1.5);v.pitchRate=clamp(v.pitchRate,-1.2,1.2);
- v.roll=clamp(v.roll+v.rollRate*h,-.55,.55);v.pitch=clamp(v.pitch+v.pitchRate*h,-.45,.45);
+ if(o.stability)stepStability(v,{dt:h,water:w,mass,crewKg:p.crewKg,payloadKg:p.payloadKg,crewX:finite(o.crewX),bailing:o.bailing,windSide:(finite(o.windX)-v.vx)*Math.cos(v.heading)-(finite(o.windZ)-v.vz)*Math.sin(v.heading)});else v.roll=clamp(v.roll+v.rollRate*h,-.55,.55);v.pitch=clamp(v.pitch+v.pitchRate*h,-.45,.45);
 }
 
 /**
@@ -78,7 +79,7 @@ export function stepVesselMotion(v,o={}){
  const dt=clamp(finite(o.dt),0,MAX_DT);if(!dt)return v;
  const n=Math.ceil(dt/STEP),h=dt/n,p=parameters(o),end=finite(o.time);
  v.massKg=p.mass;
- for(let i=0;i<n;i++)hullMotion(v,o,h,end-dt+(i+1)*h,p);
+ for(let i=0;i<n;i++)hullMotion(v,o,h*(o.motionTimeScale??1),end-dt*(o.motionTimeScale??1)+(i+1)*h*(o.motionTimeScale??1),p);
  return v;
 }
 
@@ -142,7 +143,7 @@ export function stepVessel(v,o={}){
   v.heading=wrap(v.heading+v.yawRate*h);
   v.x+=v.vx*h;v.z+=v.vz*h;
   v.speed=-(v.vx-currentX)*Math.sin(v.heading)-(v.vz-currentZ)*Math.cos(v.heading);
-  hullMotion(v,o,h,end-dt+(i+1)*h,p);
+  hullMotion(v,o,h*(o.motionTimeScale??1),end-dt*(o.motionTimeScale??1)+(i+1)*h*(o.motionTimeScale??1),p);
  }
  return v;
 }

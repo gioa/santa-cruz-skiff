@@ -1,14 +1,14 @@
-import {sampleDailyWater,drawWeatherOverlay} from './pixel-daily-weather.js?v=20260928-pixel-v63';
-import {pierRings,landPolygons,coastLines,buildingFootprints,FISHING_SPOTS,onLand,onPier} from './pixel-geography.js?v=20260928-pixel-v63';
-import {FISHING_SCENE_SCALE,fishingProjector,fishingPhysicalPoint} from './pixel-fishing-projection.js?v=20260928-pixel-v63';
-import {HARBOR,harborWaterBlocked} from './harbor-layout.js?v=20260928-pixel-v63';
-import {depthInfoAt} from './bathymetry.js?v=20260928-pixel-v63';
-import {createWildlife,drawWildlife} from './pixel-wildlife.js?v=20260928-pixel-v63';
-import {cameraOffset,projectPixel,unprojectPixel,stepDeadzoneCamera,cameraDeadzone,cameraPlayfield,fitCameraBounds,zoomCameraAt,rectilinearOutline} from './pixel-camera.js?v=20260928-pixel-v63';
-import {ladderPoint} from './swimming.js?v=20260928-pixel-v63';
-import {SKIFF_HULL_OUTLINE,SKIFF_RACKS,boatRenderPose,parkedSkiffPoses,skiffScreenPose,hitSkiff,outboardPose,skiffDavitGeometry} from './pixel-boat-geometry.js?v=20260928-pixel-v63';
-import {createWakeTrail,crestPoints,foamPoint} from './pixel-wake.js?v=20260928-pixel-v63';
-import {getRodCurve,getReelPose,getFishingLine,getFishingPresentation} from './pixel-rod-geometry.js?v=20260928-pixel-v63';
+import {sampleDailyWater,drawWeatherOverlay} from './pixel-daily-weather.js?v=20260928-pixel-v64';
+import {pierRings,landPolygons,coastLines,buildingFootprints,FISHING_SPOTS,onLand,onPier} from './pixel-geography.js?v=20260928-pixel-v64';
+import {FISHING_SCENE_SCALE,fishingProjector,fishingPhysicalPoint} from './pixel-fishing-projection.js?v=20260928-pixel-v64';
+import {HARBOR,harborWaterBlocked} from './harbor-layout.js?v=20260928-pixel-v64';
+import {depthInfoAt} from './bathymetry.js?v=20260928-pixel-v64';
+import {createWildlife,drawWildlife} from './pixel-wildlife.js?v=20260928-pixel-v64';
+import {cameraOffset,projectPixel,unprojectPixel,stepDeadzoneCamera,cameraDeadzone,cameraPlayfield,fitCameraBounds,zoomCameraAt,rectilinearOutline} from './pixel-camera.js?v=20260928-pixel-v64';
+import {ladderPoint} from './swimming.js?v=20260928-pixel-v64';
+import {SKIFF_HULL_OUTLINE,SKIFF_RACKS,boatRenderPose,parkedSkiffPoses,skiffScreenPose,hitSkiff,outboardPose,skiffDavitGeometry} from './pixel-boat-geometry.js?v=20260928-pixel-v64';
+import {createWakeTrail,crestPoints,foamPoint} from './pixel-wake.js?v=20260928-pixel-v64';
+import {getRodCurve,getReelPose,getFishingLine,getFishingPresentation} from './pixel-rod-geometry.js?v=20260928-pixel-v64';
 
 // Boat and wharf art retain readable proportions. Fishing and visible fish
 // share the same geographic projection as the seabed.
@@ -183,7 +183,7 @@ export function createPixelWorld(canvas,{sprites={},conditions={}}={}){
     // A stored boat has only its dry deck shadow. A raised hull's shadow stays
     // on the surface below, while the hull follows the crane's actual pose.
     ctx.save();ctx.translate(p.x,p.y+(pose.afloat?bob:0));ctx.rotate(-heading);ctx.translate(4,6);ctx.scale(scale,scale);hullShadow(SKIFF_HULL_OUTLINE.map(([x,y])=>[x-24,y-44]),pose.afloat?.25:.16);ctx.restore();
-    ctx.save();ctx.translate(g.screenX,g.screenY);ctx.rotate(-heading);if(occupied)ctx.scale(1-Math.min(.08,Math.abs(state.roll||0)*.3),1-Math.min(.05,Math.abs(state.pitch||0)*.2));
+    ctx.save();ctx.translate(g.screenX,g.screenY);ctx.rotate(-heading);if(occupied)ctx.scale(Math.max(.12,Math.abs(Math.cos(state.roll||0))),1-Math.min(.05,Math.abs(state.pitch||0)*.2));
     if(typeof sprites.drawBoat==='function')sprites.drawBoat(ctx,0,0,{scale,occupied,pose:occupantPose,time:clock,tiller:state.tiller||0,reeling:state.reeling,castPower:state.castPower||0,fishState:state.fishState});
     else{
       const hull=sprites.boatHull||sprites.boat,asset=hull?.image||hull?.canvas||hull;
@@ -215,11 +215,13 @@ export function createPixelWorld(canvas,{sprites={},conditions={}}={}){
         if(occupantPose==='driving'){pixelLine(6,-3,9,9,'#e1b58e',4);pixelLine(9,9,3,23,'#343f43',3);ctx.fillStyle='#d6aa86';ctx.fillRect(7,7,4,4);}else if(occupantPose!=='fishing'){ctx.fillStyle='#d9ae83';ctx.fillRect(-10,-3,3,8);ctx.fillRect(8,-3,3,8);}ctx.restore();
       }
     }
+    if(occupied&&(state.stability?.waterLitres||0)>.3){ctx.save();ctx.scale(scale,scale);ctx.beginPath();ctx.moveTo(0,-30);ctx.lineTo(14,-12);ctx.lineTo(14,31);ctx.lineTo(-14,31);ctx.lineTo(-14,-12);ctx.closePath();ctx.clip();const amount=Math.min(1,state.stability.waterLitres/130);ctx.fillStyle=`rgba(84,164,170,${.22+amount*.52})`;ctx.fillRect(-18,-28,36,62);ctx.strokeStyle='#c7e2d3';ctx.lineWidth=1;for(let y=-18;y<32;y+=11){ctx.beginPath();ctx.moveTo(-12,y+Math.sin(clock*2+y)*2);ctx.lineTo(12,y+Math.sin(clock*2+y+1)*2);ctx.stroke();}if(state.bailing){ctx.fillStyle='#ead4a0';ctx.fillRect(8,4+Math.sin(clock*5)*5,8,9);ctx.fillStyle='#b8e3df';ctx.fillRect(16,Math.sin(clock*5)*12,9,3);}ctx.restore();}
+    if(occupied&&Math.abs(state.roll||0)>Math.PI/2){ctx.save();ctx.scale(scale,scale);ctx.beginPath();ctx.moveTo(0,-42);ctx.lineTo(14,-26);ctx.lineTo(20,12);ctx.lineTo(17,35);ctx.lineTo(-17,35);ctx.lineTo(-20,12);ctx.lineTo(-14,-26);ctx.closePath();ctx.fillStyle='#ad8452';ctx.fill();ctx.strokeStyle='#e4c58d';ctx.lineWidth=3;ctx.stroke();ctx.fillStyle='#6b5942';ctx.fillRect(-2,-32,4,62);ctx.restore();}
     if(occupied&&state.trollingMotorInstalled){ctx.save();ctx.scale(scale,scale);ctx.translate(-9,-30);ctx.fillStyle='#b7bca3';ctx.fillRect(-2,-8,4,14);ctx.fillStyle='#263e42';ctx.fillRect(-5,-10,10,5);if(state.motorMode!=='off'){ctx.rotate(heading-(state.motorAngle||0));ctx.fillStyle='#a9d3cf';ctx.fillRect(-1,-17,2,7);ctx.fillStyle='#547b76';ctx.fillRect(-4,-15,8,2);}ctx.restore();}
     // Three bright rungs at the port stern make the reboarding target visible.
     pixelLine(-19*scale,22*scale,-25*scale,22*scale,'#c4d5c6',1);pixelLine(-19*scale,31*scale,-25*scale,31*scale,'#93b0b1',1);pixelLine(-25*scale,22*scale,-25*scale,31*scale,'#c4d5c6',1);pixelLine(-21*scale,25*scale,-25*scale,25*scale,'#dce3ca',1);pixelLine(-21*scale,28*scale,-25*scale,28*scale,'#dce3ca',1);
     ctx.restore();
-    if(rod)drawFishingRig(state,rod);
+    if(rod&&!state.capsize)drawFishingRig(state,rod);
   }
   function drawFishingRig(state,rod){
     const s=rod.scale,line=getFishingLine(state,rod,{project:fishingProjector(state,point),cameraScale:camera.scale*FISHING_SCENE_SCALE});
