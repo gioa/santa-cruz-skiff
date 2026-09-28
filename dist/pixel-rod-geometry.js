@@ -1,6 +1,6 @@
-import {SKIFF_METERS_PER_PIXEL} from './skiff-dimensions.js?v=20260927-pixel-v36';
-import {ROD_LENGTH_METERS} from './pixel-fishing-physics.js?v=20260927-pixel-v36';
-import {rodFlexPoint} from './pixel-rod-response.js?v=20260927-pixel-v36';
+import {SKIFF_METERS_PER_PIXEL} from './skiff-dimensions.js?v=20260927-pixel-v37';
+import {ROD_LENGTH_METERS} from './pixel-fishing-physics.js?v=20260927-pixel-v37';
+import {rodFlexPoint} from './pixel-rod-response.js?v=20260927-pixel-v37';
 // Shared presentation geometry. The model supplies angles, mount and actual
 // load-derived bend; rendering never invents fish pulls or changes line length.
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));

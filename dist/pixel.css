@@ -202,7 +202,7 @@
 #reel-wheel:focus-visible,#drag-knob:focus-visible{outline:3px solid #e7a14e;outline-offset:1px}
 #rod-monitor{display:flex;align-items:center;gap:8px;height:36px;background:#d0c7a5;border:1px solid #8d9d79;font:10px monospace;color:#456854}
 #rod-monitor canvas{width:112px;height:32px;image-rendering:pixelated}#rod-monitor b{margin-left:auto;margin-right:8px;font-size:11px}
-#fishing-tab[aria-pressed=true]{background:#edc78a}
+#boat-panel-tabs button[aria-pressed=true]{background:#315a55;color:#fff1cc;box-shadow:inset 0 -3px #d6b06b}
 /* The status strip replaces the caption; it never reserves a hidden row. */
 #boat-fishing .fish-status{
  position:static;transform:none;inset:auto;width:auto;max-width:none;padding:0;margin:0;background:transparent;border:0;box-shadow:none;display:flex;align-items:center;gap:8px;min-height:23px;height:auto;font-size:10px;grid-column:auto;grid-row:auto
@@ -392,3 +392,9 @@
 
 .outboard-head::after{content:'';position:absolute;right:7px;top:12px;width:5px;height:5px;border-radius:50%;background:#747c6b}.engine-running .outboard-head::after{background:#b6e987;box-shadow:0 0 4px #b6e987}
 #throttle-touch[aria-disabled=true]{opacity:.55}
+
+/* Two stable control categories; assembly remains in the top backpack. */
+#boat-panel-tabs{display:flex;flex:1 1 180px;gap:0;min-width:0}
+#boat-console #boat-panel-tabs button{flex:1 1 0;min-width:44px;min-height:44px;border-radius:0}
+#boat-console #boat-panel-tabs button+button{border-left:0}
+@media(max-height:500px) and (orientation:landscape){#boat-console #boat-panel-tabs{flex:1 1 100%;width:100%;flex-direction:column}#boat-console #boat-panel-tabs button+button{border-left:2px solid #5c7461;border-top:0}}

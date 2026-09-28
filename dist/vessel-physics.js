@@ -8,7 +8,7 @@ const clamp=(v,a,b)=>Math.min(b,Math.max(a,v));
 const finite=(v,fallback=0)=>Number.isFinite(v)?v:fallback;
 const wrap=a=>Math.atan2(Math.sin(a),Math.cos(a));
 const G=9.81,RHO=1025,STEP=1/120,MAX_DT=.25;
-import {SKIFF_LENGTH_METERS} from './skiff-dimensions.js?v=20260927-pixel-v36';
+import {SKIFF_LENGTH_METERS} from './skiff-dimensions.js?v=20260927-pixel-v37';
 export const VESSEL_SPEC=Object.freeze({length:SKIFF_LENGTH_METERS,beam:1.72,dryMassKg:263,defaultCrewKg:82,waterplaneM2:2.8,engineWatts:5966,maxStepSeconds:STEP});
 
 export function createVesselState({x=0,z=0,heading=0,speed=0,y=0}={}){
