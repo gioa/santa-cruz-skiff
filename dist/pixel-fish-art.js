@@ -3,18 +3,33 @@
 export const FISH_BOARD_SPAN_CM=152.4; // 60 in / 5 ft
 const boundsCache=new WeakMap();
 
+// Exact identity mapping shared by catch cards, history, cooler and fight view.
+// A missing identity must not silently become a red rockfish.
+export const FISH_ART_IDENTITIES=Object.freeze([
+ {kind:'blue',latin:'Sebastes mystinus',aliases:['blue_rockfish','blue rockfish','蓝岩鱼']},
+ {kind:'copper',latin:'Sebastes caurinus',aliases:['copper_rockfish','copper rockfish','铜岩鱼']},
+ {kind:'vermilion',latin:'Sebastes miniatus',aliases:['vermilion_rockfish','vermilion rockfish','朱红岩鱼','红岩鱼']},
+ {kind:'halibut',latin:'Paralichthys californicus',aliases:['california_halibut','california halibut','加州大比目鱼','加州比目鱼']},
+ {kind:'mackerel',latin:'Scomber japonicus',aliases:['pacific_mackerel','pacific mackerel','pacific chub mackerel','太平洋鲭鱼']},
+ {kind:'lingcod',latin:'Ophiodon elongatus',aliases:['lingcod','长蛇齿单线鱼','灵鳕']},
+ {kind:'salmon',latin:'Oncorhynchus tshawytscha',aliases:['chinook_salmon','chinook salmon','king salmon','帝王鲑','奇努克鲑']},
+ {kind:'seabass',latin:'Atractoscion nobilis',aliases:['white_seabass','white seabass','wsb','白海鲈','白海鲈鱼','白鲈']},
+ {kind:'bonito',latin:'Sarda chiliensis lineolata',aliases:['pacific_bonito','pacific bonito','Sarda chiliensis','Sarda lineolata','太平洋狐鲣','太平洋鲣']},
+ {kind:'croaker',latin:'Genyonemus lineatus',aliases:['white_croaker','white croaker','白石首鱼']},
+ {kind:'sanddab',latin:'Citharichthys sordidus',aliases:['pacific_sanddab','pacific sanddab','太平洋沙鲽']},
+ {kind:'anchovy',latin:'Engraulis mordax',aliases:['northern_anchovy','northern anchovy','北方鳀鱼','鳀鱼']},
+ {kind:'sardine',latin:'Sardinops sagax',aliases:['pacific_sardine','pacific sardine','太平洋沙丁鱼','沙丁鱼']},
+ {kind:'rockfish',latin:'Sebastes melanops',aliases:['black_rockfish','black rockfish','黑岩鱼']},
+].map(f=>Object.freeze({...f,aliases:Object.freeze(f.aliases)})));
+const normalizeFishName=value=>String(value||'').trim().toLowerCase().replace(/[_-]+/g,' ').replace(/\s+/g,' ');
+const artByName=new Map(FISH_ART_IDENTITIES.flatMap(f=>[f.kind,f.latin,...f.aliases].map(name=>[normalizeFishName(name),f.kind])));
 export function fishSpriteKind(f={}){
- const latin=f?.latin||'',name=f?.name||'';
- if(/Genyonemus/.test(latin))return'croaker';
- if(/Citharichthys sordidus/.test(latin))return'sanddab';
- if(/miniatus/.test(latin))return'vermilion';
- if(/tshawytscha/.test(latin))return'salmon';
- if(/nobilis/.test(latin))return'seabass';
- if(/Sarda/.test(latin))return'bonito';
- if(/Paralichthys/.test(latin)||name.includes('比目'))return'halibut';
- if(/Scomber/.test(latin)||name.includes('鲭'))return'mackerel';
- if(/Ophiodon/.test(latin)||name.includes('单线'))return'lingcod';
- return'rockfish';
+ const fish=typeof f==='string'?{name:f}:f||{};
+ // Scientific identity takes priority over a translated or stale display name.
+ for(const value of [fish.latin,fish.scientificName,fish.speciesId,fish.id,fish.name,fish.commonName]){
+  for(const name of String(value||'').split('·')){const kind=artByName.get(normalizeFishName(name));if(kind)return kind;}
+ }
+ return 'unknown';
 }
 
 // The authored 48 x 24 sprites have different transparent margins. Measure

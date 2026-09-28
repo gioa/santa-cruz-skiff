@@ -62,7 +62,7 @@ test('same measured length has the same silhouette width across sprites with dif
 });
 
 test('species selection and fork-length metadata survive common and scientific names',()=>{
- for(const[latin,kind]of[['Genyonemus lineatus','croaker'],['Citharichthys sordidus','sanddab'],['Paralichthys californicus','halibut'],['Ophiodon elongatus','lingcod'],['Scomber japonicus','mackerel'],['Sebastes miniatus','vermilion'],['Oncorhynchus tshawytscha','salmon'],['Atractoscion nobilis','seabass'],['Sarda chiliensis lineolata','bonito'],['Sebastes mystinus','rockfish']])assert.equal(fishSpriteKind({latin}),kind);
+ for(const[latin,kind]of[['Genyonemus lineatus','croaker'],['Citharichthys sordidus','sanddab'],['Paralichthys californicus','halibut'],['Ophiodon elongatus','lingcod'],['Scomber japonicus','mackerel'],['Sebastes miniatus','vermilion'],['Oncorhynchus tshawytscha','salmon'],['Atractoscion nobilis','seabass'],['Sarda chiliensis lineolata','bonito'],['Sebastes mystinus','blue']])assert.equal(fishSpriteKind({latin}),kind);
  assert.equal(fishSpriteKind({name:'长蛇齿单线鱼'}),'lingcod');
  assert.equal(fishArtLayout({length:50,lengthType:'fork'}).measurementType,'fork');
  assert.equal(fishArtLayout({length:50}).measurementType,'total');
