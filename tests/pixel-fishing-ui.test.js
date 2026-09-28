@@ -23,7 +23,7 @@ function fixture(t,fishState='idle',{electric=false}={}){
  const priorDocument=globalThis.document;globalThis.document={getElementById:()=>null};
  t.after(()=>{if(priorDocument===undefined)delete globalThis.document;else globalThis.document=priorDocument;});
  const buttons=['drag-knob','spool-toggle','lower-rig','reel-btn','retrieve-rig','take-rod'];
- const ids=['rod-pose','reel-wheel','rod-mount','tackle-name','rod-load','reel-instrument',...buttons];
+ const ids=['reel-wheel','rod-mount','tackle-name','rod-load','reel-instrument',...buttons];
  const elements=Object.fromEntries(ids.map(id=>[id,new Element(id==='rod-mount'?'SELECT':buttons.includes(id)?'BUTTON':'DIV')]));
  elements['.fishing-toolbar']=new Element();elements['.fishing-instruments']=new Element();
  const root=new Element();root.querySelector=query=>elements[query.startsWith('#')?query.slice(1):query];
@@ -37,21 +37,12 @@ function fixture(t,fishState='idle',{electric=false}={}){
 
 test('the console without a casting control lowers directly and exposes the reel',t=>{
  const {state,ui,elements}=fixture(t),lower=elements['lower-rig'];
- assert.equal(elements['cast-btn'],undefined);assert.equal(lower.hidden,false);
+ assert.equal(elements['cast-btn'],undefined);assert.equal(elements['rod-pose'],undefined);assert.equal(elements['.fishing-instruments'].hidden,true);assert.equal(lower.hidden,false);
  assert.equal(lower.textContent,'船边下放');assert.equal(elements['reel-instrument'].hidden,true);
  lower.onclick();assert.equal(state.fishState,'sinking');ui.update();
- assert.equal(lower.hidden,true);assert.equal(elements['reel-instrument'].hidden,false);
+ assert.equal(lower.hidden,true);assert.equal(elements['reel-instrument'].hidden,false);assert.equal(elements['.fishing-instruments'].hidden,false);
  assert.equal(elements['spool-toggle'].hidden,false);assert.equal(elements['reel-btn'].hidden,false);
  lower.onclick();assert.equal(state.fishState,'sinking','an unavailable lower action cannot restart deployment');
-});
-
-test('legacy flight state cancels an already held rod and a fresh touch is needed afterwards',t=>{
- const {state,ui,elements}=fixture(t),pose=elements['rod-pose'];
- pose.emit('pointerdown');pose.emit('pointermove',{clientY:86});assert.equal(state.rodElevation,53.5);
- state.fishState='flight';ui.update();assert.equal(pose.attributes.role,'img');assert.equal(pose.hasPointerCapture(1),false);
- pose.emit('pointermove',{clientY:30});assert.equal(state.rodElevation,53.5);
- state.fishState='waiting';ui.update();pose.emit('pointermove',{clientY:30});assert.equal(state.rodElevation,53.5,'the old touch must not reactivate');
- pose.emit('pointerdown',{pointerId:2});pose.emit('pointermove',{pointerId:2,clientY:86});assert.equal(state.rodElevation,62);
 });
 
 test('the drag control stays hidden and ignores pointer and keyboard input before hookup',t=>{
@@ -86,7 +77,6 @@ test('a waiting-state snag exposes drag adjustment and releasing the snag cancel
  const {state,ui,elements}=fixture(t,'waiting'),drag=elements['drag-knob'];
  state.snagged=true;state.rodBend=.95;state.lineSlackMeters=0;ui.update();
  assert.equal(drag.hidden,false);assert.equal(elements['rod-load'].textContent,'钓组卡住了');
- assert.ok(elements['rod-pose'].attributes['aria-valuetext'].includes('竿身深弯'));
  drag.emit('pointerdown');drag.emit('pointermove',{clientY:82});assert.equal(state.drag,.6);
  state.snagged=false;drag.emit('pointermove',{clientY:46});assert.equal(state.drag,.6);assert.equal(drag.hasPointerCapture(1),false);
  ui.update();assert.equal(drag.hidden,true);
@@ -105,10 +95,10 @@ test('losing reel availability clears captured crank travel and keyboard winding
 });
 
 test('phase changes cancel gestures before the next UI refresh or pointer release',t=>{
- const {state,ui,elements}=fixture(t,'fight'),pose=elements['rod-pose'],drag=elements['drag-knob'],wheel=elements['reel-wheel'];
- pose.emit('pointerdown');drag.emit('pointerdown',{pointerId:2});wheel.emit('pointerdown',{pointerId:3,clientX:150,clientY:68.6});
- state.paused=true;pose.emit('pointermove',{clientY:20});
- assert.equal(state.rodElevation,45);assert.equal(state.drag,.5);assert.equal(pose.hasPointerCapture(1),false);assert.equal(drag.hasPointerCapture(2),false);assert.equal(wheel.hasPointerCapture(3),false);
+ const {state,ui,elements}=fixture(t,'fight'),drag=elements['drag-knob'],wheel=elements['reel-wheel'];
+ drag.emit('pointerdown',{pointerId:2});wheel.emit('pointerdown',{pointerId:3,clientX:150,clientY:68.6});
+ state.paused=true;drag.emit('pointermove',{pointerId:2,clientY:20});
+ assert.equal(state.rodElevation,45);assert.equal(state.drag,.5);assert.equal(drag.hasPointerCapture(2),false);assert.equal(wheel.hasPointerCapture(3),false);
  state.paused=false;ui.update();wheel.emit('keydown',{key:'ArrowUp'});assert.equal(ui.input(.01).reel,1.2);
  state.paused=true;assert.equal(ui.input(.01).reel,0);state.paused=false;assert.equal(ui.input(.01).reel,0,'the frame gate also cancels a held key before update() runs');
 });
@@ -117,8 +107,6 @@ test('console replaces force percentages with line cues and a physical drag adju
  const {state,ui,elements}=fixture(t,'fight');
  Object.assign(state,{rodBend:.9,rodLoadN:40,tension:99,stamina:8,payoutRate:1.2,retrieveRate:.1,paidLineMeters:26});ui.update();
  assert.equal(elements['rod-load'].textContent,'鱼在出线');
- assert.ok(elements['rod-pose'].attributes['aria-valuetext'].includes('竿身深弯'));
- assert.ok(!elements['rod-pose'].attributes['aria-valuetext'].includes('%'));
  assert.ok(elements['drag-knob'].innerHTML.includes('drag-star'));assert.ok(!elements['drag-knob'].innerHTML.includes('%'));
  assert.equal(elements['drag-knob'].attributes['aria-valuetext'],'泄力适中，向上拧紧，向下放松');
  Object.assign(state,{lineSlackMeters:1,payoutRate:0});ui.update();assert.equal(elements['rod-load'].textContent,'鱼线松了');
