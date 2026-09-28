@@ -11,9 +11,9 @@ const RIG_ITEMS={bottom:'tackle',slider:'rig_slider',jig:'rig_jig',float:'rig_fl
 const clone=x=>x==null?null:JSON.parse(JSON.stringify(x));
 const bounded=v=>Number.isFinite(v)?Math.max(0,Math.min(1,v)):0;
 const cleanBait=b=>b&&BAIT_IDS.includes(b.kind)?{kind:b.kind,condition:bounded(b.condition)}:null;
-const cleanSpare=r=>r&&typeof r==='object'?{condition:bounded(r.condition),bait:cleanBait(r.bait)}:null;
+const cleanSpare=r=>r&&typeof r==='object'?{condition:bounded(r.condition),hookDamage:bounded(r.hookDamage),bait:cleanBait(r.bait)}:null;
 export const rigRequiresBait=rig=>rig!=='sabiki';
-export function starterConsumables(){return{consumablesVersion:CONSUMABLES_VERSION,rigStock:Object.fromEntries(RIG_IDS.map(id=>[id,id==='bottom'?[{condition:1,bait:null},{condition:1,bait:null}]:[]])),rodSupplies:{rod:{rig:'bottom',condition:1,bait:{kind:'squid',condition:1}}}};}
+export function starterConsumables(){return{consumablesVersion:CONSUMABLES_VERSION,rigStock:Object.fromEntries(RIG_IDS.map(id=>[id,id==='bottom'?[{condition:1,hookDamage:0,bait:null},{condition:1,hookDamage:0,bait:null}]:[]])),rodSupplies:{rod:{rig:'bottom',condition:1,hookDamage:0,bait:{kind:'squid',condition:1}}}};}
 export function ensureConsumables(profile,legacy={}){
  if(profile.consumablesVersion!==CONSUMABLES_VERSION){
   const rigs=Object.fromEntries(RIG_IDS.map(id=>[id,[]])),supplies={},mounted=new Set();
@@ -26,15 +26,15 @@ export function ensureConsumables(profile,legacy={}){
   for(const id of RIG_IDS)if(id!=='bottom'&&profile.owned?.includes(RIG_ITEMS[id])&&!mounted.has(id))rigs[id].push({condition:1,bait:null});
   profile.rigStock=rigs;profile.rodSupplies=supplies;profile.consumablesVersion=CONSUMABLES_VERSION;
  }
- profile.rigStock=Object.fromEntries(RIG_IDS.map(id=>[id,Array.isArray(profile.rigStock?.[id])?profile.rigStock[id].map(cleanSpare).filter(r=>r&&r.condition>USABLE_CONDITION):[]]));
+ profile.rigStock=Object.fromEntries(RIG_IDS.map(id=>[id,Array.isArray(profile.rigStock?.[id])?profile.rigStock[id].map(cleanSpare).filter(r=>r&&r.condition>USABLE_CONDITION&&r.hookDamage<1):[]]));
  profile.rodSupplies??={};
- for(const rod of ROD_IDS.filter(id=>profile.owned?.includes(id))){const old=profile.rodSupplies[rod];if(old&&RIG_IDS.includes(old.rig)){old.condition=bounded(old.condition);if(old.bait&&BAIT_IDS.includes(old.bait.kind))old.bait.condition=bounded(old.bait.condition);else old.bait=null;}else profile.rodSupplies[rod]=null;}
+ for(const rod of ROD_IDS.filter(id=>profile.owned?.includes(id))){const old=profile.rodSupplies[rod];if(old&&RIG_IDS.includes(old.rig)&&bounded(old.hookDamage)<1){old.condition=bounded(old.condition);old.hookDamage=bounded(old.hookDamage);if(old.bait&&BAIT_IDS.includes(old.bait.kind))old.bait.condition=bounded(old.bait.condition);else old.bait=null;}else profile.rodSupplies[rod]=null;}
  for(const bait of BAIT_IDS)profile.stock[bait]=Math.max(0,Math.floor(Number.isFinite(profile.stock?.[bait])?profile.stock[bait]:0));
  return profile.rodSupplies;
 }
 export function consumableStatus(profile,rodId=profile.loadout?.rod){
  ensureConsumables(profile);const supply=profile.rodSupplies[rodId];
- return{rig:{id:supply?.rig||profile.rodLoadouts?.[rodId]?.rig||'bottom',condition:supply?.condition||0,present:Boolean(supply)},bait:clone(supply?.bait),requiresBait:rigRequiresBait(supply?.rig||profile.rodLoadouts?.[rodId]?.rig||'bottom'),rigStock:Object.fromEntries(RIG_IDS.map(id=>[id,profile.rigStock[id].length])),baitStock:{...profile.stock}};
+ return{rig:{id:supply?.rig||profile.rodLoadouts?.[rodId]?.rig||'bottom',condition:supply?.condition||0,hookDamage:supply?.hookDamage||0,present:Boolean(supply)},bait:clone(supply?.bait),requiresBait:rigRequiresBait(supply?.rig||profile.rodLoadouts?.[rodId]?.rig||'bottom'),rigStock:Object.fromEntries(RIG_IDS.map(id=>[id,profile.rigStock[id].length])),baitStock:{...profile.stock}};
 }
 export function installBait(profile,rodId,bait){
  ensureConsumables(profile);const supply=profile.rodSupplies[rodId];
@@ -47,8 +47,8 @@ export function installRig(profile,rodId,rig){
  ensureConsumables(profile);if(!ROD_IDS.includes(rodId)||!profile.owned.includes(rodId))return{ok:false,message:'还没有这根船竿。'};
  if(!RIG_IDS.includes(rig)||!profile.rigStock[rig].length)return{ok:false,message:'没有备用钓组，到小屋补给。'};
  const next=profile.rigStock[rig].shift(),old=profile.rodSupplies[rodId];
- if(old&&old.condition>USABLE_CONDITION)profile.rigStock[old.rig].push({condition:old.condition,bait:clone(old.bait)});
- profile.rodSupplies[rodId]={rig,condition:next.condition,bait:clone(next.bait)};
+ if(old&&old.condition>USABLE_CONDITION)profile.rigStock[old.rig].push({condition:old.condition,hookDamage:old.hookDamage,bait:clone(old.bait)});
+ profile.rodSupplies[rodId]={rig,condition:next.condition,hookDamage:next.hookDamage,bait:clone(next.bait)};
  return{ok:true,message:old&&old.condition>USABLE_CONDITION?'已更换整套钓组，原钓组与鱼饵收回背包。':'已装上备用钓组。'};
 }
 export function loseRig(profile,rodId){ensureConsumables(profile);profile.rodSupplies[rodId]=null;}

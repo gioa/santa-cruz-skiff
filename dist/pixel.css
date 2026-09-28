@@ -378,3 +378,10 @@
 .premade-workbench .rod-assembly-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.premade-workbench .assembly-slot{min-height:132px}.supply-condition{font-size:9px;color:#536a54;line-height:1.35}.supply-condition.empty{color:#935334}.supply-action{font-size:9px;padding:3px 6px;background:#ded0ab;color:#344f48}.premade-workbench .rod-part{min-height:110px}.premade-workbench .rod-part-options{max-height:360px}.rod-part:disabled .supply-action{background:transparent}.premade-workbench .assembly-slot strong{font-size:11px}
 @media(max-width:600px){.premade-workbench .assembly-slot{min-height:106px}.premade-workbench .rod-part{min-height:104px}.premade-workbench .rod-part-options{max-height:232px}.premade-workbench .assembly-slot strong{font-size:10px}}
 @media(max-height:500px) and (orientation:landscape){.premade-workbench .rod-part-options{max-height:132px}.premade-workbench .assembly-slot{min-height:115px}.premade-workbench .rod-part{min-height:94px}}
+
+/* Hook specifications stay visible on touch-sized premade rig cards. */
+.hook-spec{display:block;max-width:100%;font:700 10px/1.5 'Space Mono',monospace;text-align:center;color:#214c48;background:#d4debc;padding:3px 5px;border:1px solid #91a382;overflow-wrap:anywhere}
+.assembly-slot>.hook-spec{font-size:10px;color:#214c48}.premade-workbench .rod-part{min-height:136px}.premade-workbench .rod-part-options{max-height:408px}
+.slot-hook{position:absolute;bottom:15px;right:3px;background:#163e47;color:#fff2cc;font:bold 10px/1.3 monospace;padding:1px 3px;pointer-events:none}.item-facts .item-hook-spec{font-weight:700;background:#d4debc}
+@media(max-width:600px){.premade-workbench .rod-part-options{grid-template-columns:repeat(2,minmax(0,1fr));max-height:306px}.premade-workbench .rod-part{min-height:133px}.premade-workbench .assembly-slot{min-height:124px}.hook-spec{font-size:10px}}
+@media(max-height:500px) and (orientation:landscape){.premade-workbench .rod-part-options{max-height:150px}.premade-workbench .rod-part{min-height:124px}}

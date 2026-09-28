@@ -1,0 +1,197 @@
+{
+  "note": "Synthetic calibration probes of game parameters, not observed Santa Cruz catch probabilities.",
+  "cases": [
+    {
+      "fish": {
+        "name": "25 cm mackerel",
+        "fightKind": "mackerel",
+        "length": 25,
+        "kg": 0.32
+      },
+      "rigs": {
+        "bottom": {
+          "hookSize": "2/0",
+          "mouthSpanMm": 12.5,
+          "hookGapMm": 13,
+          "mouthFit": 0.15194538006372316,
+          "purchase": 1,
+          "seatChance": 0.15194538006372316,
+          "wireStrengthN": 65
+        },
+        "dropper": {
+          "hookSize": "1/0",
+          "mouthSpanMm": 12.5,
+          "hookGapMm": 11,
+          "mouthFit": 0.48846244879380973,
+          "purchase": 1,
+          "seatChance": 0.48846244879380973,
+          "wireStrengthN": 48
+        },
+        "slider": {
+          "hookSize": "3/0",
+          "mouthSpanMm": 12.5,
+          "hookGapMm": 14.5,
+          "mouthFit": 0.010894856622667315,
+          "purchase": 1,
+          "seatChance": 0.010894856622667315,
+          "wireStrengthN": 78
+        },
+        "jig": {
+          "hookSize": "4/0",
+          "mouthSpanMm": 12.5,
+          "hookGapMm": 16,
+          "mouthFit": 0,
+          "purchase": 1,
+          "seatChance": 0,
+          "wireStrengthN": 85
+        },
+        "float": {
+          "hookSize": "#2",
+          "mouthSpanMm": 12.5,
+          "hookGapMm": 8,
+          "mouthFit": 0.9477942649066909,
+          "purchase": 1,
+          "seatChance": 0.9477942649066909,
+          "wireStrengthN": 30
+        },
+        "sabiki": {
+          "hookSize": "#6",
+          "mouthSpanMm": 12.5,
+          "hookGapMm": 5.5,
+          "mouthFit": 1,
+          "purchase": 1,
+          "seatChance": 1,
+          "wireStrengthN": 17
+        }
+      }
+    },
+    {
+      "fish": {
+        "name": "25 cm blue rockfish",
+        "latin": "Sebastes mystinus",
+        "length": 25,
+        "kg": 0.43
+      },
+      "rigs": {
+        "bottom": {
+          "hookSize": "2/0",
+          "mouthSpanMm": 23.75,
+          "hookGapMm": 13,
+          "mouthFit": 1,
+          "purchase": 1,
+          "seatChance": 1,
+          "wireStrengthN": 65
+        },
+        "dropper": {
+          "hookSize": "1/0",
+          "mouthSpanMm": 23.75,
+          "hookGapMm": 11,
+          "mouthFit": 1,
+          "purchase": 1,
+          "seatChance": 1,
+          "wireStrengthN": 48
+        },
+        "slider": {
+          "hookSize": "3/0",
+          "mouthSpanMm": 23.75,
+          "hookGapMm": 14.5,
+          "mouthFit": 0.975602258988403,
+          "purchase": 1,
+          "seatChance": 0.975602258988403,
+          "wireStrengthN": 78
+        },
+        "jig": {
+          "hookSize": "4/0",
+          "mouthSpanMm": 23.75,
+          "hookGapMm": 16,
+          "mouthFit": 0.9051561583500357,
+          "purchase": 1,
+          "seatChance": 0.9051561583500357,
+          "wireStrengthN": 85
+        },
+        "float": {
+          "hookSize": "#2",
+          "mouthSpanMm": 23.75,
+          "hookGapMm": 8,
+          "mouthFit": 1,
+          "purchase": 1,
+          "seatChance": 1,
+          "wireStrengthN": 30
+        },
+        "sabiki": {
+          "hookSize": "#6",
+          "mouthSpanMm": 23.75,
+          "hookGapMm": 5.5,
+          "mouthFit": 1,
+          "purchase": 1,
+          "seatChance": 1,
+          "wireStrengthN": 17
+        }
+      }
+    },
+    {
+      "fish": {
+        "name": "80 cm lingcod",
+        "fightKind": "lingcod",
+        "length": 80,
+        "kg": 7
+      },
+      "rigs": {
+        "bottom": {
+          "hookSize": "2/0",
+          "mouthSpanMm": 128,
+          "hookGapMm": 13,
+          "mouthFit": 1,
+          "purchase": 0.5974264705882353,
+          "seatChance": 0.750404411764706,
+          "wireStrengthN": 65
+        },
+        "dropper": {
+          "hookSize": "1/0",
+          "mouthSpanMm": 128,
+          "hookGapMm": 11,
+          "mouthFit": 1,
+          "purchase": 0.5055147058823529,
+          "seatChance": 0.6934191176470588,
+          "wireStrengthN": 48
+        },
+        "slider": {
+          "hookSize": "3/0",
+          "mouthSpanMm": 128,
+          "hookGapMm": 14.5,
+          "mouthFit": 1,
+          "purchase": 0.666360294117647,
+          "seatChance": 0.7931433823529411,
+          "wireStrengthN": 78
+        },
+        "jig": {
+          "hookSize": "4/0",
+          "mouthSpanMm": 128,
+          "hookGapMm": 16,
+          "mouthFit": 1,
+          "purchase": 0.7352941176470588,
+          "seatChance": 0.8358823529411764,
+          "wireStrengthN": 85
+        },
+        "float": {
+          "hookSize": "#2",
+          "mouthSpanMm": 128,
+          "hookGapMm": 8,
+          "mouthFit": 1,
+          "purchase": 0.3676470588235294,
+          "seatChance": 0.6079411764705882,
+          "wireStrengthN": 30
+        },
+        "sabiki": {
+          "hookSize": "#6",
+          "mouthSpanMm": 128,
+          "hookGapMm": 5.5,
+          "mouthFit": 1,
+          "purchase": 0.25275735294117646,
+          "seatChance": 0.5367095588235294,
+          "wireStrengthN": 17
+        }
+      }
+    }
+  ]
+}

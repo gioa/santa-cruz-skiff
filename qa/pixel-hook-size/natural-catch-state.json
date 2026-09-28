@@ -1,0 +1,79 @@
+{
+  "activeSeconds": 166,
+  "fishState": "landed",
+  "hookSize": "#6",
+  "fish": {
+    "bait": "jig",
+    "caughtAt": "2026-09-27T13:04:12.407Z",
+    "caughtGPS": {
+      "lat": 36.96061526007776,
+      "lon": -122.0202933214724
+    },
+    "color": "#73b8c1",
+    "groundfishAboardAtCapture": true,
+    "hasDescendingDevice": true,
+    "hookCount": 2,
+    "kg": 0.74,
+    "landingNetDiameterInches": 20,
+    "latin": "Scomber japonicus",
+    "length": 34,
+    "lineCount": 1,
+    "max": 38,
+    "min": 25,
+    "name": "太平洋鲭鱼",
+    "power": 0.8,
+    "rig": {
+      "bait": false,
+      "breakawayWeight": false,
+      "circleHook": false,
+      "fishingDepthMeters": 6,
+      "hookCount": 2,
+      "hookSize": "#6",
+      "hookStyle": "j",
+      "id": "sabiki",
+      "leader": null,
+      "line": null,
+      "lineCount": 1,
+      "reel": null,
+      "rod": "rod",
+      "rodCount": 1,
+      "sinkerLb": 0.061729483765145775,
+      "trolling": false,
+      "weightGrams": 28,
+      "wireLeader": false
+    },
+    "salmonAboardAtCapture": false,
+    "spot": "sand",
+    "weight": 0.6
+  },
+  "hookHold": {
+    "purchase": 1,
+    "wireDamage": 0,
+    "wireStrengthN": 17
+  },
+  "consumables": {
+    "bait": null,
+    "baitStock": {
+      "anchovy": 0,
+      "jig": 3,
+      "sardine": 0,
+      "shrimp": 0,
+      "squid": 12
+    },
+    "requiresBait": false,
+    "rig": {
+      "condition": 1,
+      "hookDamage": 0,
+      "id": "sabiki",
+      "present": true
+    },
+    "rigStock": {
+      "bottom": 3,
+      "dropper": 0,
+      "float": 0,
+      "jig": 0,
+      "sabiki": 0,
+      "slider": 2
+    }
+  }
+}

@@ -16,3 +16,9 @@ The pixel edition uses preassembled rod hardware and whole terminal rigs. Player
 ## Units
 
 Active pixel UI uses US customary units: ft for depth, deployed line and wave height; in for fish length and net openings; mi for distance; lb for fish, cargo and tackle ratings; oz for sinkers; mph for boat speed and wind; and °F for temperature. Conversion occurs only at display boundaries. Physics and saved numerical state retain SI values; NOAA source wind and legal threshold metadata retain their original precision and units internally. Consumable stock, wear and replacement behavior are unchanged by the display conversion.
+
+## Premade hook sizes
+
+Every premade rig identifies its US hook size, pattern and number on its mounted slot, replacement card and inventory/shop details. Presets use bottom 2/0, dropper 1/0, slider 3/0, jig 4/0, float #2 and sabiki #6. Sizes are properties of the whole rig; changing them requires exchanging rigs. Existing rigs keep their wear and bait, with no free refill during this update. New catch records preserve the actual supplied hook size.
+
+Hook fit uses the encountered fish's species and length. A single seating roll per bite prevents repeated button presses from rerolling an unsuitable hook. Small hooks retain a chance on large fish, but have less jaw purchase; a thin hook can straighten under sustained transmitted load. Partial deformation is stored on each terminal rig and survives retrieval, rod changes, stowing and reload; its mounted slot reports visible hook deformation. Full straightening retires the terminal rig and its bait, requiring an explicit replacement from finite stock. Dimensions, force limits and probabilities are game calibration, not measured Santa Cruz odds; see [hook-size evidence](pixel-hook-size-evidence.md).

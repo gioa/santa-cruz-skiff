@@ -81,3 +81,10 @@ test('fully soaked natural bait stops attracting bites until explicitly replaced
  assert.ok(['sinking','waiting'].includes(sim.state.fishState));assert.equal(sim.state.biteTimer,0);assert.ok(sim.rigEnvironment().freshness<.08);sim.state.baitOnHook.condition=0;assert.equal(sim.rigEnvironment().freshness,0);sim.retrieve();assert.ok(sim.replaceBait().ok);assert.ok(sim.lowerRig().ok);
  sim.retrieve();shop(sim);assert.ok(sim.buyGear('rig_sabiki').ok);assert.ok(sim.replaceRig(undefined,'sabiki').ok);assert.equal(sim.rodConsumableStatus().requiresBait,false);assert.equal(sim.rodConsumableStatus().bait,null);Object.assign(sim.state,{mode:'boat',moored:false});assert.ok(sim.lowerRig().ok);assert.equal(sim.rigEnvironment().freshness,1);
 });
+
+test('pre-hook-size saves default to intact wire without repairing recorded partial damage',()=>{
+ const sim=ready();delete sim.state.profile.rodSupplies.rod.hookDamage;for(const rig of sim.state.profile.rigStock.bottom)delete rig.hookDamage;
+ assert.equal(sim.rodConsumableStatus().rig.hookDamage,0);assert.ok(sim.state.profile.rigStock.bottom.every(r=>r.hookDamage===0));
+ sim.state.profile.rodSupplies.rod.hookDamage=.45;const before=copy(sim.state.profile.stock);assert.ok(sim.replaceBait().ok);assert.equal(sim.rodConsumableStatus().rig.hookDamage,.45);assert.equal(sim.state.profile.stock.squid,before.squid-1,'fresh bait cannot repair hook wire');
+ shop(sim);assert.ok(sim.restock().ok);assert.equal(sim.rodConsumableStatus().rig.hookDamage,.45,'restock cannot repair the mounted rig');
+});
