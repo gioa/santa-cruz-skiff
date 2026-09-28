@@ -4,7 +4,7 @@ Corrects the requested display system to US customary units: fish length in inch
 
 Validation:
 - JavaScript syntax checks pass; all 403 automated tests pass, including exact conversions, invalid readings, legacy catch notes, consumable persistence and fishing state guards.
-- The later legacy tiller-message correction also passes its 8 dedicated tests.
+- The later legacy tiller-message correction also passes its 7 dedicated tests.
 - In-app browser at 390×844: resumed existing save, 9 previous catches convert to inches/pounds; historical journal catches convert consistently. The previous 27 cm / 0.43 kg rockfish appears as 10.6 in / 0.95 lb.
 - Backpack shows 25.0 lb total and item weights in lb.
 - At 320×568 the premade rod/supply panel remains usable with its scrollable content; bottom rig sinker displays 3.00 oz, supplies and wear are preserved.
