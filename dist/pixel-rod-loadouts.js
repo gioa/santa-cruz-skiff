@@ -1,7 +1,7 @@
 import {rigWeight} from './pixel-sinkers.js?v=20260928-pixel-v80';
-import {GEAR_CATALOG} from './equipment.js?v=20260928-pixel-v80';
-import {RIG_PROFILES} from './fishing-rigs.js?v=20260928-pixel-v80';
-import {ensureConsumables,installBait,installRig,USABLE_CONDITION} from './pixel-consumables.js?v=20260928-pixel-v80';
+import {GEAR_CATALOG} from './equipment.js?v=species-1';
+import {RIG_PROFILES} from './fishing-rigs.js?v=species-1';
+import {ensureConsumables,installBait,installRig,USABLE_CONDITION} from './pixel-consumables.js?v=species-1';
 import {formatDepth} from './units.js?v=20260928-pixel-v80';
 
 /** Rod hardware is a premade set. Legacy mounted upgrades are preserved but

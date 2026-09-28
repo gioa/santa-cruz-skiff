@@ -5,7 +5,7 @@
  * pay line out, while turning the handle takes it in. Rod movement never
  * manufactures more line. This module has no inventory, UI or random events.
  */
-import {getRigProfile,stepRigLure} from './fishing-rigs.js?v=20260928-pixel-v80';
+import {getRigProfile,stepRigLure} from './fishing-rigs.js?v=species-1';
 import {rigHydrodynamics} from './pixel-rig-hydrodynamics.js?v=20260928-pixel-v80';
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 const finite=(n,f=0)=>Number.isFinite(n)?n:f;

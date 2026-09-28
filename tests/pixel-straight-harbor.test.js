@@ -1,4 +1,5 @@
 import test from 'node:test';
+import {normalizeFishIdentity} from '../dist/fish-species.js';
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 globalThis.fetch=async url=>new Response(await readFile(url));
@@ -38,7 +39,7 @@ function paidBoatSave(){const sim=new PixelSimulation({now});sim.start();Object.
 
 test('resuming a hull inside new deck moves only that hull to nearby water and preserves its rental and cargo',()=>{
  for(const pose of[{x:17,z:-400,heading:0},{x:-25,z:-472,heading:0},{x:-30.2,z:-472,heading:0},{x:24.2,z:-410,heading:.2},{x:0,z:-482.2,heading:Math.PI/4}]){
-  const saved=paidBoatSave();Object.assign(saved,{boatX:pose.x,boatZ:pose.z,heading:pose.heading});assert.ok(nav.hullPenetration(pose)>0);const sim=new PixelSimulation({saved,now});sim.start(true);assert.equal(nav.hullPenetration({x:sim.state.boatX,z:sim.state.boatZ,heading:sim.state.heading}),0);assert.ok(Math.hypot(sim.state.boatX-pose.x,sim.state.boatZ-pose.z)<12);assert.equal(sim.state.heading,pose.heading);assert.equal(sim.state.rentalPaid,true);assert.equal(sim.state.profile.credits,saved.profile.credits);assert.deepEqual(sim.state.packed,saved.packed);assert.deepEqual(sim.state.catches,saved.catches);assert.equal(sim.state.sailed,456);
+  const saved=paidBoatSave();Object.assign(saved,{boatX:pose.x,boatZ:pose.z,heading:pose.heading});assert.ok(nav.hullPenetration(pose)>0);const sim=new PixelSimulation({saved,now});sim.start(true);assert.equal(nav.hullPenetration({x:sim.state.boatX,z:sim.state.boatZ,heading:sim.state.heading}),0);assert.ok(Math.hypot(sim.state.boatX-pose.x,sim.state.boatZ-pose.z)<12);assert.equal(sim.state.heading,pose.heading);assert.equal(sim.state.rentalPaid,true);assert.equal(sim.state.profile.credits,saved.profile.credits);assert.deepEqual(sim.state.packed,saved.packed);assert.deepEqual(sim.state.catches,saved.catches.map(normalizeFishIdentity));assert.equal(sim.state.sailed,456);
  }
 });
 

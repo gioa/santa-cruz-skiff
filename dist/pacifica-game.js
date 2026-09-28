@@ -1,12 +1,13 @@
-import {PacificaSimulation,BAITS} from './pacifica-sim.js?v=coast-6';
+import {metersToFeet} from './units.js?v=species-1';
+import {PacificaSimulation,BAITS} from './pacifica-sim.js?v=species-1';
 import {createPacificaWorld} from './pacifica-world.js?v=coast-6';
-import {createPacificaMenus} from './pacifica-menus.js?v=coast-7';
-import {createPixelSprites} from './pixel-sprites.js?v=20260928-pixel-v80';
-import {createShoreFightView,shoreFightActive} from './shore-fight-view.js?v=coast-7';
+import {createPacificaMenus} from './pacifica-menus.js?v=species-1';
+import {createPixelSprites} from './pixel-sprites.js?v=species-1';
+import {createShoreFightView,shoreFightActive} from './shore-fight-view.js?v=species-1';
 
 import {getShoreScene,sampleShore,onPier} from './shore-data.js?v=coast-6';
 
-import {createShoreNavigation,habitatName} from './shore-navigation.js?v=coast-6';
+import {createShoreNavigation,habitatName} from './shore-navigation.js?v=species-1';
 
 const $=id=>document.getElementById(id), show=(id,value)=>{$(id).hidden=!value;};
 const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -99,12 +100,12 @@ function updateUI(){
   $('credits').textContent=Math.floor(s.credits);show('map-btn',s.shoreLore.notes.length>0);
   const e=s.shoreLore.encounter,ep=e?world.worldToScreen(e):null,near=e&&Math.hypot(e.x-s.player.x,e.y-s.player.y)<480;const talkVisible=started&&!modalType&&!scenePickerOpen&&s.phase==='walk'&&!s.onPier&&near&&ep.x>36&&ep.x<innerWidth-36&&ep.y>(innerHeight<500?110:190)&&ep.y<innerHeight-$('boat-console').offsetHeight-50;show('angler-talk',Boolean(talkVisible));if(talkVisible){$('angler-talk').style.left=`${Math.max(64,Math.min(innerWidth-64,ep.x))}px`;$('angler-talk').style.top=`${ep.y-68}px`;const label=e.talked?'再聊两句':'打个招呼';if($('angler-talk').textContent!==label)$('angler-talk').textContent=label;}
   const minutes=360+Math.floor(s.elapsed/30);$('clock').textContent=String(Math.floor(minutes/60)%24).padStart(2,'0')+':'+String(minutes%60).padStart(2,'0');
-  $('active-rod-name').textContent=s.upgrades.includes('surf_rod')?'长节沙滩竿':'岸钓竿';
+  $('active-rod-name').textContent=s.activeRod==='surf_rod'?'长节沙滩竿':'入门岸钓竿';
   $('rod-config-btn').disabled=s.phase!=='walk';const supply=s.rodSupplies[s.activeRod];$('tackle-name').textContent=`${s.activeRod==='surf_rod'?'长节沙滩竿':'入门岸钓竿'} · ${supply?s.rig==='fishfinder'?'滑铅 · 2/0':'Carolina · 1':'未装钓组'} · ${supply?.bait?.condition>.08?bait?.name:'需装饵'}`;
   const shore=s.shoreSample||sampleShore(scene,s.player.x,WORLD.shoreY(s.player.x)-90,s.elapsed);$('place').textContent=scene.shortName+(sim.onPier?' · 封闭栈桥':s.shoreLore.notes.some(n=>n.zoneId===shore.zoneId)?' · '+shore.zoneName:'');$('speed').textContent=sim.nearShop?'钓具小店':sim.onPier?'越栏进入 · 巡查风险':atShore?'沙滩岸钓':'沙滩步道';$('weather').textContent=shore.tideLabel+' · 晨雾';show('shore-rig-summary',false);show('pier-btn',Boolean(scene.pier)&&(sim.nearPier||sim.onPier));$('pier-btn').textContent=sim.onPier?'离开栈桥':'封闭栈桥';$('pier-btn').disabled=s.phase!=='walk';$('walk-surf').textContent=sim.onPier?'走向桥端':'前往浪线';
   const states={walk:'准备抛竿',casting:'钓组落水',waiting:'等待鱼讯',bite:'鱼咬钩了 · 现在扬竿',fighting:'中鱼 · 控制张力收线',landed:'鱼已上岸'};
-  $('fish-title').textContent=states[s.phase];$('fish-distance').textContent=Math.round(s.lineDistance*3.28084)+' ft';
-  const hints={walk:!sim.tackleReady?'打开鱼竿配置，检查钓组和余饵。':atShore?'轻点海面瞄准 · 按住抛竿蓄力':sim.nearShop?'轻点小店补给，或前往浪线。':'轻点沙地行走 · WASD',casting:'钓组飞向浪外…',waiting:`已放线 ${Math.round(s.lineDistance*3.28084)} ft · 留意竿尖`,bite:'现在扬竿 / 空格',fighting:'按住收线 · 高张力时松手',landed:'留下或放流'};
+  $('fish-title').textContent=states[s.phase];$('fish-distance').textContent=Math.round(metersToFeet(s.lineDistance))+' ft';
+  const hints={walk:!sim.tackleReady?'打开鱼竿配置，检查钓组和余饵。':atShore?'轻点海面瞄准 · 按住抛竿蓄力':sim.nearShop?'轻点小店补给，或前往浪线。':'轻点沙地行走 · WASD',casting:'钓组飞向浪外…',waiting:`已放线 ${Math.round(metersToFeet(s.lineDistance))} ft · 留意竿尖`,bite:'现在扬竿 / 空格',fighting:'按住收线 · 高张力时松手',landed:'留下或放流'};
   $('navigation').textContent=hints[s.phase];$('fish-detail').textContent=hints[s.phase];
   show('walk-shop',sim.nearShop);$('walk-shop').textContent='进入小店';for(const id of ['walk-surf','walk-shop'])$(id).disabled=s.phase!=='walk';
   show('boat-action-bar',s.phase==='walk');show('boat-fishing',fishing);show('fish-status',s.phase!=='walk');

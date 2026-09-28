@@ -1,8 +1,8 @@
 import {separateSinker,SINKER_SIZES} from './pixel-sinkers.js?v=20260928-pixel-v80';
-import {rigHookLabel} from './pixel-hook-label.js?v=20260928-pixel-v80';
+import {rigHookLabel} from './pixel-hook-label.js?v=species-1';
 import {formatSinker} from './units.js?v=20260928-pixel-v80';
-import {GEAR_CATALOG} from './equipment.js?v=20260928-pixel-v80';
-import {RIG_PROFILES,getRigProfile} from './fishing-rigs.js?v=20260928-pixel-v80';
+import {GEAR_CATALOG} from './equipment.js?v=species-1';
+import {RIG_PROFILES,getRigProfile} from './fishing-rigs.js?v=species-1';
 import {drawItemIcon} from './pixel-item-icons.js?v=20260928-pixel-v80';
 
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));

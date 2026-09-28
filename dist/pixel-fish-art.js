@@ -1,3 +1,4 @@
+import {FISH_SPECIES,fishSpecies} from './fish-species.js?v=species-1';
 import {fishBodyPose,drawFishBody} from './pixel-fish-motion.js?v=20260928-pixel-v80';
 // A shared measuring board: a fish never grows to fill its card. The same
 // centimetre-to-pixel scale applies to every species and every catch on a view.
@@ -6,32 +7,8 @@ const boundsCache=new WeakMap();
 
 // Exact identity mapping shared by catch cards, history, cooler and fight view.
 // A missing identity must not silently become a red rockfish.
-export const FISH_ART_IDENTITIES=Object.freeze([
- {kind:'blue',latin:'Sebastes mystinus',aliases:['blue_rockfish','blue rockfish','蓝岩鱼']},
- {kind:'copper',latin:'Sebastes caurinus',aliases:['copper_rockfish','copper rockfish','铜岩鱼']},
- {kind:'vermilion',latin:'Sebastes miniatus',aliases:['vermilion_rockfish','vermilion rockfish','朱红岩鱼','红岩鱼']},
- {kind:'halibut',latin:'Paralichthys californicus',aliases:['california_halibut','california halibut','加州大比目鱼','加州比目鱼']},
- {kind:'mackerel',latin:'Scomber japonicus',aliases:['pacific_mackerel','pacific mackerel','pacific chub mackerel','太平洋鲭鱼']},
- {kind:'lingcod',latin:'Ophiodon elongatus',aliases:['lingcod','长蛇齿单线鱼','灵鳕']},
- {kind:'salmon',latin:'Oncorhynchus tshawytscha',aliases:['chinook_salmon','chinook salmon','king salmon','帝王鲑','奇努克鲑']},
- {kind:'seabass',latin:'Atractoscion nobilis',aliases:['white_seabass','white seabass','wsb','白海鲈','白海鲈鱼','白鲈']},
- {kind:'bonito',latin:'Sarda chiliensis lineolata',aliases:['pacific_bonito','pacific bonito','Sarda chiliensis','Sarda lineolata','太平洋狐鲣','太平洋鲣']},
- {kind:'croaker',latin:'Genyonemus lineatus',aliases:['white_croaker','white croaker','白石首鱼']},
- {kind:'sanddab',latin:'Citharichthys sordidus',aliases:['pacific_sanddab','pacific sanddab','太平洋沙鲽']},
- {kind:'anchovy',latin:'Engraulis mordax',aliases:['northern_anchovy','northern anchovy','北方鳀鱼','鳀鱼']},
- {kind:'sardine',latin:'Sardinops sagax',aliases:['pacific_sardine','pacific sardine','太平洋沙丁鱼','沙丁鱼']},
- {kind:'rockfish',latin:'Sebastes melanops',aliases:['black_rockfish','black rockfish','黑岩鱼']},
-].map(f=>Object.freeze({...f,aliases:Object.freeze(f.aliases)})));
-const normalizeFishName=value=>String(value||'').trim().toLowerCase().replace(/[_-]+/g,' ').replace(/\s+/g,' ');
-const artByName=new Map(FISH_ART_IDENTITIES.flatMap(f=>[f.kind,f.latin,...f.aliases].map(name=>[normalizeFishName(name),f.kind])));
-export function fishSpriteKind(f={}){
- const fish=typeof f==='string'?{name:f}:f||{};
- // Scientific identity takes priority over a translated or stale display name.
- for(const value of [fish.latin,fish.scientificName,fish.speciesId,fish.id,fish.name,fish.commonName]){
-  for(const name of String(value||'').split('·')){const kind=artByName.get(normalizeFishName(name));if(kind)return kind;}
- }
- return 'unknown';
-}
+export const FISH_ART_IDENTITIES=Object.freeze(FISH_SPECIES.filter(f=>f.artKind).map(f=>Object.freeze({kind:f.artKind,latin:f.latin,aliases:Object.freeze([f.id,f.name,f.commonName,...f.aliases])})));
+export function fishSpriteKind(f={}){return fishSpecies(f)?.artKind||'unknown';}
 
 // The authored 48 x 24 sprites have different transparent margins. Measure
 // their visible silhouettes once, so those margins cannot distort fish length.
@@ -70,7 +47,17 @@ export function fishArtLayout(f={},options={}){
 
 const lengthWithinBoard=layout=>layout.lengthCm<=layout.spanCm;
 
+export function drawFishPortrait(canvas,sprite,options={}){
+ const compact=Boolean(options.compact),width=Math.max(compact?48:120,Number(options.width)||480),height=Math.max(24,Number(options.height)||(compact?48:160));
+ canvas.width=width;canvas.height=height;const ctx=canvas.getContext('2d'),bounds=fishSpriteBounds(sprite);
+ if(!ctx)return{width,height,lengthCm:null};
+ ctx.imageSmoothingEnabled=false;ctx.fillStyle='#c2d4b7';ctx.fillRect(0,0,width,height);
+ if(bounds.width&&bounds.height){const scale=Math.min(width*.78/bounds.width,height*.66/bounds.height);ctx.drawImage(sprite,bounds.x,bounds.y,bounds.width,bounds.height,(width-bounds.width*scale)/2,(height-bounds.height*scale)/2,bounds.width*scale,bounds.height*scale);}
+ return{width,height,lengthCm:null,measurementType:null};
+}
+
 export function drawFishArt(canvas,sprite,f={},options={}){
+ if(!(Number.isFinite(f?.length)&&f.length>0))return drawFishPortrait(canvas,sprite,options);
  const bounds=fishSpriteBounds(sprite),layout=fishArtLayout(f,{...options,spriteBounds:bounds});
  canvas.width=layout.width;canvas.height=layout.height;
  const ctx=canvas.getContext('2d');if(!ctx)return layout;

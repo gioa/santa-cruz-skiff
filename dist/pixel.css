@@ -558,3 +558,7 @@ html,body,#app,#app *,#app *::before,#app *::after{-webkit-user-select:none;user
 .is-fishing-focus #boat-fishing #rod-mount{grid-template-columns:1fr}
 
 .inspection-findings{padding-left:1.5em;line-height:1.65}.inspection-findings li{margin:12px 0}.inspection-findings p{margin:4px 0 0;overflow-wrap:anywhere}
+
+/* Keep longer shared fish identities and status labels legible on phones. */
+.catch-row>span{flex:0 0 auto;white-space:nowrap}
+#modal-content>.balance{margin-right:56px}

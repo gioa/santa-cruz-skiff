@@ -1,3 +1,4 @@
+import {fishSpecies} from './fish-species.js?v=species-1';
 /** Whole wet mass (kg) from the game's species-specific ruler length (cm).
  * Population fits, units, length conversions and extrapolation limits:
  * docs/fish-mass-audit.md. These are typical masses, not exact wild specimens.
@@ -31,10 +32,20 @@ export const FISH_MASS_MODELS=Object.freeze({
 });
 const gramPrecision=new Set(['Engraulis mordax','Sardinops sagax','Scomber japonicus']);
 export function fishMassKg(fish,lengthCm){
- const L=Number(lengthCm),id=fish?.latin,model=Object.hasOwn(FISH_MASS_MODELS,id)?FISH_MASS_MODELS[id]:null;
+ const L=Number(lengthCm),id=fishSpecies(fish)?.latin||fish?.latin,model=Object.hasOwn(FISH_MASS_MODELS,id)?FISH_MASS_MODELS[id]:null;
  if(!Number.isFinite(L)||L<=0||!model)return 0;
  const kg=model(L);if(!Number.isFinite(kg)||kg<0)return 0;
  // Same species, same rounding whether it is a visible school or regular bite.
  const precision=gramPrecision.has(id)?1000:100;
  return Math.round(kg*precision)/precision;
+}
+
+// Inverse of the same monotonic species curve, for a new catch authored from
+// a mass range. Existing catches without measured length are not backfilled.
+export function fishLengthCmFromMass(fish,weightKg){
+ const kg=Number(weightKg),id=fishSpecies(fish)?.latin||fish?.latin,model=Object.hasOwn(FISH_MASS_MODELS,id)?FISH_MASS_MODELS[id]:null;
+ if(!(kg>0)||!Number.isFinite(kg)||!model)return null;
+ let lo=0,hi=400;if(model(hi)<kg)return null;
+ for(let i=0;i<60;i++){const mid=(lo+hi)/2;if(model(mid)<kg)lo=mid;else hi=mid;}
+ return Math.round((lo+hi)*5)/10;
 }

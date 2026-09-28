@@ -230,7 +230,7 @@ test('version-one saves migrate catch and equipment; inspection and pending catc
     inventory: {sandcrab: 4}, upgrades: ['surf_rod'], catches: [{id: 'surfperch', catchId: 1, weightKg: .8}],
     pendingCatch: {id: 'halibut', catchId: 2, weightKg: 2}};
   const sim = new PacificaSimulation({saved: old});
-  assert.equal(sim.snapshot().version, 3);
+  assert.equal(sim.snapshot().version, 4);
   assert.equal(sim.state.catches.length, 1);
   assert.deepEqual(sim.state.upgrades, ['surf_rod']);
   assert.equal(sim.state.phase, 'landed');

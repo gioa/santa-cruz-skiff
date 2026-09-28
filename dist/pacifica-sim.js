@@ -1,5 +1,8 @@
-import {BAITS,SHOP_ITEMS,restoreShoreEquipment,shoreReady,shoreSupply,wearShoreSupplies,configureShoreEquipment,shoreSlots,moveShoreSlot} from './shore-equipment.js?v=coast-6';
+import {BAITS,SHOP_ITEMS,restoreShoreEquipment,shoreReady,shoreSupply,wearShoreSupplies,configureShoreEquipment,shoreSlots,moveShoreSlot} from './shore-equipment.js?v=species-1';
 import {createShoreLore,stepShoreLore,talkShoreAngler} from './shore-lore.js?v=coast-6';
+import {fishSpecies,normalizeFishIdentity} from './fish-species.js?v=species-1';
+import {fishLengthCmFromMass} from './pixel-fish-mass.js?v=species-1';
+import {formatWeight} from './units.js?v=species-1';
 // Shared shore-fishing simulation. Geometry and habitats are scene specific;
 // prices, bite rates, inspection odds and fines are authored game tuning.
 import {getShoreScene, sampleShore, onPier} from './shore-data.js?v=coast-6';
@@ -7,12 +10,12 @@ export const SAVE_KEY = 'pacifica-surf-save-v1';
 export const WORLD = getShoreScene('pacifica').world;
 export const SHOP = getShoreScene('pacifica').shop;
 export const PIER_RULES = Object.freeze({interval: 30, probability: .35, fine: 80});
-export {BAITS,SHOP_ITEMS} from './shore-equipment.js?v=coast-6';
+export {BAITS,SHOP_ITEMS} from './shore-equipment.js?v=species-1';
 export const SPECIES = Object.freeze([
-  {id: 'surfperch', name: '红尾海鲫', nameEn: 'Redtail surfperch', minKg: .35, maxKg: 1.2, baseValue: 15, valuePerKg: 13, strength: .65, color: '#eac896'},
-  {id: 'striped_bass', name: '条纹鲈', nameEn: 'Striped bass', minKg: 1.2, maxKg: 4.6, baseValue: 25, valuePerKg: 12, strength: 1.05, color: '#b9d2cc'},
-  {id: 'halibut', name: '加州比目鱼', nameEn: 'California halibut', minKg: 1, maxKg: 4.2, baseValue: 30, valuePerKg: 14, strength: .88, color: '#bca176'},
-]);
+  {id: 'surfperch', speciesId: 'redtail_surfperch', minKg: .35, maxKg: 1.2, baseValue: 15, valuePerKg: 13, strength: .65, color: '#eac896'},
+  {id: 'striped_bass', speciesId: 'striped_bass', minKg: 1.2, maxKg: 4.6, baseValue: 25, valuePerKg: 12, strength: 1.05, color: '#b9d2cc'},
+  {id: 'halibut', speciesId: 'california_halibut', minKg: 1, maxKg: 4.2, baseValue: 30, valuePerKg: 14, strength: .88, color: '#bca176'},
+].map(fish => Object.freeze(normalizeFishIdentity(fish))));
 
 const clamp = (value, low, high) => Math.max(low, Math.min(high, value));
 const finite = (value, fallback = 0) => typeof value === 'number' && Number.isFinite(value) ? value : fallback;
@@ -20,6 +23,8 @@ const integer = (value, low, high, fallback = 0) => Math.floor(clamp(finite(valu
 const baitIds = BAITS.map(item => item.id);
 const upgradeIds = SHOP_ITEMS.filter(item => ['rod','reel','rig'].includes(item.kind)).map(item => item.id);
 const statKeys = ['caught', 'kept', 'released', 'sold', 'casts', 'missed'];
+const saveVersions = [1, 2, 3, 4];
+const catchStatuses = new Set(['kept', 'released', 'sold', 'confiscated']);
 const shopBounds = shop => ({left: shop.x - 18, right: shop.x + shop.width + 18, top: shop.y - 18, bottom: shop.y + shop.height + 18});
 const inBuilding = (building, x, y) => x > building.left && x < building.right && y > building.top && y < building.bottom;
 const point = (x, y) => ({x, y});
@@ -66,15 +71,18 @@ function routeAroundShop(building, start, end) {
 
 function safeFish(raw) {
   if (!raw || typeof raw !== 'object') return null;
-  const species = SPECIES.find(item => item.id === raw.id);
-  if (!species || !Number.isFinite(raw.weightKg)) return null;
-  const weightKg = Math.round(clamp(raw.weightKg, species.minKg, species.maxKg) * 100) / 100;
-  return {
-    id: species.id, name: species.name, nameEn: species.nameEn, color: species.color,
-    catchId: integer(raw.catchId, 1, 1e9, 1), weightKg,
+  const identity = fishSpecies(raw), species = SPECIES.find(item => item.speciesId === identity?.id);
+  const mass = Number.isFinite(raw.weightKg) ? raw.weightKg : raw.kg;
+  if (!species || !Number.isFinite(mass)) return null;
+  const weightKg = Math.round(clamp(mass, species.minKg, species.maxKg) * 100) / 100;
+  const hasLength = Number.isFinite(raw.length) && raw.length > 0 && raw.length <= 1000;
+  return normalizeFishIdentity({
+    id: species.id, speciesId: species.speciesId, color: species.color,
+    catchId: integer(raw.catchId, 1, 1e9, 1), weightKg, kg: weightKg,
+    ...(hasLength ? {length: raw.length, lengthType: raw.lengthType === 'fork' ? 'fork' : 'total', ...(raw.lengthSource === 'mass-model' ? {lengthSource: 'mass-model'} : {})} : {}),
     value: Math.round(species.baseValue + weightKg * species.valuePerKg),
     strength: species.strength, stamina: 0, run: 0,
-  };
+  });
 }
 
 export class PacificaSimulation {
@@ -90,7 +98,7 @@ export class PacificaSimulation {
       player: {...this.scene.spawn, facing: -1, walking: false},
       phase: 'walk', elapsed: 0, credits: 120,
       inventory: {sandcrab: 12, squid: 0, anchovy: 0}, bait: 'sandcrab', rig: 'carolina', upgrades: [],
-      catches: [], lastCatch: null, stats: Object.fromEntries(statKeys.map(key => [key, 0])),
+      catches: [], catchHistory: [], lastCatch: null, stats: Object.fromEntries(statKeys.map(key => [key, 0])),
       cast: null, lineDistance: 0, tension: 0, fish: null,
       biteRemaining: 0, waitRemaining: 0, fightElapsed: 0, lineStress: 0, slackTime: 0,
       walkTarget: null, walkRoute: [],
@@ -99,8 +107,8 @@ export class PacificaSimulation {
       onPier: false, leavingPier: false, pierExposure: 0, inspectionCount: 0, inspection: null, fineDebt: 0,
       shoreSample: null,
     };
-    if (saved?.scene === this.scene.id && [1, 2, 3].includes(saved.version)) this.restore(saved);
-    restoreShoreEquipment(this.state,saved?.scene===this.scene.id&&[1,2,3].includes(saved.version)?saved:null);
+    if (saved?.scene === this.scene.id && saveVersions.includes(saved.version)) this.restore(saved);
+    restoreShoreEquipment(this.state,saved?.scene===this.scene.id&&saveVersions.includes(saved.version)?saved:null);
     this.state.shoreLore=createShoreLore(this.scene,saved?.scene===this.scene.id?saved.shoreLore:null,this.state.elapsed,loreSeed);
     this.refreshSample();
   }
@@ -108,6 +116,20 @@ export class PacificaSimulation {
   talkAngler(id){return talkShoreAngler(this,id);}
 
   random() { return clamp(finite(this.rng(), .5), 0, .999999); }
+
+  recordCatch(fish, status) {
+    const s = this.state, clean = safeFish(fish);
+    if (!clean || !catchStatuses.has(status)) return null;
+    const index = s.catchHistory.findIndex(record => record.catchId === clean.catchId), previous = s.catchHistory[index];
+    // A terminal record cannot become inventory again after a stale save or
+    // pending-catch retry. Recording never awards points or increments stats.
+    if (previous && previous.status !== 'kept') return previous;
+    const record = {...clean, status, kept: status !== 'released', recordedAtElapsed: previous?.recordedAtElapsed ?? s.elapsed};
+    if (index < 0) s.catchHistory.push(record); else s.catchHistory[index] = record;
+    if (s.lastCatch?.catchId === clean.catchId) s.lastCatch = {...record};
+    s.nextCatchId = Math.max(s.nextCatchId, clean.catchId + 1);
+    return record;
+  }
 
   get nearShop() {
     return !this.state.inspection && this.state.phase === 'walk' && Math.hypot(this.state.player.x - this.shop.door.x, this.state.player.y - this.shop.door.y) <= 88;
@@ -222,7 +244,7 @@ export class PacificaSimulation {
       if (this.random() >= PIER_RULES.probability) continue;
       const paid = Math.min(s.credits, PIER_RULES.fine), debt = PIER_RULES.fine - paid;
       s.credits -= paid; s.fineDebt += debt; s.inspectionCount++;
-      const confiscated=s.catches.map(f=>({...f}));s.catches=[];
+      const confiscated=s.catches.map(f=>this.recordCatch(f,'confiscated')).filter(Boolean).map(f=>({...f}));s.catches=[];
       this.clearLine(); this.ejectFromPier();
       s.inspection = {id: s.inspectionCount, fine: PIER_RULES.fine, paid, debt, exposure: s.pierExposure,confiscated,findings:[{location:'Pacifica Municipal Pier',code:'closed_pier_entry',detail:'翻越入口封闭围栏，进入维修期间禁止进入的栈桥。鱼警已将你带回入口。'}],
         message: `巡查员发现你进入封闭栈桥，罚款 ${PIER_RULES.fine} 潮汐点，没收全部 ${confiscated.length} 尾鱼获，已带回入口。${debt ? `尚欠 ${debt} 点，出售渔获时优先偿还。` : ''}`};
@@ -270,7 +292,8 @@ export class PacificaSimulation {
     const weights = this.speciesWeights(sample), total = weights.reduce((a, b) => a + b, 0);
     const species = SPECIES[choice < weights[0] / total ? 0 : choice < (weights[0] + weights[1]) / total ? 1 : 2];
     const weightKg = Math.round((species.minKg + this.random() * (species.maxKg - species.minKg)) * 100) / 100;
-    s.fish = {...safeFish({id: species.id, weightKg, catchId: s.nextCatchId++}), stamina: 1, run: 0, runOffset: this.random() * Math.PI * 2};
+    const length = fishLengthCmFromMass(species, weightKg);
+    s.fish = {...safeFish({id: species.id, weightKg, catchId: s.nextCatchId++, ...(Number.isFinite(length) && length > 0 ? {length, lengthType: 'total', lengthSource: 'mass-model'} : {})}), stamina: 1, run: 0, runOffset: this.random() * Math.PI * 2};
     s.phase = 'fighting'; s.tension = .33; s.biteRemaining = 0; s.fightElapsed = 0; s.lineStress = 0; s.slackTime = 0;
     return this.result(true, '中鱼！按住收线；张力过高就松开，让鱼冲一阵。');
   }
@@ -314,9 +337,11 @@ export class PacificaSimulation {
   resolveCatch(keep) {
     const s = this.state;
     if (s.phase !== 'landed' || !s.fish) return this.result(false, '还没有需要处理的鱼。');
+    if (s.catchHistory.some(record => record.catchId === s.fish.catchId)) return this.result(false, '这条鱼已经记录，不能重复处理。');
     if (keep && s.catches.length >= 20) return this.result(false, '鱼袋已经装满了，先放流这条鱼，再回店出售。');
     const fish = safeFish(s.fish);
-    s.lastCatch = {...fish, kept: Boolean(keep)};
+    if (!fish) return this.result(false, '鱼获资料无效，无法处理。');
+    s.lastCatch = {...this.recordCatch(fish, keep ? 'kept' : 'released')};
     if (keep) {s.catches.push(fish); s.stats.kept++;} else s.stats.released++;
     this.clearLine();
     return this.result(true, keep ? `${fish.name}已放入鱼袋，回店出售可得 ${fish.value} 潮汐点。` : `${fish.name}游回浪里了。`, {fish});
@@ -349,6 +374,7 @@ export class PacificaSimulation {
     if (!this.nearShop) return this.result(false, '带着鱼走回商店门口再出售。');
     const count = s.catches.length, total = s.catches.reduce((sum, fish) => sum + fish.value, 0);
     const debtPaid = Math.min(s.fineDebt, total);
+    for (const fish of s.catches) this.recordCatch(fish, 'sold');
     s.catches = []; s.fineDebt -= debtPaid; s.credits += total - debtPaid; s.stats.sold += count;
     return this.result(true, count ? `出售 ${count} 条鱼，获得 ${total} 潮汐点。${debtPaid ? `其中 ${debtPaid} 点用于偿还罚款${s.fineDebt ? `，尚欠 ${s.fineDebt} 点` : ''}。` : ''}` : '鱼袋还是空的，先去浪线试试手气。', {count, total, debtPaid});
   }
@@ -434,16 +460,16 @@ export class PacificaSimulation {
       wearShoreSupplies(s,'escape'); this.clearLine(); s.message = '鱼线松弛太久，鱼脱钩了。适时收线，让钓线保持张力。';
     } else if (s.lineDistance <= 3 && fish.stamina <= .32) {
       wearShoreSupplies(s,'catch'); s.phase = 'landed'; s.stats.caught++; s.tension = 0; fish.run = 0; this.reeling = false;
-      s.message = `${fish.name}上岸了！${(fish.weightKg * 2.20462).toFixed(2)} lb。留在鱼袋里，或放回海里。`;
+      s.message = `${fish.name}上岸了！${formatWeight(fish.kg)}。留在鱼袋里，或放回海里。`;
     }
   }
 
   snapshot() {
     const s = this.state;
     return JSON.parse(JSON.stringify({
-      scene: this.scene.id, version: 3, elapsed: s.elapsed, credits: s.credits,
+      scene: this.scene.id, version: 4, elapsed: s.elapsed, credits: s.credits,
       activeRod:s.activeRod,activeReel:s.activeReel,rodSupplies:s.rodSupplies,rigStock:s.rigStock,inventorySlots:s.inventorySlots,
-      inventory: s.inventory, bait: s.bait, upgrades: s.upgrades, catches: s.catches,
+      inventory: s.inventory, bait: s.bait, upgrades: s.upgrades, catches: s.catches, catchHistory: s.catchHistory,
       stats: s.stats, nextCatchId: s.nextCatchId, player: {x: s.player.x, y: s.player.y},
       pendingCatch: s.phase === 'landed' ? s.fish : null,
       onPier: s.onPier, pierExposure: s.pierExposure, inspectionCount: s.inspectionCount,
@@ -459,13 +485,25 @@ export class PacificaSimulation {
     s.bait = baitIds.includes(saved.bait) ? saved.bait : 'sandcrab';
     s.upgrades = [...new Set(Array.isArray(saved.upgrades) ? saved.upgrades.filter(id => upgradeIds.includes(id)) : [])];
     s.rig = s.upgrades.includes('fishfinder_rig') ? 'fishfinder' : 'carolina';
+    const records = new Map();
+    for (const raw of saved.version >= 4 && Array.isArray(saved.catchHistory) ? saved.catchHistory : []) {
+      const fish = safeFish(raw);
+      if (!fish || !catchStatuses.has(raw.status)) continue;
+      const previous = records.get(fish.catchId);
+      if (!previous || previous.status === 'kept') records.set(fish.catchId, {...fish, status: raw.status, kept: raw.status !== 'released', recordedAtElapsed: clamp(finite(raw.recordedAtElapsed, s.elapsed), 0, 1e9)});
+    }
+    s.catchHistory = [...records.values()];
     const seen = new Set();
     s.catches = (Array.isArray(saved.catches) ? saved.catches : []).map(safeFish).filter(fish => {
-      if (!fish || seen.has(fish.catchId) || seen.size >= 20) return false;
+      if (!fish || seen.has(fish.catchId) || seen.size >= 20 || records.has(fish.catchId) && records.get(fish.catchId).status !== 'kept') return false;
       seen.add(fish.catchId); return true;
     });
+    // The cargo list is authoritative for what is physically in the bag.
+    // Legacy saves gain history once; terminal history never creates cargo.
+    s.catchHistory = s.catchHistory.filter(record => record.status !== 'kept' || seen.has(record.catchId));
+    for (const fish of s.catches) this.recordCatch(fish, 'kept');
     for (const key of statKeys) s.stats[key] = integer(saved.stats?.[key], 0, 1e8);
-    s.nextCatchId = Math.max(integer(saved.nextCatchId, 1, 1e9, 1), ...s.catches.map(fish => fish.catchId + 1));
+    s.nextCatchId = s.catchHistory.reduce((next, fish) => Math.max(next, fish.catchId + 1), integer(saved.nextCatchId, 1, 1e9, 1));
     const x = finite(saved.player?.x, this.scene.spawn.x), y = finite(saved.player?.y, this.scene.spawn.y);
     if (this.onSand(x, y)) {s.player.x = x; s.player.y = y;}
     if (saved.version >= 2) {
@@ -480,15 +518,21 @@ export class PacificaSimulation {
         s.inspectionCount = Math.max(id, s.inspectionCount);
         // Balances in the save already contain this fine: displaying a pending
         // notice must never apply it a second time or mint a pending fish.
-        const confiscated=[...(Array.isArray(saved.inspection.confiscated)?saved.inspection.confiscated:[]),...s.catches].map(safeFish).filter(Boolean);s.catches=[];
+        const confiscatedById = new Map();
+        for (const raw of [...(Array.isArray(saved.inspection.confiscated) ? saved.inspection.confiscated : []), ...s.catches]) {
+          const fish = safeFish(raw);
+          if (fish && !confiscatedById.has(fish.catchId)) confiscatedById.set(fish.catchId, {...this.recordCatch(fish, 'confiscated')});
+        }
+        const confiscated = [...confiscatedById.values()];s.catches=[];
         s.inspection = {id, fine: PIER_RULES.fine, paid, debt: PIER_RULES.fine - paid, exposure: s.pierExposure,confiscated,findings:[{location:'Pacifica Municipal Pier',code:'closed_pier_entry',detail:'翻越入口封闭围栏，进入维修期间禁止进入的栈桥。鱼警已将你带回入口。'}],
           message: `封闭栈桥检查已结算：罚款 ${PIER_RULES.fine} 潮汐点。${s.fineDebt ? `尚欠 ${s.fineDebt} 点。` : ''}请确认后继续。`};
         this.ejectFromPier();
       }
     }
     const pending = safeFish(saved.pendingCatch);
+    s.lastCatch = s.catchHistory.length ? {...s.catchHistory.at(-1)} : null;
     if (s.inspection) s.message = s.inspection.message;
-    else if (pending && !seen.has(pending.catchId)) {
+    else if (pending && !s.catchHistory.some(record => record.catchId === pending.catchId)) {
       s.fish = pending; s.phase = 'landed'; s.nextCatchId = Math.max(s.nextCatchId, pending.catchId + 1);
       s.message = '这条鱼还在等你决定：留下，还是放流？';
     } else s.message = `欢迎回到 ${this.scene.name}。装备和渔获已恢复，沿浪线继续沙滩钓吧。`;

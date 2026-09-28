@@ -1,4 +1,4 @@
-import {fightViewGeometry} from './pixel-fight-view.js?v=20260928-pixel-v80';
+import {fightViewGeometry} from './pixel-fight-view.js?v=species-1';
 import {drawCloseTackle} from './pixel-fight-tackle.js?v=coast-7';
 import {getShoreScene,sampleShore} from './shore-data.js?v=coast-6';
 

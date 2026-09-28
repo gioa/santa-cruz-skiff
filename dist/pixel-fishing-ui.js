@@ -1,9 +1,9 @@
-import {rodSelectionStatus} from './pixel-rod-selection.js?v=20260928-pixel-v80';
+import {rodSelectionStatus} from './pixel-rod-selection.js?v=species-1';
 import {drawAnglerArm} from './pixel-angler-arms.js?v=20260928-pixel-v80';
 import {rodFlexPoint} from './pixel-rod-response.js?v=20260928-pixel-v80';
-import {rigHookSize} from './pixel-hook-label.js?v=20260928-pixel-v80';
+import {rigHookSize} from './pixel-hook-label.js?v=species-1';
 import {formatDepth} from './units.js?v=20260928-pixel-v80';
-import {getRigProfile} from './fishing-rigs.js?v=20260928-pixel-v80';
+import {getRigProfile} from './fishing-rigs.js?v=species-1';
 import {bindPointer} from './input.js?v=20260928-pixel-v80';
 import {fishingFeedback,reelMotion} from './pixel-fishing-feedback.js?v=20260928-pixel-v80';
 

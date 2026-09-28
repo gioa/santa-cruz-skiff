@@ -1,4 +1,4 @@
-import {GEAR_CATALOG,BASE_GEAR,buyGear,restock,settleFish,cargoWeight,carriedWeight,equipmentStats} from './equipment.js?v=20260927-articulated-v5';
+import {GEAR_CATALOG,BASE_GEAR,buyGear,restock,settleFish,cargoWeight,carriedWeight,equipmentStats} from './equipment.js?v=species-1';
 import {HARBOR} from './harbor-layout.js?v=20260927-articulated-v5';
 const $=selector=>document.querySelector(selector);
 export function createCommerce({state:s,openModal,closeModal,toast,save,onPacked,launchBoat,staffName}){

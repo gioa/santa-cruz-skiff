@@ -260,6 +260,35 @@ export function createFishSprite(kind){return raster(48,24,({rect:r,px,poly:p,li
     const deep=kind==='sardine';p([[5,12],[15,deep?8:10],[34,deep?7:9],[45,11],[45,13],[34,deep?17:15],[15,deep?17:15],[5,13],[1,18],[3,12],[1,6]],'ink');
     p([[7,12],[16,deep?9:11],[34,deep?8:10],[44,11],[44,13],[33,deep?16:14],[15,14],[7,13]],'steel');l(10,12,40,12,'white',2);p([[21,10],[25,5],[28,10]],'slate');r(39,10,3,3,'ivory');px(40,11,'ink');
     if(deep)for(let x=17;x<35;x+=4)px(x,11,'slate');else l(37,13,44,13,'ink');
+  }else if(kind==='surfperch'){
+    // Redtail surfperch: a deep oval silver flank, small mouth, and warm
+    // red-orange caudal, anal and pelvic fins. The back is not a rockfish crest.
+    p([[10,11],[15,7],[23,4],[32,5],[39,8],[44,11],[44,14],[38,18],[29,21],[20,20],[14,17],[10,14],[2,19],[4,12],[2,5]],'ink');
+    p([[10,12],[15,8],[23,5],[32,6],[38,9],[43,11],[43,14],[37,17],[29,20],[20,19],[14,16],[10,13],[4,17],[6,12],[4,7]],'steel');
+    p([[6,12],[4,8],[10,11],[11,13],[4,17]],'coral');l(5,10,9,12,'gold');l(5,15,9,13,'rust');
+    p([[13,11],[19,7],[27,6],[34,8],[40,11],[41,14],[35,17],[27,19],[19,17],[13,14]],'light');
+    p([[15,13],[24,10],[35,10],[41,12],[39,15],[32,18],[23,18],[17,16]],'white');
+    p([[14,8],[16,4],[21,2],[26,3],[29,2],[33,4],[35,7]],'slate');
+    l(17,5,25,4,'steel');l(29,3,31,5,'light');
+    p([[16,17],[18,21],[23,22],[26,20]],'rust');p([[18,18],[20,21],[24,21]],'coral');
+    p([[31,18],[33,23],[37,18]],'rust');p([[32,19],[34,21],[35,18]],'coral');
+    p([[36,12],[28,13],[29,17],[34,16]],'peach');l(29,14,33,14,'gold');
+    l(15,11,30,8,'steel');l(19,14,25,13,'ivory');l(22,17,30,17,'light');
+    l(37,10,36,15,'slate');r(39,9,3,3,'ivory');px(40,10,'ink');l(41,14,43,13,'ink');
+  }else if(kind==='striped_bass'){
+    // Striped bass: narrow silver body, forked tail and separate dorsal fins.
+    // Four full-length dark flank bands remain readable at the native 48 px.
+    p([[8,11],[17,8],[29,6],[40,8],[47,11],[46,14],[40,16],[28,18],[17,16],[8,14],[1,20],[4,12],[1,4]],'ink');
+    p([[8,12],[17,9],[29,7],[40,9],[46,11],[45,13],[39,15],[28,17],[17,15],[8,13],[3,17],[6,12],[3,7]],'steel');
+    p([[12,12],[21,9],[34,8],[43,10],[45,12],[40,14],[29,17],[19,15]],'light');
+    p([[13,13],[26,10],[40,10],[44,12],[38,15],[28,16],[18,14]],'white');
+    p([[13,9],[16,5],[21,4],[24,7]],'slate');p([[27,7],[29,3],[31,5],[33,2],[35,5],[37,4],[38,8]],'slate');
+    l(16,6,21,5,'steel');l(30,5,30,6,'light');l(34,4,34,6,'steel');
+    p([[17,15],[19,20],[25,17]],'steel');p([[33,16],[35,20],[38,16]],'steel');
+    l(17,9,34,9,'deep');l(12,11,36,11,'deep');l(12,13,36,13,'deep');l(19,15,33,15,'deep');
+    p([[38,12],[32,13],[33,16],[37,14]],'steel');l(33,14,36,13,'light');
+    l(38,9,37,14,'slate');r(40,9,3,3,'ivory');px(41,10,'ink');l(41,14,46,12,'ink');
+    l(4,8,8,11,'light');l(4,16,8,13,'slate');
   }else if(kind==='croaker'){
     // White croaker: silvery/brassy compressed body, blunt snout, subterminal
     // mouth, nearly straight tail and a dark mark at the pectoral-fin base.
@@ -400,7 +429,7 @@ function iconSprite(kind){return raster(16,16,({rect:r,line:l,poly:p,px,oval:o})
 
 /** All canvases are original art at native pixel resolution. */
 export function createPixelSprites(){
-  const fish=Object.fromEntries(['unknown','anchovy','sardine','blue','copper','rockfish','vermilion','halibut','mackerel','lingcod','salmon','seabass','bonito','croaker','sanddab'].map(name=>[name,createFishSprite(name)]));
+  const fish=Object.fromEntries(['unknown','anchovy','sardine','blue','copper','rockfish','vermilion','halibut','mackerel','lingcod','salmon','seabass','bonito','croaker','sanddab','surfperch','striped_bass'].map(name=>[name,createFishSprite(name)]));
   const icons=Object.fromEntries(['rod','anchor','engine','backpack','fish','coin','tackle','oar','map','sun','bait','reel'].map(name=>[name,iconSprite(name)]));
   const angler=personSprite(),anglerBack=personSprite({back:true});
   const hut=hutSprite();

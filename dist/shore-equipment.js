@@ -1,3 +1,4 @@
+import {USABLE_CONDITION,wearFishingSupply} from './fishing-supply-wear.js?v=species-1';
 import {personalInventorySlots,swapInventorySlots} from './personal-inventory.js?v=coast-6';
 export const BAITS=Object.freeze([
  {id:'sandcrab',name:'沙蟹',kind:'bait',price:12,quantity:8,description:'近岸浪区使用的天然饵。装饵时消耗一份，空收钓组不会自动换饵。'},
@@ -18,7 +19,7 @@ export const SHOP_ITEMS=Object.freeze([
 export const SHORE_ITEMS=[...STARTER_ITEMS,...SHOP_ITEMS];
 const rigIds=['carolina_rig','fishfinder_rig'];
 const bounded=v=>Number.isFinite(v)?Math.max(0,Math.min(1,v)):0;
-const cleanRig=r=>r&&rigIds.includes(r.id)&&bounded(r.condition)>.08?{id:r.id,condition:bounded(r.condition),bait:r.bait&&BAITS.some(b=>b.id===r.bait.kind)?{kind:r.bait.kind,condition:bounded(r.bait.condition)}:null}:null;
+const cleanRig=r=>r&&rigIds.includes(r.id)&&bounded(r.condition)>USABLE_CONDITION?{id:r.id,condition:bounded(r.condition),bait:r.bait&&BAITS.some(b=>b.id===r.bait.kind)?{kind:r.bait.kind,condition:bounded(r.bait.condition)}:null}:null;
 const fresh=id=>({id,condition:1,bait:null});
 export function ownedRods(s){return ['starter_rod',...(s.upgrades.includes('surf_rod')?['surf_rod']:[])];}
 export function restoreShoreEquipment(s,saved){
@@ -40,16 +41,15 @@ export function restoreShoreEquipment(s,saved){
 }
 export function syncShoreEquipment(s){const r=s.rodSupplies[s.activeRod];s.rig=r?.id==='fishfinder_rig'?'fishfinder':'carolina';s.bait=r?.bait?.kind||s.bait||'sandcrab';}
 export function shoreSupply(s){return s.rodSupplies[s.activeRod];}
-export function shoreReady(s){const r=shoreSupply(s);return Boolean(r&&r.condition>.08&&r.bait?.condition>.08);}
+export function shoreReady(s){const r=shoreSupply(s);return Boolean(r&&r.condition>USABLE_CONDITION&&r.bait?.condition>USABLE_CONDITION);}
 export function shoreOwnedItems(s){return SHORE_ITEMS.filter(i=>i.kind==='rod'?ownedRods(s).includes(i.id):i.kind==='reel'?i.id==='starter_reel'||s.upgrades.includes(i.id):i.kind==='bait'?s.inventory[i.id]>0:s.rigStock[i.id]?.length||Object.values(s.rodSupplies).some(r=>r?.id===i.id));}
 export function shoreSlots(s){return personalInventorySlots(s,shoreOwnedItems(s).map(i=>i.id)).pack;}
 export function moveShoreSlot(s,from,to){return swapInventorySlots(shoreSlots(s),from,to);}
-export function shoreItemActive(s,item){return item.kind==='rod'?s.activeRod===item.id:item.kind==='reel'?s.activeReel===item.id:item.kind==='rig'?shoreSupply(s)?.id===item.id:shoreSupply(s)?.bait?.kind===item.id&&shoreSupply(s).bait.condition>.08;}
+export function shoreItemActive(s,item){return item.kind==='rod'?s.activeRod===item.id:item.kind==='reel'?s.activeReel===item.id:item.kind==='rig'?shoreSupply(s)?.id===item.id:shoreSupply(s)?.bait?.kind===item.id&&shoreSupply(s).bait.condition>USABLE_CONDITION;}
 export function wearShoreSupplies(s,event){
  const r=shoreSupply(s);if(!r)return;
  if(event==='break'){s.rodSupplies[s.activeRod]=null;return;}
- if(r.bait)r.bait.condition=Math.max(0,r.bait.condition-({bite:.15,catch:1,escape:.28}[event]||0));
- if(event==='catch')r.condition=Math.max(0,r.condition-.025);
+ wearFishingSupply(r,event);
 }
 export function configureShoreEquipment(sim,id,rodId=sim.state.activeRod){
  const s=sim.state,item=SHORE_ITEMS.find(i=>i.id===id),rod=s.rodSupplies[rodId];
@@ -62,13 +62,13 @@ export function configureShoreEquipment(sim,id,rodId=sim.state.activeRod){
   if(id!=='starter_reel'&&!s.upgrades.includes(id))return sim.result(false,'还没有这个鱼轮。');
   s.activeReel=id;
  }else if(item.kind==='bait'){
-  if(!rod||rod.condition<=.08)return sim.result(false,'先给这根鱼竿装上一套可用钓组。');
+  if(!rod||rod.condition<=USABLE_CONDITION)return sim.result(false,'先给这根鱼竿装上一套可用钓组。');
   if(!(s.inventory[id]>0))return sim.result(false,'这种鱼饵没有库存。');
   s.inventory[id]--;rod.bait={kind:id,condition:1};
  }else{
   if(!s.rigStock[id]?.length)return sim.result(false,'没有备用钓组。');
   const next=s.rigStock[id].shift();
-  if(rod?.condition>.08)s.rigStock[rod.id].push(rod);
+  if(rod?.condition>USABLE_CONDITION)s.rigStock[rod.id].push(rod);
   s.rodSupplies[rodId]=next;
  }
  syncShoreEquipment(s);shoreSlots(s);
