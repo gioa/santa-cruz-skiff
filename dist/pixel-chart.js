@@ -1,7 +1,7 @@
-import {bathymetry,elevationAtGPS} from './bathymetry.js?v=20260928-pixel-v70';
-import {seafloor,seafloorAtGPS} from './pixel-seafloor.js?v=20260928-pixel-v70';
-import {landPolygons,pierRings,toGPS,FISHING_SPOTS} from './pixel-geography.js?v=20260928-pixel-v70';
-import {CHART_HOME,BED_COLORS,BED_LABELS,FEET_PER_METER,chartMeters,chartProjection,zoomChart,chartSample,depthContours,depthColor} from './pixel-chart-data.js?v=20260928-pixel-v70';
+import {bathymetry,elevationAtGPS} from './bathymetry.js?v=20260928-pixel-v71';
+import {seafloor,seafloorAtGPS} from './pixel-seafloor.js?v=20260928-pixel-v71';
+import {landPolygons,pierRings,toGPS} from './pixel-geography.js?v=20260928-pixel-v71';
+import {CHART_HOME,BED_COLORS,BED_LABELS,FEET_PER_METER,chartMeters,chartProjection,zoomChart,chartSample,depthContours,depthColor} from './pixel-chart-data.js?v=20260928-pixel-v71';
 let layers=null,contours=null;
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 function makeLayers(){
@@ -32,7 +32,6 @@ export function mountChart(root,{gpsPosition=null,canNavigate=false,heading=0,wa
  let W=0,H=0,view=null,layer='bottom',selection=waypoint,plan=null,frame=0,gesture=null;
  const pointers=new Map(),go=root.querySelector('#chart-navigate'),routeStatus=root.querySelector('#chart-route-status');
  const geographicRings=[...landPolygons.map(r=>({pier:false,points:r.map(p=>toGPS(p.x,p.z))})),...pierRings.map(r=>({pier:true,points:r.map(p=>toGPS(p.x,p.z))}))];
- const waypoints=FISHING_SPOTS.map((p,i)=>({...toGPS(p.x,p.z),label:String(i+1)}));
  const home=()=>{view={x:0,y:0,mpp:CHART_HOME.spanMeters/W};updateReading();schedule();};
  function schedule(){if(!frame)frame=requestAnimationFrame(()=>{frame=0;draw();});}
  function updateReading(){
@@ -68,8 +67,6 @@ export function mountChart(root,{gpsPosition=null,canNavigate=false,heading=0,wa
   for(const r of geographicRings){ctx.beginPath();r.points.forEach((p,i)=>{const q=project(p.lon,p.lat);ctx[i?'lineTo':'moveTo'](q.x,q.y);});ctx.closePath();ctx.fillStyle=r.pier?'#ae805b':'#eee2b8';ctx.fill();ctx.strokeStyle=r.pier?'#755d44':'#677c67';ctx.lineWidth=r.pier?1:1.2;ctx.stroke();}
   ctx.font='10px ui-monospace,monospace';ctx.textAlign='center';ctx.textBaseline='middle';
   for(const p of labelPoints){ctx.fillStyle=layer==='depth'?'#d4e5dded':'#e9dfbced';ctx.fillRect(p.x-13,p.y-7,26,14);ctx.fillStyle='#234d59';ctx.fillText(p.text,p.x,p.y);}
-  function marker(p,label,color){const q=project(p.lon,p.lat);if(!visible(q,0))return;ctx.fillStyle=color;ctx.strokeStyle='#fff0ce';ctx.lineWidth=2;ctx.beginPath();ctx.arc(q.x,q.y,9,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.fillStyle='#fff6de';ctx.font='bold 11px monospace';ctx.fillText(label,q.x,q.y+.5);}
-  waypoints.forEach(p=>marker(p,p.label,'#385b58'));
   if(gpsPosition){
    const origin=project(gpsPosition.lon,gpsPosition.lat);
    if(plan?.ok&&plan.route?.length){ctx.save();ctx.strokeStyle='#fff5d9';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(origin.x,origin.y);for(const p of plan.route){const q=project(p.lon,p.lat);ctx.lineTo(q.x,q.y);}ctx.stroke();ctx.strokeStyle='#245d9e';ctx.lineWidth=2;ctx.setLineDash([7,5]);ctx.stroke();ctx.restore();}

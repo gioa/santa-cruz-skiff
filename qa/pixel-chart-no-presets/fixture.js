@@ -1,0 +1,1 @@
+start(false);sim.state.profile.credits=1000;Object.assign(sim.state,{playerX:HARBOR.counterX,playerZ:HARBOR.counterZ});for(const id of ['gps','trolling_motor']){sim.buyGear(id);sim.equip(id);}openMap();
