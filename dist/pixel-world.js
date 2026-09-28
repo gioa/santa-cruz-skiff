@@ -1,13 +1,13 @@
-import {pierRings,landPolygons,coastLines,buildingFootprints,FISHING_SPOTS,onLand,onPier} from './pixel-geography.js?v=20260927-pixel-v57';
-import {FISHING_SCENE_SCALE,fishingProjector,fishingPhysicalPoint} from './pixel-fishing-projection.js?v=20260927-pixel-v57';
-import {HARBOR,harborWaterBlocked} from './harbor-layout.js?v=20260927-pixel-v57';
-import {depthInfoAt} from './bathymetry.js?v=20260927-pixel-v57';
-import {createWildlife,drawWildlife} from './pixel-wildlife.js?v=20260927-pixel-v57';
-import {cameraOffset,projectPixel,unprojectPixel,stepDeadzoneCamera,cameraDeadzone,cameraPlayfield,fitCameraBounds,zoomCameraAt,rectilinearOutline} from './pixel-camera.js?v=20260927-pixel-v57';
-import {ladderPoint} from './swimming.js?v=20260927-pixel-v57';
-import {SKIFF_HULL_OUTLINE,SKIFF_RACKS,boatRenderPose,parkedSkiffPoses,skiffScreenPose,hitSkiff,outboardPose} from './pixel-boat-geometry.js?v=20260927-pixel-v57';
-import {createWakeTrail,crestPoints,foamPoint} from './pixel-wake.js?v=20260927-pixel-v57';
-import {getRodCurve,getReelPose,getFishingLine,getFishingPresentation} from './pixel-rod-geometry.js?v=20260927-pixel-v57';
+import {pierRings,landPolygons,coastLines,buildingFootprints,FISHING_SPOTS,onLand,onPier} from './pixel-geography.js?v=20260928-pixel-v58';
+import {FISHING_SCENE_SCALE,fishingProjector,fishingPhysicalPoint} from './pixel-fishing-projection.js?v=20260928-pixel-v58';
+import {HARBOR,harborWaterBlocked} from './harbor-layout.js?v=20260928-pixel-v58';
+import {depthInfoAt} from './bathymetry.js?v=20260928-pixel-v58';
+import {createWildlife,drawWildlife} from './pixel-wildlife.js?v=20260928-pixel-v58';
+import {cameraOffset,projectPixel,unprojectPixel,stepDeadzoneCamera,cameraDeadzone,cameraPlayfield,fitCameraBounds,zoomCameraAt,rectilinearOutline} from './pixel-camera.js?v=20260928-pixel-v58';
+import {ladderPoint} from './swimming.js?v=20260928-pixel-v58';
+import {SKIFF_HULL_OUTLINE,SKIFF_RACKS,boatRenderPose,parkedSkiffPoses,skiffScreenPose,hitSkiff,outboardPose,skiffDavitGeometry} from './pixel-boat-geometry.js?v=20260928-pixel-v58';
+import {createWakeTrail,crestPoints,foamPoint} from './pixel-wake.js?v=20260928-pixel-v58';
+import {getRodCurve,getReelPose,getFishingLine,getFishingPresentation} from './pixel-rod-geometry.js?v=20260928-pixel-v58';
 
 // Boat and wharf art retain readable proportions. Fishing and visible fish
 // share the same geographic projection as the seabed.
@@ -248,14 +248,17 @@ export function createPixelWorld(canvas,{sprites={},conditions={}}={}){
       const tail=line.underwater[1];if(tail){for(let i=0;i<3;i++){const a={x:q.x+(tail.x-q.x)*i/3,y:q.y+(tail.y-q.y)*i/3},b={x:q.x+(tail.x-q.x)*(i+1)/3,y:q.y+(tail.y-q.y)*(i+1)/3};ctx.globalAlpha=.23-i*.075;pixelLine(a.x,a.y,b.x,b.y,'#aec8ba',1);}}ctx.globalAlpha=1;
     }
   }
-  function davit(state){
-    if(!visible(HARBOR.craneX,HARBOR.craneZ,100))return;
-    const pose=boatRenderPose(state,HARBOR),g=skiffGeometry(pose),c=point(HARBOR.craneX,HARBOR.craneZ),s=g.scale;
-    const standby=point(pose.afloat?HARBOR.boatX:HARBOR.craneX+4.8,HARBOR.craneZ),hook={x:pose.rigged?g.screenX:standby.x,y:c.y-42*s};
-    smallShadow(c.x+4,c.y+4,18*s,8*s,.25);ctx.fillStyle='#625950';ctx.fillRect(c.x-4*s,c.y-2*s,8*s,7*s);
-    pixelLine(c.x,c.y,c.x,c.y-47*s,'#7e6146',5);pixelLine(c.x,c.y-46*s,hook.x,hook.y,'#725342',5);pixelLine(c.x,c.y-46*s,hook.x,hook.y,'#e5b451',3);pixelLine(c.x,c.y-50*s,hook.x,hook.y-2*s,'#fff0aa',1);
-    const y=pose.rigged?g.screenY-14*s:hook.y+12*s;pixelLine(hook.x,hook.y,hook.x,y,'#526971',1);ctx.fillStyle='#f2cd73';ctx.fillRect(hook.x-2*s,y-2*s,5*s,4*s);
-    if(pose.rigged){pixelLine(hook.x,y,g.screenX-14*s,g.screenY+3*s,'#b4c5a9',1);pixelLine(hook.x,y,g.screenX+14*s,g.screenY+3*s,'#e7e4be',1);}
+  function davit(state,rigging=false){
+    if(!visible(HARBOR.craneX,HARBOR.craneZ,120))return;
+    const pose=boatRenderPose(state,HARBOR),d=skiffDavitGeometry(pose,{harbor:HARBOR,cameraScale:camera.scale,project:point,time:clock}),{base:c,top,tip,hook,scale:s}=d;
+    if(!rigging){
+      smallShadow(c.x+4,c.y+4,18*s,8*s,.25);ctx.fillStyle='#625950';ctx.fillRect(c.x-4*s,c.y-2*s,8*s,7*s);
+      pixelLine(c.x,c.y,top.x,top.y,'#7e6146',5);pixelLine(top.x,top.y,tip.x,tip.y,'#725342',5);pixelLine(top.x,top.y,tip.x,tip.y,'#e5b451',3);pixelLine(top.x,top.y-3*s,tip.x,tip.y-2*s,'#fff0aa',1);
+      return;
+    }
+    // Only the hanging cable and straps pass in front of the raised hull.
+    pixelLine(tip.x,tip.y,hook.x,hook.y,'#526971',1);ctx.fillStyle='#f2cd73';ctx.fillRect(hook.x-2*s,hook.y-2*s,5*s,4*s);
+    d.slings.forEach((p,i)=>pixelLine(hook.x,hook.y,p.x,p.y,i?'#e7e4be':'#b4c5a9',1));
   }
   function wildlife(){
     for(let i=0;i<3;i++){
@@ -349,7 +352,7 @@ export function createPixelWorld(canvas,{sprites={},conditions={}}={}){
     if(mode==='boat'){const frame=boatFrame(state);Object.assign(camera,fitCameraBounds(camera,frame.all,{primaryBounds:frame.primary}));lastFrameBounds=boatFrame(state);}else lastFrameBounds=null;
     cameraResized=false;lastMode=mode;pixelOffset=cameraOffset(camera);
     const nature=ecology.update(state,dt,seaConditions);
-    ctx.imageSmoothingEnabled=false;ocean();drawWildlife(ctx,nature,{project:point,scale:camera.scale,sprites,layer:'water'});terrain();drawWake(state,dt);routeMarker(state);buildings();dockLife();boat(state);davit(state);patrol(state);
+    ctx.imageSmoothingEnabled=false;ocean();drawWildlife(ctx,nature,{project:point,scale:camera.scale,sprites,layer:'water'});terrain();drawWake(state,dt);routeMarker(state);buildings();davit(state);dockLife();boat(state);davit(state,true);patrol(state);
     if(mode==='walk'||mode==='intro')person(focus.x,focus.z,{walking:state.walking,heading:state.yaw||0});
     if(mode==='swim'){
       const p=point(focus.x,focus.z);ctx.strokeStyle='#c5e4c4';ctx.strokeRect(p.x-12,p.y+2,24,5);ctx.fillStyle='#e3b78d';ctx.fillRect(p.x-4,p.y-8,9,9);ctx.fillStyle='#365762';ctx.fillRect(p.x-5,p.y-11,11,4);ctx.fillStyle=state.pfd===false?'#57827d':'#e99b50';ctx.fillRect(p.x-7,p.y,14,5);pixelLine(p.x-8,p.y+1,p.x-14,p.y+Math.sin(clock*6)*3,'#e2b68d',3);pixelLine(p.x+8,p.y+1,p.x+14,p.y-Math.sin(clock*6)*3,'#e2b68d',3);
@@ -365,9 +368,9 @@ export function createPixelWorld(canvas,{sprites={},conditions={}}={}){
     // stays put while the crane swings and the boat passes beneath its hook.
     const poses=Array.from({length:41},(_,i)=>boatRenderPose({...state,launchStage:'lowering',launchProgress:i/40},HARBOR));
     poses.push(boatRenderPose(state,HARBOR));
-    const frames=poses.map(skiffGeometry),c=point(HARBOR.craneX,HARBOR.craneZ),scale=frames[0].scale;
-    const left=Math.min(c.x-6*scale,...frames.map(g=>g.bounds.left)),right=Math.max(c.x+6*scale,...frames.map(g=>g.bounds.right));
-    const top=Math.min(c.y-54*scale,...frames.map(g=>g.bounds.top)),bottom=Math.max(c.y+9*scale,...frames.map(g=>g.bounds.bottom));
+    const bounds=poses.flatMap(p=>[skiffGeometry(p).bounds,skiffDavitGeometry(p,{harbor:HARBOR,cameraScale:camera.scale,project:point,time:clock}).bounds]);
+    const left=Math.min(...bounds.map(b=>b.left)),right=Math.max(...bounds.map(b=>b.right));
+    const top=Math.min(...bounds.map(b=>b.top)),bottom=Math.max(...bounds.map(b=>b.bottom));
     return{left:left*cssWidth/canvas.width-12,right:right*cssWidth/canvas.width+12,top:top*cssHeight/canvas.height-12,bottom:bottom*cssHeight/canvas.height+12};
   }
   function interactionAnchors(state){

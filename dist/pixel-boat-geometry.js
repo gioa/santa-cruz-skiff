@@ -1,4 +1,4 @@
-import {SKIFF_LENGTH_METERS,SKIFF_HULL_PIXELS,SKIFF_METERS_PER_PIXEL,SKIFF_DISPLAY_METERS_PER_PIXEL} from './skiff-dimensions.js?v=20260927-pixel-v57';
+import {SKIFF_LENGTH_METERS,SKIFF_HULL_PIXELS,SKIFF_METERS_PER_PIXEL,SKIFF_DISPLAY_METERS_PER_PIXEL} from './skiff-dimensions.js?v=20260928-pixel-v58';
 export {SKIFF_LENGTH_METERS,SKIFF_HULL_PIXELS,SKIFF_METERS_PER_PIXEL,SKIFF_DISPLAY_METERS_PER_PIXEL};
 // Presentation only: the simulation retains the surveyed boarding point and
 // water coordinates. Every rental uses the same hull and sprite dimensions.
@@ -41,6 +41,20 @@ export function skiffScreenPose(pose,{cameraScale,project,time=0}){
   const scale=skiffScale(cameraScale),p=project(pose.x,pose.z),screenX=p.x,screenY=p.y-Math.round(pose.lift*scale)+Math.round(Math.sin(time*1.8)*.8*pose.bobWeight),width=48*scale,height=88*scale;
   const c=Math.abs(Math.cos(pose.heading)),s=Math.abs(Math.sin(pose.heading)),rx=(width*c+height*s)/2,ry=(width*s+height*c)/2;
   return{...pose,scale,width,height,hullLength:SKIFF_HULL_PIXELS*scale,hullLengthMeters:SKIFF_LENGTH_METERS,screenX,screenY,bounds:{left:screenX-rx,top:screenY-ry,right:screenX+rx,bottom:screenY+ry}};
+}
+// Keep the upright on the seaward side of the entire enlarged sprite envelope,
+// outside the transfer corridor. A fixed overhead boom leaves real cable travel
+// above the highest bow; moving the hook upward with the hull caused overlap.
+export function skiffDavitGeometry(pose,{harbor,cameraScale,project,time=0}){
+  const g=skiffScreenPose(pose,{cameraScale,project,time}),s=g.scale;
+  const base=project(harbor.craneX,harbor.craneZ-78*SKIFF_DISPLAY_METERS_PER_PIXEL);
+  const rest=project(pose.afloat?harbor.boatX:harbor.craneX+4.8,harbor.craneZ);
+  const top={x:base.x,y:base.y-47*s};
+  const tip={x:pose.rigged?g.screenX:rest.x,y:rest.y-76*s};
+  const hook={x:tip.x,y:pose.rigged?g.screenY-14*s:tip.y+12*s};
+  const slings=pose.rigged?[-18,18].map(x=>({x:g.screenX+x*s,y:g.screenY+3*s})):[];
+  const points=[{x:base.x-6*s,y:base.y+9*s},{x:base.x+6*s,y:base.y+9*s},{x:top.x-6*s,y:top.y-5*s},tip,hook,...slings];
+  return{base,top,tip,hook,slings,scale:s,bounds:{left:Math.min(...points.map(p=>p.x))-3,top:Math.min(...points.map(p=>p.y))-3,right:Math.max(...points.map(p=>p.x))+3,bottom:Math.max(...points.map(p=>p.y))+3}};
 }
 export function hitSkiff(x,y,geometry,{minimum=44}={}){
   const dx=x-geometry.screenX,dy=y-geometry.screenY,c=Math.cos(geometry.heading),s=Math.sin(geometry.heading);

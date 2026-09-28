@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
-import {SKIFF_RACKS,boatRenderPose,parkedSkiffPoses,skiffScreenPose,hitSkiff,skiffScale,SKIFF_METERS_PER_PIXEL,SKIFF_LENGTH_METERS,SKIFF_HULL_PIXELS,SKIFF_DISPLAY_METERS_PER_PIXEL} from '../dist/pixel-boat-geometry.js';
+import {SKIFF_RACKS,skiffDavitGeometry,boatRenderPose,parkedSkiffPoses,skiffScreenPose,hitSkiff,skiffScale,SKIFF_METERS_PER_PIXEL,SKIFF_LENGTH_METERS,SKIFF_HULL_PIXELS,SKIFF_DISPLAY_METERS_PER_PIXEL} from '../dist/pixel-boat-geometry.js';
 globalThis.fetch=async url=>new Response(await readFile(url));
 const {HARBOR}=await import('../dist/harbor-layout.js');
 const {onPier,insidePolygon,pierRings,buildingFootprints}=await import('../dist/pixel-geography.js');
@@ -111,4 +111,18 @@ test('fishing conversion does not change walking/helm map targets and rejects vi
  assert.equal(world.screenToFishingWorld(dock.x,dock.y,state),null,'visual land must not become a valid shorter cast');
  const ocean=world.cssWorldToScreen(state.boatX-30,state.boatZ),map=world.screenToWorld(ocean.x,ocean.y),cast=world.screenToFishingWorld(ocean.x,ocean.y,state);
  assert.ok(Math.abs(map.x-(state.boatX-30))<.2);assert.ok(cast);assert.ok(Math.abs(cast.x-map.x)<1e-9);
+});
+
+// Check the rendered (enlarged) hull, not only the small physical collision hull.
+test('entire launch clears the crane upright and boom while cables stay above the load',()=>{
+ const overlaps=(a,b)=>a.left<b.right&&a.right>b.left&&a.top<b.bottom&&a.bottom>b.top;
+ for(const zoom of[2,4,6,9])for(let i=0;i<=1440;i++){
+  const pose=poseAt(i/1440),project=(x,z)=>({x:x*zoom,y:z*zoom}),options={harbor:HARBOR,cameraScale:zoom,project,time:0},g=skiffScreenPose(pose,options),d=skiffDavitGeometry(pose,options),s=d.scale;
+  const upright={left:d.base.x-6*s,right:d.base.x+6*s,top:d.top.y-5*s,bottom:d.base.y+9*s};
+  assert.equal(overlaps(g.bounds,upright),false,`upright cuts hull: zoom ${zoom}, progress ${i/1440}`);
+  assert.ok(Math.max(d.top.y,d.tip.y)+2.5<g.bounds.top,`boom cuts bow at ${i/1440}`);
+  assert.ok(d.hook.y>d.tip.y,'positive hanging cable length');
+  if(pose.rigged){assert.equal(d.slings.length,2);assert.ok(d.hook.y<d.slings[0].y);for(const p of d.slings){assert.ok(p.x>=g.bounds.left&&p.x<=g.bounds.right);assert.ok(p.y>=g.bounds.top&&p.y<=g.bounds.bottom);}}
+  for(const p of[d.base,d.top,d.tip,d.hook,...d.slings])assert.ok(p.x>=d.bounds.left&&p.x<=d.bounds.right&&p.y>=d.bounds.top&&p.y<=d.bounds.bottom,'shared animation exclusion bounds cover all crane pieces');
+ }
 });
