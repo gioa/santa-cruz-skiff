@@ -34,7 +34,7 @@ test('a natural hand-held bite enters focus and stays through hooking, real reel
 });
 
 test('a trolling bite stays focused through pickup, winding into the fish and landing',()=>{
- const sim=ready();assert.ok(sim.setRodMount('starboard').ok);assert.ok(sim.lowerRig().ok);sim.state.biteAt=.5;assert.ok(sim.toggleEngine().ok);assert.ok(sim.setThrottle(.15));until(sim,s=>s.fishState==='bite');assert.equal(isFishingFocus(sim.state),true);assert.equal(sim.state.rodMount,'starboard');assert.equal(sim.state.throttle,0);assert.equal(sim.hook().ok,false);assert.equal(isFishingFocus(sim.state),true);
+ const sim=ready();assert.ok(sim.setRodMount('starboard').ok);assert.ok(sim.lowerRig().ok);sim.state.biteAt=.5;assert.ok(sim.setThrottle(.15));until(sim,s=>s.fishState==='bite');assert.equal(isFishingFocus(sim.state),true);assert.equal(sim.state.rodMount,'starboard');assert.equal(sim.state.throttle,0);assert.equal(sim.hook().ok,false);assert.equal(isFishingFocus(sim.state),true);
  assert.ok(sim.setRodMount('hand').ok);assert.equal(sim.state.engine,false);assert.equal(isFishingFocus(sim.state),true);assert.ok(sim.hook().ok);assert.equal(isFishingFocus(sim.state),true);until(sim,s=>s.fishState==='landed',240,{reel:1.2});assert.equal(isFishingFocus(sim.state),true);assert.ok(sim.releaseCatch().ok);assert.equal(isFishingFocus(sim.state),false);assert.equal(sim.state.catches[0].kept,false);
 });
 

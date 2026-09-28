@@ -2,7 +2,7 @@
  * Transparent canvases can be drawn directly; callers should disable smoothing.
  * Boat points north. Figures stand at the bottom centre of their 16 × 26 cell.
  */
-import {SKIFF_HULL_OUTLINE} from './pixel-boat-geometry.js?v=20260927-pixel-v39';
+import {SKIFF_HULL_OUTLINE} from './pixel-boat-geometry.js?v=20260927-pixel-v40';
 const C = {
   ink:'#223a46', deep:'#304956', slate:'#4c6872', steel:'#79959a', light:'#b9d0cb',
   cream:'#fff0ca', ivory:'#e6d9ad', sand:'#c4b17f', wood:'#b87850', woodDark:'#795544',

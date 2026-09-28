@@ -1,4 +1,4 @@
-import {HARBOR} from './harbor-layout.js?v=20260927-pixel-v39';
+import {HARBOR} from './harbor-layout.js?v=20260927-pixel-v40';
 
 /**
  * Offshore navigation uses a 1:2 game-distance scale. Geographic coordinates,
@@ -20,6 +20,7 @@ function spatialScale(x,z){
 /** Multiplier for vessel navigation time ONLY. Never multiply the whole sim dt. */
 export function navigationStepScale(state={}){
   if(!state||state.mode!=='boat'||state.paused||state.moored||state.anchor||state.docking||state.standing||!state.engine||state.casting||state.fishState!=='idle')return 1;
+  if(Number.isFinite(state.throttle)&&Math.abs(state.throttle)<=.01)return 1;
   if(!finite(state.boatX)||!finite(state.boatZ)||!finite(state.speed)||state.speed<=.35)return 1;
   return 1+(spatialScale(state.boatX,state.boatZ)-1)*smoothstep(.35,1.15,state.speed);
 }

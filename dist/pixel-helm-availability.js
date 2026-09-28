@@ -2,7 +2,7 @@
 // The model remains responsible for the actual outboard and trolling limits.
 export function helmShiftAvailability(vessel,control){
   const rigDeployed=['flight','sinking','waiting','bite','fight'].includes(vessel.fishState);
-  const active=vessel.mode==='boat'&&Boolean(vessel.engine)&&!vessel.standing&&!vessel.moored&&!vessel.docking&&!vessel.paused&&Boolean(vessel.canOperateHelm??vessel.fishState==='idle');
+  const active=vessel.mode==='boat'&&!vessel.standing&&!vessel.moored&&!vessel.docking&&!vessel.paused&&Boolean(vessel.canOperateHelm??vessel.fishState==='idle');
   const gear=['F','N','R'].includes(control.gear)?control.gear:'N';
   const idleThrottle=Number.isFinite(control.throttle)&&control.throttle<=.08&&(!Number.isFinite(vessel.throttle)||Math.abs(vessel.throttle)<=.08);
   const canShift=active&&gear==='N'&&idleThrottle&&Number.isFinite(vessel.speed)&&Math.abs(vessel.speed)<.8;

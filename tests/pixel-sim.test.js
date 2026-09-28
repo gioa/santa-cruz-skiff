@@ -24,7 +24,7 @@ test('missed bite expires and usable bait persists for repeated vertical lowerin
 });
 
 test('onboard walking and old water-entry controls cannot move the seated angler or interrupt propulsion',()=>{
- const sim=new PixelSimulation();departure(sim);sim.toggleEngine();sim.setThrottle(.2);for(let i=0;i<50;i++)sim.step(.1);assert.equal(sim.jump().ok,false);assert.equal(sim.stand().ok,false);assert.equal(sim.state.engine,true);assert.equal(sim.state.throttle,.2);
+ const sim=new PixelSimulation();departure(sim);sim.setThrottle(.2);for(let i=0;i<50;i++)sim.step(.1);assert.equal(sim.jump().ok,false);assert.equal(sim.stand().ok,false);assert.equal(sim.state.engine,true);assert.equal(sim.state.throttle,.2);
  const walked=sim.state.walked,position=[sim.state.playerX,sim.state.playerZ];
  for(const [moveX,moveZ]of[[1,0],[-1,0],[0,1],[0,-1],[1,1]]){for(let i=0;i<100;i++)sim.step(.25,{moveX,moveZ});assert.equal(sim.state.mode,'boat');assert.equal(sim.state.standing,false);assert.deepEqual([sim.state.deckX,sim.state.deckZ],[0,.8]);assert.equal(sim.state.walking,false);}
  assert.equal(sim.state.walked,walked);assert.deepEqual([sim.state.playerX,sim.state.playerZ],position);assert.equal(sim.walkTo('counter').ok,false);assert.equal(sim.enterWater(999,999,1).ok,false);assert.equal(sim.reboard().ok,false);assert.equal(sim.state.swim,null);assert.ok(sim.state.packed.includes('rod'));
@@ -32,7 +32,7 @@ test('onboard walking and old water-entry controls cannot move the seated angler
 
 test('legacy standing voyages resume seated with helm and gear accessible',()=>{
  const sim=new PixelSimulation();departure(sim);const saved=sim.snapshot();Object.assign(saved,{standing:true,deckX:.7,deckZ:-1.8});const restored=new PixelSimulation({saved});assert.ok(restored.start(true).ok);
- assert.equal(restored.state.mode,'boat');assert.equal(restored.state.standing,false);assert.deepEqual([restored.state.deckX,restored.state.deckZ],[0,.8]);assert.deepEqual(restored.state.packed,saved.packed);assert.ok(restored.selectRod('rod').ok);assert.ok(restored.toggleEngine().ok);assert.equal(restored.setThrottle(.2),true);
+ assert.equal(restored.state.mode,'boat');assert.equal(restored.state.standing,false);assert.deepEqual([restored.state.deckX,restored.state.deckZ],[0,.8]);assert.deepEqual(restored.state.packed,saved.packed);assert.ok(restored.selectRod('rod').ok);assert.equal(restored.setThrottle(.2),true);
 });
 
 test('mobile steering and throttle cancel assisted route without teleporting the boat',()=>{
@@ -44,11 +44,11 @@ test('saved equipment and settled fish persist while each resumed day begins at 
 });
 
 test('a legacy saved immersion restores the player and the boat together without losing equipment',()=>{
- const sim=new PixelSimulation();departure(sim);sim.toggleEngine();sim.setThrottle(.4);for(let i=0;i<180;i++)sim.step(.1);assert.ok(Math.hypot(sim.state.boatX-HARBOR.boatX,sim.state.boatZ-HARBOR.boatZ)>10);const saved=sim.snapshot();saved.mode='swim';saved.swim={x:saved.boatX+2,z:saved.boatZ+2};const restored=new PixelSimulation({saved});restored.start(true);assert.equal(restored.state.mode,'walk');assert.equal(restored.state.loaded,false);assert.equal(restored.state.moored,true);assert.equal(restored.state.launchStage,'afloat');assert.equal(restored.state.boatX,HARBOR.boatX);assert.equal(restored.state.boatZ,HARBOR.boatZ);assert.deepEqual(restored.state.packed,saved.packed);assert.equal(restored.state.profile.credits,saved.profile.credits);assert.equal(restored.state.fishState,'idle');assert.equal(restored.state.anchor,false);assert.equal(restored.state.clock,'06:00:00');
+ const sim=new PixelSimulation();departure(sim);sim.setThrottle(.4);for(let i=0;i<180;i++)sim.step(.1);assert.ok(Math.hypot(sim.state.boatX-HARBOR.boatX,sim.state.boatZ-HARBOR.boatZ)>10);const saved=sim.snapshot();saved.mode='swim';saved.swim={x:saved.boatX+2,z:saved.boatZ+2};const restored=new PixelSimulation({saved});restored.start(true);assert.equal(restored.state.mode,'walk');assert.equal(restored.state.loaded,false);assert.equal(restored.state.moored,true);assert.equal(restored.state.launchStage,'afloat');assert.equal(restored.state.boatX,HARBOR.boatX);assert.equal(restored.state.boatZ,HARBOR.boatZ);assert.deepEqual(restored.state.packed,saved.packed);assert.equal(restored.state.profile.credits,saved.profile.credits);assert.equal(restored.state.fishState,'idle');assert.equal(restored.state.anchor,false);assert.equal(restored.state.clock,'06:00:00');
 });
 
 test('releasing momentary joystick throttle selects neutral; untouched autopilot and explicit slider remain active',()=>{
- const sim=new PixelSimulation({profile:{version:2,credits:220}});departure(sim,true);sim.toggleEngine();sim.step(.1,{throttle:.6});assert.equal(sim.state.throttle,.6);sim.step(.1,{});assert.equal(sim.state.throttle,0);assert.equal(sim.state.engine,true,'neutral keeps motor running');sim.setThrottle(.3);sim.step(.1,{});sim.step(.1,{});assert.equal(sim.state.throttle,.3,'explicit throttle slider holds its setting');sim.selectWaypoint('sand');sim.step(.1,{});assert.ok(sim.state.waypoint);assert.ok(sim.state.throttle>0);sim.step(.1,{steer:1});assert.equal(sim.state.waypoint,null);assert.equal(sim.state.throttle,0,'helm takeover does not inherit hidden autopilot thrust');
+ const sim=new PixelSimulation({profile:{version:2,credits:220}});departure(sim,true);sim.step(.1,{throttle:.6});assert.equal(sim.state.throttle,.6);sim.step(.1,{});assert.equal(sim.state.throttle,0);assert.equal(sim.state.engine,true,'neutral keeps motor running');sim.setThrottle(.3);sim.step(.1,{});sim.step(.1,{});assert.equal(sim.state.throttle,.3,'explicit throttle slider holds its setting');sim.selectWaypoint('sand');sim.step(.1,{});assert.ok(sim.state.waypoint);assert.ok(sim.state.throttle>0);sim.step(.1,{steer:1});assert.equal(sim.state.waypoint,null);assert.equal(sim.state.throttle,0,'helm takeover does not inherit hidden autopilot thrust');
 });
 
 test('rig selection validates real carried rods and bait while unrelated packing preserves a selected rod',()=>{

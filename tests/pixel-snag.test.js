@@ -44,7 +44,7 @@ test('rock snag keeps the physical rig attached until sustained winding abrades 
  for(let t=0;t<180&&!s.snagged;t+=.05){sim.step(.05);if(s.rigPresentation?.bottomContact){touched=true;contactTime+=.05;if(contactTime<4)assert.equal(s.snagged,false);}}
  assert.ok(touched);assert.ok(s.snagged);assert.equal(sim.rodConsumableStatus().rig.present,true);assert.equal(s.breaks,0);assert.equal(s.fishState,'waiting');
  const point={...s.snagPoint},spares=sim.rodConsumableStatus().rigStock.bottom,bait=sim.state.profile.stock.squid;
- assert.equal(sim.canOperateHelm,false);assert.equal(boatActions(s).drag,true);assert.equal(boatActions({...s,rodMount:'port'}).engine,false);assert.equal(sim.toggleEngine().ok,false);
+ assert.equal(sim.canOperateHelm,false);assert.equal(boatActions(s).drag,true);assert.equal(boatActions({...s,rodMount:'port'}).engine,false);
  run(sim,2,{reel:1.2});assert.deepEqual(s.bobber,point);assert.ok(s.rodBend>.5);assert.ok(s.rodLoadN>5);assert.equal(s.fishState,'waiting');
  for(let t=0;t<100&&s.snagged;t+=.05)sim.step(.05,{reel:1.2});
  assert.equal(s.fishState,'idle');assert.equal(s.breaks,1);assert.equal(sim.rodConsumableStatus().rig.present,false);assert.equal(s.baitOnHook,null);assert.equal(s.rodLoadN,0);assert.equal(s.rodBend,0);assert.equal(s.snagPoint,null);assert.equal(s.snagAbrasion,0);assert.equal(s.paidLineMeters,0);

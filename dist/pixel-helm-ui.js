@@ -1,16 +1,16 @@
-import {bindPointer} from './input.js?v=20260927-pixel-v39';
-import {tillerFromPointer} from './pixel-tiller-input.js?v=20260927-pixel-v39';
-import {createSingleLeverControl,leverFromDrag,leverForThrottle,LEVER_NEUTRAL_DEADBAND} from './pixel-single-lever.js?v=20260927-pixel-v39';
+import {bindPointer} from './input.js?v=20260927-pixel-v40';
+import {tillerFromPointer} from './pixel-tiller-input.js?v=20260927-pixel-v40';
+import {createSingleLeverControl,leverFromDrag,leverForThrottle,LEVER_NEUTRAL_DEADBAND} from './pixel-single-lever.js?v=20260927-pixel-v40';
 
-// Drag the tiller to steer; tap it in neutral for ignition. The separate
+// Drag the tiller to steer. The separate
 // retained push/pull lever selects direction and power without a touch jump.
-export function mountHelm(root,{getState,onIdle,onFeedback,onToggleEngine=()=>({ok:false})}){
+export function mountHelm(root,{getState,onIdle,onFeedback}){
  const control=createSingleLeverControl(),handle=root.querySelector('#tiller-touch'),arm=root.querySelector('.tiller-arm'),lever=root.querySelector('#throttle-touch'),meter=root.querySelector('#throttle-value'),gearLabel=root.querySelector('#throttle-gear');
  let gesture=null,tillerGesture=null,lastDenial='',blocked=false;
  const deployed=s=>['flight','sinking','waiting','bite','fight'].includes(s.fishState);
  const limits=s=>({reverseAllowed:!deployed(s),maxForward:deployed(s)?.28:1});
  const available=s=>s.mode==='boat'&&!s.standing&&!s.moored&&!s.docking&&!s.paused&&!s.anchor&&s.inspection?.phase!=='checking'&&(s.canOperateHelm??s.fishState==='idle');
- const active=s=>available(s)&&s.engine;
+ const active=s=>available(s);
  const handleUsable=()=>available(getState())&&!root.hidden;
  const releaseControl=()=>{gesture=null;tillerGesture=null;blocked=false;lastDenial='';control.reset();onIdle();};
  // These interlocks also run at the frame input boundary, before the slower UI
@@ -25,7 +25,7 @@ export function mountHelm(root,{getState,onIdle,onFeedback,onToggleEngine=()=>({
   for(const[g,name]of[['N','in-neutral'],['F','in-forward'],['R','in-reverse']])lever.classList.toggle(name,c.gear===g);
   lever.classList.toggle('trolling',!l.reverseAllowed);lever.classList.toggle('shift-blocked',blocked);
   handle.setAttribute('aria-valuenow',String(Math.round(c.steer*35)));handle.setAttribute('aria-disabled',String(!handleUsable()));handle.tabIndex=handleUsable()?0:-1;
-  handle.classList.toggle('engine-running',!!s.engine);handle.setAttribute('aria-label',`舷外机握把，左右拖动转向；空挡轻点${s.engine?'熄火':'启动'}`);handle.setAttribute('aria-valuetext',`${s.engine?'运转':'熄火'} · ${Math.round(c.steer*35)}度`);
+  handle.setAttribute('aria-label','舷外机握把，左右拖动转向');handle.setAttribute('aria-valuetext',`${Math.round(c.steer*35)}度`);
   lever.setAttribute('aria-valuemin',l.reverseAllowed?'-100':'0');lever.setAttribute('aria-valuemax',String(Math.round(l.maxForward*100)));
   lever.setAttribute('aria-valuenow',String(c.gear==='N'?0:Math.round(c.throttle*100)*(c.gear==='R'?-1:1)));
   lever.setAttribute('aria-valuetext',`${c.gear==='N'?'空挡':c.gear==='F'?'前进':'倒车'} · ${Math.round(c.throttle*100)}%${!l.reverseAllowed?' · 拖钓限速':''}`);
@@ -33,28 +33,23 @@ export function mountHelm(root,{getState,onIdle,onFeedback,onToggleEngine=()=>({
  };
  const apply=value=>{const s=safeState();if(!active(s)||root.hidden)return;const r=control.setLever(value,s.speed,limits(s));blocked=!r.ok;if(!r.ok&&r.message!==lastDenial){lastDenial=r.message;onFeedback(r);}if(r.ok)lastDenial='';render();};
  const steer=e=>{if(!usable()){reset();return;}const r=handle.getBoundingClientRect(),p=tillerFromPointer(e.clientX-r.left-r.width/2,e.clientY-r.bottom+21);control.setSteer(p.steer);render();};
- function toggleIgnition(){
-  const s=getState();if(!handleUsable())return{ok:false};
-  if(control.state.gear!=='N'||Math.abs(s.throttle||0)>.01){const r={ok:false,message:'先将推杆回到空挡。'};onFeedback(r);return r;}
-  const r=onToggleEngine();if(r?.ok)releaseControl();render();return r;
- }
+
  const pointers=[bindPointer(handle,{
   start:e=>{if(!handleUsable())return false;tillerGesture={x:e.clientX,y:e.clientY,time:e.timeStamp,dragged:false};},
   move:e=>{if(!handleUsable()){reset();return;}if(!tillerGesture)return;if(Math.hypot(e.clientX-tillerGesture.x,e.clientY-tillerGesture.y)>8)tillerGesture.dragged=true;if(tillerGesture.dragged&&usable())steer(e);},
-  end:e=>{const g=tillerGesture;tillerGesture=null;if(g&&!g.dragged&&Math.hypot(e.clientX-g.x,e.clientY-g.y)<=8&&e.timeStamp-g.time<500)toggleIgnition();render();},cancel:releaseControl
+  end:()=>{tillerGesture=null;render();},cancel:releaseControl
  }),bindPointer(lever,{
   start:e=>{if(!usable())return false;gesture={y:e.clientY,value:control.state.lever,travel:travel(),started:false};lastDenial='';},
   move:e=>{if(!usable()){reset();return;}if(gesture){const delta=gesture.y-e.clientY;if(!gesture.started&&Math.abs(delta)<2)return;gesture.started=true;const value=leverFromDrag(gesture.value,delta,{travel:gesture.travel});apply(value);if(blocked&&gesture){gesture={y:e.clientY,value:control.state.lever,travel:gesture.travel,started:false};}}},
   end:()=>{gesture=null;render();},cancel:releaseControl
  })];
  function reset(){for(const p of pointers)p.reset();releaseControl();render();}
- function cancelUnavailable(){const s=safeState();if(((!available(s)||root.hidden)&&pointers.some(p=>p.owner!==null))||(!s.engine&&pointers[1].owner!==null)){reset();return s;}return s;}
+ function cancelUnavailable(){const s=safeState();if(((!available(s)||root.hidden)&&pointers.some(p=>p.owner!==null))){reset();return s;}return s;}
  for(const el of[handle,lever])el.addEventListener('keydown',e=>{
-  if(el===handle&&['Enter',' '].includes(e.key)){e.preventDefault();e.stopPropagation();if(!e.repeat)toggleIgnition();return;}
   if(!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Home','End'].includes(e.key))return;
   e.preventDefault();e.stopPropagation();if(!usable())return;
   if(el===handle){const value=e.key==='Home'?0:e.key==='End'?1:control.state.steer+(['ArrowLeft','ArrowDown'].includes(e.key)?-.1:.1);control.setSteer(value);render();}
   else{const direction=['ArrowLeft','ArrowDown'].includes(e.key)?-1:1,c=control.state;apply(e.key==='Home'?0:e.key==='End'?1:c.gear==='N'?direction*(LEVER_NEUTRAL_DEADBAND+.08):c.lever+direction*.08);}
  });
- return{reset,toggleIgnition,input(){cancelUnavailable();return control.input();},snapshot:()=>control.snapshot(),update(){cancelUnavailable();render();}};
+ return{reset,input(){cancelUnavailable();return control.input();},snapshot:()=>control.snapshot(),update(){cancelUnavailable();render();}};
 }

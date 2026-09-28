@@ -31,11 +31,11 @@ test('land, pier corridors, invalid and inside-hull taps do not deploy a rig',()
  const p=planCast({...s,boatX:0,boatZ:0},{x:20,z:0},{isWater:(x)=>x<5||x>10});assert.equal(p.ok,false);
 });
 test('casts cannot start while mounted, driving, moving fast, fighting, paused, unpaid or missing bait',()=>{
- for(const patch of [{rodMount:'port'},{engine:true},{speed:1.1},{fishState:'fight'},{paused:true},{rentalPaid:false}]){const sim=ready();Object.assign(sim.state,patch);assert.equal(sim.castTo({x:sim.state.boatX-12,z:sim.state.boatZ}).ok,false);assert.equal(sim.state.casts,0);}
+ for(const patch of [{rodMount:'port'},{engine:true,throttle:.2},{speed:1.1},{fishState:'fight'},{paused:true},{rentalPaid:false}]){const sim=ready();Object.assign(sim.state,patch);assert.equal(sim.castTo({x:sim.state.boatX-12,z:sim.state.boatZ}).ok,false);assert.equal(sim.state.casts,0);}
  const sim=ready();sim.state.baitOnHook.condition=0;assert.equal(sim.castTo({x:sim.state.boatX-12,z:sim.state.boatZ}).ok,false);
 });
 test('flight blocks helm and repeat casts; pausing or old release calls do not erase the airborne tackle',()=>{
- const sim=ready(),s=sim.state,target={x:s.boatX-14,z:s.boatZ};sim.castTo(target);sim.step(.1);const flight=structuredClone(s.castFlight),line=s.paidLineMeters;sim.pause(true);sim.step(.1);assert.deepEqual(s.castFlight,flight);assert.equal(s.paidLineMeters,line);sim.pause(false);assert.equal(sim.releaseCast().ok,false);assert.deepEqual(s.castFlight,flight);assert.equal(sim.toggleEngine().ok,false);assert.equal(sim.castTo(target).ok,false);assert.equal(s.casts,1);splash(sim);
+ const sim=ready(),s=sim.state,target={x:s.boatX-14,z:s.boatZ};sim.castTo(target);sim.step(.1);const flight=structuredClone(s.castFlight),line=s.paidLineMeters;sim.pause(true);sim.step(.1);assert.deepEqual(s.castFlight,flight);assert.equal(s.paidLineMeters,line);sim.pause(false);assert.equal(sim.releaseCast().ok,false);assert.deepEqual(s.castFlight,flight);assert.equal(sim.castTo(target).ok,false);assert.equal(s.casts,1);splash(sim);
  const a=boatActions({...s,fishState:'flight'},{canLower:true});assert.equal(a.cast,false);assert.equal(a.reel,false);assert.equal(a.engine,false);assert.equal(a.mount,false);assert.equal(a.reelInstrument,true);
 });
 test('close and far casts reach their intended surface location consistently at different frame rates',()=>{

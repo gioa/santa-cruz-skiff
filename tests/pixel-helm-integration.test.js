@@ -13,7 +13,7 @@ function depart(){
 function cruise(sim,helm,seconds){for(let t=0;t<seconds-1e-8;t+=.1)sim.step(.1,{steer:0,...helm.input()});}
 
 test('natural launch, retained push/pull lever, neutral coasting and automatic navigation hand off without hidden thrust',()=>{
- const sim=depart(),helm=createSingleLeverControl();assert.equal(sim.toggleEngine().ok,true);assert.equal(helm.setLever(leverForThrottle(.62),sim.state.speed).ok,true);helm.setSteer(.04);const retained=helm.snapshot();cruise(sim,helm,12);
+ const sim=depart(),helm=createSingleLeverControl();assert.equal(helm.setLever(leverForThrottle(.62),sim.state.speed).ok,true);helm.setSteer(.04);const retained=helm.snapshot();cruise(sim,helm,12);
  assert.deepEqual(helm.snapshot(),retained,'sampling frames does not release friction-set controls');assert.equal(sim.state.engine,true);assert.ok(Math.abs(sim.state.throttle-.62)<1e-9);assert.ok(sim.state.speed>1);assert.ok(Math.hypot(sim.state.boatX-HARBOR.boatX,sim.state.boatZ-HARBOR.boatZ)>8);
  const beforeNeutral=sim.state.speed;assert.equal(helm.setLever(0,sim.state.speed).ok,true);sim.step(.1,helm.input());assert.equal(sim.state.throttle,0);assert.ok(sim.state.speed>beforeNeutral*.9,'neutral does not erase hull momentum');assert.equal(sim.state.engine,true);
  // Selecting a route must relinquish the old manual throttle source first.
@@ -31,7 +31,18 @@ test('automatic route survives menu pause/resume with no movement or extra time 
 });
 
 test('interrupting manual helm idles the vessel and does not reapply the old retained throttle after resume',()=>{
- const sim=depart(),helm=createSingleLeverControl();sim.toggleEngine();helm.setLever(leverForThrottle(.8),sim.state.speed);cruise(sim,helm,8);const before=sim.state.speed;
+ const sim=depart(),helm=createSingleLeverControl();helm.setLever(leverForThrottle(.8),sim.state.speed);cruise(sim,helm,8);const before=sim.state.speed;
  helm.reset();assert.equal(sim.setThrottle(0),true);sim.pause(true);cruise(sim,helm,2);assert.equal(sim.state.throttle,0);assert.equal(sim.state.speed,before);assert.deepEqual(helm.input(),{});
  sim.pause(false);cruise(sim,helm,.3);assert.equal(sim.state.throttle,0);assert.equal(sim.state.engine,true);assert.ok(sim.state.speed<before&&sim.state.speed>0);assert.equal(helm.state.gear,'N');assert.equal(helm.state.manual,false);
+});
+
+test('neutral alone permits fishing and legacy engine-off saves can drive directly after resume',()=>{
+ const sim=depart();assert.equal(sim.state.throttle,0);assert.equal(sim.fishingReadiness().ok,true);
+ assert.equal(sim.setThrottle(.4),true);assert.equal(sim.fishingReadiness().ok,false);
+ sim.setThrottle(0);assert.equal(sim.fishingReadiness().ok,true);assert.equal(sim.lowerRig().ok,true);
+ assert.equal(sim.setThrottle(.3),false);assert.ok(sim.setRodMount('port').ok);assert.equal(sim.setThrottle(.8),true);assert.equal(sim.state.throttle,.28);
+ const saved=sim.snapshot();saved.engine=false;saved.throttle=.8;
+ const restored=new PixelSimulation({saved,patrolRng:()=>.9});restored.start(true);assert.equal(restored.state.throttle,0);
+ assert.equal(restored.setThrottle(.3),true);restored.step(.1);assert.equal(restored.state.throttle,.3);assert.equal(restored.state.engine,true);
+ restored.setThrottle(0);restored.step(.1,{throttle:-.2});assert.equal(restored.state.throttle,-.2);
 });

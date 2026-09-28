@@ -52,14 +52,14 @@ test('retired anchors cannot be purchased or enabled and cannot affect carried w
  const sim=equipped(),credits=sim.state.profile.credits;Object.assign(sim.state,{playerX:HARBOR.counterX,playerZ:HARBOR.counterZ});const weight=sim.stats.weight;
  for(const id of ['anchor','sea_anchor']){assert.equal(sim.buyGear(id).ok,false);sim.state.profile.owned.push(id);sim.state.packed.push(id);assert.equal(sim.equip(id).ok,false);}
  assert.equal(sim.state.profile.credits,credits);assert.equal(sim.stats.weight,weight);assert.equal(sim.stats.hasAnchor,false);assert.equal(sim.publicState().hasAnchor,false);sim.syncLoadout();assert.ok(!sim.state.packed.includes('anchor'));assert.ok(!sim.state.packed.includes('sea_anchor'));
- aboard(sim);assert.equal(sim.toggleAnchor().ok,false);assert.equal(sim.state.anchor,false);assert.equal(sim.state.moored,false);assert.ok(sim.toggleEngine().ok);
+ aboard(sim);assert.equal(sim.toggleAnchor().ok,false);assert.equal(sim.state.anchor,false);assert.equal(sim.state.moored,false);
 });
 
 test('old deployed anchors, ropes and empty tanks resume as a usable boat without losing equipment or catches',()=>{
  const sim=equipped();aboard(sim);const saved=sim.snapshot();saved.profile.owned.push('anchor','sea_anchor');saved.packed.push('anchor','sea_anchor');Object.assign(saved,{anchor:true,moored:true,fuel:0});
- const restored=new PixelSimulation({saved,now});assert.ok(restored.start(true).ok);assert.equal(restored.state.anchor,false);assert.equal(restored.state.moored,false);assert.equal(restored.state.fuel,100);assert.equal(restored.publicState().hasAnchor,false);assert.equal(restored.stats.hasAnchor,false);assert.equal(restored.state.profile.credits,saved.profile.credits);assert.deepEqual(restored.state.catches,saved.catches);assert.deepEqual(restored.state.packed,saved.packed.filter(id=>!['anchor','sea_anchor'].includes(id)));assert.ok(restored.state.profile.owned.includes('anchor'));assert.ok(restored.toggleEngine().ok);assert.ok(restored.setThrottle(.4));
+ const restored=new PixelSimulation({saved,now});assert.ok(restored.start(true).ok);assert.equal(restored.state.anchor,false);assert.equal(restored.state.moored,false);assert.equal(restored.state.fuel,100);assert.equal(restored.publicState().hasAnchor,false);assert.equal(restored.stats.hasAnchor,false);assert.equal(restored.state.profile.credits,saved.profile.credits);assert.deepEqual(restored.state.catches,saved.catches);assert.deepEqual(restored.state.packed,saved.packed.filter(id=>!['anchor','sea_anchor'].includes(id)));assert.ok(restored.state.profile.owned.includes('anchor'));assert.ok(restored.setThrottle(.4));
 });
 
 test('running the engine consumes no fuel and an empty legacy tank never stops propulsion',()=>{
- const sim=equipped();aboard(sim);sim.state.fuel=0;assert.ok(sim.toggleEngine().ok);assert.ok(sim.setThrottle(.25));run(sim,60);assert.equal(sim.state.engine,true);assert.equal(sim.state.fuel,0);assert.ok(sim.state.sailed>20);sim.setThrottle(0);assert.ok(sim.toggleEngine().ok);assert.ok(sim.toggleEngine().ok);
+ const sim=equipped();aboard(sim);sim.state.fuel=0;assert.ok(sim.setThrottle(.25));run(sim,60);assert.equal(sim.state.engine,true);assert.equal(sim.state.fuel,0);assert.ok(sim.state.sailed>20);sim.setThrottle(0);
 });

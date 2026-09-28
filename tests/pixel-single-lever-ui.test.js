@@ -17,7 +17,7 @@ class Element extends EventTarget{
 function fixture(){
  const s={mode:'boat',engine:true,standing:false,moored:false,docking:null,paused:false,fishState:'idle',canOperateHelm:true,speed:0,throttle:0},handle=new Element(),lever=new Element(),arm=new Element(),meter=new Element(),gear=new Element(),feedback=[];
  const selectors={'#tiller-touch':handle,'.tiller-arm':arm,'#throttle-touch':lever,'#throttle-value':meter,'#throttle-gear':gear};let idles=0;
- const root={hidden:false,querySelector:selector=>selectors[selector]},helm=mountHelm(root,{getState:()=>s,onIdle:()=>{if(!s.waypoint)s.throttle=0;idles++;},onFeedback:value=>feedback.push(value),onToggleEngine:()=>{s.engine=!s.engine;return{ok:true};}});helm.update();
+ const root={hidden:false,querySelector:selector=>selectors[selector]},helm=mountHelm(root,{getState:()=>s,onIdle:()=>{if(!s.waypoint)s.throttle=0;idles++;},onFeedback:value=>feedback.push(value)});helm.update();
  return{s,helm,root,handle,lever,meter,gear,feedback,get idles(){return idles;}};
 }
 const close=(value,expected)=>assert.ok(Math.abs(value-expected)<1e-9,`${value} != ${expected}`);
@@ -55,8 +55,8 @@ for(const reason of['pointercancel','lostpointercapture','reset'])test(`${reason
  f.lever.send('pointerdown',2);f.lever.send('pointermove',2,{clientY:65});assert.equal(f.helm.snapshot().gear,'F');f.lever.send('pointerup',2);
 });
 
-test('pause, disabled fishing states and engine stop cancel held inputs before the next UI refresh',()=>{
- for(const patch of[{paused:true},{engine:false},{moored:true},{standing:true},{anchor:true},{docking:{}},{inspection:{phase:'checking'}},{fishState:'bite',canOperateHelm:false}]){
+test('pause, disabled fishing states  cancel held inputs before the next UI refresh',()=>{
+ for(const patch of[{paused:true},{moored:true},{standing:true},{anchor:true},{docking:{}},{inspection:{phase:'checking'}},{fishState:'bite',canOperateHelm:false}]){
   const f=fixture();f.lever.send('pointerdown');f.lever.send('pointermove',1,{clientY:40});Object.assign(f.s,patch);assert.deepEqual(f.helm.input(),{},JSON.stringify(patch));assert.equal(f.lever.captured.size,0);assert.equal(f.helm.snapshot().gear,'N');
   Object.assign(f.s,{paused:false,engine:true,moored:false,standing:false,anchor:false,docking:null,inspection:null,fishState:'idle',canOperateHelm:true});f.lever.send('pointermove',1,{clientY:10});assert.deepEqual(f.helm.input(),{});f.helm.update();assert.equal(f.lever.attributes['aria-disabled'],'false');
  }
@@ -86,26 +86,15 @@ test('keyboard crosses the neutral detent in one deliberate step and reversal ne
 });
 
 
-test('neutral tap starts and stops, while steering drag and cancellation never toggle',()=>{
- const f=fixture();f.s.engine=false;f.helm.update();assert.equal(f.handle.attributes['aria-disabled'],'false');assert.equal(f.lever.attributes['aria-disabled'],'true');
- // Event.timeStamp is native readonly; ordinary synthetic taps have a short elapsed time.
- f.handle.send('pointerdown');f.handle.send('pointerup');assert.equal(f.s.engine,true);assert.equal(f.helm.snapshot().gear,'N');
- f.handle.send('pointerdown',2);f.handle.send('pointermove',2,{clientX:110});f.handle.send('pointerup',2,{clientX:110});assert.equal(f.s.engine,true);assert.ok(f.helm.snapshot().steer>0);
- f.handle.send('pointerdown',3);f.handle.send('pointercancel',3);f.handle.send('pointerup',3);assert.equal(f.s.engine,true);
- f.handle.send('pointerdown',4);f.handle.send('pointerup',5);assert.equal(f.s.engine,true);f.handle.send('pointerup',4);assert.equal(f.s.engine,false);
- f.handle.key('Enter');assert.equal(f.s.engine,true);f.handle.key(' ');assert.equal(f.s.engine,false);
+test('legacy engine-off state does not gate steering or forward/reverse lever input',()=>{
+ const f=fixture();f.s.engine=false;f.helm.update();assert.equal(f.lever.attributes['aria-disabled'],'false');
+ f.lever.key('ArrowUp');assert.ok(f.helm.input().throttle>0);f.lever.key('Home');assert.equal(f.helm.input().throttle,0);
+ f.lever.key('ArrowDown');assert.ok(f.helm.input().throttle<0);f.lever.key('Home');
+ f.handle.send('pointerdown',2);f.handle.send('pointermove',2,{clientX:110});f.handle.send('pointerup',2,{clientX:110});assert.ok(f.helm.snapshot().steer>0);
 });
-
-test('ignition refuses engaged gears, route throttle and unavailable controls without neutralizing them',()=>{
- const f=fixture();f.lever.key('ArrowUp');const before=f.helm.snapshot();f.handle.send('pointerdown');f.handle.send('pointerup');assert.equal(f.s.engine,true);assert.deepEqual(f.helm.snapshot(),before);assert.match(f.feedback.at(-1).message,/空挡/);
- f.lever.key('Home');f.s.throttle=.3;f.s.waypoint={};assert.equal(f.helm.toggleIgnition().ok,false);assert.equal(f.s.engine,true);assert.equal(f.s.throttle,.3);
- f.s.throttle=0;for(const patch of[{paused:true},{canOperateHelm:false},{docking:{}},{inspection:{phase:'checking'}}]){const g=fixture();Object.assign(g.s,patch);g.handle.send('pointerdown');g.handle.send('pointerup');assert.equal(g.s.engine,true);}
- f.root.hidden=true;assert.equal(f.helm.toggleIgnition().ok,false);assert.equal(f.s.engine,true);
-});
-
-
-test('long press or an outward-and-back drag does not masquerade as an ignition tap',()=>{
- const f=fixture();f.handle.send('pointerdown',1,{timeStamp:100});f.handle.send('pointerup',1,{timeStamp:800});assert.equal(f.s.engine,true);
- f.handle.send('pointerdown',2);f.handle.send('pointermove',2,{clientX:120});f.handle.send('pointermove',2,{clientX:75});f.handle.send('pointerup',2);assert.equal(f.s.engine,true);
- f.s.engine=false;f.helm.update();f.handle.send('pointerdown',3);f.handle.send('pointermove',3,{clientX:120});f.handle.send('pointerup',3,{clientX:120});assert.equal(f.s.engine,false);
+test('tapping or keyboard activation on the tiller does not change propulsion',()=>{
+ const f=fixture();f.lever.key('ArrowUp');const before=f.helm.snapshot();
+ f.handle.send('pointerdown');f.handle.send('pointerup');f.handle.key('Enter');f.handle.key(' ');
+ assert.deepEqual(f.helm.snapshot(),before);assert.equal(f.feedback.length,0);assert.equal(f.s.engine,true);
+ assert.doesNotMatch(f.handle.attributes['aria-label'],/启停|启动|熄火/);
 });

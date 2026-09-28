@@ -12,14 +12,14 @@ function landing(sim){assert.equal(sim.walkTo('boarding').ok,true);for(let t=0;t
 const rentalTransactions=sim=>sim.state.profile.transactions.filter(t=>t.kind==='boat_rental');
 
 test('a new trip starts with an unpaid boat ashore and rescue cannot launch it for free',()=>{
- const sim=begin();assert.equal(BOAT_RENTAL_PRICE,15);assert.equal(sim.state.version,5);assert.equal(sim.state.profile.version,2);assert.equal(sim.state.launchStage,'stored');assert.equal(sim.publicState().rentalPaid,false);assert.equal(sim.publicState().rentalPrice,15);assert.equal(sim.launchBoat().ok,false,'payment happens at the counter');assert.equal(sim.toggleEngine().ok,false);assert.equal(sim.board().ok,false);
+ const sim=begin();assert.equal(BOAT_RENTAL_PRICE,15);assert.equal(sim.state.version,5);assert.equal(sim.state.profile.version,2);assert.equal(sim.state.launchStage,'stored');assert.equal(sim.publicState().rentalPaid,false);assert.equal(sim.publicState().rentalPrice,15);assert.equal(sim.launchBoat().ok,false,'payment happens at the counter');assert.equal(sim.board().ok,false);
  const credits=sim.state.profile.credits;sim.rescue();run(sim,30);assert.equal(sim.state.launchStage,'stored');assert.equal(sim.state.rentalPaid,false);assert.equal(sim.state.profile.credits,credits);assert.equal(rentalTransactions(sim).length,0);landing(sim);assert.equal(sim.board().ok,false);
 });
 
 test('counter payment starts a timed launch exactly once, including repeated requests',()=>{
  const sim=begin();counter(sim);assert.equal(sim.launchBoat().ok,true);assert.equal(sim.state.profile.credits,85);assert.equal(sim.state.rentalPaid,true);assert.equal(sim.state.launchStage,'lowering');assert.equal(sim.state.launchProgress,0);assert.deepEqual(rentalTransactions(sim).map(t=>t.delta),[-15]);
  run(sim,3);const progress=sim.state.launchProgress;sim.launchBoat();assert.equal(sim.state.launchProgress,progress);assert.equal(sim.state.profile.credits,85);assert.equal(rentalTransactions(sim).length,1);
- Object.assign(sim.state,{playerX:HARBOR.boardingX,playerZ:HARBOR.boardingZ});assert.equal(sim.board().ok,false);run(sim,21.1);assert.equal(sim.state.launchStage,'afloat');assert.equal(sim.board().ok,true);assert.equal(sim.unmoor().ok,true);assert.equal(sim.toggleEngine().ok,true);sim.rescue();counter(sim);assert.equal(sim.launchBoat().ok,true);assert.equal(rentalTransactions(sim).length,1);assert.equal(sim.state.profile.credits,85);
+ Object.assign(sim.state,{playerX:HARBOR.boardingX,playerZ:HARBOR.boardingZ});assert.equal(sim.board().ok,false);run(sim,21.1);assert.equal(sim.state.launchStage,'afloat');assert.equal(sim.board().ok,true);assert.equal(sim.unmoor().ok,true);sim.rescue();counter(sim);assert.equal(sim.launchBoat().ok,true);assert.equal(rentalTransactions(sim).length,1);assert.equal(sim.state.profile.credits,85);
 });
 
 test('insufficient credits never become a free rental or negative balance; exact payment is allowed',()=>{
@@ -51,7 +51,7 @@ test('version-five floating flags without payment recover ashore and all propuls
   const saved={...begin(14).snapshot(),mode:'boat',launchStage:stage,launchProgress:.6,rentalPaid:false,boatX:100,boatZ:-300,loaded:true,engine:true,throttle:1,moored:false,anchor:true};const sim=new PixelSimulation({saved,now});sim.start(true);
   assert.equal(sim.state.mode,'walk');assert.deepEqual(position(sim.state),{x:HARBOR.spawnX,z:HARBOR.spawnZ});assert.equal(sim.state.launchStage,'stored');assert.equal(sim.state.launchProgress,0);assert.equal(sim.state.rentalPaid,false);assert.equal(sim.state.moored,true);assert.equal(sim.state.loaded,false);assert.equal(sim.state.engine,false);assert.equal(sim.state.anchor,false);assert.equal(sim.state.profile.credits,14);
  }
- const sim=begin();Object.assign(sim.state,{mode:'boat',launchStage:'afloat',moored:false});assert.equal(sim.toggleEngine().ok,false);assert.equal(sim.setThrottle(1),false);assert.equal(sim.selectWaypoint(FISHING_SPOTS[0]).ok,false);assert.equal(sim.startCast().ok,false);assert.equal(sim.unmoor().ok,false);sim.step(.1,{throttle:1});assert.equal(sim.state.engine,false);assert.equal(sim.state.launchStage,'stored');assert.equal(sim.state.speed,0);
+ const sim=begin();Object.assign(sim.state,{mode:'boat',launchStage:'afloat',moored:false});assert.equal(sim.setThrottle(1),false);assert.equal(sim.selectWaypoint(FISHING_SPOTS[0]).ok,false);assert.equal(sim.startCast().ok,false);assert.equal(sim.unmoor().ok,false);sim.step(.1,{throttle:1});assert.equal(sim.state.engine,false);assert.equal(sim.state.launchStage,'stored');assert.equal(sim.state.speed,0);
 });
 
 test('starting a new trip from a paid save needs a new rental while continuing that save does not',()=>{
