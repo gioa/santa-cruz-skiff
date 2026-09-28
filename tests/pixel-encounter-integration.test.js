@@ -47,3 +47,17 @@ test('encounter month changes at Santa Cruz midnight, not UTC midnight',()=>{
  sim.state.gameElapsed=13*3600;assert.equal(sim.rigEnvironment().month,9);
  sim.state.gameElapsed=18*3600;assert.equal(sim.rigEnvironment().month,10);
 });
+
+test('feather tips use physical stock, affect rockfish encounters and wear without disabling the feather lure',()=>{
+ for(const bait of ['squid','anchovy','jig']){
+  const sim=ready('feather40'),s=sim.state;s.profile.stock[bait]=4;
+  const opts={habitat:'reef',substrateMapped:true,bottomDepth:30,lureDepth:29,month:9,waterTemp:14,driftSpeedMps:.08,lureVerticalSpeedMps:.5};
+  const rate=()=>fishEncounter([{id:'copper'}],{...sim.rigEnvironment(),...opts}).ratePerSecond;
+  const bare=rate();assert.ok(sim.replaceBait(undefined,bait).ok);assert.equal(s.profile.stock[bait],3);assert.equal(sim.rigEnvironment().baitTipped,true);assert.ok(rate()>bare);
+  const tipped=rate();assert.ok(sim.lowerRig().ok);sim.retrieve();assert.equal(s.profile.stock[bait],3,'lowering never consumes a second portion');
+  s.fish={name:'铜岩鱼',latin:'Sebastes caurinus',length:30,kg:.5};s.fishState='landed';sim.releaseCatch();
+  assert.equal(s.baitOnHook.condition,bait==='jig'?.77:0);assert.ok(rate()<tipped);
+  s.baitOnHook.condition=0;assert.equal(sim.rigEnvironment().baitTipped,false);assert.equal(sim.rigEnvironment().bait,'feather');assert.ok(rate()>0);assert.ok(sim.lowerRig().ok,'bare feathers still work');sim.retrieve();
+  const restored=new PixelSimulation({saved:sim.snapshot()});restored.start(true);assert.equal(restored.state.profile.stock[bait],3);assert.equal(restored.state.baitOnHook.condition,0);
+ }
+});

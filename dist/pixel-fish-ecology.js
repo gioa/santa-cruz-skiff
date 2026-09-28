@@ -3,8 +3,8 @@
  * measured bite percentages. Seasons describe availability, never legality.
  * Every species uses the same unnormalised weight for both encounter timing
  * and conditional selection; poor presentations therefore mean fewer bites. */
-import {getRigProfile,rigSpeciesKey} from './fishing-rigs.js?v=20260927-pixel-v26';
-import {USABLE_CONDITION} from './pixel-consumables.js?v=20260927-pixel-v26';
+import {getRigProfile,rigSpeciesKey} from './fishing-rigs.js?v=20260927-pixel-v27';
+import {USABLE_CONDITION} from './pixel-consumables.js?v=20260927-pixel-v27';
 
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const finite=(v,f=0)=>Number.isFinite(v)?v:f;
@@ -69,8 +69,8 @@ function environment(options){
 function tipAffinity(key,e){
  if(!e.tip||e.tipFreshness<=USABLE_CONDITION)return 1;
  const fishBait=['anchovy','sardine'].includes(e.tip);
- const boost=['blue','copper','vermilion'].includes(key)?(e.tip==='squid'?.18:fishBait?.12:.08):
-  key==='lingcod'?(fishBait?.16:e.tip==='squid'?.1:.03):
+ const boost=['blue','copper','vermilion'].includes(key)?(e.tip==='jig'?.08+.16*e.action:e.tip==='squid'?.18:fishBait?.12:.08):
+  key==='lingcod'?(e.tip==='jig'?.06+.18*e.action:fishBait?.16:e.tip==='squid'?.1:.03):
   key==='halibut'?(fishBait?.18:e.tip==='squid'?.08:.03):
   ['croaker','sanddab'].includes(key)?(['squid','shrimp'].includes(e.tip)?.3:fishBait?.25:.06):
   key==='mackerel'?(fishBait?.16:e.tip==='squid'?.12:.08):fishBait?.12:e.tip==='squid'?.06:.02;

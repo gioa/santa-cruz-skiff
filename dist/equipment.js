@@ -1,4 +1,4 @@
-import {starterConsumables,ensureConsumables,suppliesWeight} from './pixel-consumables.js?v=20260927-pixel-v26';
+import {starterConsumables,ensureConsumables,suppliesWeight} from './pixel-consumables.js?v=20260927-pixel-v27';
 // Virtual credits and simulation tuning. These are not retail prices or harvest rules.
 export const GEAR_CATALOG=[
  {id:'pfd',slot:'safety',name:'救生衣',price:0,kg:.7,desc:'穿在身上 · 落水时提供浮力',icon:'◈'},
@@ -21,7 +21,7 @@ export const GEAR_CATALOG=[
  {id:'rig_float',slot:'rig',name:'定层浮游钓组',price:25,kg:.09,desc:'调整浮漂饵层，搜索中上层鱼群',rig:'float',hooks:1},
  {id:'rig_dropper',slot:'rig',name:'双支线沉底组',price:35,kg:.16,desc:'两枚钩高低分布，鱼饵略离底层',rig:'dropper',hooks:2},
  {id:'rig_sabiki',slot:'rig',name:'双钩羽毛钓组',price:30,kg:.08,desc:'两枚小钩，中层短提寻找鲭鱼群',rig:'sabiki',hooks:2},
- {id:'rig_feather40',slot:'rig',name:'双支线羽毛钓组',price:40,kg:.16,desc:'两枚 4/0 羽毛 J 型钩 · 4 oz 底坠 · 礁区离底轻提，无需另挂鱼饵',rig:'feather40',hooks:2},
+ {id:'rig_feather40',slot:'rig',name:'双支线羽毛钓组',price:40,kg:.16,desc:'两枚 4/0 羽毛 J 型钩 · 4 oz 底坠 · 礁区离底轻提，可挂鱿鱼条、鳀鱼或软饵',rig:'feather40',hooks:2},
  {id:'sinker_heavy',slot:'weight',name:'可调铅坠包',price:30,kg:.45,desc:'加速深水下沉；更易接触结构和挂底'},
  {id:'bait_anchovy',slot:'consumable',name:'鳀鱼饵 · 12 份',price:16,kg:.25,desc:'柔软鱼肉饵；多种近岸鱼都会取食',bait:'anchovy',quantity:12},
  {id:'bait_shrimp',slot:'consumable',name:'虾饵 · 12 份',price:18,kg:.22,desc:'适合近底和码头周边搜索',bait:'shrimp',quantity:12},
