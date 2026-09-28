@@ -97,3 +97,14 @@ test('partial wire damage survives retrieval, save/resume and stowing then reins
  assert.ok(resumed.replaceRig(undefined,'sabiki').ok);assert.equal(resumed.rodConsumableStatus().rig.hookDamage,damage);
  bite(resumed,large);assert.equal(resumed.state.biteHold.wireDamage,damage,'a second fish inherits the physical hook damage');
 });
+
+
+test('a 32-inch halibut keeps loaded winding feedback through the real simulation input loop',()=>{
+ const sim=ready();bite(sim,{name:'加州比目鱼',latin:'Paralichthys californicus',length:81.28,kg:6.1});
+ sim.state.drag=.85;until(sim,s=>s.fishState==='fight',10,{reel:1.2});
+ let slowed=0,bent=0,ran=0,elapsed=0;
+ while(sim.state.fishState==='fight'&&elapsed<240){sim.step(.05,{reel:1.2});elapsed+=.05;
+  if(sim.state.crankRate<.9)slowed++;if(sim.state.rodBend>.6)bent++;if(sim.state.payoutRate>.1)ran++;
+ }
+ assert.ok(slowed>20);assert.ok(bent>20);assert.ok(ran>5);assert.equal(sim.state.fishState,'landed');
+});

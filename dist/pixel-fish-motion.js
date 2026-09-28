@@ -14,7 +14,7 @@ export function fishBodyPose(kind,{time=0,mass=1,energy=1,headShake=0,phase='',l
  const rate=p.hz*clamp(Math.pow(Math.max(.05,mass),-.12),.65,1.45),t=time*rate*Math.PI*2;
  const fatigue=.15+.85*Math.sqrt(clamp(energy,0,1));
  // Quiet breathing between irregular kicks; a caught fish is not a metronome.
- const kick=landed?Math.max(0,Math.sin(time*2.2+.4))**8:clamp(.15+headShake*.6+(['run','kick','jump'].includes(phase)?.35:0),0,1);
+ const kick=landed?Math.max(0,Math.sin(time*2.2+.4))**8:clamp(.15+headShake*.6+(['run','kick','jump','dive'].includes(phase)?.35:0),0,1);
  const effort=fatigue*(landed?.13+.87*kick:kick);
  return{tail:p.tail*effort,wave:t,pitch:airborne?clamp(jumpVelocity*.14,-.55,.55):Math.sin(t*.43)*.055*effort,roll:1-p.roll*Math.abs(Math.sin(t*.47))*effort};
 }

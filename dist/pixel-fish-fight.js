@@ -33,7 +33,7 @@ export function fishFightKind(fish={}){
 }
 export function createFishFight(fish={},variation=.5){
  const kind=fishFightKind(fish),mass=clamp(finite(fish.kg,.6),kind==='baitfish'?.005:.05,80),p=FISH_FIGHT_PROFILES[kind];
- return{kind,mass,energy:1,variation:clamp(finite(variation,.5),0,1),capacityJ:p.budget*Math.pow(mass,.85),workJ:0,jumpVelocity:0,jumpActive:false,jumpCooldown:6+clamp(finite(variation,.5),0,1)*12,splash:0};
+ return{kind,mass,energy:1,variation:clamp(finite(variation,.5),0,1),capacityJ:p.budget*Math.pow(mass,.85),workJ:0,surfaceStartleUsed:false,surfaceBurstSeconds:0,jumpVelocity:0,jumpActive:false,jumpCooldown:6+clamp(finite(variation,.5),0,1)*12,splash:0};
 }
 export function stepFishFight(fish={},fight,{dt=.1,time=0,rodLoadN=0,payoutRate=0,retrieveRate=0,lineSlackMeters=0,lureDepth=0,fishHeight=-lureDepth,paidLineMeters=0}={}){
  const f=fight||createFishFight(fish),p=FISH_FIGHT_PROFILES[f.kind]||FISH_FIGHT_PROFILES.rockfish;
@@ -42,7 +42,14 @@ export function stepFishFight(fish={},fight,{dt=.1,time=0,rodLoadN=0,payoutRate=
  const largeRock=f.kind==='rockfish'?clamp((f.mass-1.5)/4,0,1):0;
  const run=p.run*(1+.8*largeRock),rest=p.rest*(1-.2*largeRock),cycle=(run+rest)*v,phase=time%cycle,burst=phase<run*v;
  // Short accelerating surges with rounded ends, not every fish sharing one sine.
- const envelope=burst?Math.sin(Math.PI*clamp(phase/(run*v),0,1))**.55:0;
+ let envelope=burst?Math.sin(Math.PI*clamp(phase/(run*v),0,1))**.55:0;
+ // Some flatfish rise quietly, then bolt when hurried into the surface zone.
+ // One opportunity per encounter, not a mandatory timer or repeated boss phase.
+ const nearSurface=f.kind==='halibut'&&lureDepth<1.8&&lureDepth>.05;
+ const startled=nearSurface&&!f.surfaceStartleUsed&&energy>.18&&f.mass>.8&&lineSlackMeters<.3&&retrieveRate>.12&&f.variation<.82;
+ const surfaceBurstSeconds=startled?2.2+f.variation*1.2:Math.max(0,finite(f.surfaceBurstSeconds)-dt);
+ const surfaceBurst=surfaceBurstSeconds>0;
+ if(surfaceBurst)envelope=Math.max(envelope,.8+.2*Math.sin(Math.PI*Math.min(1,surfaceBurstSeconds/3.2)));
  const rockFloor=.44+.16*largeRock;
  const fatigue=.12+.88*Math.sqrt(energy),rockSettle=f.kind==='rockfish'?(rockFloor+(1-rockFloor)*Math.exp(-time/(11+17*largeRock))):1;
  let headShake=(.5+.5*Math.sin(time*p.shake*Math.PI*2+f.variation*3))*envelope*fatigue;
@@ -59,7 +66,7 @@ export function stepFishFight(fish={},fight,{dt=.1,time=0,rodLoadN=0,payoutRate=
   if(height<=0&&jumpVelocity<0){jumpActive=false;jumpVelocity=0;splash=.65;nextCooldown=18+f.variation*30;}
   else{jumpVelocity-=9.81*dt;headShake=Math.max(headShake,.75*fatigue);}
  }
- const drive=massScale*(p.base*.55+p.burst*(1+.2*largeRock)*envelope)*fatigue*rockSettle*v;
+ const drive=massScale*(p.base*(f.kind==='halibut'?1.5:.55)+p.burst*(1+.2*largeRock)*(surfaceBurst?1.6:1)*envelope)*fatigue*rockSettle*v;
  const pullN=Math.max(.12,drive*(.86+.14*headShake));
  const loaded=lineSlackMeters<.3&&rodLoadN>.25;
  // Work against the line plus muscle effort under load. Free slack lets fish
@@ -70,9 +77,9 @@ export function stepFishFight(fish={},fight,{dt=.1,time=0,rodLoadN=0,payoutRate=
  const runSpeedMps=p.speed*Math.pow(f.mass,.12)*envelope*fatigue*rockSettle;
  const lateralMps=Math.sin(time*.62+f.variation*5)*p.lateral*envelope*fatigue;
  // Pelagic runs gradually travel upwards; bottom species stay close to reef.
- const diveMps=burst?p.dive*envelope*fatigue:((f.kind==='salmon'||f.kind==='bonito')&&lureDepth>1?-.16:0);
- return{fight:{...f,energy:nextEnergy,workJ:finite(f.workJ)+effort*dt,jumpVelocity,jumpActive,jumpCooldown:nextCooldown,splash},pullN,
-  motion:{runSpeedMps,lateralMps,diveMps:jumpActive?-jumpVelocity:diveMps,headShake,jumpActive,jumpVelocity,splash,phase:jumpActive?'jump':envelope>.15?(f.kind==='rockfish'?'kick':'run'):energy<.25?'settle':'glide'}};
+ const diveMps=surfaceBurst?(1.15+.25*Math.pow(f.mass,.12))*fatigue:burst?p.dive*envelope*fatigue:((f.kind==='salmon'||f.kind==='bonito')&&lureDepth>1?-.16:0);
+ return{fight:{...f,energy:nextEnergy,workJ:finite(f.workJ)+effort*dt,surfaceStartleUsed:Boolean(f.surfaceStartleUsed||startled),surfaceBurstSeconds,jumpVelocity,jumpActive,jumpCooldown:nextCooldown,splash},pullN,
+  motion:{bodyDragArea:f.kind==='halibut'?.018*Math.pow(f.mass,2/3):0,runSpeedMps,lateralMps,diveMps:jumpActive?-jumpVelocity:diveMps,headShake,jumpActive,jumpVelocity,splash,phase:jumpActive?'jump':surfaceBurst?'dive':envelope>.15?(f.kind==='rockfish'?'kick':'run'):energy<.25?'settle':'glide'}};
 }
 /** At the gunwale, an adequately controlled fish can be netted immediately.
  * A small fish never has to spend a scripted amount of time being fought.

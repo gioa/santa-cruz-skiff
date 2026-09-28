@@ -1,0 +1,44 @@
+[
+  {
+    "inches": 32,
+    "kg": 6.1,
+    "drag": 0.35,
+    "depth": 12,
+    "variation": 0.5,
+    "landed": true,
+    "seconds": 58.2,
+    "out": 18.76,
+    "peak": 25.76,
+    "maxLoad": 11.56,
+    "slowest": 0.062,
+    "nearRun": false
+  },
+  {
+    "inches": 32,
+    "kg": 6.1,
+    "drag": 0.48,
+    "depth": 12,
+    "variation": 0.5,
+    "landed": true,
+    "seconds": 38.2,
+    "out": 9.25,
+    "peak": 25.76,
+    "maxLoad": 14.64,
+    "slowest": 0.062,
+    "nearRun": false
+  },
+  {
+    "inches": 32,
+    "kg": 6.1,
+    "drag": 0.85,
+    "depth": 12,
+    "variation": 0.5,
+    "landed": true,
+    "seconds": 19,
+    "out": 0.5,
+    "peak": 25.76,
+    "maxLoad": 23.32,
+    "slowest": 0.062,
+    "nearRun": false
+  }
+]
