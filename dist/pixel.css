@@ -405,3 +405,17 @@
  #app #controls:has(#boat-panel-tabs:not([hidden])) .helm-label{left:5px;font-size:9px;letter-spacing:0}
  #app #controls:has(#boat-panel-tabs:not([hidden])) #boat-fishing .fishing-toolbar #rod-mount{min-width:0;width:100%;font-size:14px}
 }
+
+/* The selected physical rod and its holder remain visible in every rod view. */
+#boat-fishing .rod-identity{grid-column:1/-1;display:flex;align-items:center;gap:6px;background:#f5e7c5ee;border:1px solid #9ba588;padding:5px 6px;min-width:0;font-size:11px;line-height:1.4}
+#active-rod-name{flex:1;min-width:0;overflow-wrap:anywhere}
+#active-rod-select{flex:1;min-width:0;width:100%;min-height:44px;background:#fff1d5;color:#214c4c;border:1px solid #718775;font-size:16px;touch-action:manipulation}
+#active-rod-location{flex:none;font-size:10px;color:#355e50}
+#boat-fishing .tackle-caption{grid-row:auto}
+#boat-fishing .fishing-instruments,#boat-fishing .fishing-toolbar{grid-row:3}
+#boat-fishing.no-instruments .fishing-toolbar{grid-row:auto}
+@media(max-height:500px) and (orientation:landscape){
+ #boat-console #boat-fishing .rod-identity{grid-row:1}
+ #boat-console #boat-fishing .fishing-instruments,#boat-console #boat-fishing .fishing-toolbar{grid-row:2}
+}
+.is-fishing-focus #boat-fishing .rod-identity{position:absolute;left:12px;top:calc(55px + env(safe-area-inset-top));max-width:calc(100vw - 24px);color:#244c46}

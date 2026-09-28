@@ -46,3 +46,17 @@ test('neutral alone permits fishing and legacy engine-off saves can drive direct
  assert.equal(restored.setThrottle(.3),true);restored.step(.1);assert.equal(restored.state.throttle,.3);assert.equal(restored.state.engine,true);
  restored.setThrottle(0);restored.step(.1,{throttle:-.2});assert.equal(restored.state.throttle,-.2);
 });
+
+test('entering rod mode takes the holder rod after coasting and a new helm command cancels the pending pickup',()=>{
+ const sim=depart();sim.setRodMount('port');sim.state.speed=2;sim.setThrottle(.4);const result=sim.requestRodInHand();assert.ok(result.ok);assert.equal(sim.state.throttle,0);assert.equal(sim.state.rodMount,'port');assert.equal(sim.state.pendingRodPickup,true);
+ sim.state.speed=.5;sim.step(.1);assert.equal(sim.state.rodMount,'hand');assert.equal(sim.state.pendingRodPickup,false);
+ sim.setRodMount('starboard');sim.state.speed=2;sim.requestRodInHand();sim.cancelRodPickup();sim.state.speed=.5;sim.step(.1);assert.equal(sim.state.rodMount,'starboard');
+ sim.state.speed=0;sim.requestRodInHand();assert.equal(sim.state.rodMount,'hand');sim.pause(true);assert.equal(sim.requestRodInHand().ok,false);
+});
+
+test('empty bait never blocks holding or swapping rods; a real cast explains the missing bait without consumption',()=>{
+ const sim=depart();sim.state.baitOnHook=null;sim.state.profile.rodSupplies[sim.state.profile.loadout.rod].bait=null;sim.state.profile.stock.squid=0;
+ sim.setRodMount('port');assert.equal(sim.requestRodInHand().ok,true);assert.equal(sim.state.rodMount,'hand');assert.equal(sim.selectRod('rod').ok,true);
+ assert.equal(sim.fishingReadiness(false,{ignoreBait:true}).ok,true);assert.equal(sim.fishingReadiness().ok,false);const casts=sim.state.casts;
+ const result=sim.castTo({x:sim.state.boatX-15,z:sim.state.boatZ});assert.equal(result.ok,false);assert.match(result.message,/鱼饵/);assert.equal(sim.state.casts,casts);assert.equal(sim.state.rodMount,'hand');assert.equal(sim.state.profile.stock.squid,0);
+});

@@ -1,4 +1,4 @@
-import {FISHING_SCENE_SCALE} from './skiff-dimensions.js?v=20260927-pixel-v40';
+import {FISHING_SCENE_SCALE} from './skiff-dimensions.js?v=20260927-pixel-v41';
 export {FISHING_SCENE_SCALE};
 // Boat-centred tackle projection. Geography, walking and helm waypoints keep
 // their existing map projection; the physical spool remains in real metres.
