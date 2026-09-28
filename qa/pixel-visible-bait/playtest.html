@@ -1,0 +1,22 @@
+<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>可见饵鱼 · 本机验证</title>
+<style>*{box-sizing:border-box}body{margin:0;background:#36969f;font:14px system-ui;color:#173f43;user-select:none}canvas#world{display:block;width:100vw;height:100vh;image-rendering:pixelated}header{position:fixed;top:10px;left:10px;right:10px;background:#fff1d5ed;padding:10px;border:2px solid #173f43}footer{position:fixed;bottom:10px;left:10px;right:10px;background:#fff1d5ed;padding:10px;border:2px solid #173f43;display:flex;flex-wrap:wrap;gap:8px}button{font:inherit;padding:10px;background:#173f43;color:#fff1d5;border:0;touch-action:manipulation}#status{width:100%;font-size:13px}#catch{display:none;position:fixed;inset:18% 7%;background:#fff1d5;border:3px solid #173f43;padding:18px}#fish{width:100%;image-rendering:pixelated}small{display:block;font-size:11px}</style>
+<canvas id="world"></canvas><header>可见饵鱼 · 本机验证<small>确定性鱼群；正式渲染与钓鱼物理，不修改正式存档。</small></header>
+<footer><button id="start">创建沙丁鱼群</button><button id="cast">抛到鱼群</button><button id="brake">锁住线杯</button><button id="reel">开始收线</button><div id="status">等待开始</div></footer>
+<div id="catch"><h2 id="name"></h2><p id="size"></p><canvas id="fish"></canvas><p id="population"></p><button id="keep">收入冰箱</button><button id="release">记录并放流</button></div>
+<script type="module">
+import {PixelSimulation,HARBOR,FISHING_SPOTS} from '../../dist/pixel-sim.js';
+import {createPixelWorld} from '../../dist/pixel-world.js';
+import {createPixelSprites} from '../../dist/pixel-sprites.js';
+import {syncVessel} from '../../dist/vessel-physics.js';
+import {schoolFish} from '../../dist/pixel-small-fish.js';
+import {drawFishArt,fishSpriteKind} from '../../dist/pixel-fish-art.js';
+const $=id=>document.getElementById(id),sprites=createPixelSprites(),world=createPixelWorld($('world'),{sprites,conditions:{waveHeight:0,windKnots:0}});let sim=null,reel=false,previous=performance.now(),shown=false;
+const allowed=location.hostname==='localhost'&&location.port==='4193';for(const b of document.querySelectorAll('button'))b.disabled=!allowed;
+function resize(){world.resize(innerWidth,innerHeight);world.setTopInset(75);world.setBottomInset(155);}addEventListener('resize',resize);resize();world.setZoom(7);
+$('start').onclick=()=>{sim=new PixelSimulation({rng:()=>.25,patrolRng:()=>.99});sim.start();Object.assign(sim.state,{playerX:HARBOR.counterX,playerZ:HARBOR.counterZ});sim.buyGear('rig_sabiki');sim.replaceRig(undefined,'sabiki');sim.launchBoat();for(let i=0;i<250;i++)sim.step(.1);Object.assign(sim.state,{playerX:HARBOR.boardingX,playerZ:HARBOR.boardingZ});sim.board();const p=FISHING_SPOTS[0];Object.assign(sim.state,{boatX:p.x,boatZ:p.z});syncVessel(sim.vessel,{x:p.x,z:p.z,clearMotion:true});world.wildlife.events.splice(0);world.wildlife.events.push({id:9001,type:'bait',species:'sardine-school',x:p.x-9,z:p.z-1,radius:3,density:.8,depth:2.6,thickness:.6,visualFishCount:48,age:10,duration:2000,seed:128,followers:[],members:1,heading:0,speed:.025,phase:0});shown=false;reel=false;$('catch').style.display='none';};
+$('cast').onclick=()=>{const e=world.wildlife.events.find(e=>e.id===9001);if(sim&&e){const result=sim.castTo(e);$('status').textContent=result.message;}};
+$('brake').onclick=()=>sim?.setReelMode('brake');$('reel').onclick=()=>{reel=!reel;$('reel').textContent=reel?'停止收线':'开始收线';};
+for(const keep of[true,false])$(keep?'keep':'release').onclick=()=>{const result=keep?sim.keepCatch():sim.releaseCatch();if(result.ok){$('catch').style.display='none';shown=false;reel=false;sim.pause(false);}};
+function frame(now){const dt=Math.min(.05,(now-previous)/1000);previous=now;if(sim){sim.setBaitSchools(world.wildlife.events);sim.step(dt,{reel:reel?1.2:0});world.draw({...sim.state,controlPanel:'tackle'},dt);const s=sim.state,e=world.wildlife.events.find(e=>e.id===9001),count=e?schoolFish(e).length:0;$('status').textContent=`#6 羽毛组 · ${s.fishState} · 放线 ${(s.paidLineMeters*3.28084).toFixed(1)} ft · 钩深 ${(s.lureDepth*3.28084).toFixed(1)} ft · 鱼群 ${count} 条 · ${s.toast||''}`;if(s.fishState==='landed'&&!shown){shown=true;sim.pause(true);$('catch').style.display='block';$('name').textContent=s.fish.commonName;$('size').textContent=`${(s.fish.length/2.54).toFixed(1)} in · ${(s.fish.kg*2.20462).toFixed(2)} lb`;drawFishArt($('fish'),sprites.fish[fishSpriteKind(s.fish)],s.fish);$('population').textContent=`来自鱼群 ${s.fish.schoolId}，个体 ${s.fish.schoolSlot}。鱼群剩余 ${count} 条。`;}}
+ requestAnimationFrame(frame);}requestAnimationFrame(frame);
+</script>

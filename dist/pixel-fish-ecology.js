@@ -3,8 +3,8 @@
  * measured bite percentages. Seasons describe availability, never legality.
  * Every species uses the same unnormalised weight for both encounter timing
  * and conditional selection; poor presentations therefore mean fewer bites. */
-import {getRigProfile,rigSpeciesKey} from './fishing-rigs.js?v=20260927-pixel-v42';
-import {USABLE_CONDITION} from './pixel-consumables.js?v=20260927-pixel-v42';
+import {getRigProfile,rigSpeciesKey} from './fishing-rigs.js?v=20260927-pixel-v43';
+import {USABLE_CONDITION} from './pixel-consumables.js?v=20260927-pixel-v43';
 
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const finite=(v,f=0)=>Number.isFinite(v)?v:f;
@@ -145,6 +145,7 @@ export function fishEncounter(fishes,options={}){
  const weights=fishes.map(fish=>{
   const key=speciesKey(fish),s=SPECIES[key];
   if(!active)return 0;
+  if(fish.baitfish&&Number.isFinite(fish.encounterWeight))return Math.max(0,fish.encounterWeight)*freshness;
   if(!s)return .002*freshness;
   // Mapped artificial structure supplies shelter/edges, not a kelp claim.
   const substrate=options.habitat==='artificial'?'mixed':options.habitat;

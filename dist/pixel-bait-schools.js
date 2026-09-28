@@ -30,7 +30,8 @@ export function baitSchoolInfluence(schools,point,depth){
   if(distance>radius*2.5)continue;
   const fade=clamp(Math.min(finite(e.age,3)/3,(finite(e.duration,100)-finite(e.age))/6),0,1);
   const horizontal=Math.exp(-.5*(distance/radius)**2),vertical=Math.exp(-.5*((depth-finite(e.depth,3.4))/Math.max(.5,finite(e.thickness,1.3)))**2);
-  const local=horizontal*vertical*density*fade;
+  const remaining=Number.isFinite(e.visualFishCount)?Math.max(0,1-new Set(e.removedFish||[]).size/Math.max(1,e.visualFishCount)):1;
+  const local=horizontal*vertical*density*fade*remaining;
   if(e.species==='mackerel-school')result.mackerel=Math.max(result.mackerel,1+5*local);
   for(const p of e.followers||[])if(p.kind in result)result[p.kind]=Math.max(result[p.kind],1+7*local);
  }

@@ -1,4 +1,4 @@
-import {starterConsumables,ensureConsumables,suppliesWeight} from './pixel-consumables.js?v=20260927-pixel-v42';
+import {starterConsumables,ensureConsumables,suppliesWeight} from './pixel-consumables.js?v=20260927-pixel-v43';
 // Virtual credits and simulation tuning. These are not retail prices or harvest rules.
 export const GEAR_CATALOG=[
  {id:'pfd',slot:'safety',name:'救生衣',price:0,kg:.7,desc:'穿在身上 · 落水时提供浮力',icon:'◈'},
@@ -20,7 +20,7 @@ export const GEAR_CATALOG=[
  {id:'rig_jig',slot:'rig',name:'铅头软饵钓组',price:35,kg:.16,desc:'轻提后放落，或缓收搜索礁区底层',rig:'jig',hooks:1},
  {id:'rig_float',slot:'rig',name:'定层浮游钓组',price:25,kg:.09,desc:'浮漂保持预设饵层，搜索中上层鱼群',rig:'float',hooks:1},
  {id:'rig_dropper',slot:'rig',name:'双支线沉底组',price:35,kg:.16,desc:'两枚钩高低分布，鱼饵略离底层',rig:'dropper',hooks:2},
- {id:'rig_sabiki',slot:'rig',name:'双钩羽毛钓组',price:30,kg:.08,desc:'两枚小钩，中层短提寻找鲭鱼群',rig:'sabiki',hooks:2},
+ {id:'rig_sabiki',slot:'rig',name:'双钩羽毛钓组',price:30,kg:.08,desc:'两枚 #6 羽毛钩 · 1 oz 底坠 · 对准可见饵鱼群，在同水层轻提缓收',rig:'sabiki',hooks:2},
  {id:'rig_feather40',slot:'rig',name:'双支线羽毛钓组',price:40,kg:.16,desc:'两枚 4/0 羽毛 J 型钩 · 4 oz 底坠 · 礁区离底轻提，可挂鱿鱼条、鳀鱼或软饵',rig:'feather40',hooks:2},
  {id:'sinker_heavy',slot:'weight',name:'可调铅坠包',price:30,kg:.45,desc:'加速深水下沉；更易接触结构和挂底'},
  {id:'bait_anchovy',slot:'consumable',name:'鳀鱼饵 · 12 份',price:16,kg:.25,desc:'柔软鱼肉饵；多种近岸鱼都会取食',bait:'anchovy',quantity:12},
@@ -57,7 +57,7 @@ export function buyGear(profile,id){
  return{ok:true,message:`已兑换 ${item.name}，可在装备里选择使用。`};
 }
 export function restock(profile){ensureConsumables(profile);profile.stock.squid=Math.max(12,profile.stock.squid||0);while(profile.rigStock.bottom.length<2)profile.rigStock.bottom.push({condition:1,bait:null});profile.condition=100;return profile;}
-export function fishReward(fish){return Math.round(22*Math.max(.7,Math.min(2.2,Math.sqrt((fish.kg||.5)/.75))))+Math.round((fish.length||20)/5);}
+export function fishReward(fish){if(fish.baitfish)return Math.max(1,Math.round((fish.kg||.01)*20));return Math.round(22*Math.max(.7,Math.min(2.2,Math.sqrt((fish.kg||.5)/.75))))+Math.round((fish.length||20)/5);}
 export function settleFish(profile,fish){if(!fish.catchId||profile.settled.includes(fish.catchId)||fish.settled)return 0;const first=!profile.seen.includes(fish.name);const reward=fishReward(fish)+(first?15:0);profile.settled.push(fish.catchId);fish.settled=true;fish.reward=reward;profile.credits+=reward;if(first)profile.seen.push(fish.name);profile.transactions.unshift({kind:fish.kept?'fish_trade':'release_record',catchId:fish.catchId,delta:reward,time:new Date().toISOString()});return reward;}
 export function cargoWeight(catches){return catches.filter(f=>f.kept&&!f.settled).reduce((n,f)=>n+(f.kg||0),0);}
 export function carriedWeight(packed,profile){const baitMass=packed.includes('bait')&&profile?Object.values(profile.stock).reduce((a,b)=>a+b,0)*.018:0;return GEAR_CATALOG.filter(g=>packed.includes(g.id)&&g.slot!=='consumable'&&(g.slot!=='rig'||g.id==='tackle')).reduce((n,g)=>n+g.kg,0)+baitMass+suppliesWeight(profile||{},packed);}

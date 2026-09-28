@@ -11,7 +11,8 @@
  * illustrative game tuning, NOT measured encounter probabilities or forecasts.
  * Birds and cetaceans never change catches, stock, credits or fishing RNG.
  */
-import {createBaitSchool,followerPosition} from './pixel-bait-schools.js?v=20260927-pixel-v42';
+import {schoolFish} from './pixel-small-fish.js?v=20260927-pixel-v43';
+import {createBaitSchool,followerPosition} from './pixel-bait-schools.js?v=20260927-pixel-v43';
 const TAU=Math.PI*2,clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
 const finite=(x,f=0)=>Number.isFinite(x)?x:f;
 export const WILDLIFE_SOURCES=Object.freeze([
@@ -76,9 +77,9 @@ export function createWildlife({seed=defaultSeed(),month=currentMonth(),habitat=
     let remaining=clamp(finite(dt),0,60);
     while(remaining>0){const step=Math.min(remaining,.5);remaining-=step;elapsed+=step;
       for(let i=events.length-1;i>=0;i--){
-        const e=events[i];e.age+=step;
+        const e=events[i];e.age+=step;if(e.type==='bait')e.removedFish=[...(state.schoolRemovals?.[e.id]||[])];
         const nx=e.x-Math.sin(e.heading)*e.speed*step,nz=e.z-Math.cos(e.heading)*e.speed*step,h=environment(nx,nz);
-        if(h.water&&h.depth>(e.type==='whale'?9:e.type==='dolphins'?4:1)){e.x=nx;e.z=nz;}else{e.heading+=step*.8;e.duration=Math.min(e.duration,e.age+12);}
+        if(h.water&&h.depth>(e.type==='whale'?9:e.type==='dolphins'?4:1)){e.x=nx;e.z=nz;if(e.type==='bait'){e.depth=Math.min(e.depth,Math.max(.5,h.depth-.5));e.thickness=Math.min(e.thickness,Math.max(.3,(h.depth-e.depth)*2));}}else{e.heading+=step*.8;e.duration=Math.min(e.duration,e.age+12);}
         const boatDistance=Math.hypot(e.x-finite(state.boatX,origin.x),e.z-finite(state.boatZ,origin.z));
         // The animals can pass the scene but never intentionally circle a boat.
         if(e.type!=='bait'&&boatDistance<18)e.heading=Math.atan2(-(e.x-state.boatX),-(e.z-state.boatZ));
@@ -102,7 +103,7 @@ export function createWildlife({seed=defaultSeed(),month=currentMonth(),habitat=
     }
     return events;
   }
-  return {update,get events(){return events;},get history(){return history.map(e=>({...e}));},get seed(){return seed>>>0;},snapshot(){return events.map(e=>({id:e.id,type:e.type,species:e.species,name:e.name,x:Math.round(e.x),z:Math.round(e.z),age:Math.round(e.age),members:e.members,...(e.type==='bait'?{radius:e.radius,density:e.density,depth:e.depth,thickness:e.thickness,visualFishCount:e.visualFishCount,followers:e.followers.map(f=>({...f}))}:{})}));}};
+  return {update,get events(){return events;},get history(){return history.map(e=>({...e}));},get seed(){return seed>>>0;},snapshot(){return events.map(e=>({id:e.id,type:e.type,species:e.species,name:e.name,x:Math.round(e.x),z:Math.round(e.z),age:Math.round(e.age),members:e.members,...(e.type==='bait'?{radius:e.radius,density:e.density,depth:e.depth,thickness:e.thickness,visualFishCount:e.visualFishCount,remainingFish:schoolFish(e).length,removedFish:[...(e.removedFish||[])],followers:e.followers.map(f=>({...f}))}:{})}));}};
 }
 
 // All marks land on whole pixels. project() is supplied by the world renderer,
@@ -121,7 +122,14 @@ export function drawWildlife(ctx,events,{project,scale=5,sprites={},layer='water
         const edge=project(e.x+finite(e.radius,8),e.z),edgeZ=project(e.x,e.z+finite(e.radius,8)),rx=Math.max(3,Math.hypot(edge.x-p.x,edge.y-p.y)),ry=Math.max(2,Math.hypot(edgeZ.x-p.x,edgeZ.y-p.y)*.7),density=finite(e.density,.5),count=Math.min(160,finite(e.visualFishCount,23));
         ctx.globalAlpha=(.12+.22*density)*fade;oval(p.x,p.y,rx,ry,'#367e88');
         ctx.globalAlpha=(.32+.45*density)*fade;
-        for(let i=0;i<count;i++){const a=i*2.399+e.age*.35,r=Math.sqrt((i+.5)/count),x=p.x+Math.cos(a)*r*rx,y=p.y+Math.sin(a)*r*ry;rect(x,y,2+(i%3===0?1:0),1,i%4?'#a9d2c4':'#e1e8bf');}
+        // Every silhouette is the same identifiable fish used by bite selection.
+        // Deeper fish fade; drawing does not attach them to the camera or hull.
+        for(const fish of schoolFish(e)){
+          const q=project(fish.x,fish.z),length=Math.max(2,fish.length/100*scale),alpha=(.32+.45*density)*fade*Math.exp(-fish.depth/7);
+          ctx.globalAlpha=alpha;const dx=Math.cos(fish.heading)*length*.5,dy=Math.sin(fish.heading)*length*.5;
+          line(q.x-dx,q.y-dy,q.x+dx,q.y+dy,fish.id==='mackerel'?'#245f70':'#a9d2c4');
+          rect(q.x-dx-dy*.4,q.y-dy+dx*.4,1,1,'#397c88');
+        }
         ctx.globalAlpha=1;for(let i=0;i<Math.ceil(density*5);i++)ripple(p.x+Math.sin(i*4.2)*rx*.7,p.y+Math.cos(i*3.7)*ry*.6,3+(e.age*5+i*4)%8,.32*fade);
         // Brief subsurface silhouettes at the school edge; never labels or a
         // promise of a bite. Fish artwork uses actual length in world metres.

@@ -41,6 +41,8 @@ const species=[
  {id:'white_seabass',names:['白鲈','白海鲈','白海鲈鱼','white seabass','wsb'],latin:'Atractoscion nobilis',minimumCm:28*2.54,bag:3,source:SOURCE.central},
  {id:'pacific_bonito',names:['太平洋鲣','太平洋狐鲣','pacific bonito','sarda chiliensis','sarda lineolata'],latin:'Sarda chiliensis lineolata',pelagic:true,minimumCm:0,bag:10,smallBag:5,minimumForkCm:24*2.54,minimumKg:5*.45359237,source:SOURCE.booklet},
  {id:'california_halibut',names:['加州大比目鱼','加州比目鱼','california halibut'],latin:'Paralichthys californicus',minimumCm:22*2.54,bag:2,source:SOURCE.halibut},
+ {id:'northern_anchovy',names:['北方鳀鱼','northern anchovy','anchovy'],latin:'Engraulis mordax',minimumCm:0,bag:null,excludedGeneralBag:true,pelagic:true,source:SOURCE.general},
+ {id:'pacific_sardine',names:['太平洋沙丁鱼','pacific sardine'],latin:'Sardinops sagax',minimumCm:0,bag:null,excludedGeneralBag:true,pelagic:true,source:SOURCE.general},
  {id:'pacific_mackerel',names:['太平洋鲭鱼','pacific mackerel','pacific chub mackerel'],latin:'Scomber japonicus',minimumCm:0,bag:null,excludedGeneralBag:true,pelagic:true,source:SOURCE.general},
  {id:'white_croaker',names:['白石首鱼','white croaker'],latin:'Genyonemus lineatus',minimumCm:0,bag:10,source:SOURCE.general},
  // 27.60(b) excludes sanddabs from the general bag; 28.48 flatfish are

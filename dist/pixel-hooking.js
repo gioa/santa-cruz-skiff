@@ -1,5 +1,5 @@
-import {fishFightKind} from './pixel-fish-fight.js?v=20260927-pixel-v42';
-import {hookSizeFit} from './pixel-hook-size.js?v=20260927-pixel-v42';
+import {fishFightKind} from './pixel-fish-fight.js?v=20260927-pixel-v43';
+import {hookSizeFit} from './pixel-hook-size.js?v=20260927-pixel-v43';
 
 /** Hook-seat and retention approximation, in active real seconds.
  * EVERY force threshold, duration and hazard below is gameplay calibration,
@@ -15,8 +15,9 @@ import {hookSizeFit} from './pixel-hook-size.js?v=20260927-pixel-v42';
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 const number=(n,fallback=0)=>Number.isFinite(n)?n:fallback;
 const bounded=(n,fallback,a,b)=>clamp(number(n,fallback),a,b);
-const kinds=new Set(['rockfish','mackerel','lingcod','halibut','salmon','seabass','bonito','croaker','sanddab']);
+const kinds=new Set(['baitfish','rockfish','mackerel','lingcod','halibut','salmon','seabass','bonito','croaker','sanddab']);
 const settings={
+ baitfish:{hold:4,holdScale:2,engage:.25,bite:.025,slack:.004,overload:.045,shake:.25},
  rockfish:{hold:25,holdScale:7,engage:.43,bite:.008,slack:.002,overload:.025,shake:.25},
  mackerel:{hold:19,holdScale:6,engage:.46,bite:.02,slack:.0035,overload:.03,shake:.45},
  lingcod:{hold:25,holdScale:7,engage:1.08,bite:.018,slack:.011,overload:.045,shake:.65},
@@ -31,7 +32,7 @@ const settings={
 export function hookProfile(fish={},rig={}){
  const kind=fishFightKind(fish||{}),p=settings[kind],mass=bounded(fish?.kg,.6,.05,80);
  const circle=rig?.circleHook===true||rig?.hookStyle==='circle'||rig?.hookType==='circle';
- const easy=kind==='rockfish'&&mass<=1.5||kind==='mackerel'&&mass<=.9||['croaker','sanddab'].includes(kind)&&mass<=.7;
+ const easy=kind==='baitfish'||kind==='rockfish'&&mass<=1.5||kind==='mackerel'&&mass<=.9||['croaker','sanddab'].includes(kind)&&mass<=.7;
  const growth=kind==='rockfish'?clamp((mass-1.5)/6,0,1):kind==='mackerel'?clamp((mass-.9)/3,0,1):0;
  const sizeRisk=1+clamp(Math.log1p(mass)/12,0,.25),stableSeat=circle?.72:1,fit=hookSizeFit(fish,rig);
  return{kind,easy,hookSize:fit.hookSize,mouthFit:fit.mouthFit,purchase:fit.purchase,seatChance:fit.seatChance,wireStrengthN:fit.wireStrengthN,

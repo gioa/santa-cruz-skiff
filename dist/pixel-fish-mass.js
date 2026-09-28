@@ -16,5 +16,5 @@ export function fishMassKg(fish,lengthCm){
   if(!(reference>0&&mass>0))return 0;
   kg=mass*(L/reference)**2.7;
  }
- return Math.round(kg*100)/100;
+ const precision=fish.baitfish?1000:100;return Math.round(kg*precision)/precision;
 }

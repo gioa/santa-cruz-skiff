@@ -7,6 +7,7 @@
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 const finite=(n,f=0)=>Number.isFinite(n)?n:f;
 export const FISH_FIGHT_PROFILES=Object.freeze({
+ baitfish:{base:.4,burst:1.1,run:.65,rest:2.1,speed:.12,lateral:.055,dive:.015,budget:18,shake:7},
  rockfish:{base:1.0,burst:5.4,run:2.0,rest:6.8,speed:.62,lateral:.18,dive:.24,budget:75,shake:3.8},
  lingcod:{base:1.65,burst:6.4,run:3.8,rest:5.7,speed:.94,lateral:.3,dive:.5,budget:120,shake:2.5},
  halibut:{base:1.25,burst:5.7,run:3.1,rest:7.2,speed:.88,lateral:.55,dive:.26,budget:130,shake:2.8},
@@ -19,6 +20,7 @@ export const FISH_FIGHT_PROFILES=Object.freeze({
 });
 export function fishFightKind(fish={}){
  const key=`${fish.fightKind||''} ${fish.latin||''} ${fish.name||''}`;
+ if(/baitfish|Engraulis|Sardinops|鳀鱼|沙丁鱼/i.test(key))return'baitfish';
  if(/croaker|Genyonemus|白石首/i.test(key))return'croaker';
  if(/sanddab|Citharichthys sordidus|太平洋沙鲽/i.test(key))return'sanddab';
  if(/salmon|tshawytscha|鲑/i.test(key))return'salmon';
@@ -30,7 +32,7 @@ export function fishFightKind(fish={}){
  return'rockfish';
 }
 export function createFishFight(fish={},variation=.5){
- const kind=fishFightKind(fish),mass=clamp(finite(fish.kg,.6),.05,80),p=FISH_FIGHT_PROFILES[kind];
+ const kind=fishFightKind(fish),mass=clamp(finite(fish.kg,.6),kind==='baitfish'?.005:.05,80),p=FISH_FIGHT_PROFILES[kind];
  return{kind,mass,energy:1,variation:clamp(finite(variation,.5),0,1),capacityJ:p.budget*Math.pow(mass,.85),workJ:0,jumpVelocity:0,jumpActive:false,jumpCooldown:6+clamp(finite(variation,.5),0,1)*12,splash:0};
 }
 export function stepFishFight(fish={},fight,{dt=.1,time=0,rodLoadN=0,payoutRate=0,retrieveRate=0,lineSlackMeters=0,lureDepth=0,fishHeight=-lureDepth,paidLineMeters=0}={}){

@@ -1,6 +1,6 @@
 // Pixel-edition wharf: one straight, constant-width deck. Keep the coastal
 // geography and GPS projection unchanged; only simplify the playable wharf.
-export * from './geography.js?v=20260927-pixel-v42';
+export * from './geography.js?v=20260927-pixel-v43';
 
 export const PIXEL_PIER_BOUNDS=Object.freeze({minX:-30,maxX:24,minZ:-483,maxZ:263});
 const {minX,maxX,minZ,maxZ}=PIXEL_PIER_BOUNDS;

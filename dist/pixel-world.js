@@ -1,17 +1,16 @@
-import {pierRings,landPolygons,coastLines,buildingFootprints,FISHING_SPOTS,onLand,onPier} from './pixel-geography.js?v=20260927-pixel-v42';
-import {FISHING_SCENE_SCALE,fishingProjector,fishingPhysicalPoint} from './pixel-fishing-projection.js?v=20260927-pixel-v42';
-import {HARBOR,harborWaterBlocked} from './harbor-layout.js?v=20260927-pixel-v42';
-import {depthInfoAt} from './bathymetry.js?v=20260927-pixel-v42';
-import {createWildlife,drawWildlife} from './pixel-wildlife.js?v=20260927-pixel-v42';
-import {cameraOffset,projectPixel,unprojectPixel,stepDeadzoneCamera,cameraDeadzone,cameraPlayfield,fitCameraBounds,zoomCameraAt,rectilinearOutline} from './pixel-camera.js?v=20260927-pixel-v42';
-import {ladderPoint} from './swimming.js?v=20260927-pixel-v42';
-import {SKIFF_HULL_OUTLINE,SKIFF_RACKS,boatRenderPose,parkedSkiffPoses,skiffScreenPose,hitSkiff,outboardPose} from './pixel-boat-geometry.js?v=20260927-pixel-v42';
-import {createWakeTrail,crestPoints,foamPoint} from './pixel-wake.js?v=20260927-pixel-v42';
-import {getRodCurve,getReelPose,getFishingLine,getFishingPresentation} from './pixel-rod-geometry.js?v=20260927-pixel-v42';
+import {pierRings,landPolygons,coastLines,buildingFootprints,FISHING_SPOTS,onLand,onPier} from './pixel-geography.js?v=20260927-pixel-v43';
+import {FISHING_SCENE_SCALE,fishingProjector,fishingPhysicalPoint} from './pixel-fishing-projection.js?v=20260927-pixel-v43';
+import {HARBOR,harborWaterBlocked} from './harbor-layout.js?v=20260927-pixel-v43';
+import {depthInfoAt} from './bathymetry.js?v=20260927-pixel-v43';
+import {createWildlife,drawWildlife} from './pixel-wildlife.js?v=20260927-pixel-v43';
+import {cameraOffset,projectPixel,unprojectPixel,stepDeadzoneCamera,cameraDeadzone,cameraPlayfield,fitCameraBounds,zoomCameraAt,rectilinearOutline} from './pixel-camera.js?v=20260927-pixel-v43';
+import {ladderPoint} from './swimming.js?v=20260927-pixel-v43';
+import {SKIFF_HULL_OUTLINE,SKIFF_RACKS,boatRenderPose,parkedSkiffPoses,skiffScreenPose,hitSkiff,outboardPose} from './pixel-boat-geometry.js?v=20260927-pixel-v43';
+import {createWakeTrail,crestPoints,foamPoint} from './pixel-wake.js?v=20260927-pixel-v43';
+import {getRodCurve,getReelPose,getFishingLine,getFishingPresentation} from './pixel-rod-geometry.js?v=20260927-pixel-v43';
 
-// Keep the original readable boat and wharf art proportions. A separate
-// boat-centred fishing projection translates real tackle metres to this art;
-// walking, the chart and helm navigation retain their map coordinates.
+// Boat and wharf art retain readable proportions. Fishing and visible fish
+// share the same geographic projection as the seabed.
 const TAU=Math.PI*2, clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const hash=(x,y=0)=>{let n=Math.imul(x|0,374761393)+Math.imul(y|0,668265263);n=(n^(n>>>13))*1274126177;return((n^(n>>>16))>>>0)/4294967295;};
 const rectRing=r=>[{x:r.minX,z:r.minZ},{x:r.maxX,z:r.minZ},{x:r.maxX,z:r.maxZ},{x:r.minX,z:r.maxZ}];
@@ -94,9 +93,7 @@ export function createPixelWorld(canvas,{sprites={},conditions={}}={}){
     // water; their darker colour also makes the left boarding landing clear.
     path(artHarborPool);ctx.fillStyle='#35969f';ctx.fill();
     for(const spot of FISHING_SPOTS){if(spot.kind!=='kelp'||!visible(spot.x,spot.z,300))continue;for(let i=0;i<50;i++){const a=hash(i,41)*TAU,r=Math.sqrt(hash(i,32))*42,p=point(spot.x+Math.cos(a)*r,spot.z+Math.sin(a)*r);ctx.fillStyle=i%3?'#397f7e':'#428d81';ctx.fillRect(p.x,p.y,Math.max(2,s),Math.max(3,s*2));ctx.fillRect(p.x-s,p.y+s*2,Math.max(2,s*2),Math.max(2,s));}}
-    // Schools are only visual. Catch probability and species stay in the sim.
-    const focusX=lastBoat?.x??HARBOR.boatX,focusZ=lastBoat?.z??HARBOR.boatZ;
-    for(let i=0;i<5;i++){const a=clock*.11+i*.85,x=focusX+Math.sin(a)*10-7,z=focusZ+Math.cos(a*.8)*8+5,p=point(x,z);ctx.globalAlpha=.2;ctx.fillStyle='#1c6574';ctx.fillRect(p.x,p.y,6,2);ctx.fillRect(p.x+5,p.y-1,2,4);}ctx.globalAlpha=1;
+
   }
   function terrain(){
     for(const ring of artLandPolygons){path(ring,4,5);ctx.fillStyle='#2d8f92';ctx.fill();path(ring);ctx.fillStyle='#ead6a6';ctx.fill();ctx.strokeStyle='#f4e4bd';ctx.lineWidth=Math.max(2,camera.scale*2);ctx.stroke();}

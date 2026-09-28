@@ -1,4 +1,4 @@
-import {fishFightKind} from './pixel-fish-fight.js?v=20260927-pixel-v42';
+import {fishFightKind} from './pixel-fish-fight.js?v=20260927-pixel-v43';
 
 /** Mouth fit, initial purchase and wire strength are separate constraints.
  * Every dimension/force/curve here is GAME TUNING, not measured morphology,
@@ -11,7 +11,7 @@ const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 const finite=(n,fallback)=>Number.isFinite(n)?n:fallback;
 const smooth=(a,b,x)=>{const t=clamp((x-a)/(b-a),0,1);return t*t*(3-2*t);};
 // Calibrated effective mouth opening per cm of fish length, not survey data.
-const mouthScale={rockfish:1.1,mackerel:.5,lingcod:1.6,halibut:1.3,salmon:.8,seabass:1.1,bonito:.9,croaker:.75,sanddab:.7};
+const mouthScale={baitfish:.5,rockfish:1.1,mackerel:.5,lingcod:1.6,halibut:1.3,salmon:.8,seabass:1.1,bonito:.9,croaker:.75,sanddab:.7};
 
 export function hookSizeFit(fish={},rig={}){
  const gap=rig?.hookGapMm,wire=rig?.hookWireStrengthN;
@@ -20,7 +20,8 @@ export function hookSizeFit(fish={},rig={}){
  const kind=fishFightKind(fish||{}),mass=clamp(finite(fish?.kg,.6),.01,80);
  const length=clamp(finite(fish?.length,30*Math.cbrt(mass/.7)),1,300);
  const blue=/mystinus|blue|蓝岩/i.test(`${fish?.latin||''} ${fish?.name||''} ${fish?.id||''}`);
- const mouthSpanMm=length*(blue?.95:mouthScale[kind]),hookGapMm=clamp(gap,.1,100);
+ const anchovy=/Engraulis|anchovy|鳀鱼/i.test(`${fish?.latin||''} ${fish?.name||''}`);
+ const mouthSpanMm=length*(anchovy?.7:blue?.95:mouthScale[kind]),hookGapMm=clamp(gap,.1,100);
  const ratio=hookGapMm/mouthSpanMm;
  // Oversized hooks can still be nibbled, but cannot seat if too large to enter.
  // There is broad overlap for large-mouthed rockfish and lingcod.
