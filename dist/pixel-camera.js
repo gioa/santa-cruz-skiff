@@ -1,6 +1,6 @@
 // Camera and presentation geometry only. Gameplay coordinates and collision
 // polygons are never rewritten by this module.
-import {skiffScale} from './pixel-boat-geometry.js?v=20260927-pixel-v32';
+import {skiffScale} from './pixel-boat-geometry.js?v=20260927-pixel-v33';
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 const finite=(n,f=0)=>Number.isFinite(n)?n:f;
 export function cameraOffset(camera){return{x:Math.round(camera.width*.5-camera.x*camera.scale),y:Math.round(camera.height*.47-camera.z*camera.scale)};}

@@ -1,9 +1,10 @@
-import {fishBodyPose,drawFishBody} from './pixel-fish-motion.js?v=20260927-pixel-v32';
-import {rodFlexPoint} from './pixel-rod-response.js?v=20260927-pixel-v32';
+import {drawAnglerArm} from './pixel-angler-arms.js?v=20260927-pixel-v33';
+import {fishBodyPose,drawFishBody} from './pixel-fish-motion.js?v=20260927-pixel-v33';
+import {rodFlexPoint} from './pixel-rod-response.js?v=20260927-pixel-v33';
 // First-person artwork uses the same rod pose, load, surface intersection and
 // crank speed as the simulation. It is a camera change, never another fight.
-import {reelMotion} from './pixel-fishing-feedback.js?v=20260927-pixel-v32';
-import {fishSpriteKind,fishSpriteBounds} from './pixel-fish-art.js?v=20260927-pixel-v32';
+import {reelMotion} from './pixel-fishing-feedback.js?v=20260927-pixel-v33';
+import {fishSpriteKind,fishSpriteBounds} from './pixel-fish-art.js?v=20260927-pixel-v33';
 const TAU=Math.PI*2;
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 const finite=(n,f=0)=>Number.isFinite(n)?n:f;
@@ -34,8 +35,9 @@ export function fightViewGeometry(width,height,state={},options={}){
  const heave=options.reducedMotion?0:Math.sin(finite(options.clock)*.72)*Math.min(1.1,h*.003);
  const horizon=Math.round(h*(landscape?.25:.31)),railY=Math.min(h*.86,bottom+23)+heave;
  const scale=clamp(Math.min(w/200,h/260),.68,1.45);
- const base={x:w*(mount==='port'?.25:mount==='starboard'?.73:.36),y:bottom-15*scale+heave};
- const length=Math.min(w*.70,(bottom-horizon)*1.04),e=elevation*Math.PI/180;
+ const armRoom=mounted?15*scale:Math.min(57*scale,(bottom-horizon)*.32);
+ const base={x:w*(mount==='port'?.25:mount==='starboard'?.73:.36),y:bottom-armRoom+heave};
+ const length=Math.min(w*.70,Math.max(20,(base.y-horizon)*1.04)),e=elevation*Math.PI/180;
  // Perspective compresses the sideways sweep near the camera edges. Reserve
  // some of that span for the loaded tip so full left/right sweeps never clip.
  const span=azimuth<0?base.x-w*.06:w*.94-base.x,dx=span*(azimuth/110)*.80,dy=-length*(.34+.74*Math.sin(e));
@@ -150,21 +152,13 @@ export function createFightView(canvas,{sprites}={}){
   // Interior ribs and a seat are part of the skiff, below the gunwale plane.
   const seatY=y+29*s;if(seatY<h){rect(0,seatY,w,7*s,'#715c46');rect(0,seatY,w,3*s,'#c09864');rect(0,seatY+1,w,1,'#d3b782');}
  }
- function arm(from,to,scale,right=false){
-  const dx=to.x-from.x,dy=to.y-from.y,n=Math.hypot(dx,dy)||1,nx=-dy/n,ny=dx/n,r=9*scale;
-  polygon([{x:from.x-nx*r*1.45,y:from.y-ny*r*1.45},{x:from.x+nx*r*1.45,y:from.y+ny*r*1.45},{x:to.x+nx*r*.7,y:to.y+ny*r*.7},{x:to.x-nx*r*.7,y:to.y-ny*r*.7}],'#243f51');
-  polygon([{x:from.x-nx*r*.9,y:from.y-ny*r*.9},{x:from.x+nx*r*.6,y:from.y+ny*r*.6},{x:to.x+nx*r*.45,y:to.y+ny*r*.45},{x:to.x-nx*r*.7,y:to.y-ny*r*.7}],'#3d6777');
-  line({x:mix(from.x,to.x,.2)-nx*r*.6,y:mix(from.y,to.y,.2)-ny*r*.6},{x:to.x-nx*r*.5,y:to.y-ny*r*.5},'#658c95',Math.max(1,scale));
-  const cuff={x:mix(from.x,to.x,.92),y:mix(from.y,to.y,.92)};line({x:cuff.x-nx*r*.72,y:cuff.y-ny*r*.72},{x:cuff.x+nx*r*.72,y:cuff.y+ny*r*.72},'#a1b4b0',3*scale);
-  ellipse(to.x,to.y,7.5*scale,6*scale,'#b57f58');ellipse(to.x-1.5*scale,to.y-1.5*scale,6.5*scale,4.7*scale,'#e2ad78');
-  if(right)line({x:to.x-4*scale,y:to.y-3*scale},{x:to.x+3*scale,y:to.y-3*scale},'#f5c68c',2*scale);
- }
  function tackle(g,s){
   const {width:w,height:h,scale:k,base,reel,knob,points,butt,mounted}=g;
   if(!mounted){
    // The left hand wraps the foregrip; the right hand stays on the actual crank.
-   arm({x:w*.06,y:h+14*k},{x:base.x-4*k,y:base.y+4*k},k);
-   arm({x:w*.81,y:h+16*k},{x:knob.x+3*k,y:knob.y+4*k},k,true);
+   const armSpan=Math.min(w*.17,38*k),leftElbow={x:base.x-armSpan,y:g.bottom+12*k},rightElbow={x:knob.x+armSpan*1.4,y:g.bottom+14*k};
+   drawAnglerArm(c,{root:{x:leftElbow.x-armSpan*.5,y:h+18*k},elbow:leftElbow,hand:{x:base.x-4*k,y:base.y+4*k},scale:k});
+   drawAnglerArm(c,{root:{x:rightElbow.x+armSpan*.65,y:h+18*k},elbow:rightElbow,hand:{x:knob.x+3*k,y:knob.y+4*k},scale:k,right:true});
   }else{
    const mountX=base.x;rect(mountX-7*k,g.railY-7*k,15*k,4*k,'#324d51');rect(mountX-6*k,g.railY-7*k,12*k,2*k,'#b6c4b3');
    line({x:mountX,y:g.railY-4*k},butt,'#263e44',11*k);line({x:mountX-1*k,y:g.railY-4*k},{x:butt.x-1*k,y:butt.y},'#a7bcb1',7*k);line({x:mountX-3*k,y:g.railY-4*k},{x:butt.x-3*k,y:butt.y},'#d2dac3',2*k);

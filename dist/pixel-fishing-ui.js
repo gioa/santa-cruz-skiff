@@ -1,10 +1,11 @@
-import {rodFlexPoint} from './pixel-rod-response.js?v=20260927-pixel-v32';
-import {rigHookSize} from './pixel-hook-label.js?v=20260927-pixel-v32';
-import {formatDepth,metersToFeet} from './units.js?v=20260927-pixel-v32';
-import {getRigProfile} from './fishing-rigs.js?v=20260927-pixel-v32';
-import {bindPointer} from './input.js?v=20260927-pixel-v32';
-import {rodPoseFromDrag,clockwiseTurns,createCrankInput} from './pixel-fishing-input.js?v=20260927-pixel-v32';
-import {fishingFeedback,reelMotion} from './pixel-fishing-feedback.js?v=20260927-pixel-v32';
+import {drawAnglerArm} from './pixel-angler-arms.js?v=20260927-pixel-v33';
+import {rodFlexPoint} from './pixel-rod-response.js?v=20260927-pixel-v33';
+import {rigHookSize} from './pixel-hook-label.js?v=20260927-pixel-v33';
+import {formatDepth,metersToFeet} from './units.js?v=20260927-pixel-v33';
+import {getRigProfile} from './fishing-rigs.js?v=20260927-pixel-v33';
+import {bindPointer} from './input.js?v=20260927-pixel-v33';
+import {rodPoseFromDrag,clockwiseTurns,createCrankInput} from './pixel-fishing-input.js?v=20260927-pixel-v33';
+import {fishingFeedback,reelMotion} from './pixel-fishing-feedback.js?v=20260927-pixel-v33';
 
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const rigNames={bottom:'沉底组',dropper:'双支线',slider:'滑铅组',jig:'软饵组',float:'浮漂组',sabiki:'羽毛组',feather40:'双支羽毛'};
@@ -51,15 +52,16 @@ export function mountFishingConsole(root,{sim,getActions,isRetrieving=()=>false,
   const c=canvas.getContext('2d'),w=canvas.width,h=canvas.height,elevation=(s.rodElevation??45)*Math.PI/180,bend=clamp(s.rodBend||0,0,1),azimuth=(s.rodAzimuth??70)/110;
   c.clearRect(0,0,w,h);c.fillStyle='#c8c39f';c.fillRect(0,0,w,h);
   c.strokeStyle='#a6ae8b';c.lineWidth=1;for(let x=0;x<w;x+=24){c.beginPath();c.moveTo(x,0);c.lineTo(x,h);c.stroke();}
-  const by=compact?h*.82:h*.83,length=compact?w*.43:Math.min(w*.43,h*.85),side=azimuth<0?-1:1,dx=Math.cos(elevation)*length*azimuth,dy=-Math.sin(elevation)*length;
+  const by=compact?h*.74:h*.67,length=Math.min(w*.43,h*(compact?.62:.55)),side=azimuth<0?-1:1,dx=Math.cos(elevation)*length*azimuth,dy=-Math.sin(elevation)*length;
   const baseX=w*.5,points=[];
   for(let i=0;i<=18;i++){const t=i/18,motion=rodFlexPoint(s,t,length);points.push({x:baseX+dx*t+motion.x,y:by+dy*t+bend*length*.48*motion.shape+motion.y});}
+  if(s.rodMount==='hand')drawAnglerArm(c,{root:{x:w*.20,y:h+15},elbow:{x:w*.34,y:h+2},hand:{x:baseX-3,y:by+5},scale:compact?.44:.58});
   c.lineCap='round';for(let i=1;i<points.length;i++){c.strokeStyle=i<5?'#354c42':i<11?'#415b4b':'#9a8050';c.lineWidth=i<4?6:i<9?3:1.7;c.beginPath();c.moveTo(points[i-1].x,points[i-1].y);c.lineTo(points[i].x,points[i].y);c.stroke();}
   c.strokeStyle='#e5eed2';c.lineWidth=1;c.beginPath();points.forEach((p,i)=>c[i?'lineTo':'moveTo'](p.x+side*2,p.y+2));const tip=points.at(-1),entry={x:tip.x+azimuth*8,y:h+4},slack=clamp(s.lineSlackMeters||0,0,6)*4;
   c.quadraticCurveTo((tip.x+entry.x)*.5+slack,(tip.y+entry.y)*.5+slack,entry.x,entry.y);c.stroke();
   for(const i of[4,8,11,14,17]){const p=points[i];c.strokeStyle='#5e7669';c.strokeRect(p.x-2,p.y+1,4,3);}
   c.fillStyle='#6d4e37';c.fillRect(baseX-4,by-3,8,13);c.fillStyle='#bda16c';c.fillRect(baseX-4,by,8,2);
-  if(s.rodMount!=='hand'){c.fillStyle='#52746a';c.fillRect(baseX-9,by+6,18,7);c.fillStyle='#dbe2b7';c.fillRect(baseX-11,by+5,22,2);}else{c.fillStyle='#dcac7c';c.fillRect(baseX-7,by+3,8,5);c.fillRect(baseX+2,by-2,6,5);}
+  if(s.rodMount!=='hand'){c.fillStyle='#52746a';c.fillRect(baseX-9,by+6,18,7);c.fillStyle='#dbe2b7';c.fillRect(baseX-11,by+5,22,2);}else{c.fillStyle='#dcac7c';for(let i=0;i<3;i++){c.fillStyle=i===0?'#f1c594':'#dcac7c';c.fillRect(baseX-5,by+1+i*3,8,2);}}
  }
  function paintReel(s){
   const focus=document.getElementById('app')?.classList.contains('is-fishing-focus'),c=wheel.getContext('2d'),w=wheel.width,h=wheel.height,cx=w*.46,cy=h*.49,r=Math.min(w,h)*.32;
