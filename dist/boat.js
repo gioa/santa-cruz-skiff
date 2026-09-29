@@ -1,3 +1,4 @@
+import {siteUrl} from './data-url.js';
 import * as THREE from './vendor/three.module.js';
 
 // Authored clinker construction and scale joinery. Dimensions in metres; -Z is bow.
@@ -58,7 +59,7 @@ export function createSkiff(){
  const red=new THREE.MeshStandardMaterial(timberSurface('#a84035',71,true));
  const green=new THREE.MeshStandardMaterial({...timberSurface('#3c6352',33,true),side:THREE.DoubleSide});
  // Cropped texture coordinates select one actual plank, avoiding false seams across each board.
- if(typeof Image!=='undefined'){const loader=new THREE.TextureLoader();const map=(path,srgb=false)=>{const t=loader.load(new URL('./assets/'+path,import.meta.url).href);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(1,.057);t.offset.y=.36;t.anisotropy=8;if(srgb)t.colorSpace=THREE.SRGBColorSpace;return t;};const grain=map('env-wood-normal.jpg'),rough=map('env-wood-roughness.jpg');for(const m of[red,green,wood]){m.normalMap=grain;m.normalScale=new THREE.Vector2(.10,.10);m.roughnessMap=rough;}wood.map=map('env-wood-color.jpg',true);wood.color.set('#fff4dc');wood.normalScale.set(.18,.18);wood.roughness=.85;}
+ if(typeof Image!=='undefined'){const loader=new THREE.TextureLoader();const map=(path,srgb=false)=>{const t=loader.load(siteUrl('./assets/'+path).href);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(1,.057);t.offset.y=.36;t.anisotropy=8;if(srgb)t.colorSpace=THREE.SRGBColorSpace;return t;};const grain=map('env-wood-normal.jpg'),rough=map('env-wood-roughness.jpg');for(const m of[red,green,wood]){m.normalMap=grain;m.normalScale=new THREE.Vector2(.10,.10);m.roughnessMap=rough;}wood.map=map('env-wood-color.jpg',true);wood.color.set('#fff4dc');wood.normalScale.set(.18,.18);wood.roughness=.85;}
  const dark=material('#392f25'),metal=material('#8d9895',.37,.8),gray=material('#788991',.32,.58),black=material('#172026',.65),rope=material('#b9ab81',1),seam=material('#702b20');
  const mesh=(g,m,name,parent=boat)=>{const o=new THREE.Mesh(g,m);o.name=name;o.castShadow=true;o.receiveShadow=true;parent.add(o);return o;};
  const box=(x,y,z,p,m,name,parent=boat)=>mesh(boxg(x,y,z,...p),m,name,parent);

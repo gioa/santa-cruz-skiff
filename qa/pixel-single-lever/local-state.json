@@ -1,0 +1,42 @@
+{
+  "aria": "空挡 · 0% · 拖钓限速",
+  "boat": {
+    "heading": null,
+    "x": -68,
+    "z": -1691.3
+  },
+  "build": "20260927-pixel-v13",
+  "helm": {
+    "gear": "N",
+    "lever": 0,
+    "manual": true,
+    "steer": 0,
+    "throttle": 0
+  },
+  "knob": {
+    "bottom": 762,
+    "height": 30,
+    "left": 268.6796875,
+    "right": 336.6796875,
+    "top": 732,
+    "width": 68,
+    "x": 268.6796875,
+    "y": 732
+  },
+  "lever": {
+    "bottom": 821,
+    "height": 148,
+    "left": 199,
+    "right": 367,
+    "top": 673,
+    "width": 168,
+    "x": 199,
+    "y": 673
+  },
+  "mode": "waiting",
+  "oldGearButtons": 0,
+  "overflows": false,
+  "paused": false,
+  "throttle": 0,
+  "view": "overhead"
+}

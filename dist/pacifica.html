@@ -7,9 +7,9 @@
   <meta name="description" content="潮汐之间的第二站：Pacifica Beach。走过沙滩，在浪边抛竿，再去 Bait & Tackle 小店补给。">
   <title>Pacifica Beach · 潮汐之间</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath fill='%23163e47' d='M0 0h32v32H0z'/%3E%3Cpath fill='%23f8d393' d='M14 3h4v3h4v16h-4v6h-4v-6h-4V6h4z'/%3E%3C/svg%3E">
-  <link rel="stylesheet" href="./pixel.css?v=20260928-pixel-css-v80">
-  <link rel="stylesheet" href="./pacifica.css?v=coast-7">
-  <link rel="stylesheet" href="./pixel-locations.css?v=coast-6">
+  <link rel="stylesheet" href="./pixel.css">
+  <link rel="stylesheet" href="./pacifica.css">
+  <link rel="stylesheet" href="./pixel-locations.css">
 </head>
 <body>
 <main id="app" class="is-intro" data-location="pacifica" data-shore-scene>
@@ -19,11 +19,11 @@
 <section id="intro" class="intro"><div class="stamp"><span></span>A LITTLE ROD. A WHOLE OCEAN.</div><h1>潮汐之间<small>像素里的海风，<br>属于你的慢时光。</small></h1><p>一片沙滩，一根鱼竿。<br>从 Pacifica 的清晨出发。</p><button id="start-btn" class="primary intro-start">去沙滩 <span>→</span></button><button id="resume-btn" class="text-button" hidden>继续上次航程 ↗</button><div class="intro-foot"><span id="intro-clock">06:00 AM</span><i></i><span>SHARP PARK, CA</span></div></section>
 <div id="intro-location" class="intro-location"><span>37°38′ N · 122°30′ W</span><strong>THE BEACH</strong><small>今天，也去浪边待一会儿。</small></div>
 <nav id="trip-tools" class="trip-tools" hidden aria-label="航程工具"><button id="gear-btn" aria-label="背包与装备"><canvas data-icon="backpack" width="16" height="16"></canvas><span>背包</span><kbd>I</kbd></button><button id="map-btn" aria-label="沿岸手记" hidden><canvas data-icon="map" width="16" height="16"></canvas><span>手记</span><kbd>M</kbd></button><button id="journal-btn" aria-label="鱼获与航程"><canvas data-icon="fish" width="16" height="16"></canvas><span>鱼获</span><kbd>J</kbd></button></nav>
+<button id="rules-btn" class="rules-book-btn" type="button" hidden aria-label="打开加州休闲捕鱼规定" title="加州休闲捕鱼规定"><canvas data-item-art="ca_fishing_regulations" width="32" height="32" aria-hidden="true"></canvas><span>规定</span></button>
 <section id="trip-info" class="trip-info" hidden><span id="place">Pacifica Beach</span><div><span id="speed">沙滩</span><span id="shore-rig-summary"></span></div><small id="navigation"></small></section>
 <div id="toast" role="status" aria-live="polite"></div>
 <div id="controls" class="controls" hidden>
 <section id="boat-console" class="actions-only" aria-label="岸钓操作台">
- <div id="boat-action-bar"><button id="walk-surf" class="small-button">前往浪线</button><button id="walk-shop" class="small-button">钓具小店</button><button id="pier-btn" class="small-button" hidden>封闭栈桥</button></div>
  <section id="boat-fishing" class="no-instruments" hidden aria-label="鱼竿与鱼轮控制台">
   <section id="fish-status" class="fish-status" hidden aria-live="polite"><div class="fish-status-head"><i></i><b id="fish-title">等待鱼讯</b><span id="fish-distance"></span></div><small id="fish-detail"></small></section>
   <div class="rod-identity"><span id="active-rod-name">岸钓竿</span><span id="tackle-name">Carolina · 沙蟹</span><button id="rod-config-btn" type="button" aria-label="配置当前鱼竿" title="配置当前鱼竿"><svg viewBox="0 0 24 24" width="23" height="23" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="15" cy="4" r="2"/><path d="M15 6v10a5 5 0 0 1-10 0v-4l4 3" stroke-linejoin="round"/></svg></button></div>
@@ -36,9 +36,8 @@
 </section>
 </div>
 <div id="modal-layer" hidden><section id="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title"><button id="close-modal" class="square close" aria-label="关闭窗口">×</button><div id="modal-content"></div></section></div>
-<button id="angler-talk" class="shore-angler-talk" hidden>打个招呼</button>
 <output id="beach-state" hidden></output>
 </main>
-<script type="module" src="./pacifica-game.js?v=coast-7"></script>
-<script type="module" src="./pixel-locations.js?v=coast-6"></script>
+<script type="module" src="./pacifica-game.js"></script>
+<script type="module" src="./pixel-locations.js"></script>
 </body></html>

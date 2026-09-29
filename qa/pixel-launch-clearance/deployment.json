@@ -1,0 +1,28 @@
+{
+  "commit": "03400ee76da0c5508fdadd9d955cace4323853f8",
+  "version": "v58",
+  "checks": [
+    {
+      "file": "index.html",
+      "matches": true,
+      "sha256": "2d34108f39ecb02539294bbaaec85b9d047fe0a21c9ecbf447ed1294677ad9bf"
+    },
+    {
+      "file": "pixel-world.js",
+      "matches": true,
+      "sha256": "a10994769586dc6c4aa9bc3cf37df9261e2f5044a10d98c50b75fb63bd02873d"
+    },
+    {
+      "file": "pixel-boat-geometry.js",
+      "matches": true,
+      "sha256": "059e1e81860630c69215cd605ab510f854a4166e0d9cc500560367667d17e77d"
+    },
+    {
+      "file": "pixel-game.js",
+      "matches": true,
+      "sha256": "ddc5fde3efdcd56876321585624cb5c8f72a1d3445f147b279e9a63e98747609"
+    }
+  ],
+  "releaseTests": 652,
+  "sharedTests": 664
+}

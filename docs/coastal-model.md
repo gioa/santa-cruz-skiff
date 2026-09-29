@@ -16,7 +16,11 @@ NOAA/NWS explains that shallow bars promote wave breaking; deeper troughs and ba
 
 `shoreProfile` varies bar distance, trough distance, slope, gap strength and exposure smoothly with alongshore position. `sampleShore` derives water depth, breaking strength and current from the same profile. Rendering and fishing consume these values rather than using unrelated random foam. Whitewater moves across shallow sections; channel gaps and dark troughs stay geographically coherent. The tackle drifts with the local current, and its habitat changes encounter weights and fight load. Tide is slow and repeatable; it does not regenerate the seabed every frame.
 
-The depth, exact bars and channel locations, wave heights, fish probabilities and compact distance scale are authored approximations. No local survey or live ocean feed is used. Walking time is compressed for play. This is a readable coastal model, not a numerical coastal-engineering solver.
+Wave period and height now drive linear dispersion, shoaling, depth-limited breaking, upstream bar dissipation, orbital motion, and wave-powered mean currents. Both cameras draw crests from the same traveling phase used by the simulation. Tackle sinking and holding use the mounted sinker and local forcing; drift changes the hook's actual water sample. Fight load follows the returning fish through that water. See [wave model and primary sources](shore-wave-model.md).
+
+Bites come from simulated fish schools rather than a timer or fixed chance. Distance relative to local troughs and bars, depth, sand, season, light and waves decide where schools are. The scent plume in the surf current, soak time, splashes, and the bait, rig and presentation decide whether they find and take a bait. A no-bite cast is a normal result, and reloading cannot reroll the fish. See [population model](fish-population-model.md).
+
+The depth, exact bars and channel locations, scenario wave heights, fish probabilities and compact distance scale are authored approximations. No local survey or live ocean feed is used. Walking time is compressed for play. This is a readable coastal model, not a numerical coastal-engineering solver.
 
 ## Fictional game content
 

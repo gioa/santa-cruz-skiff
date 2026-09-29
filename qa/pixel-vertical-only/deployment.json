@@ -1,0 +1,31 @@
+{
+  "commit": "46d7f765a09dcb0a1029fd395d84d2e93ea1a456",
+  "run": 36361988607,
+  "conclusion": "success",
+  "publicFiles": [
+    {
+      "file": "index.html",
+      "matches": true
+    },
+    {
+      "file": "pixel-game.js",
+      "matches": true
+    },
+    {
+      "file": "pixel-fishing-ui.js",
+      "matches": true
+    },
+    {
+      "file": "pixel-sim.js",
+      "matches": true
+    },
+    {
+      "file": "pixel-boat-actions.js",
+      "matches": true
+    },
+    {
+      "file": "pixel.css",
+      "matches": true
+    }
+  ]
+}

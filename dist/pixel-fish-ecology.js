@@ -3,8 +3,8 @@
  * measured bite percentages. Seasons describe availability, never legality.
  * Every species uses the same unnormalised weight for both encounter timing
  * and conditional selection; poor presentations therefore mean fewer bites. */
-import {getRigProfile,rigSpeciesKey} from './fishing-rigs.js?v=20260928-pixel-v80';
-import {USABLE_CONDITION} from './pixel-consumables.js?v=20260928-pixel-v80';
+import {getRigProfile,rigSpeciesKey} from './fishing-rigs.js';
+import {USABLE_CONDITION} from './pixel-consumables.js';
 
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const finite=(v,f=0)=>Number.isFinite(v)?v:f;
@@ -171,3 +171,62 @@ export function weightedEncounterFish(fishes,options={},rng=Math.random){
  for(let i=0;i<fishes.length;i++){roll-=weights[i];if(roll<0)return fishes[i];}
  return fishes.at(-1);
 }
+
+// ---------------------------------------------------------------------------
+// Population inputs for fish-population.js. Where fish are comes from habitat,
+// depth, season and water temperature; whether a fish that found the bait takes
+// it comes from the presentation (bait, rig, motion, tipping). Nothing here is
+// a bite probability on its own.
+export function pixelSuitability(key,{habitat='unknown',bottom=12,month=9,waterTemp=14,schoolInfluence=1}={}){
+ const s=SPECIES[key];if(!s||!(bottom>.3))return 0;
+ const substrate=habitat==='artificial'?'mixed':habitat;
+ const temperature=key==='bonito'?.06+.94*clamp((waterTemp-11)/6,0,1):key==='mackerel'?.2+.8*clamp((waterTemp-9)/5,0,1):1;
+ return (s.habitat[substrate]??s.habitat.unknown)*depthAffinity(bottom,s.depth)*monthlyAvailability(key,month)*temperature*clamp(finite(schoolInfluence,1),1,8);
+}
+export function pixelBaitAppeal(key,options={}){
+ const e=environment(options),freshness=clamp(finite(options.freshness,1),0,1);
+ if(!SPECIES[key]||freshness<=0)return 0;
+ return presentationAffinity(key,e)*tipAffinity(key,e)*freshness**.75;
+}
+const BAIT_SCENT=Object.freeze({squid:.75,anchovy:1,sardine:1,shrimp:.8,live:1,jig:.05,feather:0});
+export function pixelBaitScent(options={}){
+ const e=environment(options),fresh=clamp(finite(options.freshness,1),0,1);
+ if(e.artificial)return e.tip?(BAIT_SCENT[e.tip]??.5)*e.tipFreshness*.7:(e.softPlastic?.05:0);
+ return (BAIT_SCENT[e.bait]??.6)*fresh;
+}
+export function pixelBaitMotion(options={}){const e=environment(options);return clamp(Math.max(e.action,e.troll*.8,e.live?.5:0),0,1);}
+export function pixelBaitFlash(options={}){
+ const e=environment(options);
+ return e.artificial?clamp(.25+.6*e.action+.45*e.troll,0,1):clamp(.1+.3*e.slowDrift+.35*e.troll+(e.live?.4:0),0,1);
+}
+// Where in the water column each group swims, and how far it will leave it.
+const LAYER=Object.freeze({
+ sand:[b=>Math.max(.2,b-.4),()=>1.4],
+ structure:[b=>Math.max(.2,b-1.1),()=>2.6],
+ school:[b=>Math.min(9,b*.65),b=>Math.max(3,b*.3)],
+ salmon:[b=>Math.min(24,b*.7),b=>Math.max(6,b*.3)],
+ seabass:[b=>Math.max(.5,b-2),()=>5],
+ pelagic:[b=>Math.min(5,b*.4),b=>Math.max(3,Math.min(12,b*.25))],
+});
+const behaviour={
+ croaker:{school:[8,30],density:55,cruise:.3,burst:1.3,smell:1,sight:1.5,sightDrive:.2,wariness:.25,patience:30,biteRate:1},
+ sanddab:{school:[5,20],density:60,cruise:.15,burst:1,smell:.9,sight:1.5,sightDrive:.3,wariness:.2,patience:30,biteRate:1},
+ blue:{school:[15,60],density:320,cruise:.25,burst:1.5,smell:.6,sight:8,sightDrive:.8,wariness:.35,patience:20,biteRate:.9},
+ copper:{school:[1,4],density:40,cruise:.12,burst:1.4,smell:.6,sight:5,sightDrive:.7,wariness:.45,patience:20,biteRate:.8},
+ vermilion:{school:[2,8],density:20,cruise:.15,burst:1.5,smell:.6,sight:6,sightDrive:.7,wariness:.45,patience:20,biteRate:.8},
+ lingcod:{school:[1,1],density:5,cruise:.1,burst:2.5,smell:.5,sight:8,sightDrive:1,wariness:.5,patience:25,biteRate:.8},
+ halibut:{school:[1,1],density:4,cruise:.12,burst:2.6,smell:.45,sight:5,sightDrive:1,wariness:.5,patience:30,biteRate:.7},
+ mackerel:{school:[15,60],density:180,cruise:.8,burst:3,smell:.6,sight:6,sightDrive:.9,wariness:.3,patience:15,biteRate:.9},
+ salmon:{school:[1,6],density:3.5,cruise:.9,burst:4,smell:.5,sight:8,sightDrive:1,wariness:.6,patience:12,biteRate:.7},
+ seabass:{school:[2,10],density:1.5,cruise:.5,burst:3,smell:.5,sight:6,sightDrive:.9,wariness:.7,patience:15,biteRate:.7},
+ bonito:{school:[5,25],density:5,cruise:1.2,burst:5,smell:.3,sight:10,sightDrive:1,wariness:.5,patience:10,biteRate:.8},
+};
+/** Engine species for Santa Cruz. `lengths` maps key → [min,max] cm from the catalogue. */
+export function pixelPopulationSpecies(lengths={}){
+ return Object.entries(behaviour).map(([id,b])=>{
+  const s=SPECIES[id],[preferredDepth,verticalReach]=LAYER[s.layer];
+  return Object.freeze({id,...b,density:b.density*s.density*(s.rarity??1),calmSeconds:40,giveUpMeters:60,probeMeters:18,lateralMeters:6,
+   lengthCm:lengths[id]||[20,40],cohortSd:.08,preferredDepth,verticalReach,arrivalSeconds:id==='salmon'||id==='seabass'||id==='bonito'?150:90});
+ });
+}
+export const pixelSpeciesKey=speciesKey;

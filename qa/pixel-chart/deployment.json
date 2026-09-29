@@ -1,0 +1,43 @@
+{
+  "version": "20260927-pixel-v56",
+  "commit": "5613d749fc8ace963b87fa3edc82103114d94175",
+  "releaseTests": 642,
+  "sharedTests": 654,
+  "files": [
+    {
+      "file": "index.html",
+      "matches": true,
+      "sha256": "edaa3d43e361e52295f91a150ec448e433bb3dd58795964bf9a268ce986bd4eb"
+    },
+    {
+      "file": "pixel.css",
+      "matches": true,
+      "sha256": "a433d77b2424e0cd8eadbf172569d7f538235e5b2f129f09cb8ad83b5fca661a"
+    },
+    {
+      "file": "pixel-game.js",
+      "matches": true,
+      "sha256": "1927b65e218b508fd92cf65fd6f2bd733d209ad527c9b01118d0425b11b47be0"
+    },
+    {
+      "file": "pixel-chart.js",
+      "matches": true,
+      "sha256": "cc856d4005dbcc9093bdeb7a6fa0fcac77fca87b94d39f78be91a7aeeabec7a3"
+    },
+    {
+      "file": "pixel-chart-data.js",
+      "matches": true,
+      "sha256": "e40d6cbea94aedb63d83891297d3eb2b3a20b671afdc0e11fa8ada5e67efd1a9"
+    },
+    {
+      "file": "data/bathymetry.json",
+      "matches": true,
+      "sha256": "95c37ce0c50be4e64bdca55b781f0e60f03826c1996e9516820493894c2b5f97"
+    },
+    {
+      "file": "data/seafloor.json",
+      "matches": true,
+      "sha256": "af6d5654528341f9e58a008c61453056b20541dc3974876d35188c44d2471328"
+    }
+  ]
+}

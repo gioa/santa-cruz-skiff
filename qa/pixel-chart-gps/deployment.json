@@ -1,0 +1,48 @@
+{
+  "commit": "47c3258b0dcd0c31c4754752234d45eea9493c75",
+  "version": "v57",
+  "checks": [
+    {
+      "file": "index.html",
+      "matches": true,
+      "sha256": "d5ef77e2bdbaa6f4fc71ebb934f113de5337d024bd2909cd9f9ed95d2acc0263"
+    },
+    {
+      "file": "pixel-game.js",
+      "matches": true,
+      "sha256": "0980149881565fbd6ef0d62934c41b222b155bec2e8e832f1ab8eff3f7d43074"
+    },
+    {
+      "file": "pixel-chart.js",
+      "matches": true,
+      "sha256": "a5c83a5b3cb209b32c489f36fd27092fc6e7bfd844fec638d175f735d871cf28"
+    },
+    {
+      "file": "equipment.js",
+      "matches": true,
+      "sha256": "0023c669c95fb79bd2b3ecd1232206aabd8f347306d62fe5440d112f9b0750bb"
+    },
+    {
+      "file": "pixel-sim.js",
+      "matches": true,
+      "sha256": "940f47775de910d14fe525b694affa175db96c4db4d3cfd52e219318d191f02b"
+    },
+    {
+      "file": "pixel-navigation.js",
+      "matches": true,
+      "sha256": "48085b9b709b45475b3ebf0388e74ce2735bf293b7dea0ebd39dd5cfbba49ff8"
+    },
+    {
+      "file": "navigation.js",
+      "matches": true,
+      "sha256": "51b8c6b0248294b9481ac621b9d7558ada5e96b281f658b2e3ed6f91afc44038"
+    },
+    {
+      "file": "pixel.css",
+      "matches": true,
+      "sha256": "2f856e7df09eb8f440ff0108e91c27a2c22ab39b4655835906727a6ddbe7ac60"
+    }
+  ],
+  "releaseTests": 651,
+  "sharedTests": 663
+}

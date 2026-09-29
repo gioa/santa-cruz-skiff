@@ -1,0 +1,22 @@
+{
+  "release": "v33",
+  "commit": "b455d4a2f0aa52f66dc4ef80c824bf2d6838cb67",
+  "files": [
+    {
+      "file": "index.html",
+      "matches": true
+    },
+    {
+      "file": "pixel-angler-arms.js",
+      "matches": true
+    },
+    {
+      "file": "pixel-fight-view.js",
+      "matches": true
+    },
+    {
+      "file": "pixel-fishing-ui.js",
+      "matches": true
+    }
+  ]
+}

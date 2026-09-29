@@ -1,0 +1,81 @@
+{
+  "base": "http://127.0.0.1:4198/",
+  "checks": [
+    "pacifica: ordinary walk/cast/retrieve; empty-beach 30s no bite; four responsive viewports; menu pauses fish; calm/rough stability; school finds bait, bites, UI strike and first-person fight",
+    "half-moon-bay: ordinary walk/cast/retrieve; empty-beach 30s no bite; four responsive viewports; menu pauses fish; calm/rough stability; school finds bait, bites, UI strike and first-person fight"
+  ],
+  "castChecks": [
+    {
+      "scene": "pacifica",
+      "tapMetres": 5.145133406946307,
+      "tapOffshoreMetres": 2.646537581285884,
+      "heldMetres": 20.816808740654338,
+      "keyboardRanges": [
+        20.65575704065786,
+        20.668319712675984
+      ],
+      "checks": [
+        "short pointer tap",
+        "900ms pointer and two keyboard paths agree",
+        "no duplicate casts",
+        "blur cancels",
+        "accessibility click is short",
+        "dry cast lands on sand"
+      ]
+    },
+    {
+      "scene": "half-moon-bay",
+      "tapMetres": 5.145133406946307,
+      "tapOffshoreMetres": 2.9115000351999853,
+      "heldMetres": 20.763975343593835,
+      "keyboardRanges": [
+        20.648222065275483,
+        20.665806739294243
+      ],
+      "checks": [
+        "short pointer tap",
+        "900ms pointer and two keyboard paths agree",
+        "no duplicate casts",
+        "blur cancels",
+        "accessibility click is short",
+        "dry cast lands on sand"
+      ]
+    }
+  ],
+  "discoveryChecks": [
+    {
+      "scene": "pacifica",
+      "checks": [
+        "no navigation shortcut buttons or arrival modal",
+        "distant E never starts a route",
+        "four walking viewports have no empty bottom panel",
+        "WASD doorway entry opens shop",
+        "close stays closed until walk out and reenter",
+        "manual WASD cancels pointer route without delayed opening",
+        "ground clicks around shop reach surf",
+        "walk into NPC starts conversation and note",
+        "nearby E can interact again",
+        "notes have no destination buttons",
+        "silent pier gate; leaning on it is the hidden way on"
+      ]
+    },
+    {
+      "scene": "half-moon-bay",
+      "checks": [
+        "no navigation shortcut buttons or arrival modal",
+        "distant E never starts a route",
+        "four walking viewports have no empty bottom panel",
+        "WASD doorway entry opens shop",
+        "close stays closed until walk out and reenter",
+        "manual WASD cancels pointer route without delayed opening",
+        "ground clicks around shop reach surf",
+        "walk into NPC starts conversation and note",
+        "nearby E can interact again",
+        "notes have no destination buttons"
+      ]
+    }
+  ],
+  "errors": [],
+  "fixture": "Test-only response route; no public game debug controls",
+  "verifiedAt": "2026-09-29T04:05:37.464Z"
+}

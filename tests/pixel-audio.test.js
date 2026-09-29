@@ -102,7 +102,7 @@ const advanceAudio=(audio,seconds,options)=>{for(let i=0;i<Math.ceil(seconds*60)
 
 test('drag teeth follow actual payout, with distinct open-spool and crank sounds',()=>{
   const small=reelFeedbackForState({...runState,payoutRate:.25,rodLoadN:5}),run=reelFeedbackForState({...runState,payoutRate:2.8});
-  assert.ok(run.ratchetHz>small.ratchetHz);assert.ok(run.ratchetFrequency>small.ratchetFrequency);assert.ok(run.ratchetVolume>small.ratchetVolume);
+  assert.ok(run.ratchetHz>small.ratchetHz);assert.equal(run.ratchetFrequency,6800);assert.equal(small.ratchetFrequency,6800);assert.ok(run.ratchetVolume>small.ratchetVolume);
   const feed=reelFeedbackForState({...runState,reelMode:'free'});
   assert.equal(feed.ratchetHz,0);assert.ok(feed.feedVolume>0);assert.equal(feed.crankVolume,0);
   assert.equal(run.feedVolume,0);assert.equal(run.crankVolume,0);

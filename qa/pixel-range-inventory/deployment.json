@@ -1,0 +1,153 @@
+{
+  "commit": "5ce40d64f634bf18255838b190eaf0981c051b69",
+  "version": "v76",
+  "checks": [
+    {
+      "file": "pixel-sinkers.js",
+      "matches": true,
+      "sha256": "0e0d240628ef7ee2877bc09f0972ac247cb18ca182ceea98f6df2e1838143092"
+    },
+    {
+      "file": "pixel-rod-ui.js",
+      "matches": true,
+      "sha256": "eda9fc83fa3188245e8005211b988568ef8a8a86cfbf60b91a32da1b1f95e27a"
+    },
+    {
+      "file": "pixel-rod-loadouts.js",
+      "matches": true,
+      "sha256": "521e3c65a1445e73634edb6239d5628bde06810cd5864244424db28809aff3f5"
+    },
+    {
+      "file": "pixel-consumables.js",
+      "matches": true,
+      "sha256": "5c1797641056b1a1b7d1b0ce4fe9d719f541f6291715cbbd43d327eabe1a380d"
+    },
+    {
+      "file": "pixel-item-icons.js",
+      "matches": true,
+      "sha256": "d7face91fe39271d5c8428c906bef9e4ff34f04620b770c175fa1f8dee637944"
+    },
+    {
+      "file": "fishing-rigs.js",
+      "matches": true,
+      "sha256": "2fe83d252ae27dc373a3275801ea8527fbcf439d6c8eda2bce26a955231a63ca"
+    },
+    {
+      "file": "pixel-casting.js",
+      "matches": true,
+      "sha256": "a402bab5538a62c18bec74bd59ece3ba78edbf10670c8700a97292f4137fe1f2"
+    },
+    {
+      "file": "pixel-rod-geometry.js",
+      "matches": true,
+      "sha256": "ad23cebce23d97172fbc08b78c749d6601a8ead535984a52c07a06f7432a41b0"
+    },
+    {
+      "file": "pixel-fight-pump.js",
+      "matches": true,
+      "sha256": "d074bbd46a736ee3ab83ead09d2e1d96c8ef7872fb927002382967561e5ab88f"
+    },
+    {
+      "file": "pixel-focus-input.js",
+      "matches": true,
+      "sha256": "a1b77bacd0f76c5db992c43bfc9056abd8bd77864c626f4b406a25abf6c5651f"
+    },
+    {
+      "file": "index.html",
+      "matches": true,
+      "sha256": "2d3df5040b7fc87763950a8baa876c65a59288b3460f59876eae1cecba15ba48"
+    },
+    {
+      "file": "pixel.css",
+      "matches": true,
+      "sha256": "ac8b6e6d2959313d8e1a560c5bbf75370ebc7417ceaa6c2ebe1823efe938bd52"
+    },
+    {
+      "file": "pixel-sim.js",
+      "matches": true,
+      "sha256": "fcc38eb4268442ca58856c8e38914f630fe7fbdb126cdde7eb42dcdd2572a5c8"
+    },
+    {
+      "file": "pixel-game.js",
+      "matches": true,
+      "sha256": "c1a6cc78e5e753f662723b7f1555eb8d6e09e325fdb2c05a9ddac0cba0796354"
+    },
+    {
+      "file": "pixel-chart.js",
+      "matches": true,
+      "sha256": "879969a354a6c81689c7a151bcb29c90036403c942c946dd8d91234c5e44a3a2"
+    },
+    {
+      "file": "pixel-wildlife.js",
+      "matches": true,
+      "sha256": "5852efbd2eaa5d98454fbf365bd554fe7dd4b6aa2b6feb7bcbae467572cd9916"
+    },
+    {
+      "file": "pixel-fishing-ui.js",
+      "matches": true,
+      "sha256": "49c0c4773d6023dd137352a463d6dc6ecdfc9e90fd9a32cc84e77e74114cd229"
+    },
+    {
+      "file": "pixel-daily-weather.js",
+      "matches": true,
+      "sha256": "9fbac32b85be45a261b014e4899b52d6b4a82a8b83d34c008c47b59b252a5ea7"
+    },
+    {
+      "file": "pixel-day-cycle.js",
+      "matches": true,
+      "sha256": "63547a185da1ac478177313e104b0056fe0a7f4d2c8e9f89bd17f7facb4d0bdc"
+    },
+    {
+      "file": "pixel-world.js",
+      "matches": true,
+      "sha256": "2d6338bbd80fa7e18a89c9248b9979d681da083901fb99fb347e520c6725956b"
+    },
+    {
+      "file": "pixel-fight-view.js",
+      "matches": true,
+      "sha256": "c7d01a3f3bf9694e597e04edd01fba271e793ec9bd93c5b90f65bc646d11807d"
+    },
+    {
+      "file": "pixel-boat-geometry.js",
+      "matches": true,
+      "sha256": "632c7b16a0f1d9c12ca6e635149e9b496f985269c7b1e5e4eb3a7775abb3cecd"
+    },
+    {
+      "file": "pixel-fishing-physics.js",
+      "matches": true,
+      "sha256": "668c898291541a3b3a6696c1c40ac80eded8e2101e1c1d903461772c62f8226b"
+    },
+    {
+      "file": "pixel-stability.js",
+      "matches": true,
+      "sha256": "a27964ca239f9e0d4e9f4f2dfd69b3ce76f22d5553cbd19dbc86bea8da05b2a8"
+    },
+    {
+      "file": "pixel-rescue-view.js",
+      "matches": true,
+      "sha256": "7c2d9faaf18f6dabed1baea65945112fffffdf7e83968afbeba46fdb2ac552f5"
+    },
+    {
+      "file": "vessel-physics.js",
+      "matches": true,
+      "sha256": "aed7b4bd0c11c3e1659e7804119d1f81208fb7339b1c1026c8974a4c192fbda4"
+    },
+    {
+      "file": "pixel-boat-actions.js",
+      "matches": true,
+      "sha256": "8e52c97f0726375d0784fdaa601966347193bba48cc133f341e242938f678cfb"
+    },
+    {
+      "file": "equipment.js",
+      "matches": true,
+      "sha256": "36d94d025c472fd6674cfbf20accb9dee6ed6663941bb5511df7696e9ee9cc3d"
+    },
+    {
+      "file": "pixel-gear-availability.js",
+      "matches": true,
+      "sha256": "aadb644411c3e0db7766020218fed3e3d6e2410b6624737bf3e9421d2c73649f"
+    }
+  ],
+  "releaseTests": 728,
+  "sharedTests": 750
+}

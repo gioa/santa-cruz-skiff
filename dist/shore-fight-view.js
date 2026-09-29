@@ -1,6 +1,8 @@
-import {fightViewGeometry} from './pixel-fight-view.js?v=20260928-pixel-v80';
-import {drawCloseTackle} from './pixel-fight-tackle.js?v=coast-7';
-import {getShoreScene,sampleShore} from './shore-data.js?v=coast-6';
+import {fightViewGeometry} from './pixel-fight-view.js';
+import {drawCloseTackle} from './pixel-fight-tackle.js';
+import {getShoreScene,sampleShore,shoreWaveCrests} from './shore-data.js';
+import {shoreFishPosition} from './shore-line-geometry.js';
+import {shorePresentation} from './shore-presentation.js';
 
 const TAU=Math.PI*2,PIXELS_PER_METRE=3.2;
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
@@ -10,20 +12,19 @@ const hash=n=>{let x=Math.imul(n|0,1597334677);x^=x>>>15;return((Math.imul(x,224
 export const shoreFightActive=state=>['fighting','landed'].includes(state?.phase);
 
 // A read-only camera adapter. Shore coordinates are pixels; tackle coordinates
-// are metres. Depth here is an authored bottom-rig presentation, not a new fish
-// simulation. Fish remain below the opaque surf until the existing catch panel.
+// are metres. Bottom-rig fighting depth is authored; a float rig retains its
+// simulated hook depth. Fish remain below opaque surf until the catch panel.
 export function shoreFightPose(sceneId,state={}){
  const scene=getShoreScene(sceneId),player=state.player||scene.spawn,cast=state.cast;
  const origin=cast?.origin||{x:player.x,y:player.y-18};
- const target=cast?.target||{x:player.x,y:scene.shoreY(player.x)-32};
- const ratio=clamp(finite(state.lineDistance,cast?.distance||1)/Math.max(1,finite(cast?.distance,1)),.025,1.5);
- const fishX=mix(origin.x,target.x,ratio);
- const fishWorld={x:fishX,y:Math.min(scene.shoreY(fishX)-3.2,mix(origin.y,target.y,ratio))};
- const sample=sampleShore(scene,fishWorld.x,fishWorld.y,finite(state.elapsed));
- const tipHeight=state.onPier?5.5:1.8,depth=Math.max(.05,sample.depth*.72);
+ const fishWorld=shoreFishPosition(scene,state);
+ const sample=sampleShore(scene,fishWorld.x,fishWorld.y,finite(state.elapsed),state.seaState);
+ const floating=state.presentation?.mode==='float'||state.rig==='float';
+ const tipHeight=state.onPier?5.5:1.8,depth=floating?Math.max(.05,shorePresentation(sample,'float_rig',finite(state.presentation?.depth,1)).depth):Math.max(.05,sample.depth*.72);
  const rodTip={x:0,z:0,height:tipHeight};
  const fishMeters={x:(fishWorld.x-player.x)/PIXELS_PER_METRE,z:(fishWorld.y-origin.y)/PIXELS_PER_METRE,height:-depth};
- const surfaceFraction=tipHeight/(tipHeight+depth);
+ // The suspended hook hangs below the float, so line meets the water there.
+ const surfaceFraction=floating?1:tipHeight/(tipHeight+depth);
  const entryMeters={x:fishMeters.x*surfaceFraction,z:fishMeters.z*surfaceFraction};
  const entryWorld={x:player.x+entryMeters.x*PIXELS_PER_METRE,y:origin.y+entryMeters.z*PIXELS_PER_METRE};
  // At the last few metres the strand-line clamp prevents a submerged endpoint
@@ -32,7 +33,7 @@ export function shoreFightPose(sceneId,state={}){
  const tension=clamp(finite(state.tension),0,1),run=clamp(finite(state.fish?.run),0,2);
  const visual={fishState:state.phase==='fighting'?'fight':'landed',rodMount:'hand',rodElevation:46,rodAzimuth:62,
   rodBend:clamp(tension*.78+run*.10,0,.95),lineSlackMeters:Math.max(0,.16-tension)*3,
-  rodTip,lineEntry:entryMeters,lureDepth:depth,paidLineMeters:finite(state.lineDistance),rig:'bottom'};
+  rodTip,lineEntry:entryMeters,lureDepth:depth,paidLineMeters:finite(state.lineDistance),rig:floating?'float':'bottom',...(floating?{floatPosition:{...entryMeters,height:0}}:{})};
  return{visual,fishWorld,entryWorld,depth,sample,ground:state.onPier&&scene.pier?'pier':'sand'};
 }
 
@@ -71,26 +72,30 @@ export function createShoreFightView(canvas,{sceneId='pacifica'}={}){
   for(let row=0;row<28;row++){
    const p=(row+.5)/28,yy=horizon+(bottom-horizon)*p*p,span=3+p*14;
    for(let i=0;i<w/(span*3);i++){
-    const seed=row*311+i,x=i*span*3+hash(seed+51)*span+Math.sin(t*.22+seed)*p*2;
+    const seed=row*311+i,x=i*span*3+hash(seed+51)*span;
     if(hash(seed+12)>.36)rect(x,yy,span*(.4+hash(seed+27)),1,row%3?palette.sea:'#82aaa5');
    }
   }
-  // Wave fronts advance shoreward. Each segment tests the same depth and
-  // breaking criterion as the overhead world; troughs and rip gaps stay dark.
-  for(let row=0;row<11;row++){
-   const distance=(row*15+165-(t*1.8)%15)%165+1;
-   for(let x=0;x<w;x+=5){
-    const scale=18/(18+distance),worldX=pl.x+(x/w-.5)/(.025*scale)*3.2;
-    const worldY=pier?pl.y-distance*3.2:scene.shoreY(worldX)-distance*3.2;
-    const sample=sampleShore(scene,worldX,worldY,t),p=shoreSurfaceProjection(w,h,scene,s,{x:worldX,y:worldY});
-    const crest=(Math.sin(x*.048+row*.9+t*.17)*2+Math.sin(x*.17+row)*1.1)*scale,breaking=sample.breakStrength>.10;
-    if(breaking||hash(row*727+Math.floor(x/5))>.28){
-     const thickness=breaking?Math.max(2,scale*sample.waveHeight*10*sample.breakStrength):1;
-     if(breaking)rect(x,p.y+crest-2,6,thickness+4,palette.deep);
-     rect(x,p.y+crest,6,thickness,breaking?palette.foam:'#91b6af');
+  // Perspective projects actual roots of the same phase as the overhead
+  // view and tackle simulation, including wave period, tide and sea overrides.
+  for(let worldX=pl.x-1800;worldX<=pl.x+1800;worldX+=22){
+   const shore=scene.shoreY(worldX),maxOffshore=pier?Math.max(220,(shore-pl.y)/3.2+220):220;
+   const crests=shoreWaveCrests(scene,worldX,t,s.seaState,maxOffshore);
+   for(const distance of crests){
+    const worldY=shore-distance*3.2,forward=(pier?pl.y-worldY:shore-worldY)/3.2;
+    if(forward<.5||forward>220)continue;
+    const scale=18/(18+forward),rawX=w*.5+(worldX-pl.x)/3.2*w*.025*scale;
+    if(rawX<0||rawX>w)continue;
+    const sample=sampleShore(scene,worldX,worldY,t,s.seaState),p=shoreSurfaceProjection(w,h,scene,s,{x:worldX,y:worldY});
+    const segment=Math.max(2,22/3.2*w*.025*scale+1),breaking=sample.breakStrength>.10;
+    const rise=sample.surfaceElevation*scale*5;
+    if(breaking||hash(Math.round(sample.wavePhase/TAU)*727+Math.floor(worldX/22))>.28){
+     const thickness=breaking?Math.max(2,scale*sample.localWaveHeight*10*sample.breakStrength):1;
+     if(breaking)rect(rawX,p.y-rise-2,segment,thickness+4,palette.deep);
+     rect(rawX,p.y-rise,segment,thickness,breaking?palette.foam:'#91b6af');
      if(breaking){
-      rect(x,p.y+crest+thickness,6,2,palette.shallow);
-      if(hash(row*437+Math.floor(x/5))>.3)rect(x+1,p.y+crest+thickness+3,3,1,palette.foam);
+      rect(rawX,p.y-rise+thickness,segment,2,palette.shallow);
+      if(hash(Math.floor(worldX/22)+437)>.3)rect(rawX+1,p.y-rise+thickness+3,Math.max(1,segment*.5),1,palette.foam);
      }
     }
    }
@@ -102,13 +107,14 @@ export function createShoreFightView(canvas,{sceneId='pacifica'}={}){
    for(const x of [w*.06,w*.94]){rect(x-2,h*.76,4,h*.17,'#344c50');rect(x-1,h*.76,1,h*.17,'#98a9a0');}
    rect(0,h*.76,w,4,'#3d5658');rect(0,h*.76,w,1,'#adb7a6');
   }else{
-   const runup=Math.sin(t*.7)*h*.007,edge=h*.85+runup;
+   const swash=sampleShore(scene,pl.x,scene.shoreY(pl.x),t,s.seaState);
+   const runup=swash.runupMeters*h*.0015,edge=h*.85+runup+(swash.tide-.4)*h*.012;
    const points=[{x:0,y:h},{x:0,y:edge}];
    for(let x=0;x<=w+8;x+=8)points.push({x,y:edge+Math.sin(x/w*7+pl.x/270)*h*.01});
    points.push({x:w,y:h});polygon(points,palette.wet);
    rect(0,h*.925,w,h*.075,palette.sand);rect(0,h*.975,w,h*.025,palette.dry);
    for(let i=0;i<160;i++){const x=hash(i+931)*w,y=h*(.88+hash(i+193)*.12);rect(x,y,hash(i+84)>.9?2:1,1,i%3?palette.grainDark:palette.grain);}
-   for(let x=0;x<w;x+=5)rect(x,edge+Math.sin(x/w*7+pl.x/270)*h*.01-1,6,1,palette.foam);
+   if(swash.waveHeight>0)for(let x=0;x<w;x+=5)rect(x,edge+Math.sin(x/w*7+pl.x/270)*h*.01-1,6,1,palette.foam);
   }
  }
  function draw(state,dt,{active:visible=true,paused=false,reeling=false,reducedMotion=false}={}){
@@ -127,6 +133,7 @@ export function createShoreFightView(canvas,{sceneId='pacifica'}={}){
   g.line=Array.from({length:19},(_,i)=>{const t=i/18;return{x:mix(g.tip.x,entry.x,t),y:mix(g.tip.y,entry.y,t)+4*t*(1-t)*sag};});g.line[0]=g.tip;g.line[18]=entry;
   coast(g,state,reducedMotion?0:elapsed);
   if(g.lineVisible){const {x,y}=entry;rect(x-4,y,3,1,palette.foam);rect(x+2,y,3,1,palette.foam);}
+  if(g.showFloat&&g.lineVisible){rect(entry.x-1,entry.y-8,2,4,'#e26e50');rect(entry.x-2,entry.y-4,4,4,'#fff0cf');rect(entry.x-1,entry.y,2,2,'#c96a47');}
   drawCloseTackle(c,g,{line,rect,ellipse,spoolAngle,rotorAngle,reelStyle:'spinning',drawFishingLine(){
    if(!g.lineVisible)return;
    let prev=g.reel;for(const i of[5,10,15,20,24,28]){const p=g.points[i];line(prev,p,'#d3d5b4');prev=p;}
@@ -137,7 +144,7 @@ export function createShoreFightView(canvas,{sceneId='pacifica'}={}){
  function snapshot(){
   const g=lastGeometry,toCSS=p=>({x:Math.round(p.x*cssWidth/g.width),y:Math.round(p.y*cssHeight/g.height)});
   return{active,view:'first-person',scene:scene.id,ground:lastPose?.ground||'sand',width:cssWidth,height:cssHeight,crankAngle,rotorAngle,spoolAngle,
-   ...(g?{rodTip:toCSS(g.tip),reelKnob:toCSS(g.knob),lineEntry:toCSS(g.waterEntry),lineVisible:active&&g.lineVisible,bend:g.bend,surfaceFish:false,fishVisible:false,sandColor:palette.sand,depth:lastPose.depth,fishWorld:lastPose.fishWorld}:{} )};
+   ...(g?{rodTip:toCSS(g.tip),reelKnob:toCSS(g.knob),lineEntry:toCSS(g.waterEntry),lineVisible:active&&g.lineVisible,floatVisible:active&&g.lineVisible&&g.showFloat,bend:g.bend,surfaceFish:false,fishVisible:false,sandColor:palette.sand,depth:lastPose.depth,fishWorld:lastPose.fishWorld}:{} )};
  }
  resize(cssWidth,cssHeight);return{resize,draw,snapshot};
 }

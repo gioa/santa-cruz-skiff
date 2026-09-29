@@ -1,0 +1,58 @@
+{
+ "generatedAt": "2026-09-29T04:11:09.531Z",
+ "runs": 20,
+ "limitSeconds": 600,
+ "strategies": {
+  "reef · squid · single-hook bottom": {
+   "runs": 20,
+   "biteWithin2min": 0.7,
+   "biteWithin10min": 1,
+   "medianSeconds": 78.49999999999982,
+   "species": {
+    "蓝岩鱼": 17,
+    "铜岩鱼": 3
+   }
+  },
+  "reef · squid · recast every 30 s": {
+   "runs": 20,
+   "biteWithin2min": 0.4,
+   "biteWithin10min": 0.7,
+   "medianSeconds": 156.99999999999537,
+   "species": {
+    "蓝岩鱼": 9,
+    "铜岩鱼": 4,
+    "太平洋鲭鱼": 1
+   }
+  },
+  "reef · feather jig held at depth": {
+   "runs": 20,
+   "biteWithin2min": 0.25,
+   "biteWithin10min": 0.6,
+   "medianSeconds": 280.4999999999953,
+   "species": {
+    "蓝岩鱼": 8,
+    "铜岩鱼": 2,
+    "太平洋鲭鱼": 2
+   }
+  },
+  "sand · squid · single-hook bottom": {
+   "runs": 20,
+   "biteWithin2min": 0.5,
+   "biteWithin10min": 0.9,
+   "medianSeconds": 110.99999999999797,
+   "species": {
+    "白石首鱼": 14,
+    "太平洋鲭鱼": 4
+   }
+  },
+  "sand · feather jig held at depth": {
+   "runs": 20,
+   "biteWithin2min": 0.05,
+   "biteWithin10min": 0.05,
+   "medianSeconds": null,
+   "species": {
+    "太平洋鲭鱼": 1
+   }
+  }
+ }
+}

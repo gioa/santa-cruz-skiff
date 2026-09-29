@@ -1,0 +1,58 @@
+{
+  "commit": "5bab401965f44a1ef24674649bebee4f418b9ce3",
+  "version": "v63",
+  "checks": [
+    {
+      "file": "index.html",
+      "matches": true,
+      "sha256": "181f6db5c5bbbdcdda8c57d5748429b98822c811ef05142779ffdcc7721d1cb1"
+    },
+    {
+      "file": "pixel.css",
+      "matches": true,
+      "sha256": "70e20ebc13b523aa4797c66bf037b722024598c7f6983d8356cebfaf91a3f358"
+    },
+    {
+      "file": "pixel-sim.js",
+      "matches": true,
+      "sha256": "74e4a40e875f435ab4bbccef7f762158e16a010e5572f8b813e64c6ec159b735"
+    },
+    {
+      "file": "pixel-game.js",
+      "matches": true,
+      "sha256": "dac61895539934b24f7ddb49ce71244080bc4f42f9b3b40335676e784061af02"
+    },
+    {
+      "file": "pixel-daily-weather.js",
+      "matches": true,
+      "sha256": "6c17b4c8c3c43f242b336ef658564fb4527b10e3a2e31f05b86455fadf725cf0"
+    },
+    {
+      "file": "pixel-day-cycle.js",
+      "matches": true,
+      "sha256": "e038cb4caf1d2902ece6e75f2d462925d16f9775af5e529b871e4c8965591aae"
+    },
+    {
+      "file": "pixel-world.js",
+      "matches": true,
+      "sha256": "c408a9d1f412507241358bcc0b1c443fcf341220fc2fa19c81c1e36a7de8d249"
+    },
+    {
+      "file": "pixel-fight-view.js",
+      "matches": true,
+      "sha256": "c2d0f9f3a5018881ee08e178194ab9a1cc969b72cdc3576057236feea57f90df"
+    },
+    {
+      "file": "pixel-boat-geometry.js",
+      "matches": true,
+      "sha256": "43273f20b019085d52dfae17c1f4ad5f768f49d8afed8e6bd6f060e45d3db17b"
+    },
+    {
+      "file": "pixel-fishing-physics.js",
+      "matches": true,
+      "sha256": "6817a5e0a3879d7ba6eaf8d32a432cf39fa3fc8de0f1e770eda9acb2148106f8"
+    }
+  ],
+  "releaseTests": 679,
+  "sharedTests": 691
+}

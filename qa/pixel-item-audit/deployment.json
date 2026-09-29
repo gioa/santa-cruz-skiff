@@ -1,0 +1,25 @@
+{
+  "commit": "b057ad522f59921c11b5bf71ee6269ac8c918e8e",
+  "run": 36366893088,
+  "status": "success",
+  "assetMatches": {
+    "pixel-game.js": true,
+    "pixel-sim.js": true,
+    "pixel-gear-availability.js": true,
+    "pixel-inventory.js": true,
+    "pixel-fishing-physics.js": true,
+    "equipment.js": true
+  },
+  "publicUrl": "https://joyx.design/santa-cruz-skiff/?v=28",
+  "browser": {
+    "loadingHidden": true,
+    "module": "pixel-game.js?v=20260927-pixel-v28",
+    "consoleErrors": [],
+    "viewport": {
+      "width": 390,
+      "height": 844
+    }
+  },
+  "isolatedTestCount": 518,
+  "allDependencyModulesMatched": 55
+}

@@ -1,0 +1,586 @@
+{
+  "title": "California distinctive fishing locations research",
+  "as_of": "2026-09-28",
+  "purpose": "research_only",
+  "runtime_integration": false,
+  "implementation_requested": false,
+  "candidate_region_count": 18,
+  "existing_scenes_excluded": [
+    "Santa Cruz",
+    "Pacifica",
+    "Half Moon Bay"
+  ],
+  "interpretation": "Modes identify research opportunities, not blanket legal access. Nulls mean unmeasured or undecided, not zero. Facts, dated rules and design inferences remain distinct in dossiers.",
+  "sites": [
+    {
+      "id": "trinidad-harbor",
+      "name": "Trinidad Harbor / Trinidad Head",
+      "modes": [
+        "pier",
+        "shore",
+        "boat"
+      ],
+      "distinctive_environment": "岬角小港、吊机下水、海蚀柱",
+      "dossier": "north-coast.md#trinidad-harbor",
+      "source_urls": [
+        "https://filelib.wildlife.ca.gov/FileLib/CRFS/CRFS%20Training%20Materials/Sites/northern%20site%20description/Humboldt%20County.pdf",
+        "https://tidesandcurrents.noaa.gov/est/est_station.shtml?stnid=9419059",
+        "https://wildlife.ca.gov/Conservation/Marine/MPAs/Reading-Rock",
+        "https://wildlife.ca.gov/Fishing/Ocean/Regulations/Fishing-Map/Northern",
+        "https://www.blm.gov/california/public-room/brochure/trinidad-gateway-brochure",
+        "https://www.blm.gov/visit/trinidad-head-lighthouse",
+        "https://www.opc.ca.gov/webmaster/ftp/pdf/docs/CA_NCoastFCP.pdf",
+        "https://www.seascape-pier.com/",
+        "https://www.seascape-pier.com/launch",
+        "https://www.usgs.gov/media/images/trinidad-submarine-canyon-bathymetry"
+      ],
+      "verified_on": "2026-09-28",
+      "key_unresolved_inputs": [
+        "港内浅礁测深",
+        "吊机开放状态"
+      ],
+      "playable_polygon": null,
+      "calibrated_fish_probabilities": null,
+      "asset_reuse_clearance": "not_completed",
+      "research_status": "comparative_dossier_complete; production_data_incomplete"
+    },
+    {
+      "id": "humboldt-bay",
+      "name": "Humboldt Bay",
+      "modes": [
+        "pier",
+        "shore",
+        "boat",
+        "kayak"
+      ],
+      "distinctive_environment": "潮汐河口、泥滩、海草与口门",
+      "dossier": "north-coast.md#humboldt-bay",
+      "source_urls": [
+        "https://cty-gis-web.co.humboldt.ca.us/server/rest/services/Web/Humboldt_Bay_DEM/MapServer",
+        "https://dbw.parks.ca.gov/BoatingFacilities/f/14",
+        "https://humboldtbay.org/recreation",
+        "https://wildlife.ca.gov/Conservation/Marine/MPAs/South-Humboldt-Bay",
+        "https://wildlife.ca.gov/Fishing/Commercial/Herring/Season-Summaries",
+        "https://wildlife.ca.gov/Fishing/Ocean/Regulations/Fishing-Map/Northern",
+        "https://wildlife.ca.gov/Lands/Places-to-Visit/South-Spit-WA",
+        "https://www.fws.gov/refuge/humboldt-bay/visit-us/locations/hookton-slough-unit",
+        "https://www.fws.gov/sites/default/files/documents/HumboldtGB_2021-web_508.pdf",
+        "https://www.ncei.noaa.gov/access/metadata/landing-page/bin/iso?id=gov.noaa.ngdc.mgg.dem%3A667",
+        "https://www.tidesandcurrents.noaa.gov/stations.html?type=Historic"
+      ],
+      "verified_on": "2026-09-28",
+      "key_unresolved_inputs": [
+        "新港道测深",
+        "潮沟与海草范围"
+      ],
+      "playable_polygon": null,
+      "calibrated_fish_probabilities": null,
+      "asset_reuse_clearance": "not_completed",
+      "research_status": "comparative_dossier_complete; production_data_incomplete"
+    },
+    {
+      "id": "noyo-fort-bragg",
+      "name": "Noyo Harbor / Fort Bragg",
+      "modes": [
+        "shore_candidate",
+        "boat"
+      ],
+      "distinctive_environment": "高桥下工作渔港、河口航道与外礁",
+      "dossier": "north-coast.md#noyo-fort-bragg",
+      "source_urls": [
+        "https://conservation.ca.gov/cgs/fwg/maps/noyo",
+        "https://noyoharbordistrict.org/the-harbor/",
+        "https://noyoharbordistrict.org/the-marina/",
+        "https://pubs.usgs.gov/of/2019/1072/ofr20191072_sheet2.pdf",
+        "https://repository.library.noaa.gov/view/noaa/40878/noaa_40878_DS13.pdf",
+        "https://scc.ca.gov/2016/05/26/the-conservancy-at-40-years-fort-bragg/",
+        "https://tidesandcurrents.noaa.gov/tide_pred_stn_history.html",
+        "https://wildlife.ca.gov/Conservation/Marine/MPAs/Ten-Mile",
+        "https://wildlife.ca.gov/Conservation/Marine/Nearshore",
+        "https://wildlife.ca.gov/Fishing/Ocean/Regulations/Fishing-Map/Mendocino",
+        "https://www.tidesandcurrents.noaa.gov/stations.html?type=Historic"
+      ],
+      "verified_on": "2026-09-28",
+      "key_unresolved_inputs": [
+        "岸钓准入",
+        "河口新沙坝"
+      ],
+      "playable_polygon": null,
+      "calibrated_fish_probabilities": null,
+      "asset_reuse_clearance": "not_completed",
+      "research_status": "comparative_dossier_complete; production_data_incomplete"
+    },
+    {
+      "id": "bodega-bay",
+      "name": "Bodega Bay / Doran / Bodega Head",
+      "modes": [
+        "surf",
+        "shore",
+        "boat"
+      ],
+      "distinctive_environment": "朝南长沙滩与迎浪岬角",
+      "dossier": "north-coast.md#bodega-bay",
+      "source_urls": [
+        "https://parks.sonomacounty.ca.gov/Microsites/Regional%20Parks/Documents/Visit/Brochures/Doran-Regional-Park-Brochure.pdf",
+        "https://pubs.usgs.gov/ds/781/OffshoreBodegaHead/data_catalog_OffshoreBodegaHead.html",
+        "https://pubs.usgs.gov/publication/ofr20151140",
+        "https://wildlife.ca.gov/Conservation/Marine/MPAs/Bodega-Head",
+        "https://wildlife.ca.gov/Fishing/Ocean/Regulations/Fishing-Map/San-Francisco",
+        "https://www.parks.ca.gov/BoatingFacilities/Body-of-Water/Bodega%20Bay",
+        "https://www.parks.ca.gov/BoatingFacilities/f/42",
+        "https://www.parks.ca.gov/BoatingFacilities/f/44"
+      ],
+      "verified_on": "2026-09-28",
+      "key_unresolved_inputs": [
+        "近期滩槽断面",
+        "沙色与港道测深"
+      ],
+      "playable_polygon": null,
+      "calibrated_fish_probabilities": null,
+      "asset_reuse_clearance": "not_completed",
+      "research_status": "comparative_dossier_complete; production_data_incomplete"
+    },
+    {
+      "id": "tomales-bay",
+      "name": "Tomales Bay",
+      "modes": [
+        "pier",
+        "shore",
+        "boat",
+        "kayak"
+      ],
+      "distinctive_environment": "狭长断层湾、风道和浅滩潮沟",
+      "dossier": "north-coast.md#tomales-bay",
+      "source_urls": [
+        "https://home.nps.gov/pore/planyourvisit/safety_boating.htm",
+        "https://parks.ca.gov/?page_id=22224",
+        "https://parks.ca.gov/?page_id=470",
+        "https://parks.marincounty.gov/parkspreserves/parks/miller-boat-launch",
+        "https://pubs.usgs.gov/of/2008/1237/data/tomalesampg.html",
+        "https://pubs.usgs.gov/of/2008/1237/data/tomalesg.html",
+        "https://wildlife.ca.gov/Fishing/Commercial/Herring",
+        "https://wildlife.ca.gov/Lands/Places-to-Visit/Tomales-Bay-ER",
+        "https://www.nps.gov/pore/planyourvisit/upload/map_boatincamping.pdf",
+        "https://www.nps.gov/thingstodo/fishing-at-point-eyes.htm",
+        "https://www.nps.gov/thingstodo/point-reyes-boat-in-camping.htm",
+        "https://www.usgs.gov/publications/california-state-waters-map-series-offshore-tomales-point-california"
+      ],
+      "verified_on": "2026-09-28",
+      "key_unresolved_inputs": [
+        "口门新测深",
+        "局地鱼种调查"
+      ],
+      "playable_polygon": null,
+      "calibrated_fish_probabilities": null,
+      "asset_reuse_clearance": "not_completed",
+      "research_status": "comparative_dossier_complete; production_data_incomplete"
+    },
+    {
+      "id": "san-francisco-bay",
+      "name": "San Francisco Bay / Alameda / Berkeley / Central Bay",
+      "modes": [
+        "shore",
+        "pier_candidate",
+        "boat"
+      ],
+      "distinctive_environment": "城市浅岸、岛礁和潮流深槽",
+      "dossier": "north-coast.md#san-francisco-bay",
+      "source_urls": [
+        "https://api.tidesandcurrents.noaa.gov/api/dev",
+        "https://berkeleyca.gov/community-recreation/waterfront/waterfront-amenities",
+        "https://berkeleyca.gov/sites/default/files/2026-01/Item%2010A%20Berkeley%20Ferry%20Pier%20Use%20Permit.pdf",
+        "https://coast.noaa.gov/digitalcoast/tools/dav.html",
+        "https://coast.noaa.gov/inventory/",
+        "https://filelib.wildlife.ca.gov/Public/ITB/NRM/MPAMap/mpa_map.html",
+        "https://tidesandcurrents.noaa.gov/ofs/sfbofs/sfbofs.html",
+        "https://tidesandcurrents.noaa.gov/ports/index.html?port=sf",
+        "https://wildlife.ca.gov/Conservation/Marine/Nearshore",
+        "https://wildlife.ca.gov/Fishing/Commercial/Herring",
+        "https://wildlife.ca.gov/Fishing/Inland/Striped-Bass",
+        "https://wildlife.ca.gov/Fishing/Ocean",
+        "https://wildlife.ca.gov/Fishing/Ocean/Regulations/Fishing-Map/SF-Bay",
+        "https://www.alamedaca.gov/Departments/Recreation-Parks/Encinal-Boat-Ramp",
+        "https://www.alamedaca.gov/files/content/public/v/1/business/bid-on-city-contracts/invitation-to-bid-encinal-boat-launch-facility-no.-p.w.-04-19-19/051619-final-eblf-plans.pdf",
+        "https://www.ebparks.org/parks/crown-beach",
+        "https://www.ebparks.org/recreation/fishing",
+        "https://www.tidesandcurrents.noaa.gov/stationhome.html?id=9414290",
+        "https://www.usgs.gov/data/high-resolution-1-m-digital-elevation-model-dem-san-francisco-bay-california-created-using",
+        "https://www.usgs.gov/news/state-news-release/new-maps-reveal-seafloor-san-francisco-area"
+      ],
+      "verified_on": "2026-09-28",
+      "key_unresolved_inputs": [
+        "局地流场校准",
+        "岸线权限与物种统计"
+      ],
+      "playable_polygon": null,
+      "calibrated_fish_probabilities": null,
+      "asset_reuse_clearance": "not_completed",
+      "research_status": "comparative_dossier_complete; production_data_incomplete"
+    },
+    {
+      "id": "moss-landing-canyon",
+      "name": "Moss Landing / Monterey Canyon",
+      "modes": [
+        "surf",
+        "boat"
+      ],
+      "distinctive_environment": "沙丘海滩到近岸峡谷",
+      "dossier": "central-south-coast.md#moss-landing-canyon",
+      "source_urls": [
+        "https://dods.ndbc.noaa.gov/thredds/dodsC/data/stdmet/mlsc1/mlsc1h2026.nc.html",
+        "https://incidentnews.noaa.gov/incident/11212",
+        "https://mosslandingharbor.dst.ca.us/",
+        "https://mosslandingharbor.dst.ca.us/launch-ramp",
+        "https://sanctuaries.noaa.gov/science/condition/mbnms/history.html",
+        "https://sanctuaries.noaa.gov/science/condition/mbnms/pressures.html",
+        "https://wildlife.ca.gov/Conservation/Marine/MPAs/Elkhorn-Slough",
+        "https://wildlife.ca.gov/Lands/Places-to-Visit/Moss-Landing-WA",
+        "https://www.mbari.org/know-your-ocean/monterey-canyon/",
+        "https://www.mbari.org/news/canyons-currents-and-algal-blooms-how-monterey-canyon-influences-the-growth-of-microscopic-marine-algae/",
+        "https://www.mbari.org/news/following-the-trail-of-sand-in-monterey-canyon/",
+        "https://www.parks.ca.gov/?page_id=574"
+      ],
+      "verified_on": "2026-09-28",
+      "key_unresolved_inputs": [
+        "最新近岸测深",
+        "港道和沙滩断面"
+      ],
+      "playable_polygon": null,
+      "calibrated_fish_probabilities": null,
+      "asset_reuse_clearance": "not_completed",
+      "research_status": "comparative_dossier_complete; production_data_incomplete"
+    },
+    {
+      "id": "morro-bay-estuary",
+      "name": "Morro Bay",
+      "modes": [
+        "shore_candidate",
+        "boat",
+        "kayak"
+      ],
+      "distinctive_environment": "火山岩地标、沙嘴和海草潟湖",
+      "dossier": "central-south-coast.md#morro-bay-estuary",
+      "source_urls": [
+        "https://ceqanet.lci.ca.gov/2026050193",
+        "https://forecast.weather.gov/MapClick.php?textField1=35.3658&textField2=-120.849",
+        "https://morrobayca.gov/144/Harbor",
+        "https://morrobayca.gov/ArchiveCenter/ViewFile/Item/7328",
+        "https://pubs.usgs.gov/of/2023/1064/ofr20231064.pdf",
+        "https://wildlife.ca.gov/Conservation/Marine/MPAs/Morro-Bay",
+        "https://www.morrobayca.gov/Archive.aspx?ADID=5642",
+        "https://www.usgs.gov/data/bathymetry-backscatter-intensity-and-benthic-habitat-offshore-morro-bay-california-ver-11"
+      ],
+      "verified_on": "2026-09-28",
+      "key_unresolved_inputs": [
+        "湾内测深",
+        "岸钓入口",
+        "坡道现况"
+      ],
+      "playable_polygon": null,
+      "calibrated_fish_probabilities": null,
+      "asset_reuse_clearance": "not_completed",
+      "research_status": "comparative_dossier_complete; production_data_incomplete"
+    },
+    {
+      "id": "channel-islands-anacapa",
+      "name": "Channel Islands / Anacapa / East Santa Cruz Island",
+      "modes": [
+        "boat",
+        "shore_conditional"
+      ],
+      "distinctive_environment": "跨海、岛影、火山海崖与海带礁",
+      "dossier": "central-south-coast.md#channel-islands-anacapa",
+      "source_urls": [
+        "https://coastwatch.pfeg.noaa.gov/erddap/tabledap/erdCinpKfmFT.html",
+        "https://home.nps.gov/chis/planyourvisit/directions.htm",
+        "https://home.nps.gov/chis/planyourvisit/weather.htm",
+        "https://pubs.usgs.gov/sim/3473/sim3473_sheet3.pdf",
+        "https://venturaharbor.com/fuel-docks/",
+        "https://venturaharbor.com/parking/",
+        "https://wildlife.ca.gov/Conservation/Marine/MPAs/Anacapa-Island",
+        "https://www.nps.gov/chis/learn/nature/currents-upwelling.htm",
+        "https://www.nps.gov/chis/learn/nature/marine-protected-areas.htm",
+        "https://www.nps.gov/chis/planyourvisit/boating.htm",
+        "https://www.nps.gov/chis/planyourvisit/fishing.htm",
+        "https://www.nps.gov/im/medn/kelp-forest-communities.htm"
+      ],
+      "verified_on": "2026-09-28",
+      "key_unresolved_inputs": [
+        "开放礁选址",
+        "近岸数据与特殊关闭边界"
+      ],
+      "playable_polygon": null,
+      "calibrated_fish_probabilities": null,
+      "asset_reuse_clearance": "not_completed",
+      "research_status": "comparative_dossier_complete; production_data_incomplete"
+    },
+    {
+      "id": "catalina-avalon",
+      "name": "Santa Catalina Island / Avalon",
+      "modes": [
+        "pier_candidate",
+        "boat"
+      ],
+      "distinctive_environment": "密集系泊港与陡峭岛岸",
+      "dossier": "central-south-coast.md#catalina-avalon",
+      "source_urls": [
+        "https://tidesandcurrents.noaa.gov/benchmarks/9410079.html",
+        "https://wildlife.ca.gov/Conservation/Marine/MPAs/Casino-Point",
+        "https://wildlife.ca.gov/Conservation/Marine/MPAs/Lovers-Cove",
+        "https://www.cityofavalon.gov/175/Harbor-Department",
+        "https://www.cityofavalon.gov/DocumentCenter/View/1769/Avalon-Harbor-Brochure-FINAL-2025-2026",
+        "https://www.cityofavalon.gov/DocumentCenter/View/1852",
+        "https://www.cityofavalon.gov/m/newsflash?cat=11%2C1",
+        "https://www.csulb.edu/shark-lab/fish-movements-and-marine-protected-areas",
+        "https://www.usgs.gov/maps/colored-shaded-relief-bathymetry-acoustic-backscatter-and-selected-perspective-views-inner"
+      ],
+      "verified_on": "2026-09-28",
+      "key_unresolved_inputs": [
+        "码头准入与施工",
+        "局地测深"
+      ],
+      "playable_polygon": null,
+      "calibrated_fish_probabilities": null,
+      "asset_reuse_clearance": "not_completed",
+      "research_status": "comparative_dossier_complete; production_data_incomplete"
+    },
+    {
+      "id": "redondo-canyon",
+      "name": "Redondo Beach / King Harbor",
+      "modes": [
+        "pier",
+        "boat"
+      ],
+      "distinctive_environment": "城市栈桥、吊船机与近岸峡谷",
+      "dossier": "central-south-coast.md#redondo-canyon",
+      "source_urls": [
+        "https://ecode360.com/42662404",
+        "https://oehha.ca.gov/media/downloads/advisories/socaladvisoryl61809.pdf",
+        "https://pubs.usgs.gov/of/2002/0162/persp.html",
+        "https://pubs.usgs.gov/pp/0575c/report.pdf",
+        "https://redondo.gov/Draft%20Public%20Amenities%20Plan%20for%20King%20Harbor.pdf",
+        "https://redondo.legistar.com/View.ashx?GUID=9F098D4D-5D79-4232-A37B-9471643217A0&ID=14852330&M=F",
+        "https://wildlife.ca.gov/Conservation/Marine/MPAs/Point-Vicente-Abalone-Cove",
+        "https://wildlife.ca.gov/Fishing/Ocean/Beach-Fishing",
+        "https://www.ndbc.noaa.gov/station_page.php?station=46045"
+      ],
+      "verified_on": "2026-09-28",
+      "key_unresolved_inputs": [
+        "新船坡和旧pier工程状态",
+        "当地鱼群调查"
+      ],
+      "playable_polygon": null,
+      "calibrated_fish_probabilities": null,
+      "asset_reuse_clearance": "not_completed",
+      "research_status": "comparative_dossier_complete; production_data_incomplete"
+    },
+    {
+      "id": "san-diego-bay",
+      "name": "San Diego Bay",
+      "modes": [
+        "pier",
+        "boat",
+        "kayak"
+      ],
+      "distinctive_environment": "城市港湾、海草浅滩和饵船",
+      "dossier": "central-south-coast.md#san-diego-bay",
+      "source_urls": [
+        "https://ca.water.usgs.gov/sandiego/data/gis/dem/sd_coastal_dem/San_Diego_California.pdf",
+        "https://marinespecies.wildlife.ca.gov/spotted-sand-bass/management/",
+        "https://tidesandcurrents.noaa.gov/benchmarks/9410170.html",
+        "https://www.oxy.edu/academics/vantuna-research-group/research/estuarine-ecology",
+        "https://www.portofsandiego.org/coming-and-going/boating-san-diego-bay",
+        "https://www.portofsandiego.org/environment/environmental-conservation/monitoring-reports",
+        "https://www.portofsandiego.org/environment/environmental-conservation/natural-resources-management",
+        "https://www.portofsandiego.org/experiences/see-and-do/parks/park-permitting-information",
+        "https://www.portofsandiego.org/experiences/where-go/shelter-island/shelter-island-boat-launch",
+        "https://www.portofsandiego.org/maritime/mariner-resources"
+      ],
+      "verified_on": "2026-09-28",
+      "key_unresolved_inputs": [
+        "鱼类调查表提取",
+        "新航道测深和限制边界"
+      ],
+      "playable_polygon": null,
+      "calibrated_fish_probabilities": null,
+      "asset_reuse_clearance": "not_completed",
+      "research_status": "comparative_dossier_complete; production_data_incomplete"
+    },
+    {
+      "id": "la-jolla-kelp",
+      "name": "La Jolla",
+      "modes": [
+        "kayak",
+        "boat",
+        "shore_access_only"
+      ],
+      "distinctive_environment": "沙滩下水、双峡谷和海带外缘",
+      "dossier": "central-south-coast.md#la-jolla-kelp",
+      "source_urls": [
+        "https://nrm.dfg.ca.gov/FileHandler.ashx?DocumentID=98226&inline=",
+        "https://tidesandcurrents.noaa.gov/benchmarks/9410230.html",
+        "https://wildlife.ca.gov/Conservation/Marine/MPAs/San-Diego-Scripps-Coastal-Matlahuayl",
+        "https://wildlife.ca.gov/Conservation/Marine/MPAs/South-La-Jolla",
+        "https://www.sandiego.gov/lifeguards/beaches/shores",
+        "https://www.sandiego.gov/sites/default/files/kayak2020.pdf",
+        "https://www.sandiego.gov/sites/default/files/nora050919-rfp-271335_001-and-kayak-concessions-agreement-for-operation-of-kayak-concessions-at-la-jolla-shores-beach.pdf",
+        "https://www.usgs.gov/publications/anatomy-la-jolla-submarine-canyon-system-offshore-southern-california"
+      ],
+      "verified_on": "2026-09-28",
+      "key_unresolved_inputs": [
+        "可钓区域选址",
+        "当年海带和下水区状态"
+      ],
+      "playable_polygon": null,
+      "calibrated_fish_probabilities": null,
+      "asset_reuse_clearance": "not_completed",
+      "research_status": "comparative_dossier_complete; production_data_incomplete"
+    },
+    {
+      "id": "delta-brannan",
+      "name": "Sacramento–San Joaquin Delta / Brannan Island",
+      "modes": [
+        "shore",
+        "pier",
+        "boat"
+      ],
+      "distinctive_environment": "潮汐河网、堤岸、草边与支汊",
+      "dossier": "inland-waters.md#delta-brannan",
+      "source_urls": [
+        "https://cdec.water.ca.gov/",
+        "https://parks.ca.gov/?page_id=31888",
+        "https://pubs.usgs.gov/ds/359/",
+        "https://wildlife.ca.gov/Fishing/Inland/White-Sturgeon",
+        "https://wildlife.ca.gov/Regulations",
+        "https://www.parks.ca.gov/?page_id=487",
+        "https://www.parks.ca.gov/BoatingFacilities/f/743",
+        "https://www.usgs.gov/publications/san-francisco-bay-delta-bathymetrictopographic-digital-elevation-model-dem"
+      ],
+      "verified_on": "2026-09-28",
+      "key_unresolved_inputs": [
+        "局地流速",
+        "岸线权属和水草覆盖"
+      ],
+      "playable_polygon": null,
+      "calibrated_fish_probabilities": null,
+      "asset_reuse_clearance": "not_completed",
+      "research_status": "comparative_dossier_complete; production_data_incomplete"
+    },
+    {
+      "id": "clear-lake",
+      "name": "Clear Lake / State Park / Cole Creek",
+      "modes": [
+        "shore",
+        "boat"
+      ],
+      "distinctive_environment": "天然暖水湖、植被与能见度变化",
+      "dossier": "inland-waters.md#clear-lake",
+      "source_urls": [
+        "https://www.lakecountyca.gov/1248/Invasive-Mussel-Prevention",
+        "https://www.lakecountyca.gov/1257/Prevention-Plans-Reports",
+        "https://www.parks.ca.gov/?page_id=473",
+        "https://www.parks.ca.gov/BoatingFacilities/f/530",
+        "https://www.parks.ca.gov/pages/473/files/ClearLakeWebBrochure2012.pdf",
+        "https://www.waterboards.ca.gov/centralvalley/water_issues/tmdl/central_valley_projects/clear_lake_nutrients/index.html",
+        "https://www.waterboards.ca.gov/rwqcb5/water_issues/tmdl/central_valley_projects/clear_lake_nutrients/clearlakephase2_final_rpt.pdf",
+        "https://www.waterboards.ca.gov/waterrights/water_issues/programs/clear-lake-hitch/"
+      ],
+      "verified_on": "2026-09-28",
+      "key_unresolved_inputs": [
+        "湖底网格",
+        "植被与本地月度鱼群"
+      ],
+      "playable_polygon": null,
+      "calibrated_fish_probabilities": null,
+      "asset_reuse_clearance": "not_completed",
+      "research_status": "comparative_dossier_complete; production_data_incomplete"
+    },
+    {
+      "id": "shasta-lake",
+      "name": "Shasta Lake",
+      "modes": [
+        "shore",
+        "boat"
+      ],
+      "distinctive_environment": "多河臂峡谷水库和涨落岸线",
+      "dossier": "inland-waters.md#shasta-lake",
+      "source_urls": [
+        "https://oehha.ca.gov/sites/default/files/media/downloads/advisories/shastareport022717.pdf",
+        "https://wildlife.ca.gov/Regulations",
+        "https://www.fs.usda.gov/Internet/FSE_DOCUMENTS/fsm9_008261.pdf",
+        "https://www.fs.usda.gov/Internet/FSE_DOCUMENTS/stelprd3790610.pdf",
+        "https://www.fs.usda.gov/media/134327",
+        "https://www.usbr.gov/mp/cvo/current.html",
+        "https://www.usbr.gov/mp/nepa/includes/documentShow.php?Doc_ID=22610"
+      ],
+      "verified_on": "2026-09-28",
+      "key_unresolved_inputs": [
+        "测深",
+        "当前坡道与水温剖面"
+      ],
+      "playable_polygon": null,
+      "calibrated_fish_probabilities": null,
+      "asset_reuse_clearance": "not_completed",
+      "research_status": "comparative_dossier_complete; production_data_incomplete"
+    },
+    {
+      "id": "lake-tahoe-ca",
+      "name": "Lake Tahoe / California shore",
+      "modes": [
+        "shore_candidate",
+        "boat"
+      ],
+      "distinctive_environment": "高山清水与深湖鳟鱼",
+      "dossier": "inland-waters.md#lake-tahoe-ca",
+      "source_urls": [
+        "https://ndow-production-media.s3-us-gov-west-1.amazonaws.com/wp-content/uploads/2025/06/Lake-Tahoe_Angler-Guide-2025_FINAL-1.pdf",
+        "https://nrm.dfg.ca.gov/FileHandler.ashx?DocumentID=209090",
+        "https://pubs.usgs.gov/dds/dds-55/pacmaps/lt_data.htm",
+        "https://tahoeboatinspections.com/locations-2/",
+        "https://wildlife.ca.gov/Regulations",
+        "https://www.cityofslt.gov/296/Boat-Ramp-at-El-Dorado-Beach",
+        "https://www.ndow.org/waters/lake-tahoe/",
+        "https://www.usgs.gov/media/images/lake-tahoe-bathymetry"
+      ],
+      "verified_on": "2026-09-28",
+      "key_unresolved_inputs": [
+        "入口封闭",
+        "浅岸精测与风温剖面"
+      ],
+      "playable_polygon": null,
+      "calibrated_fish_probabilities": null,
+      "asset_reuse_clearance": "not_completed",
+      "research_status": "comparative_dossier_complete; production_data_incomplete"
+    },
+    {
+      "id": "crowley-lake",
+      "name": "Crowley Lake / Eastern Sierra",
+      "modes": [
+        "shore",
+        "boat",
+        "float_tube"
+      ],
+      "distinctive_environment": "高地雪山水库、虫饵与风漂",
+      "dossier": "inland-waters.md#crowley-lake",
+      "source_urls": [
+        "https://nrm.dfg.ca.gov/FileHandler.ashx?DocumentID=209090",
+        "https://webprod.ladwp.com/who-we-are/ladwp-eastern-sierra/recreation-eastern-sierra/eastern-sierra-ladwp-land-use-regulations",
+        "https://wildlife.ca.gov/Fishing/Inland/Sacramento-Perch",
+        "https://wildlife.ca.gov/Science-Institute/News/tag/rainbow",
+        "https://wsoweb.ladwp.com/aqueduct/operations/reservoir.htm",
+        "https://www.crowleylakefishcamp.com/",
+        "https://www.crowleylakefishcamp.com/maps",
+        "https://www.crowleylakefishcamp.com/overview"
+      ],
+      "verified_on": "2026-09-28",
+      "key_unresolved_inputs": [
+        "湖底测深",
+        "虫类季节和最新鱼类调查"
+      ],
+      "playable_polygon": null,
+      "calibrated_fish_probabilities": null,
+      "asset_reuse_clearance": "not_completed",
+      "research_status": "comparative_dossier_complete; production_data_incomplete"
+    }
+  ]
+}

@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {seatHook} from './helpers/pixel-hook.js';
 import {readFile} from 'node:fs/promises';
 globalThis.fetch=async url=>new Response(await readFile(url));
+const {schoolAtLure}=await import('./helpers/pixel-fish.js');
 const {PixelSimulation,HARBOR,FISHING_SPOTS}=await import('../dist/pixel-sim.js');
 const {syncVessel}=await import('../dist/vessel-physics.js');
 const {bearingDegrees,toGPS}=await import('../dist/pixel-geography.js');
@@ -63,7 +64,7 @@ test('vertical lure descent uses water depth and real time; lift has finite stro
 });
 
 test('hook stamps Pacific six-am date, capture position and actual carried tackle; keeping undersized fish is allowed',()=>{
- const sim=prepared(['rig_dropper']);offshore(sim);sim.setRig({rig:'dropper',bait:'squid'});lower(sim);until(sim,s=>s.fishState==='bite',100);const requestedAt=sim.captureTimestamp();seatHook(sim);const stamp=sim.captureTimestamp(),gps=toGPS(sim.state.bobber.x,sim.state.bobber.z);assert.ok(Date.parse(stamp)>Date.parse(requestedAt),'capture evidence must use actual seating time, not the button press');assert.equal(sim.state.dayStartAt,'2026-09-27T13:00:00.000Z');assert.equal(sim.state.fish.caughtAt,stamp);assert.deepEqual(sim.state.fish.caughtGPS,gps);assert.equal(sim.state.fish.hookCount,2);assert.equal(sim.state.fish.rig.id,'dropper');assert.equal(sim.state.fish.hasDescendingDevice,true);assert.equal(sim.state.fish.landingNetDiameterInches,20);
+ const sim=prepared(['rig_dropper']);offshore(sim);sim.setRig({rig:'dropper',bait:'squid'});lower(sim);until(sim,s=>s.fishState==='waiting',100);schoolAtLure(sim);until(sim,s=>s.fishState==='bite',100);const requestedAt=sim.captureTimestamp();seatHook(sim);const stamp=sim.captureTimestamp(),gps=toGPS(sim.state.bobber.x,sim.state.bobber.z);assert.ok(Date.parse(stamp)>Date.parse(requestedAt),'capture evidence must use actual seating time, not the button press');assert.equal(sim.state.dayStartAt,'2026-09-27T13:00:00.000Z');assert.equal(sim.state.fish.caughtAt,stamp);assert.deepEqual(sim.state.fish.caughtGPS,gps);assert.equal(sim.state.fish.hookCount,2);assert.equal(sim.state.fish.rig.id,'dropper');assert.equal(sim.state.fish.hasDescendingDevice,true);assert.equal(sim.state.fish.landingNetDiameterInches,20);
  Object.assign(sim.state.fish,{name:'加州大比目鱼',latin:'Paralichthys californicus',length:40,kg:1});sim.state.fishState='landed';const credits=sim.state.profile.credits;assert.equal(sim.keepCatch().ok,true);assert.equal(sim.state.profile.credits,credits);assert.equal(sim.state.catches.at(-1).kept,true);assert.equal(sim.state.lastInspection,null);assert.ok(assessCatchLedger(sim.state.catches).violations.some(v=>v.code==='undersize'));
 });
 

@@ -1,0 +1,32 @@
+{
+  "commit": "8dfa32d84a5af79b25c7790685ee2bd44ed1c018",
+  "build": "20260927-pixel-v13",
+  "workflow": "https://github.com/gioa/santa-cruz-skiff/actions/runs/36357146137",
+  "assets": [
+    {
+      "file": "index.html",
+      "matches": true,
+      "sha256": "ba2293de94d7087866fc1c5fc8eec642ac8fb6a32293ed3c397c1f3616384d56"
+    },
+    {
+      "file": "pixel.css",
+      "matches": true,
+      "sha256": "50623529587f5abf02df11c43710566ea5c29dc29a5187ce84e41f589cd1861e"
+    },
+    {
+      "file": "pixel-game.js",
+      "matches": true,
+      "sha256": "1975f99913cb860c637d323c53790d8853c279a97ee479584cd0238e8f1db626"
+    },
+    {
+      "file": "pixel-helm-ui.js",
+      "matches": true,
+      "sha256": "1cffe71a7cefe511fb086807fc32c11895d125cf7dba3b7dd6bdae7c5de3d0e2"
+    },
+    {
+      "file": "pixel-single-lever.js",
+      "matches": true,
+      "sha256": "524f5f9844a5da9a87a93cd0b602084a9959a4384ea17e994eb29b4817f5b557"
+    }
+  ]
+}

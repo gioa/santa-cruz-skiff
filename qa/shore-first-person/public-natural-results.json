@@ -1,0 +1,10 @@
+{
+  "fightWallMs": 42943,
+  "samples": 337,
+  "checks": [
+    "Natural walk/cast/wait/strike with no fixture invocation",
+    "Pointer hold/release controls tension and first-person reel",
+    "Catch kept and overhead view restored"
+  ],
+  "errors": []
+}

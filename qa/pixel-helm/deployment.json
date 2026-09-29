@@ -1,0 +1,47 @@
+{
+  "commit": "6cb3fba93d0078f121b7cb0c8208afeeda56d053",
+  "run": 36344758208,
+  "success": true,
+  "assets": [
+    {
+      "file": "index.html",
+      "matches": true
+    },
+    {
+      "file": "pixel-game.js",
+      "matches": true
+    },
+    {
+      "file": "pixel.css",
+      "matches": true
+    },
+    {
+      "file": "pixel-helm-ui.js",
+      "matches": true
+    },
+    {
+      "file": "pixel-helm-state.js",
+      "matches": true
+    },
+    {
+      "file": "pixel-tiller-input.js",
+      "matches": true
+    },
+    {
+      "file": "pixel-camera.js",
+      "matches": true
+    },
+    {
+      "file": "pixel-world.js",
+      "matches": true
+    },
+    {
+      "file": "pixel-sim.js",
+      "matches": true
+    },
+    {
+      "file": "equipment.js",
+      "matches": true
+    }
+  ]
+}

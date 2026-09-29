@@ -1,0 +1,13 @@
+{
+  "commit": "ac1e6b736b52add79e26ac6ac1fab1d616669d5e",
+  "run": 36356693028,
+  "matchingAssets": {
+    "index.html": true,
+    "pixel-game.js": true,
+    "pixel-fishing-ui.js": true,
+    "pixel-fight-view.js": true,
+    "pixel-fight-focus.js": true,
+    "pixel-focus-input.js": true,
+    "pixel.css": true
+  }
+}

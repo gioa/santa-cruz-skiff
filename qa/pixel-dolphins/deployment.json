@@ -1,0 +1,98 @@
+{
+  "commit": "9198acf9e8a795ba2dfccd6459222b35cd3bf70a",
+  "version": "v70",
+  "checks": [
+    {
+      "file": "index.html",
+      "matches": true,
+      "sha256": "eeed92538451a652cfbb6ad4cb42706b5a8807cc4dba9be27441db5dd69a7d02"
+    },
+    {
+      "file": "pixel.css",
+      "matches": true,
+      "sha256": "8c3cb151c027a08972cd66f58738b3b8600018d9101715b661e27882932c3c86"
+    },
+    {
+      "file": "pixel-sim.js",
+      "matches": true,
+      "sha256": "60f165d4d9dcb6efef1419e1343561125a60cf7e1fffaa7c3e521df00c40fb33"
+    },
+    {
+      "file": "pixel-game.js",
+      "matches": true,
+      "sha256": "40ea3d26ba2bb6b707aaafe47fdc16c859b6e76be9c99699b4fc5e7765199e13"
+    },
+    {
+      "file": "pixel-wildlife.js",
+      "matches": true,
+      "sha256": "b9eb0bd3fa21931ad78b6b74c89311320360d3a46c2bdf187057aba7b9f93c89"
+    },
+    {
+      "file": "pixel-fishing-ui.js",
+      "matches": true,
+      "sha256": "38b743561b03a4bf1283a5276b7507b25efa307f9e1f536ce21bc28f5f2eb222"
+    },
+    {
+      "file": "pixel-daily-weather.js",
+      "matches": true,
+      "sha256": "9fbac32b85be45a261b014e4899b52d6b4a82a8b83d34c008c47b59b252a5ea7"
+    },
+    {
+      "file": "pixel-day-cycle.js",
+      "matches": true,
+      "sha256": "63547a185da1ac478177313e104b0056fe0a7f4d2c8e9f89bd17f7facb4d0bdc"
+    },
+    {
+      "file": "pixel-world.js",
+      "matches": true,
+      "sha256": "47039c1562164ca59841a8c752ec69c143dac4e78c71db11e53aa88f3328b051"
+    },
+    {
+      "file": "pixel-fight-view.js",
+      "matches": true,
+      "sha256": "8e24367318d977cb29829e862f3a918c8301be897bfc40659f2048b718c816c2"
+    },
+    {
+      "file": "pixel-boat-geometry.js",
+      "matches": true,
+      "sha256": "ce7af6f5f39cc5a8710dcf1d7a6c9aad23d9ad0f01599b165bcb5a58052aacf0"
+    },
+    {
+      "file": "pixel-fishing-physics.js",
+      "matches": true,
+      "sha256": "f8f72caf0c6a7bf2fd4cf95ffb1ccd3b3269910225190a063ae1e592ee9414cd"
+    },
+    {
+      "file": "pixel-stability.js",
+      "matches": true,
+      "sha256": "a27964ca239f9e0d4e9f4f2dfd69b3ce76f22d5553cbd19dbc86bea8da05b2a8"
+    },
+    {
+      "file": "pixel-rescue-view.js",
+      "matches": true,
+      "sha256": "7c2d9faaf18f6dabed1baea65945112fffffdf7e83968afbeba46fdb2ac552f5"
+    },
+    {
+      "file": "vessel-physics.js",
+      "matches": true,
+      "sha256": "bd9e9b00482ec27f66790338cdd004c5cfa58bee325deb3ebcddef479edd030b"
+    },
+    {
+      "file": "pixel-boat-actions.js",
+      "matches": true,
+      "sha256": "5cd0e4b524e3856b30c71fe4081f75cc432f845f3106d94584fbf7f9f555aea1"
+    },
+    {
+      "file": "equipment.js",
+      "matches": true,
+      "sha256": "cefbdd614bbd0edf1523cf9cff65d2028f246b22773a7d081bf88e7ab9aea71c"
+    },
+    {
+      "file": "pixel-gear-availability.js",
+      "matches": true,
+      "sha256": "aadb644411c3e0db7766020218fed3e3d6e2410b6624737bf3e9421d2c73649f"
+    }
+  ],
+  "releaseTests": 702,
+  "sharedTests": 714
+}

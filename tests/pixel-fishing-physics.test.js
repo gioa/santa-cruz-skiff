@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {seatHook} from './helpers/pixel-hook.js';
 import {readFile} from 'node:fs/promises';
 globalThis.fetch=async url=>new Response(await readFile(url));
+const {schoolAtLure}=await import('./helpers/pixel-fish.js');
 const {PixelSimulation,HARBOR,FISHING_SPOTS}=await import('../dist/pixel-sim.js');
 const {syncVessel}=await import('../dist/vessel-physics.js');
 const {MAX_PAID_LINE_METERS,MAX_TROLL_SPEED_MPS,rodTipPosition,relativeFishingFlow,stepFishingLine}=await import('../dist/pixel-fishing-physics.js');
@@ -118,7 +119,7 @@ test('flow is relative to boat velocity, while stronger crossflow loads and bend
 });
 
 test('hooking preserves the actual rig point and paid line instead of inventing a distant fish',()=>{
- const sim=ready(['rig_dropper']);sim.setRig({rig:'dropper',bait:'squid'});assert.ok(sim.lowerRig().ok);for(let t=0;t<100&&sim.state.fishState!=='bite';t+=.1)sim.step(.1);assert.equal(sim.state.fishState,'bite');const point={...sim.state.bobber},paid=sim.state.paidLineMeters;assert.ok(sim.hook().ok);assert.deepEqual(sim.state.bobber,point);assert.equal(sim.state.paidLineMeters,paid);seatHook(sim,{request:false,onStep:(before,dt)=>assert.ok(Math.abs(sim.state.paidLineMeters-before.paidLineMeters-(sim.state.payoutRate-sim.state.retrieveRate)*dt)<1e-8,'seating must conserve actual spool travel')});assert.equal(sim.state.fish.hookCount,2);assert.equal(sim.state.fish.rig.id,'dropper');assert.equal(sim.state.reelMode,'brake');
+ const sim=ready(['rig_dropper']);sim.setRig({rig:'dropper',bait:'squid'});assert.ok(sim.lowerRig().ok);schoolAtLure(sim);for(let t=0;t<100&&sim.state.fishState!=='bite';t+=.1)sim.step(.1);assert.equal(sim.state.fishState,'bite');const point={...sim.state.bobber},paid=sim.state.paidLineMeters;assert.ok(sim.hook().ok);assert.deepEqual(sim.state.bobber,point);assert.equal(sim.state.paidLineMeters,paid);seatHook(sim,{request:false,onStep:(before,dt)=>assert.ok(Math.abs(sim.state.paidLineMeters-before.paidLineMeters-(sim.state.payoutRate-sim.state.retrieveRate)*dt)<1e-8,'seating must conserve actual spool travel')});assert.equal(sim.state.fish.hookCount,2);assert.equal(sim.state.fish.rig.id,'dropper');assert.equal(sim.state.reelMode,'brake');
 });
 
 test('an overloaded drag slips despite cranking; fish remain above seabed and line stays finite',()=>{

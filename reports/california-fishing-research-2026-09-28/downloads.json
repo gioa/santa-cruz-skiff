@@ -1,0 +1,107 @@
+{
+  "as_of": "2026-09-28",
+  "successful_download_count": 6,
+  "total_bytes": 47741856,
+  "files": [
+    {
+      "path": "raw/cdfw-freshwater-2026.pdf",
+      "url": "https://nrm.dfg.ca.gov/FileHandler.ashx?DocumentID=209090",
+      "provider": "CDFW",
+      "retrieved_on": "2026-09-28",
+      "source_version_or_survey": "2026-07-10",
+      "size_bytes": 17963444,
+      "sha256": "7bd6c7ec0881c3bbff513b8af0934e4d39fa46bc42991c21fcb0fd5462cc9235",
+      "intended_use": "2026 freshwater regulations; pair with later updates",
+      "reuse_status": "research_archive; check individual content rights before game redistribution",
+      "format": "PDF",
+      "pages": 103,
+      "validation": "PDF parsed successfully"
+    },
+    {
+      "path": "raw/cdfw-ocean-2026.pdf",
+      "url": "https://nrm.dfg.ca.gov/FileHandler.ashx?DocumentID=239985",
+      "provider": "CDFW",
+      "retrieved_on": "2026-09-28",
+      "source_version_or_survey": "2026-07-17",
+      "size_bytes": 26142062,
+      "sha256": "5c6dfb3fe5b621398dc8f80a7a619222b2a9f45fd14b2f5ccaaf3af401ca973e",
+      "intended_use": "2026 ocean regulations; pair with in-season updates",
+      "reuse_status": "research_archive; check individual content rights before game redistribution",
+      "format": "PDF",
+      "pages": 88,
+      "validation": "PDF parsed successfully"
+    },
+    {
+      "path": "raw/clear-lake-park-brochure-2012.pdf",
+      "url": "https://www.parks.ca.gov/pages/473/files/ClearLakeWebBrochure2012.pdf",
+      "provider": "California State Parks",
+      "retrieved_on": "2026-09-28",
+      "source_version_or_survey": "2012 (URL filename)",
+      "size_bytes": 973652,
+      "sha256": "d62214b3721017eed5cf967e715ae3cb38aa88c10849bd863dfb70fa7dab2d73",
+      "intended_use": "Historical park layout, not current fees or access guarantee",
+      "reuse_status": "research_archive; check individual content rights before game redistribution",
+      "format": "PDF",
+      "pages": 4,
+      "validation": "PDF parsed successfully"
+    },
+    {
+      "path": "raw/usgs-delta-elevation-ds359.pdf",
+      "url": "https://pubs.usgs.gov/ds/359/ds359_text.pdf",
+      "provider": "USGS",
+      "retrieved_on": "2026-09-28",
+      "source_version_or_survey": "2008",
+      "size_bytes": 2308179,
+      "sha256": "8b28e49f3a32ec59f8c7b749e506e948abfcdfe01b6301d27ed0929ee424e400",
+      "intended_use": "Elevation methodology; not the actual DEM grid",
+      "reuse_status": "research_archive; check individual content rights before game redistribution",
+      "format": "PDF",
+      "pages": 12,
+      "validation": "PDF parsed successfully"
+    },
+    {
+      "path": "raw/usgs-tahoe-data-metadata.html",
+      "url": "https://pubs.usgs.gov/dds/dds-55/pacmaps/lt_data.htm",
+      "provider": "USGS",
+      "retrieved_on": "2026-09-28",
+      "source_version_or_survey": "1998 survey",
+      "size_bytes": 10373,
+      "sha256": "faf71028c4f21dc1893a1ed517a38cdd66a6b7dfd4051e3f2f9e97e08fcb0820",
+      "intended_use": "Data catalog and metadata; not the actual bathymetry grid",
+      "reuse_status": "research_archive; check individual content rights before game redistribution",
+      "format": "HTML",
+      "validation": "Contains Tahoe survey and grid metadata"
+    },
+    {
+      "path": "raw/ndow-tahoe-guide-2025.pdf",
+      "url": "https://ndow-production-media.s3-us-gov-west-1.amazonaws.com/wp-content/uploads/2025/06/Lake-Tahoe_Angler-Guide-2025_FINAL-1.pdf",
+      "provider": "Nevada Department of Wildlife",
+      "retrieved_on": "2026-09-28",
+      "source_version_or_survey": "2025",
+      "size_bytes": 344146,
+      "sha256": "2be38e4dee926908ad1fc9f771852024615f599fbe81954d27f4b73fb9a9b03d",
+      "intended_use": "Historical whole-lake fishing reference, not 2026 California law",
+      "reuse_status": "research_archive; check individual content rights before game redistribution",
+      "format": "PDF",
+      "pages": 3,
+      "validation": "PDF parsed successfully"
+    }
+  ],
+  "failed_downloads": [
+    {
+      "url": "https://www.fs.usda.gov/Internet/FSE_DOCUMENTS/fsm9_008261.pdf",
+      "provider": "USFS",
+      "attempted_on": "2026-09-28",
+      "result": "HTTP 404 on direct download; historical indexed excerpt only",
+      "local_file": null
+    }
+  ],
+  "recovered_downloads": [
+    {
+      "initial_url": "https://www.ndow.org/wp-content/uploads/2025/06/Lake-Tahoe_Angler-Guide-2025_FINAL-1.pdf",
+      "initial_result": "HTTP response was HTML, not PDF",
+      "resolved_url": "https://ndow-production-media.s3-us-gov-west-1.amazonaws.com/wp-content/uploads/2025/06/Lake-Tahoe_Angler-Guide-2025_FINAL-1.pdf",
+      "path": "raw/ndow-tahoe-guide-2025.pdf"
+    }
+  ]
+}

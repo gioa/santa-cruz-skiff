@@ -1,0 +1,38 @@
+{
+  "commit": "11ef8b3707ffef282dd233dcb84270b585e79350",
+  "version": "v60",
+  "checks": [
+    {
+      "file": "index.html",
+      "matches": true,
+      "sha256": "f1db35a9793dec800e2f634d29ac7cd511886ce0027ef78c752fd808de6247d6"
+    },
+    {
+      "file": "pixel.css",
+      "matches": true,
+      "sha256": "df85506fa6d6fc422d110bbde2abe55d47374a54ae2e269c23c354a45184a1f1"
+    },
+    {
+      "file": "pixel-boat-actions.js",
+      "matches": true,
+      "sha256": "2c8c275bda769fa8ecdee2554e0cfac36c7a671958fa5460c636a6c241809fa4"
+    },
+    {
+      "file": "pixel-fishing-ui.js",
+      "matches": true,
+      "sha256": "ae958197617d1f1c2418bc3845f5e328047670b5f728e7bf7f1a43e0d12b6f3c"
+    },
+    {
+      "file": "pixel-sim.js",
+      "matches": true,
+      "sha256": "f92d953ad9ee9a3025673fe05831ae16e1b8a54ceb5b0acd55c7db70138d2cf4"
+    },
+    {
+      "file": "pixel-game.js",
+      "matches": true,
+      "sha256": "241d234f2a44afe09998bb2dd71a31aded813dc9065445b77d3bbd295e4f2e89"
+    }
+  ],
+  "releaseTests": 667,
+  "sharedTests": 679
+}

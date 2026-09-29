@@ -1,5 +1,5 @@
-import {GEAR_CATALOG,BASE_GEAR,buyGear,restock,settleFish,cargoWeight,carriedWeight,equipmentStats} from './equipment.js?v=20260927-articulated-v5';
-import {HARBOR} from './harbor-layout.js?v=20260927-articulated-v5';
+import {GEAR_CATALOG,BASE_GEAR,buyGear,restock,settleFish,cargoWeight,carriedWeight,equipmentStats} from './equipment.js';
+import {HARBOR} from './harbor-layout.js';
 const $=selector=>document.querySelector(selector);
 export function createCommerce({state:s,openModal,closeModal,toast,save,onPacked,launchBoat,staffName}){
  const shore=()=>s.mode==='walk'&&Math.hypot(s.playerX-HARBOR.counterX,s.playerZ-HARBOR.counterZ)<12;

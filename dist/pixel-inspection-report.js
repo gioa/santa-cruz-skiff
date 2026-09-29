@@ -1,4 +1,4 @@
-import {fishDisplayName} from './pixel-fish-names.js?v=20260928-pixel-v80';
+import {fishDisplayName} from './pixel-fish-names.js';
 const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const n=value=>Number(value).toFixed(1).replace(/\.0$/,'');
 const rigValue=(fish,key)=>fish?.[key]??fish?.rig?.[key];

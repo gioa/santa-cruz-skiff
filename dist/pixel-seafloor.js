@@ -1,9 +1,13 @@
-import {toGPS} from './pixel-geography.js?v=20260928-pixel-v80';
+import {toGPS} from './pixel-geography.js';
 // Categories are sampled, never interpolated. Unknown coastal strips remain
 // unknown instead of borrowing substrate from the nearest named waypoint.
-export const seafloor=await fetch(new URL('./data/seafloor.json',import.meta.url)).then(r=>{if(!r.ok)throw Error('Seafloor map unavailable');return r.json();});
+import {loadData} from './data-url.js';
+// Loaded in the background in browsers (see bathymetry.js); up front in Node.
+export let seafloor=null;
+export const seafloorReady=typeof window==='undefined'?Promise.resolve(seafloor=await loadData('seafloor.json','Seafloor map unavailable')):loadData('seafloor.json','Seafloor map unavailable').then(data=>(seafloor=data));
 export function seafloorAtGPS(lon,lat){
- const b=seafloor,u=(lon-b.west)/(b.east-b.west),v=(b.north-lat)/(b.north-b.south);
+ const b=seafloor;if(!b)return{kind:'unknown',label:'底质资料加载中',code:0,mapped:false,resolutionMeters:null,source:null,sourceUrl:null};
+ const u=(lon-b.west)/(b.east-b.west),v=(b.north-lat)/(b.north-b.south);
  const inside=Number.isFinite(u)&&Number.isFinite(v)&&u>=0&&v>=0&&u<1&&v<1;
  const col=inside?Math.floor(u*b.width):-1,row=inside?Math.floor(v*b.height):-1;
  const code=inside?(b.rows[row]?.[col]||'0'):'0',entry=b.classes[code]||b.classes['0'];

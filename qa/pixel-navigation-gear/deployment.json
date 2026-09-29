@@ -1,0 +1,53 @@
+{
+  "commit": "b11c63f552673b89278a607fdcf36b74788d1d69",
+  "version": "v62",
+  "checks": [
+    {
+      "file": "index.html",
+      "matches": true,
+      "sha256": "da67a0ef14f724f213136f9374d797b5b47f7c822cf60c42f5e65a677b9d5361"
+    },
+    {
+      "file": "equipment.js",
+      "matches": true,
+      "sha256": "5894b9772e0c18d01c0ab0f65d585f407fe873119f8d589707190572205e3ad9"
+    },
+    {
+      "file": "pixel-chart.js",
+      "matches": true,
+      "sha256": "48a2134b64801ca64c1033e3e5bbe3fe2ee7b1074d1ac37287e3cfc7120fb0f8"
+    },
+    {
+      "file": "pixel-sim.js",
+      "matches": true,
+      "sha256": "4369b4b3b9aec8b2a0c20110a82a946391f09be96bacaaee0c47ba50d464a736"
+    },
+    {
+      "file": "pixel-game.js",
+      "matches": true,
+      "sha256": "02451a7b1028d1946f2f75851767e62a6fd7e39794aa8ad3fa5cd285272c4dbb"
+    },
+    {
+      "file": "pixel-trolling-motor.js",
+      "matches": true,
+      "sha256": "d07cb3b100e1fbbc874d14605f999264366a0a29d72f99e503fd5cc6ccaff359"
+    },
+    {
+      "file": "pixel-item-icons.js",
+      "matches": true,
+      "sha256": "ba7cafa71ca2f59acb27ed26fdc3b0591aa29b80d91c0784cb6607b9ac5b50f8"
+    },
+    {
+      "file": "pixel-world.js",
+      "matches": true,
+      "sha256": "ae332f94a75d932ac4dc20d797cf3badab69e023131c04234a1be0ce90d21d03"
+    },
+    {
+      "file": "vessel-physics.js",
+      "matches": true,
+      "sha256": "d47faa2d332caa2975f0b5435f0a7eed317cf3f9dad58ea2ed24c767968291bc"
+    }
+  ],
+  "releaseTests": 674,
+  "sharedTests": 686
+}

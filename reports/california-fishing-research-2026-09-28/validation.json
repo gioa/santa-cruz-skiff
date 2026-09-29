@@ -1,0 +1,12 @@
+{
+  "regions": 18,
+  "unique_source_urls": 212,
+  "source_hosts": 75,
+  "downloaded_files": 6,
+  "downloaded_mb": 47.74,
+  "markdown_local_links": "pass",
+  "catalog_anchors": "pass",
+  "json_parse": "pass",
+  "pdf_parse": "pass",
+  "historical_download_failure_count": 1
+}

@@ -1,4 +1,5 @@
-export const geography=await fetch(new URL('./data/geography.json',import.meta.url)).then(r=>{if(!r.ok)throw Error('Coast map unavailable');return r.json();});
+import {loadData} from './data-url.js';
+export const geography=await loadData('geography.json','Coast map unavailable');
 const bearing=geography.axisBearingDegrees*Math.PI/180, sin=Math.sin(bearing),cos=Math.cos(bearing);
 const eastPerDegree=111320*Math.cos(geography.rental.lat*Math.PI/180),northPerDegree=111132;
 export const LOCAL_ORIGIN={x:-2.2,z:-56};

@@ -1,22 +1,24 @@
-import {personalInventorySlots,swapInventorySlots} from './personal-inventory.js?v=coast-6';
+import {personalInventorySlots,swapInventorySlots} from './personal-inventory.js';
 export const BAITS=Object.freeze([
- {id:'sandcrab',name:'沙蟹',kind:'bait',price:12,quantity:8,description:'近岸浪区使用的天然饵。装饵时消耗一份，空收钓组不会自动换饵。'},
- {id:'squid',name:'鱿鱼条',kind:'bait',price:20,quantity:8,description:'天然条饵。留意钩上余饵，受损后需要手动更换。'},
- {id:'anchovy',name:'鳀鱼块',kind:'bait',price:24,quantity:6,description:'切块天然饵。鱼讯、跑鱼和上鱼会损耗钩上的鱼饵。'},
+ {id:'sandcrab',name:'沙蟹',kind:'bait',price:12,quantity:8,description:'适合在近岸浪脚、沙槽寻找海鲫的天然饵。要配合落点与钓组，空竿也很常见。装饵消耗一份。'},
+ {id:'squid',name:'鱿鱼条',kind:'bait',price:20,quantity:8,description:'可用于底钓的天然条饵；不同鱼种的偏好不同，不能替代所有鱼饵。留意浸泡、浪冲和鱼讯造成的损耗。'},
+ {id:'anchovy',name:'鳀鱼块',kind:'bait',price:24,quantity:6,description:'切块鱼饵，可尝试寻找条纹鲈。与活饵的游动呈现不同；不能仅凭换饵就在任意距离钓到比目鱼。'},
 ]);
 export const STARTER_ITEMS=Object.freeze([
- {id:'starter_rod',name:'入门岸钓竿',kind:'rod',description:'随身岸钓竿。每根竿独立保存装配好的钓组和钩上鱼饵。'},
+ {id:'starter_rod',name:'入门岸钓竿',kind:'rod',description:'7 ft（2.13 m）岸钓竿，适配 14–42 g 抛投总重，包含钓组和鱼饵。适合轻组近投；重组超载会降低抛投表现。每根竿独立保存装配。'},
  {id:'starter_reel',name:'纺车轮',kind:'reel',description:'入门纺车轮。收线受力过高时松手，让鱼出线。'},
 ]);
 export const SHOP_ITEMS=Object.freeze([
  ...BAITS,
- {id:'surf_rod',name:'长节沙滩竿',kind:'rod',price:85,description:'最大抛投距离增加 72 ft。购入后在鱼竿页配置并拿起。'},
+ {id:'ca_fishing_regulations',name:'加州休闲捕鱼规定',kind:'book',price:12,kg:.15,description:'按鱼种和海域自行查阅捕捞规则的纸质手册；购买后可从左下角打开，不提供自动识鱼功能。'},
+ {id:'surf_rod',name:'长节沙滩竿',kind:'rod',price:85,description:'10 ft（3.05 m）沙滩竿，适配 28–113 g 抛投总重，包含钓组和鱼饵。搭配合适的重量并充分挥竿，才能发挥远投能力。购入后配置并拿起。'},
  {id:'sealed_reel',name:'密封纺车轮',kind:'reel',price:110,description:'收线更快，张力积累稍慢。购入后手动启用。'},
- {id:'carolina_rig',name:'Carolina 岸钓组',kind:'rig',price:18,hook:'1',description:'单钩滑坠预组装钓组。断线会损失整套钓组；完整换下的钓组和余饵放回背包。'},
- {id:'fishfinder_rig',name:'滑铅钓组',kind:'rig',price:65,hook:'2/0',description:'单钩 Fish-finder 预组装钓组。需要装饵，换下后仍保留原有损耗。'},
+ {id:'carolina_rig',name:'Carolina 岸钓组',kind:'rig',price:18,hook:'1',description:'本套装为 1 oz（28 g）滑坠、#1 单钩。适合较轻的近岸呈现；强浪中可能滚动。断线会损失整套钓组。'},
+ {id:'fishfinder_rig',name:'滑铅钓组',kind:'rig',price:65,hook:'2/0',description:'本套装为 3 oz（85 g）滑铅、2/0 单钩。有助抗流稳底；装在入门竿上会超载、削弱抛投，适合搭配沙滩竿。大钩和重组未必适合小海鲫。'},
+ {id:'float_rig',name:'小钩浮钓组',kind:'rig',price:24,hook:'6',description:'#6 单钩，12 g 配铅＋2 g 浮漂，连接件另计。挂小鱿鱼条或小鳀鱼块，在水面下约 1 m 随流漂钓 jacksmelt；浅水时钩深缩至水深的四分之三。强浪会扰乱呈现。断线会损失整套钓组。'},
 ]);
 export const SHORE_ITEMS=[...STARTER_ITEMS,...SHOP_ITEMS];
-const rigIds=['carolina_rig','fishfinder_rig'];
+const rigIds=['carolina_rig','fishfinder_rig','float_rig'];
 const bounded=v=>Number.isFinite(v)?Math.max(0,Math.min(1,v)):0;
 const cleanRig=r=>r&&rigIds.includes(r.id)&&bounded(r.condition)>.08?{id:r.id,condition:bounded(r.condition),bait:r.bait&&BAITS.some(b=>b.id===r.bait.kind)?{kind:r.bait.kind,condition:bounded(r.bait.condition)}:null}:null;
 const fresh=id=>({id,condition:1,bait:null});
@@ -38,13 +40,13 @@ export function restoreShoreEquipment(s,saved){
  s.inventorySlots=modern?saved.inventorySlots:undefined;
  syncShoreEquipment(s);shoreSlots(s);
 }
-export function syncShoreEquipment(s){const r=s.rodSupplies[s.activeRod];s.rig=r?.id==='fishfinder_rig'?'fishfinder':'carolina';s.bait=r?.bait?.kind||s.bait||'sandcrab';}
+export function syncShoreEquipment(s){const r=s.rodSupplies[s.activeRod];s.rig=r?.id==='fishfinder_rig'?'fishfinder':r?.id==='float_rig'?'float':'carolina';s.bait=r?.bait?.kind||s.bait||'sandcrab';}
 export function shoreSupply(s){return s.rodSupplies[s.activeRod];}
 export function shoreReady(s){const r=shoreSupply(s);return Boolean(r&&r.condition>.08&&r.bait?.condition>.08);}
-export function shoreOwnedItems(s){return SHORE_ITEMS.filter(i=>i.kind==='rod'?ownedRods(s).includes(i.id):i.kind==='reel'?i.id==='starter_reel'||s.upgrades.includes(i.id):i.kind==='bait'?s.inventory[i.id]>0:s.rigStock[i.id]?.length||Object.values(s.rodSupplies).some(r=>r?.id===i.id));}
+export function shoreOwnedItems(s){return SHORE_ITEMS.filter(i=>i.kind==='rod'?ownedRods(s).includes(i.id):i.kind==='reel'?i.id==='starter_reel'||s.upgrades.includes(i.id):i.kind==='book'?s.upgrades.includes(i.id):i.kind==='bait'?s.inventory[i.id]>0:i.kind==='rig'&&(s.rigStock[i.id]?.length||Object.values(s.rodSupplies).some(r=>r?.id===i.id)));}
 export function shoreSlots(s){return personalInventorySlots(s,shoreOwnedItems(s).map(i=>i.id)).pack;}
 export function moveShoreSlot(s,from,to){return swapInventorySlots(shoreSlots(s),from,to);}
-export function shoreItemActive(s,item){return item.kind==='rod'?s.activeRod===item.id:item.kind==='reel'?s.activeReel===item.id:item.kind==='rig'?shoreSupply(s)?.id===item.id:shoreSupply(s)?.bait?.kind===item.id&&shoreSupply(s).bait.condition>.08;}
+export function shoreItemActive(s,item){return item.kind==='rod'?s.activeRod===item.id:item.kind==='reel'?s.activeReel===item.id:item.kind==='rig'?shoreSupply(s)?.id===item.id:item.kind==='bait'&&shoreSupply(s)?.bait?.kind===item.id&&shoreSupply(s).bait.condition>.08;}
 export function wearShoreSupplies(s,event){
  const r=shoreSupply(s);if(!r)return;
  if(event==='break'){s.rodSupplies[s.activeRod]=null;return;}
@@ -55,6 +57,7 @@ export function configureShoreEquipment(sim,id,rodId=sim.state.activeRod){
  const s=sim.state,item=SHORE_ITEMS.find(i=>i.id===id),rod=s.rodSupplies[rodId];
  if(s.phase!=='walk'||s.inspection)return sim.result(false,'先收回水中的钓组并处理当前事件，再调整装备。');
  if(!item||!ownedRods(s).includes(rodId))return sim.result(false,'背包里没有这件装备。');
+ if(item.kind==='book')return sim.result(false,s.upgrades.includes(id)?'从左下角打开手册，自行查阅鱼种和规定。':'还没有这本手册。');
  if(item.kind==='rod'){
   if(!ownedRods(s).includes(id))return sim.result(false,'还没有这根鱼竿。');
   s.activeRod=id;
@@ -65,7 +68,7 @@ export function configureShoreEquipment(sim,id,rodId=sim.state.activeRod){
   if(!rod||rod.condition<=.08)return sim.result(false,'先给这根鱼竿装上一套可用钓组。');
   if(!(s.inventory[id]>0))return sim.result(false,'这种鱼饵没有库存。');
   s.inventory[id]--;rod.bait={kind:id,condition:1};
- }else{
+ }else if(item.kind==='rig'){
   if(!s.rigStock[id]?.length)return sim.result(false,'没有备用钓组。');
   const next=s.rigStock[id].shift();
   if(rod?.condition>.08)s.rigStock[rod.id].push(rod);

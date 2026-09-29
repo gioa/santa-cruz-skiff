@@ -1,0 +1,143 @@
+{
+  "commit": "84d160cd5836ed6500abe7b46db4c573cc3a0bae",
+  "workflow": "https://github.com/gioa/santa-cruz-skiff/actions/runs/36367488713",
+  "result": "success",
+  "assets": [
+    {
+      "file": "dist/equipment.js",
+      "matches": true
+    },
+    {
+      "file": "dist/index.html",
+      "matches": true
+    },
+    {
+      "file": "dist/pixel-audio.js",
+      "matches": true
+    },
+    {
+      "file": "dist/pixel-boat-actions.js",
+      "matches": true
+    },
+    {
+      "file": "dist/pixel-camera.js",
+      "matches": true
+    },
+    {
+      "file": "dist/pixel-casting.js",
+      "matches": true
+    },
+    {
+      "file": "dist/pixel-fight-focus.js",
+      "matches": true
+    },
+    {
+      "file": "dist/pixel-fight-view.js",
+      "matches": true
+    },
+    {
+      "file": "dist/pixel-fish-ecology.js",
+      "matches": true
+    },
+    {
+      "file": "dist/pixel-fish-names.js",
+      "matches": true
+    },
+    {
+      "file": "dist/pixel-fishing-feedback.js",
+      "matches": true
+    },
+    {
+      "file": "dist/pixel-fishing-physics.js",
+      "matches": true
+    },
+    {
+      "file": "dist/pixel-fishing-ui.js",
+      "matches": true
+    },
+    {
+      "file": "dist/pixel-focus-input.js",
+      "matches": true
+    },
+    {
+      "file": "dist/pixel-game.js",
+      "matches": true
+    },
+    {
+      "file": "dist/pixel-geography.js",
+      "matches": true
+    },
+    {
+      "file": "dist/pixel-harbor-layout.js",
+      "matches": true
+    },
+    {
+      "file": "dist/pixel-helm-state.js",
+      "matches": true
+    },
+    {
+      "file": "dist/pixel-helm-ui.js",
+      "matches": true
+    },
+    {
+      "file": "dist/pixel-hook-label.js",
+      "matches": true
+    },
+    {
+      "file": "dist/pixel-hook-size.js",
+      "matches": true
+    },
+    {
+      "file": "dist/pixel-hooking.js",
+      "matches": true
+    },
+    {
+      "file": "dist/pixel-inventory.js",
+      "matches": true
+    },
+    {
+      "file": "dist/pixel-navigation-scale.js",
+      "matches": true
+    },
+    {
+      "file": "dist/pixel-navigation.js",
+      "matches": true
+    },
+    {
+      "file": "dist/pixel-rod-geometry.js",
+      "matches": true
+    },
+    {
+      "file": "dist/pixel-rod-loadouts.js",
+      "matches": true
+    },
+    {
+      "file": "dist/pixel-rod-ui.js",
+      "matches": true
+    },
+    {
+      "file": "dist/pixel-seafloor.js",
+      "matches": true
+    },
+    {
+      "file": "dist/pixel-sim.js",
+      "matches": true
+    },
+    {
+      "file": "dist/pixel-single-lever.js",
+      "matches": true
+    },
+    {
+      "file": "dist/pixel-snag.js",
+      "matches": true
+    },
+    {
+      "file": "dist/pixel-walking-path.js",
+      "matches": true
+    },
+    {
+      "file": "dist/pixel-world.js",
+      "matches": true
+    }
+  ]
+}

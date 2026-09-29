@@ -1,0 +1,33 @@
+{
+  "commit": "8f94e5717d476c8c8f0c77296e04d961c7252c16",
+  "version": "20260927-pixel-v54",
+  "releaseTests": 637,
+  "sharedWorkspaceTests": 649,
+  "files": [
+    {
+      "file": "index.html",
+      "matchesRelease": true,
+      "sha256": "79f4a853eb924bf9b853e4fbd7bbec92c473e51f4f61823b8485505d2f3be45a"
+    },
+    {
+      "file": "pixel-game.js",
+      "matchesRelease": true,
+      "sha256": "5cdc139378f37ee552d655fd5436c56b5d04479a74f4d5156005a87ca9254697"
+    },
+    {
+      "file": "pixel-sim.js",
+      "matchesRelease": true,
+      "sha256": "71935129de98f4cfd328ffdf325651414678afe2b7d99a1101c60aa4d6101f76"
+    },
+    {
+      "file": "pixel-fish-mass.js",
+      "matchesRelease": true,
+      "sha256": "f4ec34d79be649ebc011a1bac4a862412e5e1cff2484d1d755ad9eb5981e17c3"
+    },
+    {
+      "file": "pixel-small-fish.js",
+      "matchesRelease": true,
+      "sha256": "338fbef0d463666a0b57cce7bc3f79c1ee24cfb7b8e59af1d1069ca195c7e8f1"
+    }
+  ]
+}

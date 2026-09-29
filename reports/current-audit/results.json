@@ -1,0 +1,65 @@
+{
+  "release": "d8bd2be",
+  "defaultCurrent": {
+    "x": 0,
+    "z": 0
+  },
+  "marineCurrentFields": [],
+  "bottomWeakFlow": [
+    {
+      "weightGrams": 85,
+      "currentMps": 0.05,
+      "boatMps": 0,
+      "seconds": 60,
+      "lureGroundDisplacement": 3.0000000000000493,
+      "relativeX": 3.0000000000000493,
+      "depth": 9.7,
+      "bottomContact": true,
+      "loadN": 0.0002596453125
+    },
+    {
+      "weightGrams": 340,
+      "currentMps": 0.05,
+      "boatMps": 0,
+      "seconds": 60,
+      "lureGroundDisplacement": 3.0000000000000493,
+      "relativeX": 3.0000000000000493,
+      "depth": 9.7,
+      "bottomContact": true,
+      "loadN": 0.0002596453125
+    }
+  ],
+  "midwaterSharedFlow": {
+    "weightGrams": 85,
+    "currentMps": 0.5,
+    "boatMps": 0.5,
+    "seconds": 10,
+    "lureGroundDisplacement": 5.000000000000028,
+    "relativeX": 2.531308496145357e-14,
+    "depth": 10.799999999999953,
+    "bottomContact": false,
+    "loadN": 0.07739795699999999
+  },
+  "midwaterStill": {
+    "weightGrams": 85,
+    "currentMps": 0,
+    "boatMps": 0,
+    "seconds": 10,
+    "lureGroundDisplacement": 0,
+    "relativeX": 0,
+    "depth": 10.799999999999953,
+    "bottomContact": false,
+    "loadN": 0.07739795699999999
+  },
+  "fixedHookDisplay": {
+    "scale": 3.031496062992126,
+    "before": {
+      "x": 0,
+      "z": 0
+    },
+    "afterBoatMovesOneMeter": {
+      "x": -2.031496062992126,
+      "z": 0
+    }
+  }
+}

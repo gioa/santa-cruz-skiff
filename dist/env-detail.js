@@ -1,5 +1,5 @@
 import * as THREE from './vendor/three.module.js';
-import {metreUV} from './env-materials.js?v=20260927-articulated-v5';
+import {metreUV} from './env-materials.js';
 
 // Authored close-range harbor set dressing. Geographic footprints stay in
 // world-v2; these estimated fixtures are not claimed as a surveyed replica.

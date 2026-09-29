@@ -1,0 +1,15 @@
+{
+  "commit": "360a4ad09f3ed42a5d1796b8d92c400aa2e34fdd",
+  "checks": [
+    {
+      "file": "index.html",
+      "matches": true,
+      "sha256": "31bbe4a70540443eb5ea5c502f641afa2a5196a7757ca3dc5b7c508c736a8931"
+    },
+    {
+      "file": "pixel.css",
+      "matches": true,
+      "sha256": "ff8b3583d1dfdd8c105ec9aca4166bd2832b63ade1d8ac39bf16a9ef6a168bc7"
+    }
+  ]
+}

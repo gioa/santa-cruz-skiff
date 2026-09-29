@@ -2,9 +2,9 @@
  * Sizes, search radii and rates are bounded game approximations, not surveys.
  * NOAA species sources and CDFW 27.60 are recorded in docs/visible-baitfish.md.
  */
-import {getRigProfile} from './fishing-rigs.js?v=20260928-pixel-v80';
-import {hookSizeFit} from './pixel-hook-size.js?v=20260928-pixel-v80';
-import {fishMassKg} from './pixel-fish-mass.js?v=20260928-pixel-v80';
+import {getRigProfile} from './fishing-rigs.js';
+import {hookSizeFit} from './pixel-hook-size.js';
+import {fishMassKg} from './pixel-fish-mass.js';
 const finite=(v,f=0)=>Number.isFinite(v)?v:f,clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 export const SMALL_FISH=Object.freeze({
  'anchovy-school':{id:'anchovy',name:'北方鳀鱼',commonName:'Northern Anchovy',latin:'Engraulis mordax',color:'#a9cccb',min:8,max:15,baitfish:true},

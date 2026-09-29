@@ -1,0 +1,52 @@
+{
+  "commit": "736a567f78837bb84813651370213be53e497738",
+  "build": "20260927-pixel-v18",
+  "run": "https://github.com/gioa/santa-cruz-skiff/actions/runs/36360532079",
+  "files": [
+    {
+      "file": "index.html",
+      "matches": true,
+      "sha256": "b4afd060e166c923869eb4d17049eb2ea902c2f53d70a2db0570550057298bc4"
+    },
+    {
+      "file": "pixel-game.js",
+      "matches": true,
+      "sha256": "1180b0c4ac7f028cd3b5a0d90c30a59b4e4b00ba23a1eda46984c2a46b469851"
+    },
+    {
+      "file": "pixel-consumables.js",
+      "matches": true,
+      "sha256": "ab1e9fe74ed8e1a9b0a42cb4147dc8fb264bc359eb65a30b910a64aeb459d3fd"
+    },
+    {
+      "file": "pixel-rod-loadouts.js",
+      "matches": true,
+      "sha256": "7cdf2f10441a70da40372755f7a766bb89f170632a86a65d95c4636fd8d367b5"
+    },
+    {
+      "file": "pixel-rod-ui.js",
+      "matches": true,
+      "sha256": "0a1376bbb31efb621eae87f5c1868ef27d2ffc7b1d5dd35e9921d830b4ec48ec"
+    },
+    {
+      "file": "equipment.js",
+      "matches": true,
+      "sha256": "e285afb99009d00637022fe8e5110c8713e80f9c78ca6fa46c57ccbccf91d88a"
+    },
+    {
+      "file": "units.js",
+      "matches": true,
+      "sha256": "ee0f0b150e86c4a50237bffb17db5ef8eda59180a02c2fec4b680da81a979e42"
+    },
+    {
+      "file": "pixel-fishing-ui.js",
+      "matches": true,
+      "sha256": "fd2b40b31a78851123bc4c6cf4f6b23106195079d3784722e290a0a305412a95"
+    },
+    {
+      "file": "pixel.css",
+      "matches": true,
+      "sha256": "c0ec2e66deebf9e8481813d703a159c4c1be857f6e9a0ba9d03b2951d69a8c7c"
+    }
+  ]
+}

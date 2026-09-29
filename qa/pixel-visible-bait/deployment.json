@@ -1,0 +1,31 @@
+{
+  "release": "bcc9e2c6b7b8ff5efdf47bdcd3d77b3ba10c1a44",
+  "workflow": "https://github.com/gioa/santa-cruz-skiff/actions/runs/36375043870",
+  "verified": [
+    {
+      "file": "pixel-small-fish.js",
+      "status": 200,
+      "sha256": "28b820696b083b23fc6a9b2639b1feb8a6cb2972a09c360d62cf2b49519fdaf1"
+    },
+    {
+      "file": "pixel-sim.js",
+      "status": 200,
+      "sha256": "c4814b803c80f6221f18204df40da500bef62f82647a664adbd376774ba26d25"
+    },
+    {
+      "file": "pixel-world.js",
+      "status": 200,
+      "sha256": "3e0c5e162c6b6dffd6962d0ed3d01419f2be7b59f17c9f2ef24c6519a9e18ca7"
+    },
+    {
+      "file": "pixel-wildlife.js",
+      "status": 200,
+      "sha256": "d738df08605d0235791630447dce801c3fee260b7f6019bf0e2877050b953dde"
+    },
+    {
+      "file": "pixel-fish-ecology.js",
+      "status": 200,
+      "sha256": "2fa37def7ea10bf05e3a6a9afb84b2e59d0fbef24f04475253ff5a11f0b79158"
+    }
+  ]
+}

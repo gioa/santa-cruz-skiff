@@ -1,0 +1,52 @@
+{
+  "commit": "761b65bdee5f0eb48c953663d83cd09edf01db29",
+  "run": 36348147702,
+  "url": "https://joyx.design/santa-cruz-skiff/",
+  "assets": [
+    {
+      "file": "index.html",
+      "matches": true,
+      "sha256": "b30185e869eeee185bb25ea19747031f1688a6f5b25daba855b62c7d72c15fc8"
+    },
+    {
+      "file": "pixel-game.js",
+      "matches": true,
+      "sha256": "c55ff76dc6f341d242266dd0eb137a2407b2bfebd7a96b402123c04bdf207214"
+    },
+    {
+      "file": "pixel-world.js",
+      "matches": true,
+      "sha256": "2d5c8a044aa87065d6087fec582b1a9f228902021103777f57f9c0eee7c9fe65"
+    },
+    {
+      "file": "pixel-sim.js",
+      "matches": true,
+      "sha256": "369fda867b5a6bb6d514ce01b5c147a308fff22f918c666b38e285a5c608f482"
+    },
+    {
+      "file": "pixel-geography.js",
+      "matches": true,
+      "sha256": "dc3020edeaeaa6102f2f3a2e7cd3ba354d7eb7ff32798506b67db61535fa4eec"
+    },
+    {
+      "file": "pixel-navigation.js",
+      "matches": true,
+      "sha256": "ccc7dc727c2a317330c5d78c4efb0a0afae1a491f69dedd6eb130921be22012f"
+    },
+    {
+      "file": "pixel-harbor-layout.js",
+      "matches": true,
+      "sha256": "8c1fc67261721bbafc1044870728572bb2bf194c5d477c7233b71ce8928a9396"
+    },
+    {
+      "file": "navigation.js",
+      "matches": true,
+      "sha256": "9f400d1a5a1f10ad5a031f79b9ffafda1f4786ac0b6762d947638dd1633cee5e"
+    },
+    {
+      "file": "harbor-layout.js",
+      "matches": true,
+      "sha256": "a20d865dc691ed29400e9d350567255c9629071983aceca7abedcdab4aefba6d"
+    }
+  ]
+}

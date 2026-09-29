@@ -1,0 +1,108 @@
+{
+  "commit": "93bb92edd5dadb540799000ff4b1bce65f8f7a13",
+  "checkedAt": "2026-09-27T21:36:18.630100+00:00",
+  "url": "https://joyx.design/santa-cruz-skiff/",
+  "run": "https://github.com/gioa/santa-cruz-skiff/actions/runs/36352280520",
+  "checks": [
+    {
+      "file": "dist/index.html",
+      "match": true,
+      "sha256": "d7991681873b4904e926204b0b9e4712c0b62528253bf35b499558962cd78b59"
+    },
+    {
+      "file": "dist/pixel-audio.js",
+      "match": true,
+      "sha256": "53a3cc6c1ebec37e1e5e8a69c1b515f08b94e1551f48e45976a556a46674a266"
+    },
+    {
+      "file": "dist/pixel-camera.js",
+      "match": true,
+      "sha256": "ce9732a4f4ef8a559b8fb89cfb34ad6e5cf280b61861687b1860022bab123d31"
+    },
+    {
+      "file": "dist/pixel-fishing-input.js",
+      "match": true,
+      "sha256": "f83c4470b266de4cc4eb1405b91da767183262f5f5243f9fcf504a390ef0c2ed"
+    },
+    {
+      "file": "dist/pixel-fishing-physics.js",
+      "match": true,
+      "sha256": "88b23e6ff8cae985e0aadf490d94c9305003e9358262a26bd20a8346af8878d1"
+    },
+    {
+      "file": "dist/pixel-fishing-ui.js",
+      "match": true,
+      "sha256": "d3156c008396e0b311fdee22a1d145b740070bc0a1c1119dc7e4f38af23fb1b6"
+    },
+    {
+      "file": "dist/pixel-game.js",
+      "match": true,
+      "sha256": "b6a7a19f3d00ee21d4d9b7ea34edec88767a664d151df3a0908ced1225b17eb0"
+    },
+    {
+      "file": "dist/pixel-geography.js",
+      "match": true,
+      "sha256": "f55ca10d361cb9e2aa512011694af92df87e980531e9342a2d262f1a5cce3f14"
+    },
+    {
+      "file": "dist/pixel-harbor-layout.js",
+      "match": true,
+      "sha256": "0bdf2382889810724d2fe23316398e9af6c46023151e1201313795abf0a51dc6"
+    },
+    {
+      "file": "dist/pixel-helm-ui.js",
+      "match": true,
+      "sha256": "792dd7f11afd873400f6da1c6876b5664ebfb86a964b807e42483646831565c7"
+    },
+    {
+      "file": "dist/pixel-navigation-scale.js",
+      "match": true,
+      "sha256": "6530750eb3682501a8ba16b54ad8276093aca905c99f605275ffcc4b1a962328"
+    },
+    {
+      "file": "dist/pixel-navigation.js",
+      "match": true,
+      "sha256": "b9a74ba8c5e91bdc8573b98956633700dbc09f14d19ee82482aa9c68f3598851"
+    },
+    {
+      "file": "dist/pixel-rod-geometry.js",
+      "match": true,
+      "sha256": "c5051b383599a1e9eb625b1358339eba693d163d2401d410f157239a1a167437"
+    },
+    {
+      "file": "dist/pixel-rod-loadouts.js",
+      "match": true,
+      "sha256": "152ba7308a080abfe2a92861e6f06988997c348fb017c5b86e2f078c5c7a3861"
+    },
+    {
+      "file": "dist/pixel-rod-ui.js",
+      "match": true,
+      "sha256": "f61fa3eb0fd34c83cbe2e90d07245302d4a128a1d551be88a20c0410532f1952"
+    },
+    {
+      "file": "dist/pixel-sim.js",
+      "match": true,
+      "sha256": "05a6ebe4eae2706ce4775a5b7d2d88b8ebb155bdce6053f6eb479a115341e1a7"
+    },
+    {
+      "file": "dist/pixel-sprites.js",
+      "match": true,
+      "sha256": "68ffaa37c91851bc84c5a3966abe2f27f34583da66ffdc06872e2ce19f068f35"
+    },
+    {
+      "file": "dist/pixel-walking-path.js",
+      "match": true,
+      "sha256": "4a8b26e64ad5c31278028373def8251dd0ae5e3f876127a836e692df3049ddcc"
+    },
+    {
+      "file": "dist/pixel-world.js",
+      "match": true,
+      "sha256": "4354ccd7ebad59e690abd7c5f1e079208b7bf6f3d5e7c7b523614a8315834839"
+    },
+    {
+      "file": "dist/pixel.css",
+      "match": true,
+      "sha256": "c03394353a2aa8d19961c94e767c3f956c6f17d62706775c96c78a5d634291c9"
+    }
+  ]
+}

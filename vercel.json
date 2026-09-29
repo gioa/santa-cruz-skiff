@@ -1,1 +1,1 @@
-{"outputDirectory":"dist","headers":[{"source":"/(.*)","headers":[{"key":"X-Content-Type-Options","value":"nosniff"}]}]}
+{"outputDirectory": "build", "headers": [{"source": "/(.*)", "headers": [{"key": "X-Content-Type-Options", "value": "nosniff"}]}], "buildCommand": "npm run build", "installCommand": "npm ci"}

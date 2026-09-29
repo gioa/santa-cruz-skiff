@@ -187,3 +187,12 @@ test('spinning bail remains continuous when the hand crank wraps a full turn',()
  close(view.snapshot().rotorAngle,before.rotorAngle,'payout alone cannot wind a spinning reel bail');
  close(view.snapshot().crankAngle,before.crankAngle);
 });
+
+test('fight sampling and rendered surf honor the same explicit sea-state scenario',()=>{
+ const seaState={waveHeightM:0,wavePeriodS:18,waveDirectionDeg:-25,tideM:1.2};
+ const s=state('pacifica',{seaState}),pose=shoreFightPose('pacifica',s);
+ assert.deepEqual(pose.sample,sampleShore('pacifica',pose.fishWorld.x,pose.fishWorld.y,s.elapsed,seaState));
+ assert.equal(pose.sample.waveHeight,0);assert.equal(pose.sample.wavePeriod,18);assert.equal(pose.sample.tide,1.2);
+ const calm=render('pacifica',s).canvas.digest(),rough=render('pacifica',{...s,seaState:{...seaState,waveHeightM:2}}).canvas.digest();
+ assert.notEqual(calm,rough);
+});

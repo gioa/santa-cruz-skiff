@@ -1,0 +1,93 @@
+{
+  "commit": "3b674274248c3310da223766cb5df553a8f34a1f",
+  "version": "v69",
+  "checks": [
+    {
+      "file": "index.html",
+      "matches": true,
+      "sha256": "8a1051e3446dc90aaf6a1df8e2987e8fcec4a7a612818f8d6836b05aab8b19ad"
+    },
+    {
+      "file": "pixel.css",
+      "matches": true,
+      "sha256": "8c3cb151c027a08972cd66f58738b3b8600018d9101715b661e27882932c3c86"
+    },
+    {
+      "file": "pixel-sim.js",
+      "matches": true,
+      "sha256": "66a4b04fa8685b436fb1cd224efcc99db3d18968c099bb201121ccc3f694cc1b"
+    },
+    {
+      "file": "pixel-game.js",
+      "matches": true,
+      "sha256": "d440c60f9febe8b2e3bbf5903cd55e825512bd3f5ea7b6b3fcafdb3367802cf3"
+    },
+    {
+      "file": "pixel-fishing-ui.js",
+      "matches": true,
+      "sha256": "ff8532f5e70c1a1d28d4e9a66552a4706eaa5662bd315be244827e5625cc5ec0"
+    },
+    {
+      "file": "pixel-daily-weather.js",
+      "matches": true,
+      "sha256": "9fbac32b85be45a261b014e4899b52d6b4a82a8b83d34c008c47b59b252a5ea7"
+    },
+    {
+      "file": "pixel-day-cycle.js",
+      "matches": true,
+      "sha256": "63547a185da1ac478177313e104b0056fe0a7f4d2c8e9f89bd17f7facb4d0bdc"
+    },
+    {
+      "file": "pixel-world.js",
+      "matches": true,
+      "sha256": "9099a382c884b65018d9b66b31f869f65531066ca15ec399bfdcda189fdef7ce"
+    },
+    {
+      "file": "pixel-fight-view.js",
+      "matches": true,
+      "sha256": "aff4aeca5f8db6f1b352816df13d5866d2085d3164e7cb0d0b91cfe260662ac1"
+    },
+    {
+      "file": "pixel-boat-geometry.js",
+      "matches": true,
+      "sha256": "3aebfcdc5e7e55190feed1006885bb3d442d6cd8e07987ee1824c58afe43f9f7"
+    },
+    {
+      "file": "pixel-fishing-physics.js",
+      "matches": true,
+      "sha256": "313d77bb35be74129b066132c6d37f4de00ea023a5eb5970e53d0edc40bede49"
+    },
+    {
+      "file": "pixel-stability.js",
+      "matches": true,
+      "sha256": "a27964ca239f9e0d4e9f4f2dfd69b3ce76f22d5553cbd19dbc86bea8da05b2a8"
+    },
+    {
+      "file": "pixel-rescue-view.js",
+      "matches": true,
+      "sha256": "7c2d9faaf18f6dabed1baea65945112fffffdf7e83968afbeba46fdb2ac552f5"
+    },
+    {
+      "file": "vessel-physics.js",
+      "matches": true,
+      "sha256": "c56e7d1c625128a5d614e7e373a039cae795da195d87759f64f662451fb92e0d"
+    },
+    {
+      "file": "pixel-boat-actions.js",
+      "matches": true,
+      "sha256": "7b28873906703435deccc1a27c9c1194129a6fab4e64bec1ce63047c4d6a432f"
+    },
+    {
+      "file": "equipment.js",
+      "matches": true,
+      "sha256": "b09b79f96db9c2088e5f542e7f8a33401c626e6682c86f1f4d217b9d825a43fc"
+    },
+    {
+      "file": "pixel-gear-availability.js",
+      "matches": true,
+      "sha256": "aadb644411c3e0db7766020218fed3e3d6e2410b6624737bf3e9421d2c73649f"
+    }
+  ],
+  "releaseTests": 702,
+  "sharedTests": 714
+}

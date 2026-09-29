@@ -1,0 +1,38 @@
+{
+  "commit": "8ba27ce8fb0811b0853f88a282ae01d2b0907b46",
+  "version": "v59",
+  "checks": [
+    {
+      "file": "index.html",
+      "matches": true,
+      "sha256": "628c224ad261e2cff0d5bc4fd0ad3c97a4868c7578c97b4c4ce2d7a5289d1928"
+    },
+    {
+      "file": "pixel-haptics.js",
+      "matches": true,
+      "sha256": "aed0ae168a8aa6351863c17638e350f2df09ab97aca8af6c136e77a57425a5c0"
+    },
+    {
+      "file": "pixel-game.js",
+      "matches": true,
+      "sha256": "d359b8b201c934b3998f6c61500d537ed2962b6412511d306a1865898092c02b"
+    },
+    {
+      "file": "pixel-fishing-physics.js",
+      "matches": true,
+      "sha256": "3a2b543ded88eecab0425a8c088470246f6b9faaa2e86f65b4d2c79bdae2d48d"
+    },
+    {
+      "file": "pixel-sim.js",
+      "matches": true,
+      "sha256": "b7490c90442001d2b6b2791313a4b71c0972a3f931d8057b8e9eb15bcc9e1d44"
+    },
+    {
+      "file": "pixel-fish-fight.js",
+      "matches": true,
+      "sha256": "868804285e87da34fe73ffce14fd57ae6b7480a63f059f3d850f1a5acf30ebe8"
+    }
+  ],
+  "releaseTests": 664,
+  "sharedTests": 676
+}

@@ -1,0 +1,37 @@
+{
+  "commit": "57c21593898d2bd0df467563db0ecfda6047fc42",
+  "build": "20260927-pixel-v6",
+  "run": "https://github.com/gioa/santa-cruz-skiff/actions/runs/36341692019",
+  "files": [
+    {
+      "file": "index.html",
+      "matchesLocal": true,
+      "sha256": "b80cfdbf8a8e67b813c65b8f07cab00d7a9489ea9ef0ea0256f0addb7c55ad85"
+    },
+    {
+      "file": "pixel-game.js",
+      "matchesLocal": true,
+      "sha256": "cf01f843bd73230b23a6405d96e36f9365c5c76d580a4cb513b622d8ba36661a"
+    },
+    {
+      "file": "pixel-sim.js",
+      "matchesLocal": true,
+      "sha256": "96b46dc16ac328f6c3a4d639b412d85998bd7d1b1e8d1dad95957e5852badfd2"
+    },
+    {
+      "file": "pixel-rod-loadouts.js",
+      "matchesLocal": true,
+      "sha256": "251d4bf7706320645af5007f123068f7a1dbedbdcd2d78f8a30698074078ae85"
+    },
+    {
+      "file": "pixel-rod-ui.js",
+      "matchesLocal": true,
+      "sha256": "0c8f08cb6826d424c536ed661284702d0366d384d7678f1939ce67bcb4e09873"
+    },
+    {
+      "file": "pixel.css",
+      "matchesLocal": true,
+      "sha256": "c3c2aa78675d688c183200bb23e233fbd4a3bf61e51f2ebe902bc6d80c4309b8"
+    }
+  ]
+}

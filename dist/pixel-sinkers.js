@@ -5,7 +5,7 @@ export const SINKER_ITEMS=Object.freeze(SINKER_SIZES.map(oz=>Object.freeze({id:`
 export const separateSinker=rig=>['bottom','slider','dropper','sabiki','feather40'].includes(rig);
 export const defaultSinkerOz=rig=>({bottom:3,slider:2,dropper:4,sabiki:1,feather40:4})[rig]??null;
 export const validSinker=oz=>SINKER_SIZES.includes(oz);
-export function rigWeight(rig,supply){return separateSinker(rig)?(validSinker(supply?.sinkerOz)?Math.round(supply.sinkerOz*OUNCE_GRAMS):6):rig==='jig'?42:7;}
+export function rigWeight(rig,supply){return separateSinker(rig)?(validSinker(supply?.sinkerOz)?Math.round(supply.sinkerOz*OUNCE_GRAMS):6):rig==='jig'?42:rig==='sabiki6'?28:7;}
 export function ensureSinkers(profile){
  const legacy=profile.sinkerVersion!==1;
  profile.sinkerStock=Object.fromEntries(SINKER_SIZES.map(oz=>[oz,Math.max(0,Math.floor(Number.isFinite(profile.sinkerStock?.[oz])?profile.sinkerStock[oz]:0))]));

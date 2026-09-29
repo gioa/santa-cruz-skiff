@@ -1,5 +1,5 @@
-import {onLand as defaultOnLand,onPier as defaultOnPier,landPolygons as defaultLandPolygons,pierRings as defaultPierRings} from './geography.js?v=20260927-articulated-v5';
-import {harborWaterBlocked as defaultHarborWaterBlocked,harborObstacleRings as defaultHarborObstacleRings} from './harbor-layout.js?v=20260927-articulated-v5';
+import {onLand as defaultOnLand,onPier as defaultOnPier,landPolygons as defaultLandPolygons,pierRings as defaultPierRings} from './geography.js';
+import {harborWaterBlocked as defaultHarborWaterBlocked,harborObstacleRings as defaultHarborObstacleRings} from './harbor-layout.js';
 export function createNavigation({onLand=defaultOnLand,onPier=defaultOnPier,landPolygons=defaultLandPolygons,pierRings=defaultPierRings,harborWaterBlocked=defaultHarborWaterBlocked,harborObstacleRings=defaultHarborObstacleRings,detourBounds=null}={}){
 const geographicBlocked=(x,z)=>onLand(x,z)||onPier(x,z);
 const blocked=(x,z)=>geographicBlocked(x,z)||harborWaterBlocked(x,z);

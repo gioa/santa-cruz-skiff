@@ -1,0 +1,34 @@
+{
+  "release": "cf88083b64aefd25cf02c486df050c669f567b48",
+  "workflow": "https://github.com/gioa/santa-cruz-skiff/actions/runs/36373899071",
+  "status": "success",
+  "http": [
+    {
+      "path": "?edition=pixel&release=v42",
+      "status": 200
+    },
+    {
+      "path": "pixel-fishing-physics.js?v=20260927-pixel-v42",
+      "status": 200
+    },
+    {
+      "path": "pixel-rig-hydrodynamics.js?v=20260927-pixel-v42",
+      "status": 200
+    },
+    {
+      "path": "pixel-fishing-projection.js?v=20260927-pixel-v42",
+      "status": 200
+    },
+    {
+      "path": "surface-current.js?v=20260927-pixel-v42",
+      "status": 200
+    },
+    {
+      "path": "data/marine.json?release=v42",
+      "status": 200
+    }
+  ],
+  "marineErrors": [
+    "surfaceCurrent: HTTPError"
+  ]
+}

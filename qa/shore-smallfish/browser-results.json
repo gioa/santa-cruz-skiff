@@ -1,0 +1,116 @@
+{
+  "base": "http://127.0.0.1:4198/",
+  "verifiedAt": "2026-09-29T04:06:02.797Z",
+  "checks": [
+    {
+      "scene": "pacifica",
+      "ui": [
+        "purchase float rig and squid",
+        "equip float and bait",
+        "walk to surf and half-power cast",
+        "float waiting and small-screen controls",
+        "real encounter plus UI strike for each species",
+        "normal tension-controlled fight and landing",
+        "keep both fish and show distinct catch and journal portraits"
+      ],
+      "caught": [
+        {
+          "id": "white_croaker",
+          "name": "白石首鱼",
+          "nameEn": "White croaker",
+          "weightKg": 0.18,
+          "offshoreMetres": 17.839136755484528,
+          "hookDepthMetres": 2.15735344808504,
+          "portrait": {
+            "label": "白石首鱼，9.4 英寸，0.40 磅",
+            "colors": 18,
+            "hash": 2651511368,
+            "width": 322,
+            "height": 160
+          }
+        },
+        {
+          "id": "jacksmelt",
+          "name": "加州似银汉鱼",
+          "nameEn": "Jacksmelt",
+          "weightKg": 0.08,
+          "offshoreMetres": 14.411819438773428,
+          "hookDepthMetres": 0.5486387206490883,
+          "portrait": {
+            "label": "加州似银汉鱼，9.3 英寸，0.18 磅",
+            "colors": 13,
+            "hash": 3856479126,
+            "width": 322,
+            "height": 160
+          }
+        }
+      ]
+    },
+    {
+      "scene": "half-moon-bay",
+      "ui": [
+        "purchase float rig and squid",
+        "equip float and bait",
+        "walk to surf and half-power cast",
+        "float waiting and small-screen controls",
+        "real encounter plus UI strike for each species",
+        "normal tension-controlled fight and landing",
+        "keep both fish and show distinct catch and journal portraits"
+      ],
+      "caught": [
+        {
+          "id": "white_croaker",
+          "name": "白石首鱼",
+          "nameEn": "White croaker",
+          "weightKg": 0.06,
+          "offshoreMetres": 17.82509308641087,
+          "hookDepthMetres": 1.630448348602425,
+          "portrait": {
+            "label": "白石首鱼，6.6 英寸，0.13 磅",
+            "colors": 18,
+            "hash": 2651511368,
+            "width": 322,
+            "height": 160
+          }
+        },
+        {
+          "id": "jacksmelt",
+          "name": "加州似银汉鱼",
+          "nameEn": "Jacksmelt",
+          "weightKg": 0.38,
+          "offshoreMetres": 15.285930603998619,
+          "hookDepthMetres": 0.4433126028148679,
+          "portrait": {
+            "label": "加州似银汉鱼，15.7 英寸，0.84 磅",
+            "colors": 13,
+            "hash": 3856479126,
+            "width": 322,
+            "height": 160
+          }
+        }
+      ]
+    }
+  ],
+  "captures": [
+    "pacifica-shop-small.png",
+    "pacifica-float-assembly-small.png",
+    "pacifica-float-waiting-small.png",
+    "pacifica-white_croaker-fight.png",
+    "pacifica-white_croaker-catch.png",
+    "pacifica-jacksmelt-fight.png",
+    "pacifica-jacksmelt-catch.png",
+    "pacifica-both-fish-journal.png",
+    "pacifica-both-fish-journal-small.png",
+    "half-moon-bay-shop-small.png",
+    "half-moon-bay-float-assembly-small.png",
+    "half-moon-bay-float-waiting-small.png",
+    "half-moon-bay-white_croaker-fight.png",
+    "half-moon-bay-white_croaker-catch.png",
+    "half-moon-bay-jacksmelt-fight.png",
+    "half-moon-bay-jacksmelt-catch.png",
+    "half-moon-bay-both-fish-journal.png",
+    "half-moon-bay-both-fish-journal-small.png"
+  ],
+  "errors": [],
+  "fixture": "Test-only response route; deterministic RNG, environment and time stepping; no injected fish or phase changes"
+}

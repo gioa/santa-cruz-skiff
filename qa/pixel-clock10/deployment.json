@@ -1,0 +1,21 @@
+{
+  "commit": "76b54c9eceee9766ffd5a853ac7f064cd62a08ce",
+  "deployment": 36489283722,
+  "gameTimeScale": 10,
+  "releaseTests": 787,
+  "sharedTargetedTests": 30,
+  "checks": [
+    {
+      "file": "index.html",
+      "matches": true
+    },
+    {
+      "file": "pixel-game.js",
+      "matches": true
+    },
+    {
+      "file": "pixel-sim.js",
+      "matches": true
+    }
+  ]
+}

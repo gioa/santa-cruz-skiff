@@ -1,0 +1,23 @@
+{
+  "commit": "044b34ebc7bfd40b300c2fedfac9fe08cd689b28",
+  "run": 36337825148,
+  "conclusion": "success",
+  "publicAssetChecks": [
+    {
+      "file": "index.html",
+      "matchesLocal": true
+    },
+    {
+      "file": "pixel-game.js",
+      "matchesLocal": true
+    },
+    {
+      "file": "pixel-sim.js",
+      "matchesLocal": true
+    },
+    {
+      "file": "fish-patrol.js",
+      "matchesLocal": true
+    }
+  ]
+}

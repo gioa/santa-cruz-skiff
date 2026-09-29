@@ -1,4 +1,5 @@
-import {OceanAudio} from './audio.js?v=20260928-pixel-v80';
+import {OceanAudio} from './audio.js';
+import {dragToothSamples} from './pixel-drag-sound.js';
 
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 const valid=(n,fallback)=>Number.isFinite(n)?n:fallback;
@@ -65,10 +66,10 @@ export function reelFeedbackForState(options={}){
   const free=options.reelMode==='free',slip=!free&&payout>.015,feed=free&&payout>.015;
   const winding=crank>.025,loaded=clamp(load,0,1),movement=clamp(retrieve/2,0,1);
   return{active,mode:free?'free':'brake',payout,retrieve,crank,
-    // A slip ratchet speeds up with the spool; pressure brightens the teeth.
+    // Tooth cadence follows the spool; the metal resonance keeps its timbre.
     ratchetHz:slip?clamp(6+payout*13,6,42):0,
     ratchetVolume:slip?.021+Math.min(1,payout/3)*.032+loaded*.018:0,
-    ratchetFrequency:slip?1700+Math.min(1,payout/4)*2200+loaded*650:0,
+    ratchetFrequency:slip?6800:0,
     // An open spool hisses softly. It never makes the engaged-drag click.
     feedVolume:feed?.006+Math.min(1,payout/3)*.020:0,
     feedFrequency:feed?750+Math.min(1,payout/4)*2250:0,
@@ -203,9 +204,22 @@ export class PixelAudio extends OceanAudio{
     if(this._reelNextTick===null||this._reelNextTick<now-.06)this._reelNextTick=now;
     let ticks=0;
     while(this._reelNextTick<now+.06&&ticks++<3){
-      this._noise({duration:.012,frequency:feedback.ratchetFrequency,volume:feedback.ratchetVolume,at:this._reelNextTick,kind:'reel-tick',type:'highpass'});
+      this._dragTooth(this._reelNextTick,feedback.ratchetVolume);
       this._totalReelTicks++;this._reelNextTick+=1/feedback.ratchetHz;
     }
+  }
+  _dragTooth(at,volume){
+    if(!this._canPlay())return;
+    const c=this.ctx,start=Math.max(c.currentTime,at);
+    if(!this._dragToothBuffers)this._dragToothBuffers=Array.from({length:6},()=>{
+      const samples=dragToothSamples(c.sampleRate),buffer=c.createBuffer(1,samples.length,c.sampleRate);
+      buffer.getChannelData(0).set(samples);return buffer;
+    });
+    const source=c.createBufferSource(),gain=c.createGain();
+    source.buffer=this._dragToothBuffers[this._totalReelTicks%this._dragToothBuffers.length];
+    gain.gain.value=clamp(volume/.071,.2,1);source.connect(gain);gain.connect(this.master);
+    this._track(source,[source,gain],'reel-tick',start,start+.04);
+    source.start(start);source.stop(start+.04);
   }
   _tone({frequency,duration=.12,volume=.05,type='triangle',at=null,kind='effect',cutoff=6000,toFrequency=null}={}){
     if(!this._canPlay())return;

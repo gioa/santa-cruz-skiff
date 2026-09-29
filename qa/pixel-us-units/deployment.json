@@ -1,0 +1,39 @@
+{
+  "build": "20260927-pixel-v19",
+  "commit": "243447daa95be414286efdd427ee2a46d1dbe2e3",
+  "run": "https://github.com/gioa/santa-cruz-skiff/actions/runs/36360906364",
+  "checks": [
+    {
+      "file": "index.html",
+      "matches": true
+    },
+    {
+      "file": "units.js",
+      "matches": true
+    },
+    {
+      "file": "pixel-game.js",
+      "matches": true
+    },
+    {
+      "file": "pixel-fishing-ui.js",
+      "matches": true
+    },
+    {
+      "file": "pixel-rod-ui.js",
+      "matches": true
+    },
+    {
+      "file": "equipment.js",
+      "matches": true
+    },
+    {
+      "file": "pixel-rod-loadouts.js",
+      "matches": true
+    },
+    {
+      "file": "fishing-regulations.js",
+      "matches": true
+    }
+  ]
+}

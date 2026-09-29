@@ -1,0 +1,21 @@
+{
+  "release": "v34",
+  "files": [
+    {
+      "file": "index.html",
+      "matches": true
+    },
+    {
+      "file": "pixel.css",
+      "matches": true
+    },
+    {
+      "file": "pixel-fishing-ui.js",
+      "matches": true
+    },
+    {
+      "file": "pixel-boat-actions.js",
+      "matches": true
+    }
+  ]
+}

@@ -4,8 +4,13 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "python3 -m http.server 4173 --directory dist",
+    "dev": "node scripts/serve.mjs dist 4173",
+    "build": "node scripts/build.mjs",
+    "preview": "node scripts/build.mjs && node scripts/serve.mjs build 4174",
     "check": "node scripts/check.mjs",
     "test": "node --test tests/*.test.js"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.2"
   }
 }

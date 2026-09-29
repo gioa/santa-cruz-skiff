@@ -11,7 +11,8 @@ function settle(options,seconds=120,dt=.1){let state={depth:0,pumpHeight:0};for(
 test('the provided feather and dropper rigs never silently add unrestricted hooks',()=>{
   assert.equal(RIG_PROFILES.sabiki.hooks,2);
   assert.equal(RIG_PROFILES.dropper.hooks,2);
-  for(const rig of Object.values(RIG_PROFILES))assert.ok(rig.hooks>=1&&rig.hooks<=2);
+  for(const rig of Object.values(RIG_PROFILES))assert.ok(rig.hooks>=1&&rig.hooks<=(rig.id==='sabiki6'?6:2));
+  assert.equal(RIG_PROFILES.sabiki6.hooks,6);
 });
 
 test('sinker mass counters current but thicker line increases blowback',()=>{

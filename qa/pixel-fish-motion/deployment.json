@@ -1,0 +1,37 @@
+{
+  "release": "v32",
+  "files": [
+    {
+      "file": "pixel-fish-mass.js",
+      "matches": true
+    },
+    {
+      "file": "pixel-fish-motion.js",
+      "matches": true
+    },
+    {
+      "file": "pixel-fish-fight.js",
+      "matches": true
+    },
+    {
+      "file": "pixel-fishing-physics.js",
+      "matches": true
+    },
+    {
+      "file": "pixel-fight-view.js",
+      "matches": true
+    },
+    {
+      "file": "pixel-fish-art.js",
+      "matches": true
+    },
+    {
+      "file": "pixel-sim.js",
+      "matches": true
+    },
+    {
+      "file": "pixel-game.js",
+      "matches": true
+    }
+  ]
+}

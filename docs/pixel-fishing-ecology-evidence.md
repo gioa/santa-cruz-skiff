@@ -106,8 +106,8 @@ they are not claims about measured wild catch rates.
 
 ## Reproducible calibration
 
-Run `node scripts/calibrate-pixel-ecology.mjs` to regenerate
-[`qa/pixel-ecology/calibration.json`](../qa/pixel-ecology/calibration.json).
+**Superseded (2026-09-28).** Bites now come from simulated schools ([population model](fish-population-model.md)). The preference functions below still decide where schools live (`pixelSuitability`) and whether they take a bait (`pixelBaitAppeal`). The hazard calibration this section describes, and its retired script, apply to the previous model; the historical record remains in
+[`qa/pixel-ecology/calibration.json`](../qa/pixel-ecology/calibration.json). The current strategy calibration is `node scripts/calibrate-pixel-population.mjs 20 --json reports/pixel-population-calibration.json`.
 It evaluates eleven species, twelve months, three geographic points and nine
 presentations (324 records). Each result stores the total bite hazard, each
 species' absolute hazard and its conditional share; those quantities cannot be

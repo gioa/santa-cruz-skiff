@@ -1,5 +1,5 @@
 // Independent, saved random stream: conversations never change fishing or patrol rolls.
-import {shoreZone} from './shore-data.js?v=coast-6';
+import {shoreZone} from './shore-data.js';
 export const ANGLERS=Object.freeze([
  {name:'戴旧渔帽的老钓友',coat:'#687b62',hat:'#c5b18a'},
  {name:'背帆布包的老钓友',coat:'#586e84',hat:'#9e7960'},
@@ -9,8 +9,8 @@ const pick=(a,r)=>a[Math.min(a.length-1,Math.floor(r()*a.length))];
 function random(lore){let x=lore.rngState>>>0;x^=x<<13;x^=x>>>17;x^=x<<5;lore.rngState=x>>>0;return lore.rngState/4294967296;}
 export function shoreClues(scene){return scene.zones.flatMap(z=>[
  {id:z.id+':terrain',zoneId:z.id,topic:'terrain',title:'地形印象',text:`${z.name}那边，${z.description}你可以自己去看看浪线。`},
- {id:z.id+':bait',zoneId:z.id,topic:'bait',title:'用饵经验',text:`在${z.name}附近，我通常${['north','dunes','venice','trough'].includes(z.id)?'先用沙蟹找浪脚里的海鲫，短抛也值得试':'用鳀鱼试条纹鲈和比目鱼，先让饵走过一段水'}。有经验也不代表每次都能钓到。`},
- {id:z.id+':drift',zoneId:z.id,topic:'drift',title:'看水经验',text:`到${z.name}别只盯着竿尖。先看泡沫往哪走；白浪断开的地方，饵可能会被带向外侧。水流变了，原来的落点也得调整。`},
+ {id:z.id+':bait',zoneId:z.id,topic:'bait',title:'用饵经验',text:`在${z.name}附近，我通常${['north','dunes','venice','trough'].includes(z.id)?'先用沙蟹配较小的钩找浪脚里的海鲫，短抛也值得试':'用鳀鱼块试条纹鲈，先找能让饵停留的水；比目鱼还得碰上合适的深浅和呈现'}。没有万能饵，等一阵没有口也正常。`},
+ {id:z.id+':drift',zoneId:z.id,topic:'drift',title:'看水经验',text:`到${z.name}先看几组浪和泡沫去向；白浪断开的地方，饵可能被带向外侧。钓组不停滚动就检查铅重和落点；重铅能帮助稳底，也未必更容易中鱼。`},
 ]);}
 export function createShoreLore(scene,saved,elapsed=0,seed){
  const fallback=()=>{const bytes=new Uint32Array(1);globalThis.crypto?.getRandomValues?.(bytes);return bytes[0]||((Date.now()^0x9e3779b9)>>>0);};

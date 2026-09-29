@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {PacificaSimulation} from '../dist/pacifica-sim.js';
 import {shoreOwnedItems,shoreSupply,wearShoreSupplies} from '../dist/shore-equipment.js';
 import {personalInventorySlots} from '../dist/personal-inventory.js';
-const surf=sim=>Object.assign(sim.state.player,{x:730,y:sim.world.shoreY(730)+55});
+const surf=sim=>Object.assign(sim.state.player,{x:730,y:sim.world.shoreY(730)+25});
 for(const sceneId of ['pacifica','half-moon-bay']){
  test(`${sceneId}: persistent bag moves and swaps without changing ownership, stock or equipment`,()=>{
   const sim=new PacificaSimulation({sceneId}),s=sim.state,owned=shoreOwnedItems(s).map(i=>i.id),stock=JSON.stringify(s.inventory);
@@ -38,6 +38,24 @@ for(const sceneId of ['pacifica','half-moon-bay']){
   const restored=new PacificaSimulation({sceneId,saved:sim.snapshot()});assert.equal(shoreSupply(restored.state),null);
   assert.ok(restored.configureEquipment('carolina_rig').ok);assert.equal(restored.state.rigStock.carolina_rig.length,1);
  });
+ test(`${sceneId}: single-hook float can be bought, baited, swapped, saved and lost without duplicating supplies`,()=>{
+  const sim=new PacificaSimulation({sceneId}),s=sim.state;s.credits=200;
+  assert.ok(sim.buy('float_rig').ok);assert.equal(s.rigStock.float_rig.length,1);assert.equal(s.rig,'carolina');
+  assert.ok(sim.configureEquipment('float_rig').ok);assert.equal(s.rig,'float');assert.equal(sim.tackleReady,false);
+  assert.ok(sim.buy('squid').ok);const squidStock=s.inventory.squid;assert.ok(sim.equipBait('squid').ok);assert.equal(s.inventory.squid,squidStock-1);
+  wearShoreSupplies(s,'bite');const mounted=structuredClone(shoreSupply(s));
+  const slot=sim.inventorySlots().indexOf('float_rig');assert.ok(slot>=0);assert.ok(sim.moveInventory(slot,27));
+  assert.ok(sim.configureEquipment('carolina_rig').ok);assert.deepEqual(s.rigStock.float_rig,[mounted]);
+  assert.ok(sim.configureEquipment('float_rig').ok);assert.deepEqual(shoreSupply(s),mounted);assert.equal(s.rigStock.float_rig.length,0);
+  const restored=new PacificaSimulation({sceneId,saved:sim.snapshot()});
+  assert.equal(restored.state.rig,'float');assert.deepEqual(shoreSupply(restored.state),mounted);assert.equal(restored.inventorySlots()[27],'float_rig');
+  surf(restored);const preview=restored.previewCast({power:1});
+  assert.equal(preview.payloadGrams,12+2+3+2.5*mounted.bait.condition);
+  assert.ok(preview.distance>5&&preview.distance<40,'the light float has substantial air drag rather than a free long cast');
+  wearShoreSupplies(restored.state,'break');assert.equal(shoreSupply(restored.state),null);
+  assert.equal(restored.tackleReady,false);assert.equal(restored.inventorySlots().includes('float_rig'),false);
+  const empty=new PacificaSimulation({sceneId,saved:restored.snapshot()});assert.equal(shoreSupply(empty.state),null);assert.deepEqual(empty.state.rigStock.float_rig,[]);
+ });
 }
 test('legacy saves retain bought equipment and balances without generating bait; modern restores validate every item',()=>{
  const old={scene:'pacifica',version:2,credits:83,inventory:{sandcrab:2,squid:3},upgrades:['surf_rod','sealed_reel','fishfinder_rig']};
@@ -56,7 +74,9 @@ test('zero-stock supplies disappear, existing slots remain stable, and restockin
  const large={inventorySlots:{pack:['item40'],locker:'corrupt'}};assert.equal(personalInventorySlots(large,Array.from({length:41},(_,i)=>'item'+i)).pack.length,42);
 });
 test('rig wear and configured reel survive restores; owning unused upgrades gives no performance bonus',()=>{
- const sim=new PacificaSimulation();sim.state.credits=500;sim.buy('surf_rod');sim.buy('sealed_reel');surf(sim);sim.cast({power:1});assert.equal(sim.state.cast.distance,72);sim.retrieve();
+ const sim=new PacificaSimulation(),baseline=new PacificaSimulation();sim.state.credits=500;sim.buy('surf_rod');sim.buy('sealed_reel');
+ for(const outfit of [sim,baseline]){surf(outfit);assert.ok(outfit.cast({power:1}).ok);}
+ assert.equal(sim.state.cast.distance,baseline.state.cast.distance,'stored rod and reel do not boost the fitted outfit');sim.retrieve();
  assert.equal(sim.state.activeReel,'starter_reel');assert.ok(sim.configureEquipment('sealed_reel').ok);
  const restored=new PacificaSimulation({saved:sim.snapshot()});assert.equal(restored.state.activeReel,'sealed_reel');
  restored.configureEquipment('starter_reel');assert.equal(new PacificaSimulation({saved:restored.snapshot()}).state.activeReel,'starter_reel');

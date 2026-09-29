@@ -1,6 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {PacificaSimulation, WORLD, SHOP, SAVE_KEY, SHOP_ITEMS} from '../dist/pacifica-sim.js';
+import {shoreProfile} from '../dist/shore-data.js';
+import {castToOffshore, finishShoreFlight} from './helpers/shore-cast.js';
+import {schoolAtBait, awaitBite} from './helpers/shore-fish.js';
 
 const advance = (sim, seconds, input = {}) => {
   for (let t = 0; t < seconds - 1e-7; t += .05) sim.update(Math.min(.05, seconds - t), typeof input === 'function' ? input(sim.state) : input);
@@ -10,13 +13,19 @@ const until = (sim, predicate, seconds = 180, input = {}) => {
   assert.ok(predicate(), `timed out: ${sim.state.phase} / ${sim.state.message}`);
 };
 const toSurf = sim => {
-  assert.ok(sim.walkTo(730, WORLD.shoreY(730) + 55).ok);
+  assert.ok(sim.walkTo(730, WORLD.shoreY(730) + 25).ok);
   until(sim, () => sim.state.walkTarget === null, 20);
   assert.ok(sim.canCast);
 };
 const hook = sim => {
-  assert.ok(sim.cast({power: .62, aim: -.2}).ok);
-  until(sim, () => sim.state.phase === 'bite', 40);
+  // A hungry surfperch school beside the bait still has to sense, inspect and
+  // take it through the population model. Economy tests must not depend on
+  // multi-minute fishing luck.
+  const profile=shoreProfile(sim.scene,sim.state.player.x,sim.state.elapsed,sim.state.seaState);
+  castToOffshore(sim,profile.troughDistance);
+  finishShoreFlight(sim);
+  schoolAtBait(sim,'surfperch');
+  awaitBite(sim);
   assert.ok(sim.strike().ok);
 };
 const land = sim => {
@@ -109,34 +118,39 @@ test('release earns no money and spends bait once, with no duplicate catch decis
   assert.equal(sim.state.lastCatch.kept, false);
 });
 
-test('casting is charged and aimed, while rod upgrades extend actual offshore reach', () => {
+test('casting is charged and aimed, while a fitted surf rod extends physical reach', () => {
   const sim = new PacificaSimulation({rng: () => 0});
   toSurf(sim);
-  sim.cast({power: 0, aim: -1});
+  assert.ok(sim.cast({power: 0, aim: -1}).ok);
   const short = {...sim.state.cast.target};
-  assert.equal(sim.state.cast.distance, 18);
+  const shortDistance=sim.state.cast.distance;
+  assert.ok(shortDistance>0 && shortDistance<10,'a tap gives a short toss');
   assert.ok(short.x < sim.state.player.x);
   assert.ok(short.y < WORLD.shoreY(short.x));
   assert.ok(sim.retrieve().ok);
-  sim.cast({power: 1, aim: 1});
-  assert.equal(sim.state.cast.distance, 72);
+  assert.ok(sim.cast({power: 1, aim: 1}).ok);
+  const starterDistance=sim.state.cast.distance;
+  assert.ok(starterDistance>shortDistance*3);
+  assert.ok(starterDistance<50,'the starter outfit cannot throw old 72 m casts');
   assert.ok(sim.state.cast.target.x > sim.state.player.x);
   sim.retrieve(); shop(sim); sim.buy('surf_rod');
   assert.equal(sim.state.activeRod,'starter_rod');
   sim.configureEquipment('carolina_rig','surf_rod');sim.configureEquipment('sandcrab','surf_rod');sim.configureEquipment('surf_rod');toSurf(sim);
-  sim.cast({power: 1, aim: 0});
-  assert.equal(sim.state.cast.distance, 94);
+  assert.ok(sim.cast({power: 1, aim: 1}).ok);
+  assert.ok(sim.state.cast.distance>starterDistance*1.2,'equipped surf rod improves the same cast');
+  assert.ok(sim.state.cast.distance<80,'surf rod remains below the former 94 m baseline');
 });
 
 test('bite window, early strike and retrieval are real-time and recover safely', () => {
-  const sim = new PacificaSimulation({rng: () => 0});
+  const sim = new PacificaSimulation({rng: () => .0001});
   toSurf(sim); sim.cast({power: .5});
-  advance(sim, 1.1);
+  finishShoreFlight(sim);
   assert.equal(sim.state.phase, 'waiting');
   assert.equal(sim.strike().ok, false);
-  advance(sim, 9);
+  advance(sim, .5);
   assert.equal(sim.state.phase, 'waiting');
-  until(sim, () => sim.state.phase === 'bite', 10);
+  schoolAtBait(sim, 'surfperch');
+  awaitBite(sim);
   assert.ok(sim.state.biteRemaining > 3);
   advance(sim, 3.3);
   assert.equal(sim.state.phase, 'walk');

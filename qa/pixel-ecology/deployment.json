@@ -1,0 +1,67 @@
+{
+  "commit": "eb8cde5e88ffd28f73bfa80eff9bb15f6c28b04f",
+  "run": "https://github.com/gioa/santa-cruz-skiff/actions/runs/36363317379",
+  "version": "20260927-pixel-v22",
+  "checks": [
+    {
+      "file": "index.html",
+      "matches": true,
+      "sha256": "8238594754d03a421b36b6d286c236156da45c0510f95ec138aae723a95faf7f"
+    },
+    {
+      "file": "pixel-game.js",
+      "matches": true,
+      "sha256": "6880ef2cfb33e76c90fa90221736b6dd69c8e64148881fb4f6fb2478af4f4354"
+    },
+    {
+      "file": "pixel-sim.js",
+      "matches": true,
+      "sha256": "f8e90bb829badbc58e1dda74d8a119b2cd24c1d238ee7f38e714d15174b310a6"
+    },
+    {
+      "file": "pixel-fish-ecology.js",
+      "matches": true,
+      "sha256": "f1112b6818cf7c96c905f213c5c4f603616ab5a9679d0ccbc6d2510fa5367f82"
+    },
+    {
+      "file": "pixel-seafloor.js",
+      "matches": true,
+      "sha256": "3be3098952abd9e18c8cac2ae1475fd0dd3ef2b994dea0679c7676582004a3e2"
+    },
+    {
+      "file": "data/seafloor.json",
+      "matches": true,
+      "sha256": "af6d5654528341f9e58a008c61453056b20541dc3974876d35188c44d2471328"
+    },
+    {
+      "file": "fishing-rigs.js",
+      "matches": true,
+      "sha256": "26a594dd2d3027b5c4955d26e77a436eb5b14657f10831cd7f650dac8e53edf3"
+    },
+    {
+      "file": "fish-patrol.js",
+      "matches": true,
+      "sha256": "eee30a4d8ceea1961ab61cb415964881aeeca0ac6e8c0f6b89ff85e1796740eb"
+    },
+    {
+      "file": "fishing-regulations.js",
+      "matches": true,
+      "sha256": "0fdc220befcd9ba207d8c7b1c5c77864672091efc9a6da2b36599202428ddb74"
+    },
+    {
+      "file": "equipment.js",
+      "matches": true,
+      "sha256": "f46f6a8475d4ecd6d53b1e1be53b68250578d4c08842783f169ae78c330b58d3"
+    },
+    {
+      "file": "pixel-consumables.js",
+      "matches": true,
+      "sha256": "eec4f6283b3995ace07320911bcc3b16384c6011a3a543fc05cca73931a8b029"
+    },
+    {
+      "file": "pixel-sprites.js",
+      "matches": true,
+      "sha256": "c4842de8103570c256884029d7bc3142ddbc2413963daeb342d7a75371b3623e"
+    }
+  ]
+}

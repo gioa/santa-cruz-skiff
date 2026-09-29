@@ -1,0 +1,52 @@
+{
+  "commit": "5e9ebd57cc378ed9a9ecff6ae1b40e3fc87c9061",
+  "build": "20260927-pixel-v14",
+  "workflow": "https://github.com/gioa/santa-cruz-skiff/actions/runs/36357994861",
+  "assets": [
+    {
+      "file": "index.html",
+      "matches": true,
+      "sha256": "58ad760db6ef0ea9119ea320fcaa826c4b3c506599c4a68094c43a7645681fc8"
+    },
+    {
+      "file": "pixel.css",
+      "matches": true,
+      "sha256": "9f1d4c40ebbf005cbfc0bf4ec4d4c51e66fe4652a2d255747664bf4df75da701"
+    },
+    {
+      "file": "pixel-game.js",
+      "matches": true,
+      "sha256": "b732c0c8288c71034bb1aeb211be15ee8d0fb6772822a733c39039de8113ee2f"
+    },
+    {
+      "file": "pixel-sim.js",
+      "matches": true,
+      "sha256": "aff272e3bcc7ec291c1f6215107f247c5a8db9be32892c32011361233443e58e"
+    },
+    {
+      "file": "pixel-fish-fight.js",
+      "matches": true,
+      "sha256": "29a340d41f29c286dfbb2b759760b0b894e01eb05f7b496643a1119ecd855464"
+    },
+    {
+      "file": "pixel-fishing-physics.js",
+      "matches": true,
+      "sha256": "6432531e095eb5836dc7f81f0d4da07dee21c18b65796a9e18eaa40af0302ce3"
+    },
+    {
+      "file": "pixel-audio.js",
+      "matches": true,
+      "sha256": "41fd6a0401f52b77825e318fe78fae437e30fde1013aab21913283b278a7f231"
+    },
+    {
+      "file": "pixel-fishing-feedback.js",
+      "matches": true,
+      "sha256": "ef07fcb953b8239218a46043ddd436de992e0a9c5afb32d9531bcde265cf5089"
+    },
+    {
+      "file": "fishing-regulations.js",
+      "matches": true,
+      "sha256": "c37d4f78b20a5f37656049c1fad04c7d28e71cbc1b587648ca0b10cd6050a1b0"
+    }
+  ]
+}

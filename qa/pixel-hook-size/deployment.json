@@ -1,0 +1,47 @@
+{
+  "build": "20260927-pixel-v20",
+  "commit": "7f9329abc6a8778d9ec0699f931856ed76e1918b",
+  "run": "https://github.com/gioa/santa-cruz-skiff/actions/runs/36361647098",
+  "checks": [
+    {
+      "file": "index.html",
+      "matches": true
+    },
+    {
+      "file": "pixel-game.js",
+      "matches": true
+    },
+    {
+      "file": "pixel-hook-label.js",
+      "matches": true
+    },
+    {
+      "file": "pixel-hook-size.js",
+      "matches": true
+    },
+    {
+      "file": "pixel-hooking.js",
+      "matches": true
+    },
+    {
+      "file": "pixel-sim.js",
+      "matches": true
+    },
+    {
+      "file": "pixel-consumables.js",
+      "matches": true
+    },
+    {
+      "file": "pixel-rod-ui.js",
+      "matches": true
+    },
+    {
+      "file": "fishing-rigs.js",
+      "matches": true
+    },
+    {
+      "file": "pixel.css",
+      "matches": true
+    }
+  ]
+}

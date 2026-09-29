@@ -1,0 +1,6 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><title>渔轮控制 · 本地组件验证</title>
+<style>body{margin:16px;background:#ecefe9;font:14px system-ui;color:#244b4c}header{display:flex;align-items:center;gap:16px;margin-bottom:12px}select{font:inherit;padding:8px}iframe{border:1px solid #a8b8a1;display:block;background:#367f8b}</style>
+<header><b>真实游戏组件 · 本地测试场景</b><select aria-label="设备尺寸"><option value="390,844">手机 390 × 844</option><option value="320,568">窄屏 320 × 568</option><option value="844,390">横屏 844 × 390</option></select><a href="../../dist/" target="_blank">打开实际游戏</a></header>
+<iframe src="fixture.html" width="390" height="844" title="真实渔轮控制"></iframe>
+<script>const frame=document.querySelector('iframe');document.querySelector('select').onchange=e=>{const [w,h]=e.target.value.split(',');frame.width=w;frame.height=h;};</script>
+</html>

@@ -20,6 +20,8 @@ test('encounter positions, first times and willingness differ across random seed
  const times=new Set(),places=new Set(),topics=new Set();let fishingRolls=0;
  for(let seed=1;seed<=30;seed++){
   const sim=new PacificaSimulation({loreSeed:seed*7247,rng:()=>{fishingRolls++;return .5;}});sim.state.player.y=sim.world.shoreY(sim.state.player.x)+70;
+  // Construction seeds the fish population and the warden keeps its own schedule; neither is lore.
+  fishingRolls=0;sim.state.wardenNextAt=1e9;
   times.add(sim.state.shoreLore.nextAt);
   for(let t=0;t<1200&&!sim.state.shoreLore.encounter;t+=.1)sim.update(.1);
   const e=sim.state.shoreLore.encounter;assert.ok(e);assert.ok(sim.onSand(e.x,e.y));places.add(Math.round(e.x));topics.add(e.clueId===null?'smalltalk':'information');

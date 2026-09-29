@@ -1,0 +1,193 @@
+{
+  "commit": "a38c5391b01c9ddc8862e90ce2205997a8c89e87",
+  "version": "v79",
+  "checks": [
+    {
+      "file": "pixel-fish-landing.js",
+      "matches": true,
+      "sha256": "829f10b1c2705797bc371e8910cb7937710f9f98e1bcd4928b10ba8152f2231f"
+    },
+    {
+      "file": "pixel-fight-tackle.js",
+      "matches": true,
+      "sha256": "de34146fa635f24895301e888f4bed27d942285fb297fa9e63b4494aa933544a"
+    },
+    {
+      "file": "pixel-fish-fight.js",
+      "matches": true,
+      "sha256": "9304a64d36987d7ee567b7334d3371481c9b157add1a036fcd81e1a6c06aa186"
+    },
+    {
+      "file": "pixel-locations.js",
+      "matches": true,
+      "sha256": "149d6af511ad585b5e0104ade066479083a8ead5f2a3e444c1d1c1e68a979f71"
+    },
+    {
+      "file": "pacifica.html",
+      "matches": true,
+      "sha256": "1615b3dcd2bf86466dc179a93c78d92661ff844a1e78c46a4323497904d6b1b6"
+    },
+    {
+      "file": "pacifica-game.js",
+      "matches": true,
+      "sha256": "28e1b52ae11c9f64f6afe8107c1a1a4272d7ad930cd68b8935fb46fe9694d3c9"
+    },
+    {
+      "file": "pacifica-sim.js",
+      "matches": true,
+      "sha256": "89b375c023da05085e812b6fbad8ad6ba29a8dd14a901e1e444db909980b9156"
+    },
+    {
+      "file": "pixel-fishing-input.js",
+      "matches": true,
+      "sha256": "2b4d2479018a74a00e55c665267101a72e2df9aba4b320dabb38c71f8e3ad807"
+    },
+    {
+      "file": "pixel-sinkers.js",
+      "matches": true,
+      "sha256": "0e0d240628ef7ee2877bc09f0972ac247cb18ca182ceea98f6df2e1838143092"
+    },
+    {
+      "file": "pixel-rod-ui.js",
+      "matches": true,
+      "sha256": "c41be135a454ccac0b773421ea7935be8d3a8eab4b0352befd3379167970a0a1"
+    },
+    {
+      "file": "pixel-rod-loadouts.js",
+      "matches": true,
+      "sha256": "366823be4b672d957dc57e026dea47b1a12b71bdb1c09dae6039595c72a938cd"
+    },
+    {
+      "file": "pixel-consumables.js",
+      "matches": true,
+      "sha256": "f2030cfe3706b4db1c2e7f831dfbac5475156967af08dfab844191b045cf6981"
+    },
+    {
+      "file": "pixel-item-icons.js",
+      "matches": true,
+      "sha256": "d7face91fe39271d5c8428c906bef9e4ff34f04620b770c175fa1f8dee637944"
+    },
+    {
+      "file": "fishing-rigs.js",
+      "matches": true,
+      "sha256": "2fe83d252ae27dc373a3275801ea8527fbcf439d6c8eda2bce26a955231a63ca"
+    },
+    {
+      "file": "pixel-casting.js",
+      "matches": true,
+      "sha256": "0125aabba85a53f8fe4267f29924142d9cd0bae7c94dfb25c21d8241f4e6a826"
+    },
+    {
+      "file": "pixel-rod-geometry.js",
+      "matches": true,
+      "sha256": "43f74245ed824134553071e84f231194e9266e0f22e4b9c0f75543b68927065e"
+    },
+    {
+      "file": "pixel-fight-pump.js",
+      "matches": true,
+      "sha256": "b4b1546215a5cb35eaac7cd6a647223ef11ef0c6f389ec2970f156dc3bd28767"
+    },
+    {
+      "file": "pixel-focus-input.js",
+      "matches": true,
+      "sha256": "94aae06adabc0e9cb6ee2cfe94b618f057ae1dd5e3fded997dc97d1aa6fa2bc3"
+    },
+    {
+      "file": "index.html",
+      "matches": true,
+      "sha256": "401635a1568468db9c663daf91966a1d467e13eb0bf0ef38fcd1973d95983cad"
+    },
+    {
+      "file": "pixel.css",
+      "matches": true,
+      "sha256": "cca4be48f7bdeb211315970602ff8ecaf8f775099714132402538d6cb0efb098"
+    },
+    {
+      "file": "pixel-sim.js",
+      "matches": true,
+      "sha256": "679dd7a53baffa7caa724705a4b669e6cf381fd7645056486c2e12363a520d44"
+    },
+    {
+      "file": "pixel-game.js",
+      "matches": true,
+      "sha256": "1621a143cce9cf625ad3acad0c9df9d5a487325b64136710026577eda22ee2c1"
+    },
+    {
+      "file": "pixel-chart.js",
+      "matches": true,
+      "sha256": "71d46fbbaafb2c97ae4e0f1c1706082d11c8c6d79bfee4b557241e5bc1296233"
+    },
+    {
+      "file": "pixel-wildlife.js",
+      "matches": true,
+      "sha256": "f422d4c244e55453d17cd5953ca2c363c1983dbc8d84c8dcd89763f50e7c7719"
+    },
+    {
+      "file": "pixel-fishing-ui.js",
+      "matches": true,
+      "sha256": "5ad105d56e176780fea43fc5b3a03207ea61a7cbcd33f61df64c71f9cc9419ce"
+    },
+    {
+      "file": "pixel-daily-weather.js",
+      "matches": true,
+      "sha256": "9fbac32b85be45a261b014e4899b52d6b4a82a8b83d34c008c47b59b252a5ea7"
+    },
+    {
+      "file": "pixel-day-cycle.js",
+      "matches": true,
+      "sha256": "63547a185da1ac478177313e104b0056fe0a7f4d2c8e9f89bd17f7facb4d0bdc"
+    },
+    {
+      "file": "pixel-world.js",
+      "matches": true,
+      "sha256": "ddd2f69f8bf5506b1766f59439e34edd519c0dc083cc805468f95e28fe378060"
+    },
+    {
+      "file": "pixel-fight-view.js",
+      "matches": true,
+      "sha256": "61da94ce2c3afd77bed64c4ac9b2c4c25e396fa01073d94adddf9dcfb818d46a"
+    },
+    {
+      "file": "pixel-boat-geometry.js",
+      "matches": true,
+      "sha256": "0f3bef867ddd0230fbd273369ee042f9c19a4886a300595368cb1892fd2a375e"
+    },
+    {
+      "file": "pixel-fishing-physics.js",
+      "matches": true,
+      "sha256": "964f3c7458127fc89ba56481f1b53a9653dbb477ecefe74bc88a7ebdf525dce2"
+    },
+    {
+      "file": "pixel-stability.js",
+      "matches": true,
+      "sha256": "a27964ca239f9e0d4e9f4f2dfd69b3ce76f22d5553cbd19dbc86bea8da05b2a8"
+    },
+    {
+      "file": "pixel-rescue-view.js",
+      "matches": true,
+      "sha256": "7c2d9faaf18f6dabed1baea65945112fffffdf7e83968afbeba46fdb2ac552f5"
+    },
+    {
+      "file": "vessel-physics.js",
+      "matches": true,
+      "sha256": "0d9c2194fe727e8b0e5b12215089c4be0d6babf4a357d3075e07fd7011b5188a"
+    },
+    {
+      "file": "pixel-boat-actions.js",
+      "matches": true,
+      "sha256": "5c2b131cc1422c3299d289b9e509b5ed4b61bf5381c849f1ffcbdeca0023d73d"
+    },
+    {
+      "file": "equipment.js",
+      "matches": true,
+      "sha256": "002d40d703f7633a5b23d156f110e03058e21e0622d3dfc9602d44ba6cd5354e"
+    },
+    {
+      "file": "pixel-gear-availability.js",
+      "matches": true,
+      "sha256": "aadb644411c3e0db7766020218fed3e3d6e2410b6624737bf3e9421d2c73649f"
+    }
+  ],
+  "releaseTests": 742,
+  "sharedTests": 754
+}

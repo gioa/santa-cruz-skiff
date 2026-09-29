@@ -1,16 +1,18 @@
 import * as THREE from './vendor/three.module.js';
 import {Water} from './vendor/Water.js';
 import {Sky} from './vendor/Sky.js';
-import {createRod,createFish} from './world.js?v=20260927-articulated-v5';
-import {createEnvironmentMaterials,metreUV} from './env-materials.js?v=20260927-articulated-v5';
-import {configureOcean,createWake} from './env-water.js?v=20260927-articulated-v5';
-import {addHarborDetail,addWindowDetail} from './env-detail.js?v=20260927-articulated-v5';
-import {createWharfSurface,createWharfLanding} from './wharf-landing.js?v=20260927-articulated-v5';
-import {createRentalShop} from './rental-shop.js?v=20260927-articulated-v5';
-import {HARBOR} from './harbor-layout.js?v=20260927-articulated-v5';
-import {geography,fromGPS,coastLines,pierRings,buildingFootprints,landPolygons,onLand,FISHING_SPOTS} from './geography.js?v=20260927-articulated-v5';
-import {bathymetry,elevationAt,depthAt} from './bathymetry.js?v=20260927-articulated-v5';
-import {sea,solarPosition,updateSea} from './marine.js?v=20260927-articulated-v5';
+import {createRod,createFish} from './world.js';
+import {createEnvironmentMaterials,metreUV} from './env-materials.js';
+import {configureOcean,createWake} from './env-water.js';
+import {addHarborDetail,addWindowDetail} from './env-detail.js';
+import {createWharfSurface,createWharfLanding} from './wharf-landing.js';
+import {createRentalShop} from './rental-shop.js';
+import {HARBOR} from './harbor-layout.js';
+import {geography,fromGPS,coastLines,pierRings,buildingFootprints,landPolygons,onLand,FISHING_SPOTS} from './geography.js';
+import {bathymetry,bathymetryReady,elevationAt,depthAt} from './bathymetry.js';
+import {sea,solarPosition,updateSea} from './marine.js';
+// The legacy 3D world builds its terrain from the depth grid at start-up.
+await bathymetryReady;
 export {createRod,createFish,depthAt,FISHING_SPOTS};
 export {HARBOR};
 export function waveHeight(x,z,t,strength=1){const h=Math.min(3,sea.waveHeight||.25);const angle=(sea.waveDirection-134)*Math.PI/180;const q=x*Math.sin(angle)+z*Math.cos(angle);const period=Math.max(4,sea.period);const k=4*Math.PI*Math.PI/(9.81*period*period);return strength*(Math.sin(q*k+t*2*Math.PI/period)*h*.27+Math.sin(x*.11-z*.06+t*1.15)*h*.11+Math.sin(z*.28+t*1.7)*.025);}

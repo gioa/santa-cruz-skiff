@@ -5,6 +5,7 @@ import {readFile} from 'node:fs/promises';
 globalThis.fetch=async url=>new Response(await readFile(url));
 const {PixelSimulation,HARBOR,FISHING_SPOTS}=await import('../dist/pixel-sim.js');
 const {syncVessel}=await import('../dist/vessel-physics.js');
+const {schoolAtLure}=await import('./helpers/pixel-fish.js');
 const {isFishingFocus,focusRodPoseFromDrag}=await import('../dist/pixel-fight-focus.js');
 const run=(sim,seconds,input={})=>{for(let t=0;t<seconds-1e-8;t+=.1)sim.step(Math.min(.1,seconds-t),input);};
 const until=(sim,predicate,seconds=100,input={})=>{for(let t=0;t<seconds&&!predicate(sim.state);t+=.1)sim.step(.1,input);assert.ok(predicate(sim.state),`state ${sim.state.fishState} did not reach expected transition`);};
@@ -13,7 +14,7 @@ function ready(){
  const p=FISHING_SPOTS[1];Object.assign(sim.state,{boatX:p.x,boatZ:p.z});syncVessel(sim.vessel,{x:p.x,z:p.z,clearMotion:true});return sim;
 }
 function bite(sim,{mounted=false,natural=false}={}){
- if(mounted)assert.ok(sim.setRodMount('port').ok);assert.ok(sim.lowerRig().ok);assert.equal(isFishingFocus(sim.state),false);if(!natural)sim.state.biteAt=.5;until(sim,s=>s.fishState==='bite');assert.equal(isFishingFocus(sim.state),true);
+ if(mounted)assert.ok(sim.setRodMount('port').ok);assert.ok(sim.lowerRig().ok);assert.equal(isFishingFocus(sim.state),false);if(natural){until(sim,s=>s.fishState==='waiting');schoolAtLure(sim);}else sim.state.biteAt=.5;until(sim,s=>s.fishState==='bite');assert.equal(isFishingFocus(sim.state),true);
 }
 
 test('focus is derived only from a bite, fight or unresolved catch aboard the rented afloat boat',()=>{

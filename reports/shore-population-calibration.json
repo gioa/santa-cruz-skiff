@@ -1,0 +1,209 @@
+{
+ "generatedAt": "2026-09-29T04:07:02.168Z",
+ "runs": 40,
+ "limitSeconds": 600,
+ "scenes": {
+  "pacifica": {
+   "trough · crab · Carolina · soak": {
+    "runs": 40,
+    "biteWithin2min": 0.425,
+    "biteWithin10min": 0.8,
+    "medianSeconds": 141.74999999999798,
+    "species": {
+     "surfperch": 31,
+     "white_croaker": 1
+    }
+   },
+   "trough · crab · Carolina · recast 20 s": {
+    "runs": 40,
+    "biteWithin2min": 0.3,
+    "biteWithin10min": 0.65,
+    "medianSeconds": 315.00000000003735,
+    "species": {
+     "surfperch": 24,
+     "white_croaker": 1,
+     "jacksmelt": 1
+    }
+   },
+   "trough · squid · Carolina": {
+    "runs": 40,
+    "biteWithin2min": 0.325,
+    "biteWithin10min": 0.75,
+    "medianSeconds": 219.7000000000157,
+    "species": {
+     "white_croaker": 24,
+     "surfperch": 6
+    }
+   },
+   "bar gap · anchovy · fish-finder": {
+    "runs": 40,
+    "biteWithin2min": 0.225,
+    "biteWithin10min": 0.475,
+    "medianSeconds": null,
+    "species": {
+     "halibut": 6,
+     "striped_bass": 9,
+     "white_croaker": 4
+    }
+   },
+   "trough · squid · float": {
+    "runs": 40,
+    "biteWithin2min": 0.65,
+    "biteWithin10min": 0.9,
+    "medianSeconds": 79.49999999999763,
+    "species": {
+     "jacksmelt": 36
+    }
+   },
+   "trough · crab · fish-finder (big hook)": {
+    "runs": 40,
+    "biteWithin2min": 0.225,
+    "biteWithin10min": 0.725,
+    "medianSeconds": 281.2500000000297,
+    "species": {
+     "surfperch": 26,
+     "white_croaker": 1,
+     "striped_bass": 2
+    }
+   },
+   "max range · crab · Carolina": {
+    "runs": 40,
+    "biteWithin2min": 0.025,
+    "biteWithin10min": 0.125,
+    "medianSeconds": null,
+    "species": {
+     "white_croaker": 5
+    }
+   },
+   "swash · crab · Carolina": {
+    "runs": 40,
+    "biteWithin2min": 0.4,
+    "biteWithin10min": 0.675,
+    "medianSeconds": 141.74999999999798,
+    "species": {
+     "surfperch": 26,
+     "white_croaker": 1
+    }
+   },
+   "trough · crab · Carolina · rough sea": {
+    "runs": 40,
+    "biteWithin2min": 0.175,
+    "biteWithin10min": 0.4,
+    "medianSeconds": null,
+    "species": {
+     "surfperch": 16
+    }
+   },
+   "trough · crab · Carolina · midday": {
+    "runs": 40,
+    "biteWithin2min": 0.35,
+    "biteWithin10min": 0.925,
+    "medianSeconds": 165.25000000000333,
+    "species": {
+     "surfperch": 37
+    }
+   }
+  },
+  "half-moon-bay": {
+   "trough · crab · Carolina · soak": {
+    "runs": 40,
+    "biteWithin2min": 0.8,
+    "biteWithin10min": 0.925,
+    "medianSeconds": 56.9499999999989,
+    "species": {
+     "surfperch": 36,
+     "white_croaker": 1
+    }
+   },
+   "trough · crab · Carolina · recast 20 s": {
+    "runs": 40,
+    "biteWithin2min": 0.45,
+    "biteWithin10min": 0.825,
+    "medianSeconds": 170.05000000000442,
+    "species": {
+     "surfperch": 32,
+     "white_croaker": 1
+    }
+   },
+   "trough · squid · Carolina": {
+    "runs": 40,
+    "biteWithin2min": 0.525,
+    "biteWithin10min": 0.85,
+    "medianSeconds": 116.9499999999955,
+    "species": {
+     "white_croaker": 21,
+     "surfperch": 13
+    }
+   },
+   "bar gap · anchovy · fish-finder": {
+    "runs": 40,
+    "biteWithin2min": 0.45,
+    "biteWithin10min": 1,
+    "medianSeconds": 136.19999999999672,
+    "species": {
+     "halibut": 4,
+     "white_croaker": 14,
+     "striped_bass": 22
+    }
+   },
+   "trough · squid · float": {
+    "runs": 40,
+    "biteWithin2min": 0.525,
+    "biteWithin10min": 0.975,
+    "medianSeconds": 108.64999999999597,
+    "species": {
+     "jacksmelt": 39
+    }
+   },
+   "trough · crab · fish-finder (big hook)": {
+    "runs": 40,
+    "biteWithin2min": 0.325,
+    "biteWithin10min": 0.8,
+    "medianSeconds": 182.50000000000725,
+    "species": {
+     "surfperch": 32
+    }
+   },
+   "max range · crab · Carolina": {
+    "runs": 40,
+    "biteWithin2min": 0.175,
+    "biteWithin10min": 0.475,
+    "medianSeconds": null,
+    "species": {
+     "surfperch": 13,
+     "white_croaker": 6
+    }
+   },
+   "swash · crab · Carolina": {
+    "runs": 40,
+    "biteWithin2min": 0.5,
+    "biteWithin10min": 0.875,
+    "medianSeconds": 118.24999999999542,
+    "species": {
+     "surfperch": 34,
+     "jacksmelt": 1
+    }
+   },
+   "trough · crab · Carolina · rough sea": {
+    "runs": 40,
+    "biteWithin2min": 0.025,
+    "biteWithin10min": 0.025,
+    "medianSeconds": null,
+    "species": {
+     "white_croaker": 1
+    }
+   },
+   "trough · crab · Carolina · midday": {
+    "runs": 40,
+    "biteWithin2min": 0.725,
+    "biteWithin10min": 0.925,
+    "medianSeconds": 72.949999999998,
+    "species": {
+     "surfperch": 31,
+     "white_croaker": 5,
+     "jacksmelt": 1
+    }
+   }
+  }
+ }
+}

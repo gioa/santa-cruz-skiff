@@ -1,0 +1,43 @@
+{
+  "commit": "6e6135ed0ef3a74b404165cea26428306cdf98fb",
+  "url": "https://joyx.design/santa-cruz-skiff/pacifica.html",
+  "pagesRun": "https://github.com/gioa/santa-cruz-skiff/actions/runs/36474981983",
+  "conclusion": "success",
+  "files": [
+    {
+      "file": "pacifica.html",
+      "sha256": "1615b3dcd2bf86466dc179a93c78d92661ff844a1e78c46a4323497904d6b1b6",
+      "matches": true
+    },
+    {
+      "file": "pacifica.css",
+      "sha256": "0333d2054b6776c4ae8af894f34f3babc30c3e8da333553e9b7072f6c5165e4f",
+      "matches": true
+    },
+    {
+      "file": "pacifica-game.js",
+      "sha256": "28e1b52ae11c9f64f6afe8107c1a1a4272d7ad930cd68b8935fb46fe9694d3c9",
+      "matches": true
+    },
+    {
+      "file": "pacifica-sim.js",
+      "sha256": "89b375c023da05085e812b6fbad8ad6ba29a8dd14a901e1e444db909980b9156",
+      "matches": true
+    },
+    {
+      "file": "pacifica-world.js",
+      "sha256": "67748b226a25acb1b464440429eec258eea406e810c5e37719bb45b787812711",
+      "matches": true
+    },
+    {
+      "file": "pixel-locations.js",
+      "sha256": "149d6af511ad585b5e0104ade066479083a8ead5f2a3e444c1d1c1e68a979f71",
+      "matches": true
+    },
+    {
+      "file": "pixel-locations.css",
+      "sha256": "bcfe79bffd22913e2552fa3d7fb0ea3ad104c3d07433233cfacf9722f16fdd11",
+      "matches": true
+    }
+  ]
+}

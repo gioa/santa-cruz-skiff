@@ -1,0 +1,6 @@
+Release cf88083b64aefd25cf02c486df050c669f567b48
+Release tests: 581 passed
+Shared workspace tests including pending local work: 595 passed
+12 scenarios x 600 simulated seconds; bounded finite states.
+Browser: 390x844 and 844x390, start/rental/launch/boarding/drop/settings. No console errors.
+NOAA refresh completed; surface-current grid contains no valid regional vectors and game reports missing data.

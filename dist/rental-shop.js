@@ -1,5 +1,5 @@
 import * as THREE from './vendor/three.module.js';
-import {DetailBatch} from './env-detail.js?v=20260927-articulated-v5';
+import {DetailBatch} from './env-detail.js';
 
 // Street-facing facade interpreted from the rental operator's storefront photo.
 // The footprint/orientation are geographic; dimensions and interior stock are

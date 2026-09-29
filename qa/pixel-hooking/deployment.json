@@ -1,0 +1,40 @@
+{
+  "build": "20260927-pixel-v17",
+  "commit": "2611dd3c310cb8bbbe15d75570ee92d60a92a965",
+  "run": "https://github.com/gioa/santa-cruz-skiff/actions/runs/36359778362",
+  "url": "https://joyx.design/santa-cruz-skiff/",
+  "checks": {
+    "index.html": {
+      "match": true,
+      "sha256": "cbe5acd5650f64a02ec824be96f5aad49f1b18ab8e7700d08f58d72bdac26b9f"
+    },
+    "pixel-game.js": {
+      "match": true,
+      "sha256": "5c502b64ad4df4eb9f71aa19b1cadd671ac94050289eb8a18888f186e0653c21"
+    },
+    "pixel-hooking.js": {
+      "match": true,
+      "sha256": "5cece48e1c7d3c51a6f8b6bba880ff30a515b7bf22c76f4fb18bb2304dd8655b"
+    },
+    "pixel-sim.js": {
+      "match": true,
+      "sha256": "7bba758fffbc5b2784ae132bb13373faf55e307287dee1033eb1d345e6b0141b"
+    },
+    "pixel-fishing-ui.js": {
+      "match": true,
+      "sha256": "f1d31fbd152baf8d52355b13d71e6726e681979bcb3d2196dd07d5b6c0dc8212"
+    },
+    "pixel-rod-ui.js": {
+      "match": true,
+      "sha256": "27d099a517817dd283e4f9c79cf9fe2e273d1be143b4dd59e35f678f8deee7eb"
+    },
+    "pixel-boat-actions.js": {
+      "match": true,
+      "sha256": "85e7786d0d2a65e5a1ec280bbf208acc895aaebfc75168f4e3cf2bb56409c216"
+    },
+    "fishing-rigs.js": {
+      "match": true,
+      "sha256": "8779fde458b01cfddfb04ebc684141994aed475706bdca40b5aa344213e240c1"
+    }
+  }
+}

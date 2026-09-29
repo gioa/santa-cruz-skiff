@@ -1,0 +1,62 @@
+{
+  "runId": 36365581862,
+  "codeCommit": "f2f339f1559025c2f554bd90f428472061e2e8b8",
+  "version": "20260927-pixel-v26",
+  "files": [
+    {
+      "file": "index.html",
+      "matches": true,
+      "sha256": "9e20ed5e6646e638ce6745f9655186d2f1016ca4126914612d65b4c5270e848c"
+    },
+    {
+      "file": "pixel-game.js",
+      "matches": true,
+      "sha256": "51c59f54f4d57f3b2d2621fca6fd59907e9a3709b2c25aa5001b30a883aed388"
+    },
+    {
+      "file": "pixel-rod-ui.js",
+      "matches": true,
+      "sha256": "0c3dcae21709b81916fa2b187b187ffe618c81a9245934a9fd3e781ecbd07350"
+    },
+    {
+      "file": "pixel-sim.js",
+      "matches": true,
+      "sha256": "49fb988333fa1af83b2bd31181c09c15e95c6692596728e48de255190c19cc4b"
+    },
+    {
+      "file": "pixel-boat-actions.js",
+      "matches": true,
+      "sha256": "c55dcb107e3a8fbb5efe9f48d51ba401d40d33f6384e5d0a34a8d84c2c24376c"
+    },
+    {
+      "file": "pixel-boat-geometry.js",
+      "matches": true,
+      "sha256": "a37b6347f49598afe4d1a6557e83b3d62a8d2d0e2571cc4611f3f341420cb3c1"
+    },
+    {
+      "file": "pixel-world.js",
+      "matches": true,
+      "sha256": "5cf43968d41f481ff952843fd7b50a14f3ae8eb4269cca2a82d7ee2eba02b694"
+    },
+    {
+      "file": "pixel-sprites.js",
+      "matches": true,
+      "sha256": "534f45b94d74debcdda8f96d832ed2cd7c3fe86db3ba5ccc89d21d45a1f11f83"
+    },
+    {
+      "file": "pixel-helm-ui.js",
+      "matches": true,
+      "sha256": "337825d613e20c3526086601cd5df961bbabbefc802d7f08f231d6f54c6dc2d9"
+    },
+    {
+      "file": "pixel.css",
+      "matches": true,
+      "sha256": "dfafbc774a739334ee57614f22011a809b82da69bc284c11075def5fcdc40177"
+    },
+    {
+      "file": "equipment.js",
+      "matches": true,
+      "sha256": "b823824ae762ecd6b103d60e6b0fc6dcb298452769db080bf8e83a6fd0141546"
+    }
+  ]
+}

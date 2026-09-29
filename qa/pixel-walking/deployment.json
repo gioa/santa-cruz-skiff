@@ -1,0 +1,38 @@
+{
+  "commit": "a39c62dbbd76bf07de2c34d30d0c0ffeff146cfd",
+  "build": "20260927-pixel-v6.1",
+  "workflow": "https://github.com/gioa/santa-cruz-skiff/actions/runs/36343057462",
+  "status": "success",
+  "checks": [
+    {
+      "file": "index.html",
+      "matchesLocal": true,
+      "sha256": "812fdccff1dc258cbff4db418cc8816a2528bfa765d0642e2c5045cfa7bfc864"
+    },
+    {
+      "file": "pixel-game.js",
+      "matchesLocal": true,
+      "sha256": "8b9622b2fa0202706b4d72254abaedc18bb82128b219fe927b7fffe8efb59293"
+    },
+    {
+      "file": "pixel-world.js",
+      "matchesLocal": true,
+      "sha256": "5855d184ad5b099b43c5ea562d537da34c55c9a04eb260a2e8b8beaf5053f948"
+    },
+    {
+      "file": "pixel-sprites.js",
+      "matchesLocal": true,
+      "sha256": "a8014cfdf7b81b02c3a0c70a68d7bd96b701940ec2178e87c82d96cb2a3240e9"
+    },
+    {
+      "file": "pixel-sim.js",
+      "matchesLocal": true,
+      "sha256": "c0709937aa8e8a47812f6441a3fbaab5605944d974fdef5228f7a5358d7eb427"
+    },
+    {
+      "file": "pixel-walking-path.js",
+      "matchesLocal": true,
+      "sha256": "d5ba2d85e8d7919e03ba36913ebb91cf61a151aedba548d1fb2d6c31545f02cd"
+    }
+  ]
+}

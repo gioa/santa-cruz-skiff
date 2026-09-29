@@ -1,0 +1,15 @@
+{
+  "commit": "b58a5aca6f738601a6a3d70620579f287d94c82a",
+  "run": 36356053361,
+  "url": "https://joyx.design/santa-cruz-skiff/",
+  "matchingAssets": {
+    "index.html": true,
+    "pixel-game.js": true,
+    "pixel-fishing-ui.js": true,
+    "pixel-boat-actions.js": true,
+    "pixel-helm-ui.js": true,
+    "pixel-helm-availability.js": true,
+    "pixel-sim.js": true,
+    "pixel.css": true
+  }
+}

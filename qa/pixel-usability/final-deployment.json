@@ -1,0 +1,16 @@
+{
+  "commit": "cd1c644f8a5a8ebdfbe87339c34887b7254072ee",
+  "workflow": "https://github.com/gioa/santa-cruz-skiff/actions/runs/36339390276",
+  "files": [
+    {
+      "file": "index.html",
+      "matches": true,
+      "sha256": "c7dbaf7e0ccaf29545d6d485e21f53b622110ecd93bbe44f40c2bc9c27e79987"
+    },
+    {
+      "file": "pixel-game.js",
+      "matches": true,
+      "sha256": "79fe8282e709bede96df833ef904e260b6594ab27d78581543e4fa34e5ef6f61"
+    }
+  ]
+}

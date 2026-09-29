@@ -1,0 +1,15 @@
+{
+  "commit": "68dc9d49b5bc3b46057b143909ea619be676d402",
+  "run": "https://github.com/gioa/santa-cruz-skiff/actions/runs/36479960071",
+  "deployment": "success",
+  "verifiedStaticAssets": 17,
+  "releaseTests": 753,
+  "sharedWorktreeTests": 765,
+  "url": "https://joyx.design/santa-cruz-skiff/",
+  "localBrowserReports": [
+    "local-smoke.json",
+    "play-results.json"
+  ],
+  "sharedIntegrationBackup": "/tmp/coastal-shared-integration-backup",
+  "publicBrowserSmoke": "passed: both shores, scene picker pause, 4 viewports, shop, cast and current drift, zero page errors"
+}
