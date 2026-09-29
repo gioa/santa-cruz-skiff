@@ -1,3 +1,4 @@
+import {fishSpecies} from './fish-species.js';
 /**
  * Lightweight presentation model for Santa Cruz's nearshore fishing.
  * Factual basis: bottom structure, species ecology, bait/lure technique and the
@@ -137,21 +138,12 @@ const SPECIES=Object.freeze({
   lingcod:{habitat:{kelp:2,reef:3,sand:.65},baits:{squid:1.15,anchovy:1.24,shrimp:.82,sardine:1.33,jig:1.48},layer:'structure'},
 });
 
+const RIG_SPECIES_KEYS=new Set([...Object.keys(SPECIES),'croaker','sanddab']);
+
 /** Accept existing PIXEL_FISH objects, latin names or future stable IDs. */
 export function rigSpeciesKey(fish){
-  const s=typeof fish==='string'?fish:`${fish?.id||''} ${fish?.latin||''} ${fish?.name||''}`;
-  if(/Genyonemus|croaker|白石首/i.test(s))return'croaker';
-  if(/Citharichthys sordidus|sanddab|太平洋沙鲽/i.test(s))return'sanddab';
-  if(/miniatus|vermilion|朱红/i.test(s))return'vermilion';
-  if(/tshawytscha|chinook|帝王鲑/i.test(s))return'salmon';
-  if(/nobilis|seabass|白海鲈/i.test(s))return'seabass';
-  if(/Sarda|bonito|太平洋鲣/i.test(s))return'bonito';
-  if(/mystinus|blue|蓝岩鱼/i.test(s))return'blue';
-  if(/caurinus|copper|铜岩鱼/i.test(s))return'copper';
-  if(/californicus|halibut|大比目鱼/i.test(s))return'halibut';
-  if(/japonicus|mackerel|鲭鱼/i.test(s))return'mackerel';
-  if(/elongatus|lingcod|长蛇齿/i.test(s))return'lingcod';
-  return'other';
+ const value=typeof fish==='string'&&RIG_SPECIES_KEYS.has(fish)?{id:fish}:fish;
+ const kind=fishSpecies(value)?.artKind;return RIG_SPECIES_KEYS.has(kind)?kind:'other';
 }
 
 /** Soft affinity for the actual bait layer. No species has a zero-weight gate. */

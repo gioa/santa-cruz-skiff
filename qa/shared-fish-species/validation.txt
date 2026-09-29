@@ -1,0 +1,7 @@
+2026-09-28
+node scripts/check.mjs: PASS
+node --test tests/*.test.js: 830 passed, 0 failed
+git diff --check: PASS
+Chrome browser playtest: 3 scenes, 4 viewports, 0 page errors
+See browser-results.json and playtest.mjs for fixture scope.
+Rebased onto 76b54c9 (Santa Cruz 10× clock); full tests and browser scenarios repeated successfully.

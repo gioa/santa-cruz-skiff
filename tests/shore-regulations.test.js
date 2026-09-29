@@ -9,7 +9,7 @@ import {shoreProfile} from '../dist/shore-data.js';
 
 const fish = (id, lengthCm, catchId, extra = {}) => {
   const sp = SPECIES.find(s => s.id === id);
-  return {id, name: sp.name, nameEn: sp.nameEn, catchId, lengthCm, weightKg: fishWeightKg(sp, lengthCm), caughtDate: '2026-09-28', ...extra};
+  return {id, speciesId: sp.speciesId, name: sp.name, nameEn: sp.nameEn, catchId, length: lengthCm, weightKg: fishWeightKg(sp, lengthCm), caughtDate: '2026-09-28', ...extra};
 };
 const log = catches => catches.map(f => ({catchId: f.catchId, species: f.id, date: f.caughtDate}));
 
@@ -18,9 +18,11 @@ test('every shore fish has a length; weight follows a length–weight relation',
     assert.ok(sp.lengthCm[0] > 0 && sp.lengthCm[1] > sp.lengthCm[0]);
     assert.ok(fishWeightKg(sp, sp.lengthCm[1]) > fishWeightKg(sp, sp.lengthCm[0]) * 8, 'weight grows ~ L³');
   }
-  // Old saves stored weight only: their length is derived, not invented.
+  // Old saves stored weight only: their length stays unrecorded (never invented),
+  // so the warden cannot fault it on size.
   const sim = new PacificaSimulation({saved: {scene: 'pacifica', version: 3, catches: [{id: 'halibut', catchId: 4, weightKg: 2.4}]}});
-  assert.ok(Math.abs(sim.state.catches[0].lengthCm - 55.8) < 1.5);
+  assert.equal(sim.state.catches[0].length, undefined);
+  assert.equal(assessShoreCatch(sim.state.catches, []).findings.length, 0);
 });
 
 test('shore rules match the handbook: halibut 22 in, striped bass 18 in and 2/day, jacksmelt unlimited', () => {
@@ -53,7 +55,7 @@ test('a real shore catch records length, shows it, and a warden check fines an u
   assert.ok(sim.strike().ok);
   for (let t = 0; t < 60 && sim.state.phase === 'fighting'; t += .05) sim.update(.05, {reel: sim.state.tension < .7});
   assert.equal(sim.state.phase, 'landed');
-  assert.ok(sim.state.fish.lengthCm > 15 && sim.state.fish.lengthCm < 40);
+  assert.ok(sim.state.fish.length > 15 && sim.state.fish.length < 40);
   assert.match(sim.state.message, / in · .* lb/);
   assert.ok(sim.resolveCatch(true).ok);
   assert.equal(sim.state.keptLog.length, 1);

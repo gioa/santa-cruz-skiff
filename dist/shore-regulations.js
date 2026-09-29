@@ -32,7 +32,7 @@ export function assessShoreCatch(carried=[],keptLog=[]){
  }
  for(const fish of carried){
   const rule=SHORE_RULES[fish.id];
-  if(rule?.minimumCm>0&&Number.isFinite(fish.lengthCm)&&fish.lengthCm<rule.minimumCm)findings.push({catchId:fish.catchId,code:'undersize',category:'size',actualCm:fish.lengthCm,minimumCm:rule.minimumCm});
+  if(rule?.minimumCm>0&&Number.isFinite(fish.length)&&fish.length<rule.minimumCm)findings.push({catchId:fish.catchId,code:'undersize',category:'size',actualCm:fish.length,minimumCm:rule.minimumCm});
  }
  const violating=new Set(findings.map(f=>f.catchId));
  return{findings,violatingFish:violating.size,fine:violating.size*FINE_PER_FISH};

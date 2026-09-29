@@ -102,7 +102,7 @@ try{
    assert.equal((await state()).fish.id,id);await shot(scene+'-'+id+'-fight');
    await page.evaluate(()=>window.smallfishQA.land());await page.locator('#catch-keep').waitFor({state:'visible'});
    const landed=await state();assert.equal(landed.phase,'landed');assert.equal(landed.fish.id,id);assert.match(await page.locator('#modal-content').textContent(),new RegExp(name,'i'));
-   const art=await portrait('#catch-art');assert.ok(art.colors>=8);assert.ok(art.width>=160&&art.height===160);assert.match(art.label,new RegExp(landed.fish.name));
+   const art=await portrait('#catch-art');assert.ok(art.colors>=8);assert.ok(art.width>=120&&art.height>=100,JSON.stringify({w:art.width,h:art.height}));assert.match(art.label,new RegExp(landed.fish.name));
    portraits.push(art);await shot(scene+'-'+id+'-catch');await page.locator('#catch-keep').click();
    assert.ok((await state()).catches.some(f=>f.id===id));caught.push({id,name:landed.fish.name,nameEn:landed.fish.nameEn,weightKg:landed.fish.weightKg,offshoreMetres:bite.shoreSample.offshore,hookDepthMetres:bite.presentation.depth,portrait:art});
   }

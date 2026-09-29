@@ -1,8 +1,10 @@
 import {SHORE_ITEMS,shoreOwnedItems,shoreItemActive,ownedRods} from './shore-equipment.js';
-import {BAITS, SHOP_ITEMS} from './pacifica-sim.js';
+import {BAITS,SHOP_ITEMS} from './pacifica-sim.js';
 import {drawItemIcon} from './pixel-item-icons.js';
 import {formatNumber,formatLength,formatWeight,cmToInches,kgToPounds} from './units.js';
 import {createPixelSprites} from './pixel-sprites.js';
+import {normalizeFishIdentity} from './fish-species.js';
+import {drawFishArt,fishSpriteKind} from './pixel-fish-art.js';
 
 // Pacifica uses the game's shared modal, inventory and pixel-art components.
 // These views only call the existing simulation actions; the save format stays
@@ -12,8 +14,11 @@ const heading = (eyebrow, title, description = '') => `<div class="eyebrow">${es
 const balance = credits => `<span class="balance" aria-label="${Math.floor(credits)} 潮汐点">✦ ${Math.floor(credits)}</span>`;
 const iconIds = {starter_rod:'rod_light', surf_rod:'rod', starter_reel:'reel_smooth', sealed_reel:'reel_smooth', carolina_rig:'rig_slider', fishfinder_rig:'rig_slider', float_rig:'rig_float', sandcrab:'bait', squid:'bait', anchovy:'bait_anchovy', ca_fishing_regulations:'ca_fishing_regulations',};
 const itemArt = id => `<canvas data-item-art="${iconIds[id] || 'tackle'}" width="32" height="32" aria-hidden="true"></canvas>`;
-const fishWeight = fish => formatNumber(kgToPounds(fish.weightKg), 2);
-const fishLength = fish => formatNumber(cmToInches(fish.lengthCm), 1);
+const hasFishLength = fish => Number.isFinite(fish.length) && fish.length > 0;
+const fishLength = fish => hasFishLength(fish) ? formatLength(fish.length) : '未记录';
+const fishWeight = fish => formatWeight(Number.isFinite(fish.kg) ? fish.kg : fish.weightKg);
+const fishNames = fish => `<strong class="fish-common-name">${esc(fish.commonName || fish.nameEn)}</strong><br><span>${esc(fish.latin)}</span>`;
+const catchStatus = {kept:'鱼篓中',released:'已放流',sold:'已交付',confiscated:'已没收'};
 
 export function createPacificaMenus({sim, scene, openDialog, closeDialog, feedback, openRules = () => {}}) {
   const $ = id => document.getElementById(id);
@@ -29,42 +34,16 @@ export function createPacificaMenus({sim, scene, openDialog, closeDialog, feedba
 
   function paintFish(canvas, fish, compact = false) {
     if (!canvas) return;
+    const kind = fishSpriteKind(fish), sprite = getSprites().fish[kind] || getSprites().fish.unknown;
     const width = compact ? 96 : Math.max(160, Math.floor(canvas.parentElement.clientWidth));
-    const height = compact ? 48 : 160;
-    canvas.width = width; canvas.height = height;
-    canvas.style.width = `${width}px`; canvas.style.height = `${height}px`;
+    const layout = drawFishArt(canvas, sprite, fish, {width, height: compact ? 48 : 180, compact});
+    canvas.style.width = `${layout.width}px`; canvas.style.height = `${layout.height}px`;
     canvas.setAttribute('role', 'img');
-    canvas.setAttribute('aria-label', `${fish.name}，${fishLength(fish)} 英寸，${fishWeight(fish)} 磅`);
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    ctx.imageSmoothingEnabled = false;
-    ctx.fillStyle = '#c2d4b7'; ctx.fillRect(0, 0, width, height);
-    ctx.fillStyle = '#b5c9ad';
-    for (let y = compact ? 12 : 32; y < height; y += compact ? 12 : 32) ctx.fillRect(0, y, width, 1);
-    if(['white_croaker','jacksmelt'].includes(fish.id)){
-      // Shore-only portraits keep the two small silver fish distinguishable
-      // without changing the boat game's shared sprite sheet.
-      const scale=Math.min(compact?1.6:5,(width-20)/48),x=(width-48*scale)/2,y=(height-24*scale)/2;
-      const rect=(left,top,w,h,color)=>{ctx.fillStyle=color;ctx.fillRect(Math.round(x+left*scale),Math.round(y+top*scale),Math.max(1,Math.round(w*scale)),Math.max(1,Math.round(h*scale)));};
-      if(fish.id==='jacksmelt'){
-        rect(5,10,33,7,'#778d87');rect(2,12,4,3,'#aabeb2');rect(8,9,25,2,'#688479');
-        rect(5,12,34,3,'#e4e7d6');rect(8,15,27,2,'#bdcfc0');rect(13,11,23,1,'#d7c993');
-        rect(20,6,5,3,'#849c88');rect(30,7,4,3,'#849c88');rect(25,17,6,2,'#95a58b');
-        rect(38,11,3,5,'#819b87');rect(41,8,3,4,'#819b87');rect(44,6,3,4,'#819b87');
-        rect(41,15,3,4,'#819b87');rect(44,17,3,4,'#819b87');rect(6,11,2,2,'#334f50');rect(10,12,1,4,'#80958a');
-      }else{
-        rect(9,7,22,12,'#b8bb9d');rect(5,10,7,8,'#c5c9ae');rect(3,13,4,4,'#d9ddc4');
-        rect(12,5,16,3,'#8a977f');rect(29,9,6,8,'#aeb798');rect(34,11,5,5,'#b3b88e');
-        rect(9,14,23,5,'#e0e2ca');rect(12,19,13,2,'#d5d9ba');rect(13,3,4,3,'#a1a383');
-        rect(18,4,14,3,'#929b7d');rect(18,19,6,3,'#baa976');rect(38,8,6,11,'#b4a477');
-        rect(43,7,2,5,'#b4a477');rect(43,15,2,5,'#b4a477');rect(9,10,2,2,'#344e49');
-        rect(13,11,1,7,'#909a84');rect(15,13,3,2,'#68786a');rect(17,15,6,2,'#aca87f');
-      }
-      return;
-    }
-    const sprite = getSprites().fish[fish.id === 'halibut' ? 'halibut' : 'unknown'];
-    const scale = compact ? 1.8 : Math.min(5, (width - 32) / sprite.width);
-    ctx.drawImage(sprite, Math.round((width - sprite.width * scale) / 2), Math.round((height - sprite.height * scale) / 2), sprite.width * scale, sprite.height * scale);
+    canvas.setAttribute('aria-label', `${fish.name}，长度${fishLength(fish)}，${fishWeight(fish)}`);
+    canvas.dataset.fishKind = kind;
+    canvas.dataset.speciesId = fish.speciesId || '';
+    canvas.dataset.fishLengthCm = hasFishLength(fish) ? String(fish.length) : '';
+    return layout;
   }
 
   function openShop(){if(sim.nearShop)openBag(null,'shop');}
@@ -128,19 +107,20 @@ export function createPacificaMenus({sim, scene, openDialog, closeDialog, feedba
   }
 
   function openJournal() {
-    const s = sim.state, catches = s.catches.slice().reverse();
+    const s = sim.state, catches = s.catchHistory.slice().reverse().map(normalizeFishIdentity);
     openDialog('journal', balance(s.credits) + heading('THE DAYS WE KEEP', '鱼获与行程', `下竿 ${s.stats.casts} 次 · 累计上岸 ${s.stats.caught} 尾 · 放流 ${s.stats.released} 尾`) +
-      (catches.length ? catches.map((fish, index) => `<div class="catch-row"><div class="catch-thumbnail"><canvas id="journal-fish-${index}"></canvas></div><div><b>${esc(fish.name)}</b><small>${esc(fish.nameEn)}</small><small>${formatLength(fish.lengthCm)} · ${formatWeight(fish.weightKg)} · ${fish.value} 潮汐点</small></div><span>鱼篓中</span></div>`).join('') : '<p class="journal-empty">鱼篓里还很安静。<br>好故事，总会从第一竿开始。</p>') +
-      `${sim.nearShop?'<div class="button-row"><button id="journal-shop" class="primary">兑换鱼获</button></div>':''}<p class="credits-note">鱼篓 ${s.catches.length} / 20 尾 · 已交付 ${s.stats.sold} 尾<br>带回小店的鱼获可兑换潮汐点。${s.fineDebt ? `待缴罚款 ${s.fineDebt} 点。` : ''}</p>`);
+      (catches.length ? catches.map((fish, index) => `<div class="catch-row"><div class="catch-thumbnail"><canvas id="journal-fish-${index}"></canvas></div><div><b>${esc(fish.name)}</b><small>${esc(fish.commonName || fish.nameEn)}</small><small>${esc(fish.latin)}</small><small>长度${fishLength(fish)} · ${fishWeight(fish)}</small><small>${fish.status === 'released' ? '放流不兑换积分' : fish.status === 'confiscated' ? '鱼获已没收，未兑换' : `${fish.status === 'sold' ? '鱼获价值' : '可兑换'} ${fish.value} 潮汐点`}</small></div><span>${catchStatus[fish.status] || '已记录'}</span></div>`).join('') : '<p class="journal-empty">还没有记录的鱼获。<br>好故事，总会从第一竿开始。</p>') +
+      `${sim.nearShop?'<div class="button-row"><button id="journal-shop" class="primary">兑换鱼获</button></div>':''}<p class="credits-note">鱼篓 ${s.catches.length} / 20 尾 · 已交付 ${s.stats.sold} 尾<br>留鱼与放流都保留记录。鱼篓中的鱼带回小店可兑换潮汐点。${s.fineDebt ? `待缴罚款 ${s.fineDebt} 点。` : ''}</p>`);
     catches.forEach((fish, index) => paintFish($(`journal-fish-${index}`), fish, true));
     if($('journal-shop'))$('journal-shop').onclick = openShop;
   }
 
   function openCatch() {
-    const s = sim.state, fish = s.fish;
-    if (!fish || s.phase !== 'landed') return;
-    openDialog('catch', heading('A MOMENT TO REMEMBER', fish.name, esc(fish.nameEn)) +
-      `<div class="catch-hero"><canvas id="catch-art"></canvas></div><div class="catch-stats"><div><strong>${fishLength(fish)}</strong><small>英寸 in</small></div><div><strong>${fishWeight(fish)}</strong><small>磅 lb</small></div><div><strong>${fish.value}</strong><small>潮汐点</small></div><div><strong>${Math.round(s.fightElapsed)}</strong><small>收鱼用时</small></div></div><div class="button-row"><button id="catch-keep" class="primary">放入鱼篓</button><button id="catch-release" class="secondary">记录并放流</button></div><p class="credits-note" id="catch-message" role="status">鱼篓 ${s.catches.length} / 20 尾。带回小店可兑换潮汐点。</p>`);
+    const s = sim.state;
+    if (!s.fish || s.phase !== 'landed') return;
+    const fish = normalizeFishIdentity(s.fish);
+    openDialog('catch', heading('A MOMENT TO REMEMBER', fish.name, fishNames(fish)) +
+      `<div class="catch-hero" tabindex="0"><canvas id="catch-art"></canvas></div><div class="catch-stats"><div><strong>${fishLength(fish)}</strong><small>${hasFishLength(fish) ? fish.lengthType === 'fork' ? '叉长' : '全长' : '长度'}</small></div><div><strong>${fishWeight(fish)}</strong><small>重量</small></div><div><strong>${Math.round(s.fightElapsed)} s</strong><small>收鱼用时</small></div></div><div class="button-row"><button id="catch-keep" class="primary">放入鱼篓</button><button id="catch-release" class="secondary">记录并放流</button></div><p class="credits-note" id="catch-message" role="status">鱼篓 ${s.catches.length} / 20 尾。带回小店可兑换 ${fish.value} 潮汐点；放流保留记录，不兑换积分。</p>`);
     paintFish($('catch-art'), fish);
     $('catch-keep').onclick = () => {
       const result = report(sim.resolveCatch(true));

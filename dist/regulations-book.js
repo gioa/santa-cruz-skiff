@@ -45,13 +45,13 @@ const salmonSeason=area=>area.southOfPigeonPoint
 // Each species entry is a page in the book. Values that depend on the chosen
 // area are functions of that area.
 export const BOOK_SPECIES=Object.freeze([
- {id:'barred_surfperch',group:'岸钓',name:'横带海鲫',en:'Barred surfperch',latin:'Amphistichus argenteus',
+ {id:'barred_surfperch',group:'岸钓',name:'银双齿海鲫',en:'Barred surfperch',latin:'Amphistichus argenteus',
   look:'银白色高体型，体侧有 8–10 条断续的古铜或黄褐色竖斑纹，斑纹间常夹杂小圆斑；嘴小，尾鳍分叉。',
   season:()=>'全年开放（仅旧金山湾与 San Pablo 湾 4/1–7/31 关闭，外海沙滩不受影响）。',size:()=>'无最小尺寸。',
   bag:()=>'海鲫类合计每日 20 条（不含 shiner perch），同一种不超过 10 条；计入通用 20 条总限额。',
   gear:()=>'常规钩钓。',law:'T14 CCR §28.59'},
  {id:'redtail_surfperch',group:'岸钓',name:'红尾海鲫',en:'Redtail surfperch',latin:'Amphistichus rhodoterus',
-  look:'体型与横带海鲫相似，但尾鳍和腹鳍带明显的红/粉红色，体侧为较窄的红褐色竖纹。',
+  look:'体型与银双齿海鲫相似，但尾鳍和腹鳍带明显的红/粉红色，体侧为较窄的红褐色竖纹。',
   season:()=>'全年开放（旧金山湾与 San Pablo 湾 4/1–7/31 关闭）。',size:()=>'最小 10.5 in 全长（26.7 cm）。',
   bag:()=>'计入海鲫类合计 20 条，同一种不超过 10 条。',gear:()=>'常规钩钓。',law:'T14 CCR §28.59'},
  {id:'striped_bass',group:'岸钓',name:'条纹鲈',en:'Striped bass',latin:'Morone saxatilis',

@@ -25,9 +25,9 @@ export function inspectionFindings(violations,catches){
 export function inspectionReportMarkup(report){
  const findings=report.findings||[],count=report.confiscated?.length||0;
  return `<div class="staff-banner"><p><b>鱼警检查结果</b>${findings.length?'以下行为违反本游戏采用的规则，现开具处罚记录。':'本次没有查出违规。'}</p></div>`+
- (findings.length?`<h3>具体违规</h3><ol class="inspection-findings">${findings.map(f=>`<li><b>${f.catchNumber?`第 ${Number(f.catchNumber)} 尾 · `:''}${esc(f.fishName||f.location||'本次捕捞')}</b><p>${esc(f.detail)}</p></li>`).join('')}</ol>`:'')+
+ (findings.length?`<h3>具体违规</h3><ol class="inspection-findings">${findings.map(f=>`<li><b>${f.catchNumber?`第 ${Number(f.catchNumber)} 尾 · `:''}${esc(f.fishName?fishDisplayName(f.fishName):f.location||'本次捕捞')}</b><p>${esc(f.detail)}</p></li>`).join('')}</ol>`:'')+
  `<div class="catch-stats"><div><strong>${report.fine||0}</strong><small>罚款 · 潮汐点</small></div><div><strong>${report.paid||0}</strong><small>已扣点数</small></div><div><strong>${report.debt||0}</strong><small>待缴罚款</small></div></div>`+
  `<h3>${findings.length?`全部鱼获已没收 · ${count} 尾`:'鱼获检查完毕'}</h3>`+
- (count?`<p class="credits-note">包括合规尺寸鱼在内，当前携带的全部鱼获均已没收，不能兑换积分。</p><ul>${report.confiscated.map(f=>`<li>${esc(f.displayName||f.name||f.commonName||'鱼获')}</li>`).join('')}</ul>`:findings.length?'<p class="credits-note">当前没有携带鱼获。</p>':'')+
+ (count?`<p class="credits-note">包括合规尺寸鱼在内，当前携带的全部鱼获均已没收，不能兑换积分。</p><ul>${report.confiscated.map(f=>`<li>${esc(fishDisplayName(f.displayName||f)||'鱼获')}</li>`).join('')}</ul>`:findings.length?'<p class="credits-note">当前没有携带鱼获。</p>':'')+
  `<p class="credits-note">${report.debt?'未缴罚款会从之后的收入中抵扣。':''}罚款与整批没收为游戏处罚设定。</p>`;
 }

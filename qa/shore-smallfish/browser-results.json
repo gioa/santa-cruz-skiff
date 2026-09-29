@@ -1,6 +1,6 @@
 {
   "base": "http://127.0.0.1:4198/",
-  "verifiedAt": "2026-09-29T04:06:02.797Z",
+  "verifiedAt": "2026-09-29T04:28:50.067Z",
   "checks": [
     {
       "scene": "pacifica",
@@ -17,16 +17,16 @@
         {
           "id": "white_croaker",
           "name": "白石首鱼",
-          "nameEn": "White croaker",
-          "weightKg": 0.18,
-          "offshoreMetres": 17.839136755484528,
-          "hookDepthMetres": 2.15735344808504,
+          "nameEn": "White Croaker",
+          "weightKg": 0.11,
+          "offshoreMetres": 17.83797391261965,
+          "hookDepthMetres": 2.237902053070349,
           "portrait": {
-            "label": "白石首鱼，9.4 英寸，0.40 磅",
-            "colors": 18,
-            "hash": 2651511368,
+            "label": "白石首鱼，长度7.8 in，0.24 lb",
+            "colors": 121,
+            "hash": 354194578,
             "width": 322,
-            "height": 160
+            "height": 180
           }
         },
         {
@@ -34,14 +34,14 @@
           "name": "加州似银汉鱼",
           "nameEn": "Jacksmelt",
           "weightKg": 0.08,
-          "offshoreMetres": 14.411819438773428,
-          "hookDepthMetres": 0.5486387206490883,
+          "offshoreMetres": 14.408950419969724,
+          "hookDepthMetres": 0.30839343301225447,
           "portrait": {
-            "label": "加州似银汉鱼，9.3 英寸，0.18 磅",
-            "colors": 13,
-            "hash": 3856479126,
+            "label": "加州似银汉鱼，长度9.7 in，0.18 lb",
+            "colors": 119,
+            "hash": 2313443391,
             "width": 322,
-            "height": 160
+            "height": 180
           }
         }
       ]
@@ -61,31 +61,31 @@
         {
           "id": "white_croaker",
           "name": "白石首鱼",
-          "nameEn": "White croaker",
-          "weightKg": 0.06,
-          "offshoreMetres": 17.82509308641087,
-          "hookDepthMetres": 1.630448348602425,
+          "nameEn": "White Croaker",
+          "weightKg": 0.04,
+          "offshoreMetres": 17.816032062164968,
+          "hookDepthMetres": 1.6139294805103794,
           "portrait": {
-            "label": "白石首鱼，6.6 英寸，0.13 磅",
-            "colors": 18,
-            "hash": 2651511368,
+            "label": "白石首鱼，长度5.9 in，0.09 lb",
+            "colors": 121,
+            "hash": 2087136314,
             "width": 322,
-            "height": 160
+            "height": 180
           }
         },
         {
           "id": "jacksmelt",
           "name": "加州似银汉鱼",
           "nameEn": "Jacksmelt",
-          "weightKg": 0.38,
-          "offshoreMetres": 15.285930603998619,
-          "hookDepthMetres": 0.4433126028148679,
+          "weightKg": 0.1,
+          "offshoreMetres": 15.180551814009107,
+          "hookDepthMetres": 0.8064715358464168,
           "portrait": {
-            "label": "加州似银汉鱼，15.7 英寸，0.84 磅",
-            "colors": 13,
-            "hash": 3856479126,
+            "label": "加州似银汉鱼，长度10.1 in，0.22 lb",
+            "colors": 119,
+            "hash": 3791381495,
             "width": 322,
-            "height": 160
+            "height": 180
           }
         }
       ]

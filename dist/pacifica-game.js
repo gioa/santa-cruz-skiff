@@ -3,12 +3,13 @@ import {createPacificaWorld} from './pacifica-world.js';
 import {createPacificaMenus} from './pacifica-menus.js';
 import {createPixelSprites} from './pixel-sprites.js';
 import {createShoreFightView,shoreFightActive} from './shore-fight-view.js';
+import {metersToFeet} from './units.js';
 
 import {getShoreScene,sampleShore,onPier} from './shore-data.js';
 import {shoreCastPower} from './shore-casting.js';
 import {formatGameClock} from './game-clock.js';
 
-import {createShoreNavigation} from './shore-navigation.js';
+import {createShoreNavigation,habitatName} from './shore-navigation.js';
 import {createShoreInteractions,nearbyShoreInteraction} from './shore-interactions.js';
 import {REGULATIONS_BOOK_ID,mountRegulationsBook,placeRegulationsButton,initRegulationsButton} from './regulations-book.js';
 

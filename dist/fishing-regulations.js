@@ -1,3 +1,4 @@
+import {fishSpecies} from './fish-species.js';
 /** Versioned rules data for the virtual Santa Cruz fishery, not live trip guidance.
  * No enforcement, warnings, random rates or automatic release happens here.
  * Missing/unsupported evidence is never converted into an illegal catch.
@@ -33,31 +34,30 @@ export const RULESET_2026=Object.freeze({
  sources:SOURCE,
 });
 const species=[
- {id:'blue_rockfish',names:['蓝岩鱼','blue rockfish'],latin:'Sebastes mystinus',groundfish:true,rcg:true,minimumCm:0,bag:10,source:SOURCE.groundfish},
- {id:'copper_rockfish',names:['铜岩鱼','copper rockfish'],latin:'Sebastes caurinus',groundfish:true,rcg:true,minimumCm:0,bag:1,source:SOURCE.groundfish},
- {id:'vermilion_rockfish',names:['朱红岩鱼','红岩鱼','vermilion rockfish'],latin:'Sebastes miniatus',groundfish:true,rcg:true,minimumCm:0,bag:2,bagGroup:'vermilion_sunset',source:SOURCE.groundfish},
- {id:'sunset_rockfish',names:['夕阳岩鱼','sunset rockfish'],latin:'Sebastes crocotulus',groundfish:true,rcg:true,minimumCm:0,bag:2,bagGroup:'vermilion_sunset',source:SOURCE.groundfish},
- {id:'chinook_salmon',names:['帝王鲑','奇努克鲑','chinook salmon','king salmon'],latin:'Oncorhynchus tshawytscha',salmon:true,pelagic:true,minimumCm:20*2.54,bag:2,source:SOURCE.salmon},
- {id:'white_seabass',names:['白鲈','白海鲈','白海鲈鱼','white seabass','wsb'],latin:'Atractoscion nobilis',minimumCm:28*2.54,bag:3,source:SOURCE.central},
- {id:'pacific_bonito',names:['太平洋鲣','太平洋狐鲣','pacific bonito','sarda chiliensis','sarda lineolata'],latin:'Sarda chiliensis lineolata',pelagic:true,minimumCm:0,bag:10,smallBag:5,minimumForkCm:24*2.54,minimumKg:5*.45359237,source:SOURCE.booklet},
- {id:'california_halibut',names:['加州大比目鱼','加州比目鱼','california halibut'],latin:'Paralichthys californicus',minimumCm:22*2.54,bag:2,source:SOURCE.halibut},
- {id:'northern_anchovy',names:['北方鳀鱼','northern anchovy','anchovy'],latin:'Engraulis mordax',minimumCm:0,bag:null,excludedGeneralBag:true,pelagic:true,source:SOURCE.general},
- {id:'pacific_sardine',names:['太平洋沙丁鱼','pacific sardine'],latin:'Sardinops sagax',minimumCm:0,bag:null,excludedGeneralBag:true,pelagic:true,source:SOURCE.general},
- {id:'pacific_mackerel',names:['太平洋鲭鱼','pacific mackerel','pacific chub mackerel'],latin:'Scomber japonicus',minimumCm:0,bag:null,excludedGeneralBag:true,pelagic:true,source:SOURCE.general},
- {id:'white_croaker',names:['白石首鱼','white croaker'],latin:'Genyonemus lineatus',minimumCm:0,bag:10,source:SOURCE.general},
+ {id:'blue_rockfish',groundfish:true,rcg:true,minimumCm:0,bag:10,source:SOURCE.groundfish},
+ {id:'copper_rockfish',groundfish:true,rcg:true,minimumCm:0,bag:1,source:SOURCE.groundfish},
+ {id:'vermilion_rockfish',groundfish:true,rcg:true,minimumCm:0,bag:2,bagGroup:'vermilion_sunset',source:SOURCE.groundfish},
+ {id:'sunset_rockfish',groundfish:true,rcg:true,minimumCm:0,bag:2,bagGroup:'vermilion_sunset',source:SOURCE.groundfish},
+ {id:'chinook_salmon',salmon:true,pelagic:true,minimumCm:20*2.54,bag:2,source:SOURCE.salmon},
+ {id:'white_seabass',minimumCm:28*2.54,bag:3,source:SOURCE.central},
+ {id:'pacific_bonito',pelagic:true,minimumCm:0,bag:10,smallBag:5,minimumForkCm:24*2.54,minimumKg:5*.45359237,source:SOURCE.booklet},
+ {id:'california_halibut',minimumCm:22*2.54,bag:2,source:SOURCE.halibut},
+ {id:'northern_anchovy',minimumCm:0,bag:null,excludedGeneralBag:true,pelagic:true,source:SOURCE.general},
+ {id:'pacific_sardine',minimumCm:0,bag:null,excludedGeneralBag:true,pelagic:true,source:SOURCE.general},
+ {id:'pacific_mackerel',minimumCm:0,bag:null,excludedGeneralBag:true,pelagic:true,source:SOURCE.general},
+ {id:'white_croaker',minimumCm:0,bag:10,source:SOURCE.general},
  // 27.60(b) excludes sanddabs from the general bag; 28.48 flatfish are
  // not in the 28.65(d) one-line/two-hook list. Federal descending-device
  // requirements still apply, separately from RCG seasons and gear limits.
- {id:'pacific_sanddab',names:['太平洋沙鲽','pacific sanddab'],latin:'Citharichthys sordidus',groundfish:true,groundfishSeasonExempt:true,groundfishGearExempt:true,minimumCm:0,bag:null,excludedGeneralBag:true,source:SOURCE.general},
- {id:'lingcod',names:['长蛇齿单线鱼','灵鳕','lingcod'],latin:'Ophiodon elongatus',groundfish:true,minimumCm:22*2.54,bag:2,source:SOURCE.groundfish},
- {id:'yelloweye_rockfish',names:['黄眼岩鱼','yelloweye rockfish'],latin:'Sebastes ruberrimus',groundfish:true,rcg:true,prohibited:true,bag:0,source:SOURCE.groundfish},
- {id:'quillback_rockfish',names:['刺背岩鱼','quillback rockfish'],latin:'Sebastes maliger',groundfish:true,rcg:true,prohibited:true,bag:0,source:SOURCE.groundfish},
- {id:'cowcod',names:['牛岩鱼','cowcod'],latin:'Sebastes levis',groundfish:true,rcg:true,prohibited:true,bag:0,source:SOURCE.groundfish},
- {id:'bronzespotted_rockfish',names:['铜斑岩鱼','bronzespotted rockfish'],latin:'Sebastes gilli',groundfish:true,rcg:true,prohibited:true,bag:0,source:SOURCE.groundfish},
+ {id:'pacific_sanddab',groundfish:true,groundfishSeasonExempt:true,groundfishGearExempt:true,minimumCm:0,bag:null,excludedGeneralBag:true,source:SOURCE.general},
+ {id:'lingcod',groundfish:true,minimumCm:22*2.54,bag:2,source:SOURCE.groundfish},
+ {id:'yelloweye_rockfish',groundfish:true,rcg:true,prohibited:true,bag:0,source:SOURCE.groundfish},
+ {id:'quillback_rockfish',groundfish:true,rcg:true,prohibited:true,bag:0,source:SOURCE.groundfish},
+ {id:'cowcod',groundfish:true,rcg:true,prohibited:true,bag:0,source:SOURCE.groundfish},
+ {id:'bronzespotted_rockfish',groundfish:true,rcg:true,prohibited:true,bag:0,source:SOURCE.groundfish},
 ];
-export const REGULATED_SPECIES=Object.freeze(species.map(s=>Object.freeze({...s,names:Object.freeze(s.names)})));
-const normalize=s=>String(s??'').trim().toLowerCase().replace(/\s+/g,' ');
-export function identifyRegulatedSpecies(fish){const input=typeof fish==='string'?{name:fish}:fish||{},values=[input.speciesId,input.id,input.latin,input.scientificName,input.name].map(normalize);return REGULATED_SPECIES.find(s=>[s.id,normalize(s.latin),...s.names.map(normalize)].some(v=>values.includes(v)))||null;}
+export const REGULATED_SPECIES=Object.freeze(species.map(s=>{const f=fishSpecies({speciesId:s.id});return Object.freeze({...s,latin:f.latin,names:Object.freeze([f.name,f.commonName,...f.aliases])});}));
+export function identifyRegulatedSpecies(fish){const id=fishSpecies(fish)?.id;return REGULATED_SPECIES.find(s=>s.id===id)||null;}
 
 // Natural Bridges geometry is the unsimplified CDFW-hosted ArcGIS feature used
 // by the official CDFW interactive web map, queried with outSR=4326. The legal

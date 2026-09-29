@@ -55,7 +55,7 @@ test('a bite locks its species and size before strike, and synthetic bite state 
   const visitor=sim.state.biteSpeciesId,length=sim.state.biteLengthCm;
   assert.ok(Math.abs(length-30)<30*.35,'the biter comes from the school cohort');
   sim.rng=()=>.99999;
-  assert.ok(sim.strike().ok);assert.equal(sim.state.fish.id,visitor);assert.ok(Math.abs(sim.state.fish.lengthCm-length)<.11);
+  assert.ok(sim.strike().ok);assert.equal(sim.state.fish.id,visitor);assert.ok(Math.abs(sim.state.fish.length-length)<.11);
   assert.equal(sim.population.groups[0].count,11,'the hooked fish left its school');
   sim.clearLine();sim.state.phase='bite';assert.equal(sim.strike().ok,false);assert.equal(sim.state.fish,null);
 });

@@ -161,7 +161,7 @@ test('one patrol roll per pier visit: 10% are caught at a set moment, independen
   for (const frame of [.025, .1, .25]) {
     // rng 0: the visit is one of the unlucky 10%; patrol arrives 20 s after climbing on.
     const sim = new PacificaSimulation({rng: () => 0});
-    sim.state.catches = [{id: 'surfperch', name: '横带海鲫', catchId: 3, weightKg: .5, lengthCm: 26}];
+    sim.state.catches = [{id: 'surfperch', speciesId: 'barred_surfperch', catchId: 3, weightKg: .5, length: 26}];
     enter(sim);
     advance(sim, PIER_RULES.earliestSeconds - .2, {}, frame);
     assert.equal(sim.state.inspection, null);
@@ -249,7 +249,7 @@ test('version-one saves migrate catch and equipment; inspection and pending catc
     inventory: {sandcrab: 4}, upgrades: ['surf_rod'], catches: [{id: 'surfperch', catchId: 1, weightKg: .8}],
     pendingCatch: {id: 'halibut', catchId: 2, weightKg: 2}};
   const sim = new PacificaSimulation({saved: old});
-  assert.equal(sim.snapshot().version, 3);
+  assert.equal(sim.snapshot().version, 4);
   assert.equal(sim.state.catches.length, 1);
   assert.deepEqual(sim.state.upgrades, ['surf_rod']);
   assert.equal(sim.state.phase, 'landed');

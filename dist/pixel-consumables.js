@@ -1,4 +1,5 @@
 import {ensureSinkers,validSinker,rigWeight,SINKER_SIZES,OUNCE_GRAMS} from './pixel-sinkers.js';
+import {USABLE_CONDITION,wearFishingSupply} from './fishing-supply-wear.js';
 /** Finite, persistent physical supplies. Rates and wear are game tuning.
  * Bait portions are numeric stock; spare rigs hold their own condition and bait.
  * Casting never installs supplies. Only explicit replacements transfer stock.
@@ -6,7 +7,7 @@ import {ensureSinkers,validSinker,rigWeight,SINKER_SIZES,OUNCE_GRAMS} from './pi
 export const CONSUMABLES_VERSION=1;
 export const RIG_IDS=Object.freeze(['bottom','slider','jig','float','dropper','sabiki','feather40','sabiki6']);
 export const BAIT_IDS=Object.freeze(['squid','anchovy','shrimp','sardine','jig']);
-export const USABLE_CONDITION=.08;
+export {USABLE_CONDITION};
 const ROD_IDS=['rod','rod_light','rod_boat','rod_electric','rod_sabiki'];
 const RIG_ITEMS={bottom:'tackle',slider:'rig_slider',jig:'rig_jig',float:'rig_float',dropper:'rig_dropper',sabiki:'rig_sabiki',feather40:'rig_feather40',sabiki6:'rig_sabiki6'};
 const clone=x=>x==null?null:JSON.parse(JSON.stringify(x));
@@ -54,13 +55,7 @@ export function installRig(profile,rodId,rig){
  ensureSinkers(profile);return{ok:true,message:old&&old.condition>USABLE_CONDITION?'已更换整套钓组，原钓组与鱼饵收回背包。':'已装上备用钓组。'};
 }
 export function loseRig(profile,rodId){ensureConsumables(profile);profile.rodSupplies[rodId]=null;if(profile.rodLoadouts?.[rodId])profile.rodLoadouts[rodId].weightGrams=rigWeight(profile.rodLoadouts[rodId].rig,null);}
-export function damageSupplies(profile,rodId,event){
- const supply=profile.rodSupplies?.[rodId];if(!supply)return;
- // Soft plastic survives several fish; natural bait is eaten/torn and must be
- // replaced after a landed fish. A missed bite can leave usable natural bait.
- if(supply.bait){const soft=supply.bait.kind==='jig',loss=event==='bite'?(soft?.025:.15):event==='catch'?(soft?.23:1):event==='escape'?(soft?.14:.28):0;supply.bait.condition=Math.max(0,supply.bait.condition-loss);}
- if(event==='catch')supply.condition=Math.max(0,supply.condition-.025);
-}
+export function damageSupplies(profile,rodId,event){wearFishingSupply(profile.rodSupplies?.[rodId],event);}
 export function suppliesWeight(profile,packed){
  const carry=new Set(packed);let total=0;
  if(carry.has('tackle'))for(const [id,stock] of Object.entries(profile.rigStock||{}))for(const rig of stock)total+=rigWeight(id,rig)/1000+.018*Number(Boolean(rig.bait));

@@ -571,3 +571,7 @@ html,body,#app,#app *,#app *::before,#app *::after{-webkit-user-select:none;user
 .rules-species dl{margin:0;display:grid;gap:5px}.rules-species dl div{display:flex;font-size:12px;line-height:1.55}.rules-species dd{margin:0;flex:1}.rules-note{margin:8px 0 0;padding:6px 8px;background:#f5c47633;font-size:11px;line-height:1.5}.rules-law{display:block;margin-top:8px;font:10px 'Space Mono',monospace;opacity:.55}
 .rules-general,.rules-area-facts{margin:0;padding-left:20px;display:grid;gap:9px;font-size:12px;line-height:1.6}.rules-general b{font-size:12px}.rules-general p{margin:2px 0 0}.rules-empty{font-size:12px;opacity:.75}
 .rules-foot{border-top:2px dashed #173e4640;padding-top:9px;font-size:10px;line-height:1.55;opacity:.8}.rules-foot p{margin:0 0 4px}.rules-foot a{color:var(--ink)}
+
+/* Keep longer shared fish identities and status labels legible on phones. */
+.catch-row>span{flex:0 0 auto;white-space:nowrap}
+#modal-content>.balance{margin-right:56px}

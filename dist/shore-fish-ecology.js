@@ -8,7 +8,7 @@ const bell=(value,centre,width)=>Math.exp(-.5*((value-centre)/width)**2);
 const freeze=value=>Object.freeze(value);
 
 export const SHORE_ECOLOGY=freeze([
- freeze({id:'surfperch',name:'横带海鲫',nameEn:'Barred surfperch',baseRatePerSecond:.0038,
+ freeze({id:'surfperch',name:'银双齿海鲫',nameEn:'Barred surfperch',baseRatePerSecond:.0038,
   bait:freeze({sandcrab:1,squid:.2,anchovy:.075}),rig:freeze({carolina:1,fishfinder:.22,float:.2}),
   monthly:freeze([1.15,1.15,1.08,1,.95,.9,.87,.88,.92,1,1.08,1.15]),
   depth:freeze([.5,3.2,1.7]),bottomExponent:.75}),
