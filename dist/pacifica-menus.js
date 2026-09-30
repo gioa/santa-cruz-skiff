@@ -136,6 +136,16 @@ export function createPacificaMenus({sim, scene, openDialog, closeDialog, feedba
 
   function openHelp() {
     if(scene.id==='benicia'){
+      openDialog('help',heading('FIRST STREET · CARQUINEZ STRAIT','水流与操作')+
+        `<div class="settings-grid"><button id="settings-audio" class="secondary">水声：关</button><button id="help-bag" class="secondary">人物背包 · 装备与消耗品</button><button id="help-journal" class="secondary">鱼获与行程</button></div>
+        <h3>沿岸走走</h3><p class="key-list">轻点陆地行走，走近摊位补给、兑换鱼获。这里的公共码头可以正常进入。点附近钓友聊天，听来的线索会留在沿岸手记。岸边抛收人多，找一个空位，给邻居留出走线空间。</p>
+        <h3>抛、收、停</h3><p class="key-list">轻点水面瞄准；按住抛竿 / 空格蓄力，松开投出。<br>按住收线 / F 卷线，松开后拟饵下沉。速度滑杆改变实际卷线速度；竿姿面板提放、左右扫竿，轻抽 / T 做短促动作。收回 / R 开始逐步卷回，收近后才能走动或重抛。<br>咬口时点扬竿 / 空格。鱼会游动、冲刺和下潜；根据竿弯、动作和线的拉力控制收线与泄力。镜头跟随同一场景里的鱼，不切换画面。</p>
+        <h3>这里的水</h3><p class="credits-note">亮片、旋转亮片和软饵铅头钩需要合适的收停节奏。石岸边停太久可能挂底。天然饵组可以等候或慢拖；只有浮钓组显示浮漂。潮流会改变水中钓组的方向与泳姿，涨潮向东，退潮向西。帝王鲑是季节性过路鱼，不是每次抛投都有鱼讯。</p>
+        <p class="credits-note">每根竿保留自己的钓组；换新饵、断线与补给沿用其他钓场的背包机制。菜单与切到后台时暂停，回来保持原来的时间和行程。I 背包 · M 手记 · J 鱼获 · Esc 关闭。</p>
+        <p class="credits-note">First Street 的缩尺像素演绎；水深、潮速与鱼群数量为游戏近似，非实时预报或测绘海图。钓友和补给车为虚构。<a href="./coastal-notes.html" target="_blank" rel="noopener">场景资料与范围 ↗</a></p>`);
+      $('help-bag').onclick=()=>openBag();$('help-journal').onclick=openJournal;return;
+    }
+    if(scene.id==='benicia'){
       openDialog('help',heading('CAST, WORK, REPEAT','河湾与操作')+
         '<div class="settings-grid"><button id="settings-audio" class="secondary">环境声音：关</button><button id="help-bag" class="secondary">人物背包 · 配置钓组</button><button id="help-journal" class="secondary">鱼获与行程</button></div><h3>岸边和公共钓鱼码头</h3><p class="key-list">轻点地面 / WASD 或方向键行走；走近钓友可听取线索。公共钓鱼码头开放，可从入口走进去。留出抛投空隙，避开他人的钓线。<br>轻点水面瞄准；按住抛竿 / 空格蓄力，松手抛出。亮片落水后停顿下沉，再按住收线 / F。<br>操作面板可调收线速度、抬竿、左右扫竿与泄力；轻抽让拟饵跳起。暂停收线会让拟饵继续沉降。收回按钮 / R 开始持续收近，再点一次暂停；钓组回到手边后才能重抛。<br>鱼讯出现时扬竿 / 空格；中鱼后留意冲刺、转向、下潜与张力。放松泄力允许鱼出线，高张力时暂停收线。控制住近岸鱼，才能上岸。<br>I 背包 · M 手记 · J 鱼获 · E 附近互动 · Esc 关闭菜单。</p><h3>选钓组、换节奏</h3><p class="credits-note">勺形亮片适合连续摆动，旋转亮片需要相对水流速度带动叶片，卷尾软饵可慢收或跳底。收线快或抬竿高会提高钓层；河湾潮流改变拟饵的速度和方向。岩石边让拟饵长时间触底可能挂底、丢失钓组。底钓组与浮钓组也能逐步收近；只有浮钓组带浮漂。每根竿保存自己的装配，收回重抛不重复扣库存，天然饵的损耗也不会被重置。</p><p class="credits-note">钓具店可以补给并兑换鱼获。查阅手册了解当前地点和鱼种的规则。菜单和切到后台时暂停，行程自动保存。</p>');
       $('help-bag').onclick=()=>openBag();$('help-journal').onclick=openJournal();return;
