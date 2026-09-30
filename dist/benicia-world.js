@@ -44,7 +44,10 @@ export function createBeniciaWorld(canvas){
   for(let x=lo;x<hi;x+=6)shore.push([x,Math.round(beniciaShoreY(x)/3)*3]);
   poly([...shore,[hi,1300],[lo,1300]],'#c3bca1');
   // Wet tidal pocket and armour rocks follow the outline, never a surf beach.
-  for(let x=lo;x<hi;x+=12){const y=beniciaShoreY(x);
+  // Rock identity belongs to the world, not the camera's six-unit terrain
+  // sampling offset. Include the whole edge rock before culling it offscreen.
+  const rockStart=Math.floor((v.left-32)/12)*12,rockEnd=v.right+32;
+  for(let x=rockStart;x<rockEnd;x+=12){const y=beniciaShoreY(x);
    if(x<800){const exposed=(1.7-beniciaTide(now).height)*20;rect(x,y-exposed,13,exposed+12,'#909583');if(hash(x,2)>.45)rect(x,y-exposed+4,8,1,'#bdbaa0');}
    else if(visible(x,y))rock(x,y+10,12+hash(x,4)*9);
    rect(x,y+22,13,4,'#d4c9a6');
