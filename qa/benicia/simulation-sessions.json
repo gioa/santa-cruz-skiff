@@ -4,7 +4,7 @@
     {
       "seed": 123,
       "activeSeconds": 600,
-      "casts": 14,
+      "casts": 17,
       "bites": 0,
       "catches": [],
       "lost": 0,
@@ -16,7 +16,7 @@
     {
       "seed": 911,
       "activeSeconds": 600,
-      "casts": 14,
+      "casts": 17,
       "bites": 0,
       "catches": [],
       "lost": 0,
@@ -28,7 +28,7 @@
     {
       "seed": 2048,
       "activeSeconds": 600,
-      "casts": 14,
+      "casts": 17,
       "bites": 0,
       "catches": [],
       "lost": 0,

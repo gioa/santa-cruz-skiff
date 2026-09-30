@@ -2,25 +2,29 @@
 // No injected fish: the population must spawn, roam, detect and take the lure.
 import {BeniciaSimulation} from '../dist/benicia-sim.js';
 import {writeFileSync,mkdirSync} from 'node:fs';
+import {shoreStandPosition} from '../dist/shore-movement.js';
+import {createShoreReelInput,tapShoreReelInput,stepShoreReelInput} from '../dist/shore-reel-input.js';
 function rng(seed){return()=>{seed^=seed<<13;seed^=seed>>>17;seed^=seed<<5;return(seed>>>0)/4294967296;};}
 const results=[];
 for(const seed of [123,911,2048]){
  const sim=new BeniciaSimulation({date:'2026-09-29',rng:rng(seed),loreSeed:seed}),log={seed,activeSeconds:600,casts:0,bites:0,catches:[],lost:0,finite:true};
  // A real, walkable gap on the bank to the west of the pier; moving there is
  // part of this session. No inventory gifts or generated catch outcomes.
- sim.walkTo(1384,sim.world.shoreY(1384)+28);
- let prev='walk';
+ const destination=shoreStandPosition(sim.scene,1384);sim.walkTo(destination.x,destination.y);
+ let prev='walk',reelInput=createShoreReelInput(),nextTap=0;
  for(let t=0;t<600;t+=.05){
   const s=sim.state;
   if(s.inspection)sim.acknowledgeInspection();
   if(s.phase==='walk'&&!s.walkTarget){
    if(!sim.tackleReady)sim.configureEquipment('salmon_spoon');
-   if(sim.tackleReady){const c=sim.cast({power:.7,aim:-.35});if(!c.ok&&/空位/.test(c.message))sim.walkTo(s.player.x+36,sim.world.shoreY(s.player.x+36)+26);}
+   if(sim.tackleReady){const c=sim.cast({power:.7,aim:-.35});if(!c.ok&&/空位/.test(c.message)){const gap=shoreStandPosition(sim.scene,s.player.x+12);sim.walkTo(gap.x,gap.y);}}
   }
   if(s.phase==='bite'){log.bites++;sim.strike();}
   if(s.phase==='landed'){log.catches.push({species:s.fish.id,inches:s.fish.length/2.54,lb:s.fish.weightKg/0.45359237});sim.resolveCatch(false);}
   const reel=s.phase==='fighting'?s.tension<.72:s.phase==='waiting'&&s.soakSeconds>3;
-  sim.update(.05,{reel,reelSpeed:.5,rodLift:s.phase==='fighting'?.7:.2,drag:.5});
+  if(reel&&t>=nextTap){reelInput=tapShoreReelInput(reelInput);nextTap=t+.65;}
+  const stroke=stepShoreReelInput(reelInput,.05,{enabled:sim.canReel});reelInput=stroke.state;
+  sim.update(.05,{...stroke.input,drag:.5,twitch:s.phase==='waiting'&&Math.floor(t*20)%160===0});
   if(prev==='fighting'&&s.phase==='walk')log.lost++;
   if(![s.player.x,s.player.y,s.lineDistance,s.tension,s.elapsed].every(Number.isFinite))log.finite=false;
   prev=s.phase;

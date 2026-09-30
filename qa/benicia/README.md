@@ -12,7 +12,7 @@ Verified through UI:
 - Handbook purchase subtracts 12 game credits, reveals its equipment entry, and opens Benicia's inland rules.
 - Resuming retains elapsed game time, purchased items and notes.
 
-`simulation-sessions.json` is a separate set of **accelerated deterministic simulations**, three 600-second sessions with no fish or catch injection. After the final eastward-flood correction all three runs completed with finite state and 14 casts apiece; no bites occurred. These are stability checks, not claimed human sessions or guaranteed catch rates.
+`simulation-sessions.json` is a separate set of **accelerated deterministic simulations**, three 600-second sessions with no fish or catch injection. The latest audit uses bounded click-stroke input and the corrected closed-bail line solver; the JSON records the actual casts and encounters. These are stability checks, not claimed human sessions or guaranteed catch rates. See `../benicia-physics/README.md` for the follow-up physics audit.
 
 `tests/benicia.test.js` supplies a known hungry salmon school only for its encounter integration test, then runs normal detection, strike, species fight, landing and save/restore. Remaining cases cover the public pier, currents, depth/habitat, crowds/lore, rig replacement, seasons, daily/possession limits and pre-sale confiscation.
 

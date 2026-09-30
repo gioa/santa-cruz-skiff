@@ -1,8 +1,23 @@
-import {getShoreScene,sampleShore} from './shore-data.js';
+import {getShoreScene,sampleShore,onPier} from './shore-data.js';
 import {shoreRodGeometry} from './shore-scale.js';
 
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const finite=(v,f=0)=>Number.isFinite(v)?v:f;
+
+// Orthographic projection: a strand below the deck is occluded wherever its
+// projected point lies inside the projected deck, even if it hangs underneath.
+export function shorePierOccludes(sceneId,point,height=0){
+ const scene=getShoreScene(sceneId),deckHeight=3.5;
+ return Boolean(scene.pier&&height<deckHeight&&onPier(scene,point.x,point.y+deckHeight*3.2));
+}
+export function shoreVisibleLineSegments(sceneId,points,fromHeight,toHeight=0){
+ const segments=[];
+ for(let i=1;i<points.length;i++){
+  const a=points[i-1],b=points[i],t=(i-.5)/(points.length-1),height=fromHeight+(toHeight-fromHeight)*t;
+  if(!shorePierOccludes(sceneId,{x:(a.x+b.x)/2,y:(a.y+b.y)/2},height))segments.push([a,b]);
+ }
+ return segments;
+}
 
 // The mounted tackle is authoritative. A previous cast's presentation must
 // never add a bobber to a Carolina/fish-finder rig after equipment changes.

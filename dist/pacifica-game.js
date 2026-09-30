@@ -76,7 +76,10 @@ $('world').addEventListener('pointerdown',e=>{
   if(local){if(Math.hypot(local.x-sim.state.player.x,local.y-sim.state.player.y)<=SHORE_MOVEMENT.talkReach){const r=sim.talkLocal(local.id);if(r.ok){openDialog('conversation',`<div class="eyebrow">FIRST STREET REGULAR</div><h2 id="modal-title">${esc(r.name)}</h2><div class="staff-banner"><p>「${esc(r.text)}」</p></div>${r.fresh?'<p class="credits-note">记进沿岸手记了。</p>':''}`);}else feedback(r);}else walkTo(local.x,local.y+shoreWorldMetres(1.5));return;}
   const regular=sim.state.regular;if(regular&&regular.mode!=='away'&&personHit(regular)<18){if(nearbyShoreInteraction(scene,sim.state)?.id==='regular')interactNearby();else walkTo(regular.x+shoreWorldMetres(1),regular.y+shoreWorldMetres(1));return;}
   const angler=sim.state.shoreLore.encounter;if(angler&&personHit(angler)<18){if(nearbyShoreInteraction(scene,sim.state)?.id===`angler:${angler.id}`)interactNearby();else walkTo(angler.x,angler.y+shoreWorldMetres(1.5));return;}
-  if(scene.pier&&onPier(scene,p.x,p.y)){if(sim.onPier)walkTo(p.x,p.y);else if(sim.nearPier)feedback(sim.enterPier());else walkTo(scene.pier.gate.x,scene.pier.gate.y);return;}
+  // Benicia's deck is elevated above the water plane used by screenToWorld.
+  // Pick its visible projected surface, then walk to the actual deck point.
+  const deckPoint=benicia?{x:p.x,y:p.y+shoreWorldMetres(3.5)}:p;
+  if(scene.pier&&onPier(scene,deckPoint.x,deckPoint.y)){if(sim.onPier)walkTo(deckPoint.x,deckPoint.y);else if(sim.nearPier)feedback(sim.enterPier());else walkTo(scene.pier.gate.x,scene.pier.gate.y);return;}
   if(p.x>=SHOP.x-20&&p.x<=SHOP.x+SHOP.width+20&&p.y>=SHOP.y-65&&p.y<=SHOP.door.y+30){if(nearbyShoreInteraction(scene,sim.state)?.kind==='shop')interactNearby();else walkTo(SHOP.door.x,SHOP.door.y);return;}
   if(p.y<WORLD.shoreY(p.x)){if(sim.state.phase==='bite'){feedback(sim.strike());return;}if(sim.state.phase==='walk')aim=Math.max(-1,Math.min(1,Math.atan2(p.x-sim.state.player.x,sim.state.player.y-p.y)/(Math.PI/3)));updateUI();return;}
   walkTo(p.x,p.y);

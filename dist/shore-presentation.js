@@ -65,19 +65,27 @@ export function stepShorePresentation(previous,sample,rigId,dt,controls={}){
   const speed=retrieve*(before.mode==='bottom'?(rigId==='fishfinder_rig'?.7:.88):1);
   const twitch=controls.twitch?1:Math.max(0,finite(previous?.twitch)*Math.exp(-dt/.38));
   const raise=Math.max(0,lift-finite(previous?.rodLift,lift));
-  const hop=(controls.twitch?(.18+.3*lift):0)+raise*.5;
+  // Spread one short rod stroke over time; applying its entire displacement
+  // in a render frame made velocity/load depend on the device frame rate.
+  const remaining=controls.twitch?(.18+.3*lift):Math.max(0,finite(previous?.hopRemaining));
+  const stroke=remaining*(1-Math.exp(-dt/.18));
+  const hop=stroke+raise*.5;
   const rise=speed*(before.mode==='float'?.16:.3+.45*lift)*leverage;
   const depth=clamp(before.depth+before.sinkSpeed*dt-rise*dt-hop*leverage,0,before.targetDepth);
   const p=shorePresentation(sample,rigId,depth);
   const dx=finite(controls.directionX),dy=finite(controls.directionY);
   const sweepSpeed=sweep*(.1+.18*lift)*leverage;
-  p.driftX+=dx*speed-dy*sweepSpeed;p.driftY+=dy*speed+dx*sweepSpeed;
+  // A short rod pull moves the terminal tackle toward the angler as well as
+  // lifting it. A vertical-only hop made twitching look like an outward cast
+  // while the unconstrained current carried the tackle away.
+  const pull=dt>0?hop*leverage/dt:0;
+  p.driftX+=dx*(speed+pull)-dy*sweepSpeed;p.driftY+=dy*(speed+pull)+dx*sweepSpeed;
   // Winding a taut line recovers length even in a cross-current; the flow can
   // sweep the tackle sideways and slow pickup, but cannot hold an empty rig
   // permanently offshore while the spool keeps winding.
   if(speed>0){const pickup=p.driftX*dx+p.driftY*dy,correction=Math.max(0,speed*.5-pickup);p.driftX+=dx*correction;p.driftY+=dy*correction;}
   const relativeSpeed=Math.hypot(p.driftX-finite(sample.currentX),p.driftY-finite(sample.currentY));
-  Object.assign(p,{retrieveSpeed:speed,relativeSpeed,motion:relativeSpeed+twitch*.65,rodLift:lift,rodSweep:sweep,twitch});
+  Object.assign(p,{retrieveSpeed:speed,relativeSpeed,motion:relativeSpeed+twitch*.65,rodLift:lift,rodSweep:sweep,twitch,hopRemaining:remaining-stroke});
   if(p.mode==='lure')p.status=twitch>.25?'拟饵跳动后下落':speed>.08?'拟饵随收线游动':p.bottomContact?'拟饵触底，提竿可跳底':'停收，拟饵下沉中';
   else if(speed>.08||twitch>.25)p.status=p.mode==='float'?'浮漂缓缓收近，钩饵随之抬起':rigId==='fishfinder_rig'?'重铅沿底收近':'轻组拖底、提竿跳动';
   return p;

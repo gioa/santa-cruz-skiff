@@ -20,6 +20,7 @@ import {SHORE_RIG_PHYSICS} from './shore-presentation.js';
 import {createShoreFightMotion,stepShoreFightMotion} from './shore-fish-fight.js';
 import {shoreRodGeometry} from './shore-scale.js';
 import {SHORE_CRANK_TURN_METRES,SHORE_MAX_CRANK_RATE} from './shore-reel-input.js';
+import {shoreTetherReach,stepShoreTether} from './shore-tether.js';
 export const SAVE_KEY = 'pacifica-surf-save-v1';
 export const WORLD = getShoreScene('pacifica').world;
 export const SHOP = getShoreScene('pacifica').shop;
@@ -59,8 +60,8 @@ export const fishWeightKg = (sp, lengthCm, condition = 1) => sp.id==='chinook_sa
 const clamp = (value, low, high) => Math.max(low, Math.min(high, value));
 const finite = (value, fallback = 0) => typeof value === 'number' && Number.isFinite(value) ? value : fallback;
 const emptyReelFeedback=()=>({handleRate:0,linePickupRate:0,linePayoutRate:0,dragSlip:false,load:0,slack:0});
-// The shore model solves endpoint travel, not an elastic paid-line spool.
-// These are derived kinematic feedback estimates, not calibrated reel forces.
+// Hooked-fish feedback is derived from endpoint travel, not calibrated reel
+// forces. Empty tackle instead uses the finite closed-bail line budget below.
 // A handle turn takes up an authored 0.7 m; line rates use the actual endpoint
 // slant reach, so winding vertically beside a deep pier still moves the reel.
 function shoreReelEndpoint(scene,s){
@@ -484,29 +485,48 @@ export class PacificaSimulation {
     const s = this.state;
     if (!s.cast) return;
     const beforeEndpoint=shoreReelEndpoint(this.scene,s);
+    const previousTarget={...s.cast.target},previousDepth=s.presentation?.depth||0;
+    s.cast.paidLength=finite(s.cast.paidLength,shoreTetherReach(shoreRodGeometry(s).tipWorld,previousTarget,previousDepth));
     const sample = this.refreshSample(), supply=shoreSupply(s);
-    const c=s.fishingControls,dx=s.cast.origin.x-s.cast.target.x,dy=s.cast.origin.y-s.cast.target.y,d=Math.hypot(dx,dy)||1;
+    const heldTip=shoreRodGeometry(s).tipWorld;
+    const c=s.fishingControls,dx=heldTip.x-s.cast.target.x,dy=heldTip.y-s.cast.target.y,d=Math.hypot(dx,dy)||1;
     const crankDriven=Number.isFinite(input.crankRate),crankRate=crankDriven?clamp(input.crankRate,0,SHORE_MAX_CRANK_RATE):0;
     if(crankDriven)s.autoRetrieve=false;
     const reeling=crankDriven?crankRate>0:s.autoRetrieve||(input.reel===undefined?this.reeling:Boolean(input.reel));
     const windingSpeed=crankDriven?crankRate*SHORE_CRANK_TURN_METRES:(s.activeReel==='sealed_reel'?2.15:1.8)*c.reelSpeed;
     s.presentation=stepShorePresentation(s.presentation,sample,supply?.id,dt,{...c,directionX:dx/d,directionY:dy/d,retrieveSpeed:reeling?windingSpeed:0,twitch:Boolean(input.twitch)});
-    s.retrieveSpeed=s.presentation.relativeSpeed;s.retrieveInput=reeling;
+    s.retrieveInput=reeling;
+    s.tension = clamp(.04 + Math.hypot(sample.currentX, sample.currentY) * .1 + finite(sample.waveLoad) * .12+s.presentation.relativeSpeed*.08+s.presentation.twitch*.06, 0, .65);
     // Mean current and wave orbital motion act on the same terminal tackle.
     s.cast.target.x = clamp(s.cast.target.x + s.presentation.driftX * dt * 3.2, 24, this.world.width - 24);
     s.cast.target.y = Math.max(this.world.minY + 20,s.cast.target.y + s.presentation.driftY * dt * 3.2);
-    if(s.cast.target.y>=this.world.shoreY(s.cast.target.x)||Math.hypot(s.cast.target.x-s.cast.origin.x,s.cast.target.y-s.cast.origin.y)<PIXELS_PER_METRE*1.5){
+    const tip=shoreRodGeometry(s).tipWorld;
+    const tether=stepShoreTether({tip,previous:previousTarget,target:s.cast.target,previousDepth,depth:s.presentation.depth,
+      paidLength:s.cast.paidLength,windSpeed:reeling?s.presentation.retrieveSpeed:0,dt});
+    s.cast.target=tether.target;s.cast.paidLength=tether.paidLength;s.presentation.depth=tether.depth;
+    // The fish reacts to achieved underwater motion, including the line's
+    // restraint, rather than the unconstrained current/retrieve proposal.
+    s.presentation.driftX=(s.cast.target.x-previousTarget.x)/Math.max(dt,1e-6)/PIXELS_PER_METRE;
+    s.presentation.driftY=(s.cast.target.y-previousTarget.y)/Math.max(dt,1e-6)/PIXELS_PER_METRE;
+    s.presentation.relativeSpeed=Math.hypot(s.presentation.driftX-sample.currentX,s.presentation.driftY-sample.currentY);
+    s.retrieveSpeed=s.presentation.relativeSpeed;
+    const horizontalReach=Math.hypot(s.cast.target.x-tip.x,s.cast.target.y-tip.y)/PIXELS_PER_METRE;
+    if(s.cast.target.y>=this.world.shoreY(s.cast.target.x)||(horizontalReach<1.5&&tether.depth<.35)){
       this.clearLine();s.message=reeling?'钓组已收近岸边，可以再次抛投。':'钓组随浪搁上浅滩，已收回；重新选择落点。';return;
     }
     s.cast.drift = {x: s.presentation.driftX, y: s.presentation.driftY};
     if (s.phase !== 'fighting') {
       s.lineDistance=Math.hypot(s.cast.target.x-s.cast.origin.x,s.cast.target.y-s.cast.origin.y)/3.2;
-      s.tension = clamp(.04 + Math.hypot(sample.currentX, sample.currentY) * .1 + finite(sample.waveLoad) * .12+s.presentation.relativeSpeed*.08+s.presentation.twitch*.06, 0, .65);
       // Natural bait slowly washes out. Retrieving preserves actual condition.
       if(supply?.bait) supply.bait.condition=Math.max(0,supply.bait.condition-dt*(1/2400+finite(sample.whitewater)/1800));
     }
     this.refreshSample();
+    const contact=shorePresentation(s.shoreSample,supply?.id,s.presentation.depth);
+    s.presentation.bottomContact=contact.bottomContact;
     updateReelFeedback(s,beforeEndpoint,shoreReelEndpoint(this.scene,s),dt,{winding:reeling,windingRate:s.presentation.retrieveSpeed});
+    // Closed-bail empty tackle cannot pay out line. Endpoint travel from
+    // sinking or a twitch is not spool motion.
+    s.reelFeedback.linePickupRate=dt>0?tether.pickup/dt:0;s.reelFeedback.linePayoutRate=0;
   }
 
   retrieve() {
@@ -649,6 +669,7 @@ export class PacificaSimulation {
           return;
         }
         s.cast.flight = s.cast.flightDuration; s.phase = 'waiting';
+        s.cast.paidLength=shoreTetherReach(shoreRodGeometry(s).tipWorld,s.cast.target,0);
         // The sinker's splash briefly spooks wary fish right where it lands.
         const splash = this.toPlane(s.cast.target.x, s.cast.target.y), grams = SHORE_RIG_PHYSICS[shoreSupply(s)?.id]?.sinkerGrams || 28;
         disturb(this.population, {...splash, radius: 1.5 + grams / 25, strength: .7}, this.fishWorld().species);

@@ -71,8 +71,10 @@ export class BeniciaSimulation extends PacificaSimulation{
   const reeling=crankDriven?input.crankRate>0:s.autoRetrieve||(input.reel===undefined?this.reeling:Boolean(input.reel));
   if(isShoreLure(supply?.id)&&s.cast){
    const e=this.refreshSample(),p=s.presentation;
-   if(e.substrate==='rock'&&p?.bottomContact>.8&&!reeling)s.snagSeconds+=dt;
-   else if(!reeling)s.snagSeconds=Math.max(0,s.snagSeconds-dt);
+   // Exposure belongs to this rock contact, not to a remembered patch of
+   // seabed. A lifted lure or one swept onto mud cannot break on old rocks.
+   if(e.substrate!=='rock'||!(p?.bottomContact>.8))s.snagSeconds=0;
+   else if(!reeling)s.snagSeconds+=dt;
    if(s.snagSeconds>6&&reeling){wearShoreSupplies(s,'break');this.clearLine();s.message='拟饵卡在石缝，拉断了前导。需要装上备用钓组。';return;}
   }
   super.drift(dt,input);

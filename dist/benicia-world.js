@@ -1,7 +1,7 @@
 import {BENICIA_SCENE as scene,beniciaShoreY,beniciaTide} from './benicia-data.js';
 import {drawShorePerson} from './shore-people.js';
 import {shoreCastPosition} from './shore-casting.js';
-import {shoreWaterContact,shoreTackleLine,shoreLineWaterEntry,shoreRigUsesFloat} from './shore-tackle-visual.js';
+import {shoreWaterContact,shoreTackleLine,shoreLineWaterEntry,shoreRigUsesFloat,shoreVisibleLineSegments,shorePierOccludes} from './shore-tackle-visual.js';
 import {shoreFishPosition} from './shore-line-geometry.js';
 import {sampleShore} from './shore-data.js';
 import {shoreRodPose,shoreActionCameraTarget,advanceShoreActionCamera,shoreFishVisual,drawShoreFish,shoreCastPreviewVisual,drawShoreCastPreview} from './shore-action-view.js';
@@ -80,10 +80,11 @@ export function createBeniciaWorld(canvas){
   if(visible(1130,730,220))shop();
  }
  function pier(){const p=scene.pier;
-  rect(p.x-25,p.top+15,74,p.bottom-p.top,'#3e6765');rect(p.x-32,p.top,64,p.bottom-p.top,'#b9bba5');
+  rect(p.x-25,p.top+15,74,p.bottom-p.top,'#3e6765');g.save();g.translate(0,-m(3.5));rect(p.x-32,p.top,64,p.bottom-p.top,'#b9bba5');
   for(let y=p.top+5;y<p.bottom;y+=16){rect(p.x-29,y,58,1,'#8a9589');for(const x of[p.x-32,p.x+30]){rect(x,y,3,14,'#546861');rect(x-2,y+13,7,5,'#415a53');}}
   for(const x of[p.x-32,p.x+30])rect(x,p.top,3,p.bottom-p.top,'#e0d4b2');rect(p.x-32,p.top,64,3,'#e4dab9');
   for(const y of[p.top+42,p.top+123]){lamp(p.x+29,y);bench(p.x-3,y+20);}
+  g.restore();
   withShoreProp(g,p.x,p.bottom+25,.08,()=>{rect(p.x-68,p.bottom+10,136,22,'#355e5d');label('BENICIA FISHING PIER',p.x,p.bottom+25,9,'#f1dfb4');});
  }
  function water(){
@@ -132,9 +133,11 @@ export function createBeniciaWorld(canvas){
   const airHeight=fight?Math.max(0,s.fishMotion?.airHeight||0):0;
   const attachment={x:target.x,y:target.y+(floating&&s.phase==='bite'?m(.04):0)-(floating?0:airHeight*3.2)};
   const strand=shoreTackleLine(tip,attachment,{tension:s.tension,sag:casting?m(.25):m(.2),flowX:contact?.flowX,flowY:contact?.flowY,scale:.08});
-  for(let i=1;i<strand.length;i++)shoreFineLine(g,strand[i-1],strand[i],'#e1dab7',.025);
+  const attachmentHeight=casting?ground.height:(contact?.height||0)+airHeight;
+  const visibleLine=shoreVisibleLineSegments(scene,strand,rod.tipWorld.height,attachmentHeight);
+  for(const [a,b]of visibleLine)shoreFineLine(g,a,b,'#e1dab7',.025);
   drawMetricRod(g,rod);
-  if(casting)drawMetricWeight(g,target);else if(floating)drawMetricFloat(g,attachment,contact);
+  if(!shorePierOccludes(scene,attachment,attachmentHeight)){if(casting)drawMetricWeight(g,target);else if(floating)drawMetricFloat(g,attachment,contact);}
   if(floating&&airHeight>0)shoreFineLine(g,attachment,{x:ground.x,y:ground.y-contact.height*3.2-airHeight*3.2},'#e1dab7',.025);
   lastTackle={rodTip:tip,waterEntry:target,entryWorld,terminalPosition:ground,attachment,line:strand,bend:rod.bend,surfaceHeight:contact?.height||0,tilt:floating?contact.tilt:0,breaking:contact?.breaking||0,floatVisible:floating,rodControls:rod.controls,rodPoints:rod.points,airHeight};
   return casting?target:ground;
