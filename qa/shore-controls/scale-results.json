@@ -1,0 +1,56 @@
+{
+  "results": [
+    {
+      "scene": "pacifica",
+      "mode": "walk",
+      "playerHeightCSS": 39.570279587941016
+    },
+    {
+      "scene": "pacifica",
+      "mode": "near",
+      "playerHeightCSS": 45.80259862304172,
+      "castDistanceM": 5.561125378231014
+    },
+    {
+      "scene": "pacifica",
+      "mode": "far",
+      "playerHeightCSS": 18.68391452466535,
+      "castDistanceM": 45.782245721776235
+    },
+    {
+      "scene": "half-moon-bay",
+      "mode": "walk",
+      "playerHeightCSS": 39.570279587941016
+    },
+    {
+      "scene": "half-moon-bay",
+      "mode": "near",
+      "playerHeightCSS": 45.80259862304172,
+      "castDistanceM": 5.561125378231014
+    },
+    {
+      "scene": "half-moon-bay",
+      "mode": "far",
+      "playerHeightCSS": 18.68391452466535,
+      "castDistanceM": 45.782245721776235
+    },
+    {
+      "scene": "benicia",
+      "mode": "walk",
+      "playerHeightCSS": 40.24999999999999
+    },
+    {
+      "scene": "benicia",
+      "mode": "near",
+      "playerHeightCSS": 46.58937499999999,
+      "castDistanceM": 5.561125378231014
+    },
+    {
+      "scene": "benicia",
+      "mode": "far",
+      "playerHeightCSS": 18.758844798240528,
+      "castDistanceM": 45.782245721776235
+    }
+  ],
+  "errors": []
+}

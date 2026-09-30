@@ -3,50 +3,95 @@
     {
       "scene": "pacifica",
       "checks": [
-        "Continuous world through cast/retrieve/strike/fight",
-        "Keyboard speed/drag/rod controls",
-        "Shortcuts work from range controls",
-        "Opaque readable control panel and hook/weight label",
-        "Pointer rod lift and sweep",
-        "Held retrieve moves lure",
-        "Twitch moves presentation",
-        "Gradual reel-home starts and stops",
-        "Controls fit phone/landscape/desktop",
-        "Blur freezes simulation"
+        "Continuous world through actual charged cast, visible strike and fight",
+        "No posture pad, speed slider, auto retrieve or numeric fishing gauges",
+        "Each click makes a finite winding stroke and stops",
+        "Held pointer and repeated F keydown cannot sustain winding",
+        "Denser actual F taps retrieve more line",
+        "F works from the drag slider; drag range still adjusts",
+        "Light twitch works before and after the visible strike",
+        "Removed R shortcut cannot start automatic winding",
+        "Only drag, reel and twitch controls remain within phone/landscape/desktop bounds",
+        "Opaque readable panel and hook/weight label",
+        "Blur freezes simulation and reel"
       ],
-      "initialDepth": 0
+      "initialDepth": 0,
+      "cadence": {
+        "sparse": {
+          "taps": 2,
+          "intervalMs": 1500,
+          "seconds": 2.9998000000000324,
+          "pickup": 0.8213367776920713
+        },
+        "dense": {
+          "taps": 6,
+          "intervalMs": 450,
+          "seconds": 2.9999000000000375,
+          "pickup": 3.502545919355331
+        }
+      }
     },
     {
       "scene": "half-moon-bay",
       "checks": [
-        "Continuous world through cast/retrieve/strike/fight",
-        "Keyboard speed/drag/rod controls",
-        "Shortcuts work from range controls",
-        "Opaque readable control panel and hook/weight label",
-        "Pointer rod lift and sweep",
-        "Held retrieve moves lure",
-        "Twitch moves presentation",
-        "Gradual reel-home starts and stops",
-        "Controls fit phone/landscape/desktop",
-        "Blur freezes simulation"
+        "Continuous world through actual charged cast, visible strike and fight",
+        "No posture pad, speed slider, auto retrieve or numeric fishing gauges",
+        "Each click makes a finite winding stroke and stops",
+        "Held pointer and repeated F keydown cannot sustain winding",
+        "Denser actual F taps retrieve more line",
+        "F works from the drag slider; drag range still adjusts",
+        "Light twitch works before and after the visible strike",
+        "Removed R shortcut cannot start automatic winding",
+        "Only drag, reel and twitch controls remain within phone/landscape/desktop bounds",
+        "Opaque readable panel and hook/weight label",
+        "Blur freezes simulation and reel"
       ],
-      "initialDepth": 0
+      "initialDepth": 0,
+      "cadence": {
+        "sparse": {
+          "taps": 2,
+          "intervalMs": 1500,
+          "seconds": 2.9999000000000295,
+          "pickup": 1.0733446397517028
+        },
+        "dense": {
+          "taps": 6,
+          "intervalMs": 450,
+          "seconds": 2.999900000000035,
+          "pickup": 3.7545629156518068
+        }
+      }
     },
     {
       "scene": "benicia",
       "checks": [
-        "Continuous world through cast/retrieve/strike/fight",
-        "Keyboard speed/drag/rod controls",
-        "Shortcuts work from range controls",
-        "Opaque readable control panel and hook/weight label",
-        "Pointer rod lift and sweep",
-        "Held retrieve moves lure",
-        "Twitch moves presentation",
-        "Gradual reel-home starts and stops",
-        "Controls fit phone/landscape/desktop",
-        "Blur freezes simulation"
+        "Continuous world through actual charged cast, visible strike and fight",
+        "No posture pad, speed slider, auto retrieve or numeric fishing gauges",
+        "Each click makes a finite winding stroke and stops",
+        "Held pointer and repeated F keydown cannot sustain winding",
+        "Denser actual F taps retrieve more line",
+        "F works from the drag slider; drag range still adjusts",
+        "Light twitch works before and after the visible strike",
+        "Removed R shortcut cannot start automatic winding",
+        "Only drag, reel and twitch controls remain within phone/landscape/desktop bounds",
+        "Opaque readable panel and hook/weight label",
+        "Blur freezes simulation and reel"
       ],
-      "initialDepth": 0
+      "initialDepth": 0,
+      "cadence": {
+        "sparse": {
+          "taps": 2,
+          "intervalMs": 1500,
+          "seconds": 2.999800000000035,
+          "pickup": 1.4524329122551904
+        },
+        "dense": {
+          "taps": 6,
+          "intervalMs": 450,
+          "seconds": 2.9998000000000316,
+          "pickup": 4.223094660397482
+        }
+      }
     }
   ],
   "errors": []

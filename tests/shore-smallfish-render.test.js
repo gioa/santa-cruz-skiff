@@ -46,11 +46,11 @@ test('returning float hook is limited by the shallow water and bottom rigs retai
 test('overhead waiting and bite views connect a float and dip its tip at the bite',()=>{
   globalThis.document={createElement:canvas};
   const art=canvas(),world=createPacificaWorld(art),s=state({phase:'waiting',elapsed:0});
-  world.resize(900,600);world.draw(s,0);
+  world.resize(900,600);const waiting=world.draw(s,0);
   const tip=art.calls.find(call=>call[1]==='#e26e50');assert.ok(tip);
-  art.calls.length=0;world.draw({...s,phase:'bite'},0);
+  art.calls.length=0;const bite=world.draw({...s,phase:'bite'},0);
   const dippedTip=art.calls.find(call=>call[1]==='#e26e50');assert.ok(dippedTip);
-  assert.equal(dippedTip[2],tip[2]);assert.equal(dippedTip[3],tip[3]+2);
+  assert.equal(dippedTip[2],tip[2]);assert.equal(dippedTip[3],tip[3]);assert.ok(Math.abs(bite.tackle.attachment.y-waiting.tackle.attachment.y-.04*3.2)<1e-8);
   art.calls.length=0;world.draw({...s,rig:'carolina',presentation:{mode:'bottom'}},0);
   assert.equal(art.calls.some(call=>call[1]==='#e26e50'),false);
 });

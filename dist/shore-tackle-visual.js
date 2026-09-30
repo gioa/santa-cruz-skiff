@@ -1,4 +1,5 @@
 import {getShoreScene,sampleShore} from './shore-data.js';
+import {shoreRodGeometry} from './shore-scale.js';
 
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const finite=(v,f=0)=>Number.isFinite(v)?v:f;
@@ -17,10 +18,10 @@ export function shoreRigUsesFloat(state={}){
 export function shoreLineWaterEntry(sceneId,state,target,depth){
   if(shoreRigUsesFloat(state))return{...target};
   const scene=getShoreScene(sceneId),player=state.player||scene.spawn;
-  const origin=state.cast?.origin||{x:player.x,y:player.y-18};
-  const tipHeight=state.onPier&&scene.pier?5.5:1.8;
+  const origin=shoreRodGeometry({...state,player}).tipWorld;
+  const tipHeight=origin.height;
   const fraction=tipHeight/(tipHeight+Math.max(0,finite(depth)));
-  const x=player.x+(target.x-player.x)*fraction;
+  const x=origin.x+(target.x-origin.x)*fraction;
   return{x,y:Math.min(origin.y+(target.y-origin.y)*fraction,scene.shoreY(x)-1.6)};
 }
 

@@ -1,3 +1,4 @@
+import {SHORE_MOVEMENT as M} from './shore-movement.js';
 import {PacificaSimulation,PIXELS_PER_METRE} from './pacifica-sim.js';
 import {beniciaSea,beniciaSample} from './benicia-data.js';
 import {beniciaCrowd,crowdCastConflict,BENICIA_ANGLERS} from './benicia-crowd.js';
@@ -65,7 +66,9 @@ export class BeniciaSimulation extends PacificaSimulation{
   this.state.crowd=beniciaCrowd(this.state.elapsed,this.state.crowdSeed||1,this.calendar().getUTCMonth()+1);
  }
  drift(dt,input={}){
-  const s=this.state,supply=shoreSupply(s),reeling=s.autoRetrieve||(input.reel===undefined?this.reeling:Boolean(input.reel));
+  const s=this.state,supply=shoreSupply(s),crankDriven=Number.isFinite(input.crankRate);
+  if(crankDriven)s.autoRetrieve=false;
+  const reeling=crankDriven?input.crankRate>0:s.autoRetrieve||(input.reel===undefined?this.reeling:Boolean(input.reel));
   if(isShoreLure(supply?.id)&&s.cast){
    const e=this.refreshSample(),p=s.presentation;
    if(e.substrate==='rock'&&p?.bottomContact>.8&&!reeling)s.snagSeconds+=dt;
@@ -77,7 +80,7 @@ export class BeniciaSimulation extends PacificaSimulation{
 
  talkLocal(id){
   const s=this.state,n=s.crowd.find(n=>n.id===id);
-  if(!n||s.phase!=='walk'||Math.hypot(n.x-s.player.x,n.y-s.player.y)>70)return{ok:false,message:'收好竿，走近钓友再打招呼。'};
+  if(!n||s.phase!=='walk'||Math.hypot(n.x-s.player.x,n.y-s.player.y)>M.talkReach)return{ok:false,message:'收好竿，走近钓友再打招呼。'};
   const zone=s.shoreSample.zoneId,noteId=`${zone}:local:${id%BENICIA_ANGLERS.length}`;
   const fresh=!s.shoreLore.notes.some(n=>n.id===noteId);
   if(fresh)s.shoreLore.notes.push({id:noteId,zoneId:zone,topic:'local',title:`${n.name} 的经验`,text:n.line,angler:0,sourceName:n.name,learnedAt:s.elapsed});

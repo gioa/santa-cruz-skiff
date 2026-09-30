@@ -2,6 +2,7 @@ import {fightViewGeometry} from './pixel-fight-view.js';
 import {drawCloseTackle} from './pixel-fight-tackle.js';
 import {getShoreScene,sampleShore,shoreSurfField} from './shore-data.js';
 import {shoreFishPosition} from './shore-line-geometry.js';
+import {shoreRodGeometry,shoreCastRelease} from './shore-scale.js';
 import {shorePresentation} from './shore-presentation.js';
 import {shoreWaterContact,shoreTackleLine,shoreRigUsesFloat,shoreLineWaterEntry} from './shore-tackle-visual.js';
 
@@ -16,12 +17,12 @@ export const shoreFightActive=state=>['fighting','landed'].includes(state?.phase
 // simulated hook depth. Fish remain below opaque surf until the catch panel.
 export function shoreFightPose(sceneId,state={}){
  const scene=getShoreScene(sceneId),player=state.player||scene.spawn,cast=state.cast;
- const origin=cast?.origin||{x:player.x,y:player.y-18};
+ const origin=cast?.origin||shoreCastRelease({...state,player});
  const fishWorld=shoreFishPosition(scene,state);
  const sample=sampleShore(scene,fishWorld.x,fishWorld.y,finite(state.elapsed),state.seaState);
  const floating=shoreRigUsesFloat(state);
- const tipHeight=state.onPier&&scene.pier?5.5:1.8,depth=floating?Math.max(.05,shorePresentation(sample,'float_rig',finite(state.presentation?.depth,1)).depth):Math.max(.05,sample.depth*.72);
- const rodTip={x:0,z:0,height:tipHeight};
+ const metricTip=shoreRodGeometry({...state,player}).tipWorld,tipHeight=metricTip.height,depth=floating?Math.max(.05,shorePresentation(sample,'float_rig',finite(state.presentation?.depth,1)).depth):Math.max(.05,sample.depth*.72);
+ const rodTip={x:(metricTip.x-player.x)/PIXELS_PER_METRE,z:(metricTip.y-origin.y)/PIXELS_PER_METRE,height:tipHeight};
  const entryWorld=shoreLineWaterEntry(scene,state,fishWorld,depth);
  const entryMeters={x:(entryWorld.x-player.x)/PIXELS_PER_METRE,z:(entryWorld.y-origin.y)/PIXELS_PER_METRE};
  const tension=clamp(finite(state.tension),0,1),run=clamp(finite(state.fish?.run),0,2);

@@ -48,6 +48,26 @@ The absence of a programmed jump for a species is a conservative simulation deci
 
 This module never creates a bobber. The mounted float rig alone controls float rendering. Carolina, fish-finder and lure rigs show submerged presentation, line entry, rod load and actual hooked-fish movement.
 
+## Mechanical feedback without numeric gauges
+
+The shore simulator exposes `state.reelFeedback` for the rendered handle, spool, rod and optional drag sound. `handleRate` is the solved winding term divided by an authored 0.7 metres per handle rotation. `linePickupRate` and `linePayoutRate` are metres per second of shrinking/growing endpoint slant reach, including vertical movement beside a pier. These are **derived kinematic estimates**: the shore engine does not yet solve an elastic paid-line spool. They are not calibrated mechanical measurements or forces in newtons.
+
+Only active winding produces handle rotation or pickup feedback. A strong run can still increase line reach while the angler turns the handle. Lure speed relative to water is deliberately not used as handle motion: a drifting lure can move through water with the angler's hand stopped. `dragSlip` requires actual outward endpoint travel under load at the configured drag limit; a high fish-run intent alone cannot trigger ratchet sounds. `load` is normalized simulated line tension, and `slack` is a normalized low-load visual-sag cue, not a measured length of loose line.
+
+Before/after endpoint reach is compared against the same solved physical rod tip. This keeps the calculation consistent with rod height and pier geometry while ensuring that the blank straightening under reduced load cannot itself create a false drag-slip sound.
+
+Animate rates against active simulation time, so blur/pause freezes the mechanism and stops sound. Clearing the line or landing resets all reel feedback. Persistent rod lift denotes held posture; raising the rod is a separate change in posture or explicit twitch. A held sideways rod applies side pressure and should not be animated as repeated sweeps.
+
+## Winding by deliberate taps
+
+`dist/shore-reel-input.js` turns each deliberate click or non-repeating key press into up to one crank turn completed over 0.4 seconds. The unfinished budget is capped at one turn, including the active stroke. Faster clicks therefore increase average winding until the authored 2.5-turn/s cadence cap; they cannot build a long queue. After the final click the requested motion stops within 0.4 seconds. Pausing, disabling or clearing the line discards the remaining stroke.
+
+`stepShoreReelInput` returns an explicit `crankRate` in rotations/s for every active frame, including zero when idle. The simulator converts this through the same 0.7 m/turn gear assumption used by the mechanical feedback. Explicit crank input overrides legacy held-reel, stored speed and reel-home state. In calm water an unloaded lure recovers 0.7 m per completed requested turn; bottom-tackle drag and fish resistance can reduce achieved winding, which is the rate rendered by the handle. These cadence/gear values are game calibration, not measured human or commercial-reel limits. No speed slider or automatic key repetition is needed to choose a faster average retrieve.
+
 ## Verification
 
 `node --test tests/shore-fish-fight.test.js` verifies all 13 identities, force scaling, stronger relative jacksmelt resistance, distinct species traces, work-dependent fatigue, player lift, continuous jump ascent/arc/splash, conservative no-jump species, submerged halibut dives, depth/lateral bounds, deterministic replay and phone/desktop timestep agreement.
+
+`node --test tests/shore-reel-feedback.test.js` checks that water motion cannot turn a stopped handle, true winding generates pickup, loaded outward runs can slip drag, sub-threshold travel is silent, winding and outward net movement can coexist, deep-pier vertical pickup remains visible, and landing/clearing stops the mechanism.
+
+`node --test tests/shore-reel-input.test.js` checks single-stroke budgets, linear tap-frequency/line-recovery response, the cadence/queue cap, pause cancellation, and explicit zero-crank suppression of stale held/reel-home input in both beach and Benicia simulation paths.

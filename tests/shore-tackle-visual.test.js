@@ -69,7 +69,7 @@ test('overhead float height, rod load and connected line follow actual water and
     assert.ok(loaded.bend>a.bend);assert.ok(loaded.rodTip.y>a.rodTip.y);
     assert.equal(JSON.stringify(state),before);
     const bite=world.draw({...state,phase:'bite'},state.elapsed).tackle;
-    close(bite.attachment.y-a.attachment.y,2);assert.deepEqual(bite.line.at(-1),bite.attachment);
+    close(bite.attachment.y-a.attachment.y,.04*3.2);assert.deepEqual(bite.line.at(-1),bite.attachment);
     const bottom=world.draw({...state,rig:'carolina',presentation:{mode:'bottom'}},state.elapsed).tackle;
     assert.equal(bottom.floatVisible,false);close(bottom.bend,a.bend);
   }

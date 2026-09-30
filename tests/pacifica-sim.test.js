@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {PacificaSimulation, WORLD, SHOP, SAVE_KEY, SHOP_ITEMS} from '../dist/pacifica-sim.js';
+import {SHORE_MOVEMENT as M,shoreStandPosition,shoreWalkBoundaryY,shoreArrivalPosition} from '../dist/shore-movement.js';
 import {shoreProfile} from '../dist/shore-data.js';
 import {castToOffshore, finishShoreFlight, finishShoreRetrieve} from './helpers/shore-cast.js';
 import {schoolAtBait, awaitBite} from './helpers/shore-fish.js';
@@ -13,8 +14,9 @@ const until = (sim, predicate, seconds = 180, input = {}) => {
   assert.ok(predicate(), `timed out: ${sim.state.phase} / ${sim.state.message}`);
 };
 const toSurf = sim => {
-  assert.ok(sim.walkTo(730, WORLD.shoreY(730) + 25).ok);
-  until(sim, () => sim.state.walkTarget === null, 20);
+  sim.state.wardenNextAt=1e9;
+  const p=shoreStandPosition(sim.scene,730);assert.ok(sim.walkTo(p.x,p.y).ok);
+  until(sim, () => sim.state.walkTarget === null, 180);
   assert.ok(sim.canCast);
 };
 const hook = sim => {
@@ -37,8 +39,8 @@ const land = sim => {
   });
 };
 const shop = sim => {
-  assert.ok(sim.walkTo(SHOP.door.x, SHOP.door.y + 15).ok);
-  until(sim, () => sim.state.walkTarget === null, 20);
+  assert.ok(sim.walkTo(SHOP.door.x, SHOP.door.y + 4.8).ok);
+  until(sim, () => sim.state.walkTarget === null, 180);
   assert.ok(sim.nearShop);
 };
 
@@ -60,22 +62,22 @@ test('Pacifica has a separate save and starts equipped at its actual bait shop',
 
 test('walking paths go around shop walls and cannot enter water or leave the beach', () => {
   const sim = new PacificaSimulation();
-  assert.ok(sim.walkTo(1100, WORLD.shoreY(1100) + 30).ok);
+  const b=sim.building;assert.ok(sim.walkTo(SHOP.door.x, WORLD.shoreY(SHOP.door.x) + M.stand).ok);
   let observedDetour = false;
-  until(sim, () => !sim.state.walkTarget, 20, s => {
+  until(sim, () => !sim.state.walkTarget, 120, s => {
     const {x, y} = s.player;
-    assert.equal(x > SHOP.x - 18 && x < SHOP.x + SHOP.width + 18 && y > SHOP.y - 18 && y < SHOP.y + SHOP.height + 18, false);
-    if (x < SHOP.x - 18) observedDetour = true;
+    assert.equal(x > b.left && x < b.right && y > b.top && y < b.bottom, false);
+    if (x < b.left || x > b.right) observedDetour = true;
     return {};
   });
   assert.ok(observedDetour, 'path must detour around the building');
   advance(sim, 20, {x: -1, y: -1});
-  assert.ok(sim.state.player.x >= 20);
-  assert.ok(sim.state.player.y >= WORLD.shoreY(sim.state.player.x) + 19.99);
+  assert.ok(sim.state.player.x >= M.bodyRadius);
+  assert.ok(sim.state.player.y >= shoreWalkBoundaryY(sim.scene,sim.state.player.x)-1e-6);
   advance(sim, 20, {x: 1, y: 1});
-  assert.ok(sim.state.player.x <= WORLD.width - 20);
-  assert.ok(sim.state.player.y <= WORLD.height - 25);
-  assert.equal(sim.walkTo(SHOP.x + 30, SHOP.y + 40).ok, false);
+  assert.ok(sim.state.player.x <= WORLD.width - M.bodyRadius);
+  assert.ok(sim.state.player.y <= WORLD.height - M.bodyRadius);
+  assert.equal(sim.walkTo((b.left+b.right)/2, (b.top+b.bottom)/2).ok, false);
   assert.equal(sim.walkTo(NaN, Infinity).ok, false);
 });
 
@@ -211,7 +213,7 @@ test('save restores settled catch and upgrades, with independent copies and vali
   assert.deepEqual(validated.state.upgrades, ['surf_rod']);
   assert.deepEqual(validated.state.inventory, {sandcrab: 0, squid: 0, anchovy: 0, sandworm: 0, mussel: 0});
   assert.equal(validated.state.credits, 120);
-  assert.deepEqual([validated.state.player.x, validated.state.player.y], [1100, 865]);
+  assert.deepEqual([validated.state.player.x, validated.state.player.y], Object.values(shoreArrivalPosition(validated.scene)));
   const otherScene = new PacificaSimulation({saved: {...saved, scene: 'santa-cruz'}});
   assert.equal(otherScene.state.catches.length, 0);
   assert.equal(otherScene.state.inventory.sandcrab, 12);

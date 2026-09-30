@@ -29,7 +29,7 @@ sim.cast({power, aim});
 
 Both entry points use the same pure `createShoreCast` calculation. The preview must not mutate equipment, statistics or the encounter hazard budget. Releasing at the previewed effort uses the same trajectory inputs; the UI must not compute a separate distance formula.
 
-Scene geometry uses 3.2 world units per metre. Cast travel is the horizontal origin-to-target distance; offshore distance is measured separately from the local shoreline. They are different quantities when the player stands inland, aims diagonally or casts from the pier. Fish habitat sampling continues to use the actual target and its shoreline-relative position.
+Scene geometry uses 3.2 world units per metre. People are rendered at 1.75 m, rods at their actual equipped lengths, and the casting origin is the physical rod tip. The earlier fixed 18-unit forward offset and oversized actors have been removed. Rod bend preserves blank length; preview and actual flight begin at the same projected tip, including pier deck elevation. Cast travel is the horizontal origin-to-target distance; offshore distance is measured separately from the local shoreline. They are different quantities when the player stands inland, aims diagonally or casts from the pier. Fish habitat sampling continues to use the actual target and its shoreline-relative position.
 
 ## Calibration and model limits
 
@@ -37,12 +37,12 @@ The following are reproducible model outputs for a fresh sand crab, still air, a
 
 | Action and equipment | Horizontal travel |
 | --- | ---: |
-| Starter + Carolina, tap / half / full effort | 5.1 / 20.6 / 45.2 m |
-| Surf + Carolina, tap / half / full effort | 5.3 / 31.2 / 67.1 m |
-| Surf + fish-finder, tap / half / full effort | 5.3 / 26.1 / 61.8 m |
-| Overloaded starter + fish-finder, full effort | 14.9 m |
+| Starter + Carolina, tap / half / full effort | 5.6 / 21.2 / 45.8 m |
+| Surf + Carolina, tap / half / full effort | 5.9 / 32.1 / 67.9 m |
+| Surf + fish-finder, tap / half / full effort | 5.9 / 27.0 / 62.8 m |
+| Overloaded starter + fish-finder, full effort | 15.5 m |
 
-Pointer, global Space, focused-button Space/Enter and accessibility clicks share the same input curve. Full effort takes 1.8 seconds; a click without a hold is a gentle lob. A 90-millisecond press is 5% effort. The charge meter uses the real preview to show estimated throw distance and whether the cast can reach water. The normal walk-to-surf target moves to 25 world units behind the shore reference, rather than the old 57 units. The animation samples the same flight trajectory and projects its height at 3.2 world units per metre; it no longer adds a fixed 115-unit arc.
+Pointer, global Space, focused-button Space/Enter and accessibility clicks share the same input curve. Full effort takes 1.8 seconds; a click without a hold is a gentle lob. A 90-millisecond press is 5% effort. The gameplay view shows the physical rod loading during the hold, without a charge percentage, predicted range or landing marker. The pure preview calculation remains available for simulation checks. The normal walk-to-surf target is 1.25 m behind the shore reference, with slope-aware body clearance. The animation samples the same flight trajectory and projects its height at 3.2 world units per metre; it no longer adds a fixed 115-unit arc.
 
 `createShoreCast(sceneId, state, {power, aim})` returns the origin, target, actual horizontal `distance`, separate `offshoreDistance`, `landing`, `flightDuration`, time-stamped `trajectory`, payload and loading details. `shoreCastPosition(cast, elapsed)` samples that trajectory for rendering. The plan is transient and is not restored as a deployed line after reloading.
 
@@ -52,4 +52,4 @@ Exact results depend on payload, bait, rod and geometry. A 3–6 m lob cannot re
 
 This is a compact projectile model, not a flexible-rod finite-element simulation, a casting-skill measurement or a weather forecast. It does not claim measured human release speeds, bait shapes, reel friction, line aerodynamics or rod failure thresholds. After water entry, the existing [shore wave model](shore-wave-model.md) controls sinking and drift. The casting model does not reinterpret wave height as wind speed.
 
-`tests/shore-casting.test.js` and `tests/shore-cast-render.test.js` compare preview with actual landing, short taps with sustained holds, loaded with overloaded rods, diagonal with straight casts, and dry/deck with water landings. `qa/shore-ecology/playtest.mjs` checks actual pointer/keyboard interactions, cancellation, short accessibility clicks, charge feedback and dry landing in both scenes. These checks establish consistent game behavior, not empirical validation of real casting distances.
+`tests/shore-casting.test.js` and `tests/shore-cast-render.test.js` compare preview with actual landing, short taps with sustained holds, loaded with overloaded rods, diagonal with straight casts, and dry/deck with water landings. `qa/shore-ecology/playtest.mjs` checks actual pointer/keyboard interactions, cancellation, short accessibility clicks, physical rod windup and dry landing in both scenes. These checks establish consistent game behavior, not empirical validation of real casting distances.

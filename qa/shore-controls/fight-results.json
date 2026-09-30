@@ -2,32 +2,32 @@
   "checks": [
     {
       "scene": "pacifica",
-      "initialDepth": 0.7629822616326821,
-      "initialDistance": 25.224331168904303,
-      "jumpAt": 8.675000000000056,
-      "capturedAirHeight": 0.12972384643152035,
-      "maxAirHeight": 0.18242990863416478,
-      "landedAt": 32.19999999999924,
-      "energyAtLanding": 0.17703239024342202,
+      "initialDepth": 0.7556536112199597,
+      "initialDistance": 25.75973981098949,
+      "jumpAt": 8.575000000000054,
+      "capturedAirHeight": 0.14498395051977822,
+      "maxAirHeight": 0.18562639267928757,
+      "landedAt": 33.47499999999917,
+      "energyAtLanding": 0.1421683242739271,
       "events": [
         {
           "kind": "launch",
-          "time": 8.600000000000055,
-          "previousDepth": 0.029082215771124
+          "time": 8.475000000000053,
+          "previousDepth": 0.03399895315966969
         },
         {
           "kind": "splash",
-          "time": 8.97500000000006,
-          "splash": 1
+          "time": 8.875000000000059,
+          "splash": 0.9821428571428571
         },
         {
           "kind": "launch",
-          "time": 18.949999999999992,
-          "previousDepth": 0.030564482032685192
+          "time": 18.874999999999996,
+          "previousDepth": 0.025271489812763427
         },
         {
           "kind": "splash",
-          "time": 19.299999999999972,
+          "time": 19.224999999999977,
           "splash": 1
         }
       ],
@@ -37,32 +37,32 @@
     },
     {
       "scene": "half-moon-bay",
-      "initialDepth": 0.787301190007468,
-      "initialDistance": 25.24826476340053,
-      "jumpAt": 8.350000000000051,
-      "capturedAirHeight": 0.14424246246283998,
-      "maxAirHeight": 0.18525856590834633,
-      "landedAt": 32.24999999999924,
-      "energyAtLanding": 0.17582254871897002,
+      "initialDepth": 0.7772438682769764,
+      "initialDistance": 25.804295357938038,
+      "jumpAt": 8.30000000000005,
+      "capturedAirHeight": 0.14025393101986772,
+      "maxAirHeight": 0.18135425489329318,
+      "landedAt": 33.549999999999166,
+      "energyAtLanding": 0.14067124220414068,
       "events": [
         {
           "kind": "launch",
-          "time": 8.25000000000005,
-          "previousDepth": 0.03516081016335457
+          "time": 8.200000000000049,
+          "previousDepth": 0.03924408958773586
         },
         {
           "kind": "splash",
-          "time": 8.650000000000055,
+          "time": 8.600000000000055,
           "splash": 0.9821428571428571
         },
         {
           "kind": "launch",
-          "time": 16.950000000000106,
-          "previousDepth": 0.027704313681311966
+          "time": 16.87500000000011,
+          "previousDepth": 0.026239346137499488
         },
         {
           "kind": "splash",
-          "time": 17.300000000000086,
+          "time": 17.22500000000009,
           "splash": 1
         }
       ],
@@ -73,11 +73,11 @@
     {
       "scene": "benicia",
       "species": "chinook_salmon",
-      "initialDepth": 3.773913521181181,
-      "waterDepthAtLanding": 7.056217027438942,
-      "fishDepthAtLanding": 0.3110936352391433,
-      "landedAt": 143.47500000001548,
-      "energyAtLanding": 0.04831892421505782,
+      "initialDepth": 3.7739111868608566,
+      "waterDepthAtLanding": 6.659388263101676,
+      "fishDepthAtLanding": 0.30824659722067005,
+      "landedAt": 143.70000000001554,
+      "energyAtLanding": 0.04732239352402844,
       "continuousView": true
     }
   ],

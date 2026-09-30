@@ -1,3 +1,4 @@
+import {SHORE_MOVEMENT,shoreArrivalPosition,shoreWalkBoundaryY,shoreShopBounds} from './shore-movement.js';
 import {fishMassKg} from './pixel-fish-mass.js';
 import {BAITS,SHOP_ITEMS,restoreShoreEquipment,shoreReady,shoreSupply,wearShoreSupplies,configureShoreEquipment,shoreSlots,moveShoreSlot,isShoreLure} from './shore-equipment.js';
 import {createShoreLore,stepShoreLore,talkShoreAngler} from './shore-lore.js';
@@ -17,13 +18,15 @@ import {climateSeaState} from './shore-surf.js';
 import {formatLength,formatWeight} from './units.js';
 import {SHORE_RIG_PHYSICS} from './shore-presentation.js';
 import {createShoreFightMotion,stepShoreFightMotion} from './shore-fish-fight.js';
+import {shoreRodGeometry} from './shore-scale.js';
+import {SHORE_CRANK_TURN_METRES,SHORE_MAX_CRANK_RATE} from './shore-reel-input.js';
 export const SAVE_KEY = 'pacifica-surf-save-v1';
 export const WORLD = getShoreScene('pacifica').world;
 export const SHOP = getShoreScene('pacifica').shop;
 // One roll per pier visit: 10% of visits meet a patrol at a random moment
 // 20–150 active seconds after climbing on. Being caught costs every carried fish.
 export const PIER_RULES = Object.freeze({catchChance: .1, earliestSeconds: 20, latestSeconds: 150});
-export const WARDEN_RULES = Object.freeze({firstAfter: [240, 540], between: [420, 900], speed: 70, reach: 42});
+export const WARDEN_RULES = Object.freeze({firstAfter: [240, 540], between: [420, 900], speed: SHORE_MOVEMENT.walkSpeed, reach: SHORE_MOVEMENT.talkReach});
 export const PIXELS_PER_METRE = 3.2;
 export {BAITS,SHOP_ITEMS} from './shore-equipment.js';
 // Length–weight relations W(g) = a·L(cm)^b are representative published-style
@@ -55,13 +58,38 @@ export const fishWeightKg = (sp, lengthCm, condition = 1) => sp.id==='chinook_sa
 
 const clamp = (value, low, high) => Math.max(low, Math.min(high, value));
 const finite = (value, fallback = 0) => typeof value === 'number' && Number.isFinite(value) ? value : fallback;
+const emptyReelFeedback=()=>({handleRate:0,linePickupRate:0,linePayoutRate:0,dragSlip:false,load:0,slack:0});
+// The shore model solves endpoint travel, not an elastic paid-line spool.
+// These are derived kinematic feedback estimates, not calibrated reel forces.
+// A handle turn takes up an authored 0.7 m; line rates use the actual endpoint
+// slant reach, so winding vertically beside a deep pier still moves the reel.
+function shoreReelEndpoint(scene,s){
+ if(!s.cast)return null;
+ const fighting=s.phase==='fighting',point=fighting?shoreFishPosition(scene,s):s.cast.target;
+ const depth=Math.max(0,finite(fighting?s.fishMotion?.depth:s.presentation?.depth));
+ const airHeight=fighting?Math.max(0,finite(s.fishMotion?.airHeight)):0;
+ return{x:point.x,y:point.y,height:airHeight-depth};
+}
+function updateReelFeedback(s,beforeEndpoint,afterEndpoint,dt,{winding=false,windingRate=0,dragLimit=Infinity}={}){
+ // Compare both endpoints against the same solved tip. Rod unloading can
+ // straighten the blank without any spool slipping; its elastic movement
+ // must not masquerade as paid line in this endpoint-only approximation.
+ const tip=shoreRodGeometry(s).tipWorld;
+ const reach=point=>point?Math.hypot(Math.hypot(point.x-tip.x,point.y-tip.y)/PIXELS_PER_METRE,tip.height-point.height):0;
+ const beforeReach=reach(beforeEndpoint),afterReach=reach(afterEndpoint);
+ const travel=dt>0?(afterReach-beforeReach)/dt:0,load=clamp(finite(s.tension),0,1);
+ const linePickupRate=winding?Math.max(0,-travel):0,linePayoutRate=load>.08?Math.max(0,travel):0;
+ s.reelFeedback={handleRate:winding?Math.max(0,finite(windingRate))/SHORE_CRANK_TURN_METRES:0,linePickupRate,linePayoutRate,
+  dragSlip:s.phase==='fighting'&&linePayoutRate>.02&&load>=Math.min(1,dragLimit)-.012,
+  load,slack:clamp(1-load/.18,0,1)};
+}
 const integer = (value, low, high, fallback = 0) => Math.floor(clamp(finite(value, fallback), low, high));
 const baitIds = BAITS.map(item => item.id);
 const upgradeIds = SHOP_ITEMS.filter(item => ['rod','reel','rig','book'].includes(item.kind)).map(item => item.id);
 const statKeys = ['caught', 'kept', 'released', 'sold', 'casts', 'missed'];
 const saveVersions = [1, 2, 3, 4];
 const catchStatuses = new Set(['kept', 'released', 'sold', 'confiscated']);
-const shopBounds = shop => ({left: shop.x - 18, right: shop.x + shop.width + 18, top: shop.y - 18, bottom: shop.y + shop.height + 18});
+const shopBounds = shoreShopBounds;
 const inBuilding = (building, x, y) => x > building.left && x < building.right && y > building.top && y < building.bottom;
 const point = (x, y) => ({x, y});
 
@@ -134,12 +162,12 @@ export class PacificaSimulation {
     this.reeling = false;
     this.state = {
       sceneId: this.scene.id,
-      player: {...this.scene.spawn, facing: -1, walking: false},
+      player: {...shoreArrivalPosition(this.scene), facing: -1, walking: false},
       phase: 'walk', elapsed: 0, credits: 120,
       inventory: {sandcrab: 12, squid: 0, anchovy: 0, sandworm: 0, mussel: 0}, bait: 'sandcrab', rig: 'carolina', upgrades: [],
       catches: [], catchHistory: [], lastCatch: null, stats: Object.fromEntries(statKeys.map(key => [key, 0])),
       cast: null, lineDistance: 0, tension: 0, fish: null,
-      fishingControls:{reelSpeed:.6,rodLift:.35,rodSweep:0,drag:.5},autoRetrieve:false,retrieveSpeed:0,fishMotion:null,landingControl:0,
+      fishingControls:{reelSpeed:.6,rodLift:.35,rodSweep:0,drag:.5},autoRetrieve:false,retrieveSpeed:0,reelFeedback:emptyReelFeedback(),fishMotion:null,landingControl:0,
       biteRemaining: 0, fightElapsed: 0, lineStress: 0, slackTime: 0,
       encounter: null, biteSpeciesId: null, biteLengthCm: null, presentation: null, castId: 0, soakSeconds: 0,
       keptLog: [], warden: null, wardenNextAt: null, pierVisit: null,
@@ -194,12 +222,12 @@ export class PacificaSimulation {
   }
 
   get nearShop() {
-    return !this.state.inspection && this.state.phase === 'walk' && Math.hypot(this.state.player.x - this.shop.door.x, this.state.player.y - this.shop.door.y) <= 88;
+    return !this.state.inspection && this.state.phase === 'walk' && Math.hypot(this.state.player.x - this.shop.door.x, this.state.player.y - this.shop.door.y) <= SHORE_MOVEMENT.shopReach;
   }
 
   get canCast() {
     const s = this.state, offset = s.player.y - this.world.shoreY(s.player.x);
-    return !s.inspection && s.phase === 'walk' && (s.onPier || offset >= 19.9 && offset <= 130) && shoreReady(s);
+    return !s.inspection && s.phase === 'walk' && (s.onPier || offset >= SHORE_MOVEMENT.shoreClearance-.001 && offset <= SHORE_MOVEMENT.castReach) && shoreReady(s);
   }
 
   get canReel(){return !this.state.inspection&&['waiting','bite','fighting'].includes(this.state.phase);}
@@ -213,7 +241,7 @@ export class PacificaSimulation {
 
   get nearPier() {
     const pier = this.scene.pier, s = this.state;
-    return Boolean(pier && !s.onPier && !s.inspection && s.phase === 'walk' && Math.hypot(s.player.x - pier.gate.x, s.player.y - pier.gate.y) <= 72);
+    return Boolean(pier && !s.onPier && !s.inspection && s.phase === 'walk' && Math.hypot(s.player.x - pier.gate.x, s.player.y - pier.gate.y) <= SHORE_MOVEMENT.pierReach);
   }
 
   get onPier() { return this.state.onPier; }
@@ -227,7 +255,7 @@ export class PacificaSimulation {
   }
 
   onSand(x, y) {
-    return x >= 20 && x <= this.world.width - 20 && y >= this.world.shoreY(x) + 20 && y <= this.world.height - 25 && !inBuilding(this.building, x, y);
+    return x >= SHORE_MOVEMENT.bodyRadius && x <= this.world.width - SHORE_MOVEMENT.bodyRadius && y >= shoreWalkBoundaryY(this.scene,x) && y <= this.world.height - SHORE_MOVEMENT.bodyRadius && !inBuilding(this.building, x, y);
   }
 
   refreshSample() {
@@ -247,9 +275,9 @@ export class PacificaSimulation {
     if (s.phase !== 'walk') return this.result(false, '先收回钓线或处理这条鱼，再移动。');
     if (!Number.isFinite(x) || !Number.isFinite(y)) return this.result(false, '请选择沙滩上的位置。');
     if (s.onPier) return this.walkPierTo(x, y);
-    if (this.scene.pier && onPier(this.scene, x, y) && y < this.world.shoreY(x) + 20) return this.result(false, '栈桥入口被维修围栏挡住了。');
-    x = clamp(x, 20, this.world.width - 20);
-    y = clamp(y, this.world.shoreY(x) + 20, this.world.height - 25);
+    if (this.scene.pier && onPier(this.scene, x, y) && y < this.world.shoreY(x) + SHORE_MOVEMENT.shoreClearance) return this.result(false, '栈桥入口被维修围栏挡住了。');
+    x = clamp(x, SHORE_MOVEMENT.bodyRadius, this.world.width - SHORE_MOVEMENT.bodyRadius);
+    y = clamp(y, shoreWalkBoundaryY(this.scene,x), this.world.height - SHORE_MOVEMENT.bodyRadius);
     if (inBuilding(this.building, x, y)) return this.result(false, '商店入口在建筑下方，走到门前即可交易。');
     const target = point(x, y), route = routeAroundShop(this.building, s.player, target);
     if (!route.length) return this.result(false, '这里暂时无法到达。');
@@ -269,14 +297,14 @@ export class PacificaSimulation {
   }
 
   pierSegmentClear(a, b) {
-    const distance = Math.hypot(b.x - a.x, b.y - a.y), steps = Math.max(1, Math.ceil(distance / 5));
-    for (let n = 0; n <= steps; n++) if (!onPier(this.scene, a.x + (b.x - a.x) * n / steps, a.y + (b.y - a.y) * n / steps, 5)) return false;
+    const distance = Math.hypot(b.x - a.x, b.y - a.y), steps = Math.max(1, Math.ceil(distance / SHORE_MOVEMENT.bodyRadius));
+    for (let n = 0; n <= steps; n++) if (!onPier(this.scene, a.x + (b.x - a.x) * n / steps, a.y + (b.y - a.y) * n / steps, SHORE_MOVEMENT.bodyRadius)) return false;
     return true;
   }
 
   walkPierTo(x, y, exiting = false) {
     const s = this.state, pier = this.scene.pier;
-    if (!pier || !onPier(this.scene, x, y, 5)) return this.result(false, '只能沿栈桥桥面行走；回入口才能离开。');
+    if (!pier || !onPier(this.scene, x, y, SHORE_MOVEMENT.bodyRadius)) return this.result(false, '只能沿栈桥桥面行走；回入口才能离开。');
     // Visibility graph over the L's centerline avoids walking diagonally over water.
     const target = point(x, y), nodes = [s.player, target, pier.entry, pier.tip,
       ...pier.deck.map(r => point((r.left + r.right) / 2, (r.top + r.bottom) / 2))];
@@ -351,7 +379,7 @@ export class PacificaSimulation {
     s.stats.casts++;
     s.phase = 'casting'; s.walkTarget = null; s.walkRoute = []; s.player.walking = false; s.player.facing = -1;
     s.cast = planned;
-    s.lineDistance = planned.distance; s.tension = 0; s.fish = null; s.lastCatch = null;s.autoRetrieve=false;s.fishMotion=null;s.retrieveSpeed=0;
+    s.lineDistance = planned.distance; s.tension = 0; s.fish = null; s.lastCatch = null;s.autoRetrieve=false;s.fishMotion=null;s.retrieveSpeed=0;s.reelFeedback=emptyReelFeedback();
     const sample = this.refreshSample();
     s.presentation = shorePresentation(sample, shoreSupply(s).id, 0);
     // Each cast is a new bait in the water with a fresh, short scent plume.
@@ -377,6 +405,7 @@ export class PacificaSimulation {
     if(s.presentation)s.presentation.twitch=0;
     s.autoRetrieve=false;s.landingControl=0;
     s.phase = 'fighting'; s.tension = .33; s.biteRemaining = 0; s.fightElapsed = 0; s.lineStress = 0; s.slackTime = 0;
+    s.reelFeedback={...emptyReelFeedback(),load:s.tension};
     return this.result(true, '中鱼！按住收线；张力过高就松开，让鱼冲一阵。');
   }
 
@@ -454,10 +483,14 @@ export class PacificaSimulation {
   drift(dt,input={}) {
     const s = this.state;
     if (!s.cast) return;
+    const beforeEndpoint=shoreReelEndpoint(this.scene,s);
     const sample = this.refreshSample(), supply=shoreSupply(s);
     const c=s.fishingControls,dx=s.cast.origin.x-s.cast.target.x,dy=s.cast.origin.y-s.cast.target.y,d=Math.hypot(dx,dy)||1;
-    const reeling=s.autoRetrieve||(input.reel===undefined?this.reeling:Boolean(input.reel));
-    s.presentation=stepShorePresentation(s.presentation,sample,supply?.id,dt,{...c,directionX:dx/d,directionY:dy/d,retrieveSpeed:reeling?(s.activeReel==='sealed_reel'?2.15:1.8)*c.reelSpeed:0,twitch:Boolean(input.twitch)});
+    const crankDriven=Number.isFinite(input.crankRate),crankRate=crankDriven?clamp(input.crankRate,0,SHORE_MAX_CRANK_RATE):0;
+    if(crankDriven)s.autoRetrieve=false;
+    const reeling=crankDriven?crankRate>0:s.autoRetrieve||(input.reel===undefined?this.reeling:Boolean(input.reel));
+    const windingSpeed=crankDriven?crankRate*SHORE_CRANK_TURN_METRES:(s.activeReel==='sealed_reel'?2.15:1.8)*c.reelSpeed;
+    s.presentation=stepShorePresentation(s.presentation,sample,supply?.id,dt,{...c,directionX:dx/d,directionY:dy/d,retrieveSpeed:reeling?windingSpeed:0,twitch:Boolean(input.twitch)});
     s.retrieveSpeed=s.presentation.relativeSpeed;s.retrieveInput=reeling;
     // Mean current and wave orbital motion act on the same terminal tackle.
     s.cast.target.x = clamp(s.cast.target.x + s.presentation.driftX * dt * 3.2, 24, this.world.width - 24);
@@ -473,6 +506,7 @@ export class PacificaSimulation {
       if(supply?.bait) supply.bait.condition=Math.max(0,supply.bait.condition-dt*(1/2400+finite(sample.whitewater)/1800));
     }
     this.refreshSample();
+    updateReelFeedback(s,beforeEndpoint,shoreReelEndpoint(this.scene,s),dt,{winding:reeling,windingRate:s.presentation.retrieveSpeed});
   }
 
   retrieve() {
@@ -483,7 +517,7 @@ export class PacificaSimulation {
 
   clearLine() {
     if (this.state.phase === 'bite') resolveBite(this.population, 'missed', this.fishWorld().species);
-    Object.assign(this.state, {phase: 'walk', cast: null, fish: null, lineDistance: 0, tension: 0, biteRemaining: 0, lineStress: 0, slackTime: 0, presentation:null,encounter:null,biteSpeciesId:null,biteLengthCm:null,soakSeconds:0,autoRetrieve:false,retrieveSpeed:0,retrieveInput:false,fishMotion:null,landingControl:0});
+    Object.assign(this.state, {phase: 'walk', cast: null, fish: null, lineDistance: 0, tension: 0, biteRemaining: 0, lineStress: 0, slackTime: 0, presentation:null,encounter:null,biteSpeciesId:null,biteLengthCm:null,soakSeconds:0,autoRetrieve:false,retrieveSpeed:0,retrieveInput:false,reelFeedback:emptyReelFeedback(),fishMotion:null,landingControl:0});
     this.reeling = false;
   }
 
@@ -635,7 +669,7 @@ export class PacificaSimulation {
     if (manual) {s.walkTarget = null; s.walkRoute = []; s.leavingPier = false;}
     else if (s.walkRoute.length) {
       const next = s.walkRoute[0], dx = next.x - player.x, dy = next.y - player.y;
-      if (Math.hypot(dx, dy) < 2) {
+      if (Math.hypot(dx, dy) < SHORE_MOVEMENT.routeArrival) {
         s.walkRoute.shift();
         if (!s.walkRoute.length && s.leavingPier) {this.ejectFromPier(); return;}
         if (!s.walkRoute.length) s.walkTarget = null;
@@ -643,18 +677,25 @@ export class PacificaSimulation {
     }
     // Undocumented: leaning on the closed gate long enough finds the gap in it.
     const gate = this.scene.pier?.gate;
-    if (gate && !s.onPier && manual && my < -.5 && Math.hypot(player.x - gate.x, player.y - gate.y) <= 30) {
+    if (gate && !s.onPier && manual && my < -.5 && Math.hypot(player.x - gate.x, player.y - gate.y) <= SHORE_MOVEMENT.pierReach) {
       s.pierPush = (s.pierPush || 0) + dt;
       if (s.pierPush >= 1.2) {this.enterPier(); return;}
     } else s.pierPush = 0;
-    const length = Math.hypot(mx, my), speed = 112;
+    const length = Math.hypot(mx, my), speed = SHORE_MOVEMENT.walkSpeed;
     if (length > 0) {
       const step = Math.min(speed * dt, manual ? Infinity : length);
-      const x = clamp(player.x + mx / Math.max(1, length) * step, 20, this.world.width - 20);
-      const proposedY = player.y + my / Math.max(1, length) * step;
-      const y = s.onPier ? proposedY : clamp(proposedY, this.world.shoreY(x) + 20, this.world.height - 25);
+      const dx=mx/Math.max(1,length)*step,dy=my/Math.max(1,length)*step;
+      let fraction=1,x=player.x,y=player.y;
+      // Following a sloped shoreline must not turn one walking step into a
+      // several-metre sideways/shoreward teleport on Benicia's steep banks.
+      for(let n=0;n<8;n++){
+        x=clamp(player.x+dx*fraction,SHORE_MOVEMENT.bodyRadius,this.world.width-SHORE_MOVEMENT.bodyRadius);
+        y=s.onPier?player.y+dy*fraction:clamp(player.y+dy*fraction,shoreWalkBoundaryY(this.scene,x),this.world.height-SHORE_MOVEMENT.bodyRadius);
+        const travel=Math.hypot(x-player.x,y-player.y);if(travel<=step+1e-8)break;
+        fraction*=step/Math.max(travel,1e-9);
+      }
       const oldX = player.x, oldY = player.y;
-      const valid = (tx, ty) => s.onPier ? onPier(this.scene, tx, ty, 5) : this.onSand(tx, ty) && !this.behindPierFence(tx, ty);
+      const valid = (tx, ty) => s.onPier ? onPier(this.scene, tx, ty, SHORE_MOVEMENT.bodyRadius) : this.onSand(tx, ty) && !this.behindPierFence(tx, ty);
       const clear = (a, b) => s.onPier ? this.pierSegmentClear(a, b) : segmentClear(this.building, a, b);
       if (valid(x, y) && clear(player, point(x, y))) {player.x = x; player.y = y;}
       else {
@@ -669,6 +710,10 @@ export class PacificaSimulation {
   fight(dt, reel, input={}) {
     const s=this.state,fish=s.fish,c=s.fishingControls;
     if(!fish||!s.cast)return;
+    const crankDriven=Number.isFinite(input.crankRate),crankRate=crankDriven?clamp(input.crankRate,0,SHORE_MAX_CRANK_RATE):0;
+    if(crankDriven){reel=crankRate>0;s.autoRetrieve=false;}
+    const reelSpeed=crankDriven?crankRate/SHORE_MAX_CRANK_RATE:c.reelSpeed;
+    const beforeEndpoint=shoreReelEndpoint(this.scene,s);
     s.fightElapsed+=dt;
     const p=s.presentation||={twitch:0};
     p.twitch=input.twitch?1:clamp(finite(p.twitch)*Math.exp(-dt/.38),0,1);
@@ -679,18 +724,21 @@ export class PacificaSimulation {
     const position=shoreFishPosition(this.scene,s),sample=sampleShore(this.scene,position.x,position.y,s.elapsed,s.seaState||{});
     s.shoreSample=sample;
     const surfLoad=finite(sample.waveLoad)*.09+Math.hypot(sample.currentX,sample.currentY)*.027;
-    s.fishMotion=stepShoreFightMotion(s.fishMotion,fish,{dt,time:s.fightElapsed,waterDepth:sample.depth,lineDistance:s.lineDistance,tension:s.tension,rodLift,reelSpeed:reel?c.reelSpeed:0,drag:c.drag,surfLoad});
+    s.fishMotion=stepShoreFightMotion(s.fishMotion,fish,{dt,time:s.fightElapsed,waterDepth:sample.depth,lineDistance:s.lineDistance,tension:s.tension,rodLift,reelSpeed:reel?reelSpeed:0,drag:c.drag,surfLoad});
     const m=s.fishMotion;
     // Sweep steers the loaded fish sideways without moving either cast anchor.
     m.lateral=clamp(m.lateral+c.rodSweep*dt*.32*Math.max(.1,s.tension),-Math.min(6,s.lineDistance*.25),Math.min(6,s.lineDistance*.25));
     fish.run=m.run;fish.stamina=m.energy;
-    const loading=(reel?.12*c.reelSpeed+.09*rodLift:-.18-.08*(1-rodLift))+m.pull*.24+surfLoad+liftPulse*.5;
+    const loading=(reel?.12*reelSpeed+.09*rodLift:-.18-.08*(1-rodLift))+m.pull*.24+surfLoad+liftPulse*.5;
     const dragLimit=.15+.78*c.drag+m.headShake*.06;
     s.tension=clamp(s.tension+loading*dt,0,Math.min(1,dragLimit));
-    const retrieve=(s.activeReel==='sealed_reel'?2:1.65)*c.reelSpeed*(1-m.pull*.55);
+    const windingSpeed=crankDriven?crankRate*SHORE_CRANK_TURN_METRES:(s.activeReel==='sealed_reel'?2:1.65)*c.reelSpeed;
+    const retrieve=windingSpeed*(1-m.pull*.55);
     const outward=m.run*(.32+(1-c.drag)*.85);
     s.lineDistance=Math.max(2.5,s.lineDistance+(outward-(reel?retrieve:0))*dt);
     s.retrieveSpeed=reel?retrieve:0;
+    s.retrieveInput=Boolean(reel);
+    updateReelFeedback(s,beforeEndpoint,shoreReelEndpoint(this.scene,s),dt,{winding:reel,windingRate:s.retrieveSpeed,dragLimit});
     s.lineStress=s.tension>.93?s.lineStress+dt:Math.max(0,s.lineStress-dt*2);
     s.slackTime=s.tension<.045?s.slackTime+dt:0;
     // A lively fish can be landed under control; proximity alone is insufficient.
@@ -701,7 +749,7 @@ export class PacificaSimulation {
     }else if(s.slackTime>3){
       wearShoreSupplies(s,'escape');this.clearLine();s.message='鱼线松弛太久，鱼脱钩了。适时收线，让钓线保持张力。';
     }else if(s.landingControl>=1){
-      wearShoreSupplies(s,'catch');s.phase='landed';s.stats.caught++;s.tension=0;fish.run=0;this.reeling=false;
+      wearShoreSupplies(s,'catch');s.phase='landed';s.stats.caught++;s.tension=0;fish.run=0;this.reeling=false;s.retrieveInput=false;s.retrieveSpeed=0;s.reelFeedback=emptyReelFeedback();
       s.message=`${fish.name}上岸了！${formatLength(fish.length)} · ${formatWeight(fish.weightKg)}。留在鱼袋里，或放回海里。`;
     }
   }
@@ -752,12 +800,12 @@ export class PacificaSimulation {
     for (const fish of s.catches) this.recordCatch(fish, 'kept');
     for (const key of statKeys) s.stats[key] = integer(saved.stats?.[key], 0, 1e8);
     s.nextCatchId = s.catchHistory.reduce((next, fish) => Math.max(next, fish.catchId + 1), integer(saved.nextCatchId, 1, 1e9, 1));
-    const x = finite(saved.player?.x, this.scene.spawn.x), y = finite(saved.player?.y, this.scene.spawn.y);
+    const x = finite(saved.player?.x, s.player.x), y = finite(saved.player?.y, s.player.y);
     if (this.onSand(x, y)) {s.player.x = x; s.player.y = y;}
     if (saved.version >= 2) {
       s.fineDebt = integer(saved.fineDebt, 0, 1e7);
       s.inspectionCount = integer(saved.inspectionCount, 0, 1e8);
-      if (this.scene.pier && saved.onPier === true && onPier(this.scene, x, y, 5)) {
+      if (this.scene.pier && saved.onPier === true && onPier(this.scene, x, y, SHORE_MOVEMENT.bodyRadius)) {
         s.onPier = true; s.player.x = x; s.player.y = y;
         // The visit's patrol roll survives reloads; old saves roll once now.
         const visit = saved.pierVisit;

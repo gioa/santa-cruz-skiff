@@ -1,21 +1,21 @@
+import {SHORE_MOVEMENT as M,shorePierExitPosition} from './shore-movement.js';
 // Local discovery events. Geometry is deliberately separate from the wider
 // transaction radius; entering a doorway is different from browsing a bag.
 const distance=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
 function places(scene,state){
  const player=state.player;
  if(!player)return[];
- if(state.onPier)return scene.pier?[{id:'pier-exit',kind:'pier-exit',point:scene.pier.gate,radius:34,release:54,
-  distance:distance(player,scene.pier.gate)}]:[];
- const result=[{id:'shop',kind:'shop',point:scene.shop.door,radius:40,release:64,distance:distance(player,scene.shop.door)}];
+ if(state.onPier){const point=shorePierExitPosition(scene);return point?[{id:'pier-exit',kind:'pier-exit',point,radius:M.pierReach,release:M.pierRelease,distance:distance(player,point)}]:[];}
+ const result=[{id:'shop',kind:'shop',point:scene.shop.door,radius:M.doorReach,release:M.doorRelease,distance:distance(player,scene.shop.door)}];
  // The closed gate is scenery: walking up to it opens nothing. (E beside it, or
  // tapping the deck from there, is how curious players find their way on.)
- if(scene.pier)result.push({id:'pier',kind:'pier',silent:true,point:scene.pier.gate,radius:42,release:68,distance:distance(player,scene.pier.gate)});
+ if(scene.pier)result.push({id:'pier',kind:'pier',silent:true,point:scene.pier.gate,radius:M.pierReach,release:M.pierRelease,distance:distance(player,scene.pier.gate)});
  const regular=state.regular;
  // The Sharp Park regular, wherever he is standing or walking.
- if(regular&&regular.mode!=='away')result.push({id:'regular',kind:'regular',point:{x:regular.x,y:regular.y},radius:55,release:80,distance:distance(player,regular)});
+ if(regular&&regular.mode!=='away')result.push({id:'regular',kind:'regular',point:{x:regular.x,y:regular.y},radius:M.talkReach,release:M.talkRelease,distance:distance(player,regular)});
  const angler=state.shoreLore?.encounter;
  if(angler&&angler.expiresAt>state.elapsed)result.push({id:`angler:${angler.id}`,kind:'angler',anglerId:angler.id,point:{x:angler.x,y:angler.y},
-  radius:55,release:80,distance:distance(player,angler)});
+  radius:M.talkReach,release:M.talkRelease,distance:distance(player,angler)});
  return result;
 }
 const available=state=>state.phase==='walk'&&!state.inspection&&!state.leavingPier;
@@ -35,7 +35,7 @@ export function createShoreInteractions(scene){
   lastPosition={...state.player};
   for(const id of occupied)if(!nextKnown.has(id))occupied.delete(id);
   for(const p of points){
-   if(p.distance>p.release)occupied.delete(p.id);
+   if(p.distance>p.release+1e-6)occupied.delete(p.id);
    // Spawning NPCs and paused/loaded positions never open a surprise modal.
    if((!known.has(p.id)||paused||!available(state))&&p.distance<=p.radius)occupied.add(p.id);
   }

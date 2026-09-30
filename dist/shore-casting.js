@@ -3,6 +3,7 @@
 // docs/shore-casting-model.md for manufacturer guidance and model limits.
 import {getShoreScene,onPier} from './shore-data.js';
 import {SHORE_RIG_PHYSICS,shoreBaitLoad} from './shore-presentation.js';
+import {shoreCastRelease} from './shore-scale.js';
 
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const finite=(v,f=0)=>Number.isFinite(v)?v:f;
@@ -31,10 +32,10 @@ export function createShoreCast(sceneId,state={},options={}){
   const swingEnergy=34*(rod.lengthM/2.13)**1.8;
   const energy=lobEnergy+Math.max(0,swingEnergy-lobEnergy)*power**1.65*loading;
   const launchSpeed=Math.sqrt(2*energy/inertia),elevation=38*Math.PI/180;
-  const releaseHeight=state.onPier?5.5:1.8+(rod.lengthM-2.13)*.2;
+  const release=shoreCastRelease({...state,player},{aim}),releaseHeight=release.height;
   // Aiming rotates a unit vector: diagonal casts never gain free range.
   const heading=aim*Math.PI/3,dx=Math.sin(heading),dy=-Math.cos(heading);
-  const origin={x:finite(player.x,scene.spawn.x),y:finite(player.y,scene.spawn.y)-18};
+  const origin={x:release.x,y:release.y};
   const dragArea=.0002+.00007*(rig.sinkerGrams/28)**(2/3)+bait.dragArea*(.35+.65*condition)+(rig.extraDragArea||0);
   const drag=.5*1.225*dragArea/mass,step=1/120;
   let horizontal=0,height=releaseHeight,vx=launchSpeed*Math.cos(elevation),vz=launchSpeed*Math.sin(elevation),t=0,apexHeight=height;
@@ -52,7 +53,7 @@ export function createShoreCast(sceneId,state={},options={}){
   const end=trajectory.at(-1),target={x:end.x,y:end.y};
   const landing=target.x<24||target.x>scene.world.width-24||target.y<scene.world.minY+20?'boundary':
     onPier(scene,target.x,target.y)?'pier':target.y>=scene.shoreY(target.x)?'sand':'water';
-  return{origin,target,power,aim,distance:Math.hypot(target.x-origin.x,target.y-origin.y)/3.2,
+  return{origin,target,power,aim,releaseHeight,distance:Math.hypot(target.x-origin.x,target.y-origin.y)/3.2,
     offshoreDistance:Math.max(0,(scene.shoreY(target.x)-target.y)/3.2),landing,
     flight:0,flightDuration:end.t,trajectory,apexHeight,launchSpeed,payloadGrams,
     rodLengthM:rod.lengthM,loadRatio:payloadGrams/rod.maxPayloadGrams,

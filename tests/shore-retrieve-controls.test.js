@@ -1,4 +1,5 @@
 import test from 'node:test';
+import {shoreStandPosition} from '../dist/shore-movement.js';
 import assert from 'node:assert/strict';
 import {PacificaSimulation} from '../dist/pacifica-sim.js';
 import {BeniciaSimulation} from '../dist/benicia-sim.js';
@@ -14,7 +15,7 @@ function setup(sceneId,rig){
  const sim=sceneId==='benicia'?new BeniciaSimulation({date:'2026-09-29',rng:()=>.5}):new PacificaSimulation({sceneId,date:'2026-09-29',regular:false,rng:()=>.5,seaState:{waveHeightM:0,wavePeriodS:10}});
  Object.assign(sim.state.player,sim.shop.door);sim.state.credits=500;assert.ok(sim.buy(rig).ok);assert.ok(sim.configureEquipment(rig).ok);
  if(!isShoreLure(rig)){sim.state.inventory.sandcrab=12;assert.ok(sim.equipBait('sandcrab').ok);}
- Object.assign(sim.state.player,{x:450,y:sim.world.shoreY(450)+25});
+ Object.assign(sim.state.player,shoreStandPosition(sim.scene,450));
  sim.stepFish=()=>{}; // Physics/equipment fixture: no random fish interruptions.
  if(sceneId==='benicia')sim.state.crowd=[];
  return sim;
@@ -64,7 +65,7 @@ test('cross-current cannot hold an empty rig permanently away from a winding spo
 });
 test('a lure left on Benicia rock can snag and retrieval loses only the mounted rig',()=>{
  const sim=new BeniciaSimulation({date:'2026-09-29',rng:()=>.5});sim.stepFish=()=>{};sim.state.crowd=[];
- Object.assign(sim.state.player,{x:1430,y:sim.world.shoreY(1430)+25});
+ Object.assign(sim.state.player,shoreStandPosition(sim.scene,1430));
  const stock=JSON.stringify(sim.state.rigStock),bait=JSON.stringify(sim.state.inventory);
  assert.ok(sim.cast({power:.2}).ok);finishShoreFlight(sim);advance(sim,20);
  assert.equal(sim.state.shoreSample.substrate,'rock');assert.ok(sim.state.snagSeconds>6);

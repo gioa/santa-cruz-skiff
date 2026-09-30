@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {PacificaSimulation} from '../dist/pacifica-sim.js';
 import {shoreCastPower,shoreCastPosition,SHORE_CAST_CHARGE_MS} from '../dist/shore-casting.js';
 
-function simAt({sceneId='pacifica',offset=25,rod='starter_rod',rig='carolina_rig',bait='sandcrab',pier=false}={}){
+function simAt({sceneId='pacifica',offset=4,rod='starter_rod',rig='carolina_rig',bait='sandcrab',pier=false}={}){
  const sim=new PacificaSimulation({sceneId,rng:()=>.5,loreSeed:1,date:'2026-09-28'}),s=sim.state;
  s.activeRod=rod;s.rodSupplies[rod]={id:rig,condition:1,bait:{kind:bait,condition:1}};
  const x=1100;Object.assign(s.player,pier?sim.scene.pier.tip:{x,y:sim.world.shoreY(x)+offset});s.onPier=pier;
@@ -14,10 +14,10 @@ function land(sim){for(let t=0;t<12&&sim.state.phase==='casting';t+=.025)sim.upd
 
 test('a tap is a five-metre lob; power increases real flight rather than enforcing minimum offshore range',()=>{
  const sim=simAt(),tap=sim.previewCast(),mid=sim.previewCast({power:.5}),full=sim.previewCast({power:1});
- assert.ok(tap.distance>=3&&tap.distance<=6);assert.ok(tap.offshoreDistance>0&&tap.offshoreDistance<4);
+ assert.ok(tap.distance>=3&&tap.distance<=6);assert.ok(tap.offshoreDistance>0&&tap.offshoreDistance<8);
  assert.ok(mid.distance>=15&&mid.distance<=25);assert.ok(full.distance>=30&&full.distance<=46);
  assert.ok(tap.flightDuration<mid.flightDuration&&mid.flightDuration<full.flightDuration);
- assert.ok(tap.apexHeight<3&&full.apexHeight<16);
+ assert.ok(tap.apexHeight<3.5&&full.apexHeight<16);
  assert.equal(shoreCastPower(0),0);assert.equal(shoreCastPower(90),.05);
  assert.equal(shoreCastPower(SHORE_CAST_CHARGE_MS/2),.5);assert.equal(shoreCastPower(9999),1);
 });
@@ -50,7 +50,7 @@ test('preview is read-only; actual cast and visible trajectory have identical en
  assert.ok(Math.hypot(sim.state.cast.target.x-plan.target.x,sim.state.cast.target.y-plan.target.y)<.1);
 });
 test('dry and pier-deck casts do not teleport to water, spend bait or draw an encounter',()=>{
- for(const setup of [{offset:100},{pier:true}]){
+ for(const setup of [{offset:25},{pier:true}]){
   const sim=simAt(setup);if(setup.pier)Object.assign(sim.state.player,{x:sim.scene.pier.x,y:sim.scene.pier.top+200});
   // The warden's schedule has its own roll; fix it so only fishing rolls are counted.
   sim.state.wardenNextAt=1e9;let rolls=0;sim.rng=()=>{rolls++;return .5;};

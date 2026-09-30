@@ -62,7 +62,7 @@ test('a real shore catch records length, shows it, and a warden check fines an u
   // Add an undersize halibut that was kept earlier today, then let the warden walk up.
   sim.state.catches.push(fish('halibut', 45, 99)); sim.state.keptLog.push({catchId: 99, species: 'halibut', date: '2026-09-28'});
   sim.state.wardenNextAt = sim.state.elapsed;
-  for (let t = 0; t < 60 && !sim.state.inspection; t += .1) sim.update(.1);
+  for (let t = 0; t < 120 && !sim.state.inspection; t += .1) sim.update(.1);
   assert.ok(sim.state.inspection, 'the warden reaches the angler');
   assert.equal(sim.state.inspection.kind, 'beach');
   assert.equal(sim.state.inspection.fine, FINE_PER_FISH);
@@ -78,7 +78,7 @@ test('a legal bag passes the warden with a friendly word and no dialog', () => {
   const sim = new PacificaSimulation({rng: () => .5, sceneId: 'half-moon-bay'});
   sim.state.catches = [fish('surfperch', 24, 1)]; sim.state.keptLog = log(sim.state.catches);
   sim.state.wardenNextAt = 0;
-  for (let t = 0; t < 60 && !/鱼警/.test(sim.state.message); t += .1) sim.update(.1);
+  for (let t = 0; t < 120 && !/鱼警/.test(sim.state.message); t += .1) sim.update(.1);
   assert.match(sim.state.message, /合规/);
   assert.equal(sim.state.inspection, null);
   assert.equal(sim.state.catches.length, 1);

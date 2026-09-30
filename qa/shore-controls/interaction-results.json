@@ -1,0 +1,89 @@
+{
+  "checks": [
+    {
+      "scenario": "pier local at deck height",
+      "name": "Ray",
+      "onDeck": true,
+      "playerOnDeck": true,
+      "distanceMetres": 1.4999999999999858,
+      "points": {
+        "body": {
+          "x": 131.50000000000034,
+          "y": 420.19999999999976,
+          "clientX": 131.50000000000034,
+          "clientY": 420.19999999999976,
+          "visible": true
+        },
+        "groundBody": {
+          "x": 131.50000000000034,
+          "y": 500.6999999999999,
+          "clientX": 131.50000000000034,
+          "clientY": 500.6999999999999,
+          "visible": true
+        },
+        "foot": {
+          "x": 131.50000000000034,
+          "y": 440.8999999999999,
+          "clientX": 131.50000000000034,
+          "clientY": 440.8999999999999,
+          "visible": true
+        }
+      },
+      "conversationOpened": true
+    },
+    {
+      "scenario": "bank local",
+      "name": "Ray",
+      "onDeck": false,
+      "playerOnDeck": false,
+      "distanceMetres": 1.4999999999999858,
+      "points": {
+        "body": {
+          "x": 131.50000000000034,
+          "y": 420.2,
+          "clientX": 131.50000000000034,
+          "clientY": 420.2,
+          "visible": true
+        },
+        "groundBody": {
+          "x": 131.50000000000034,
+          "y": 420.2,
+          "clientX": 131.50000000000034,
+          "clientY": 420.2,
+          "visible": true
+        },
+        "foot": {
+          "x": 131.50000000000034,
+          "y": 440.8999999999999,
+          "clientX": 131.50000000000034,
+          "clientY": 440.8999999999999,
+          "visible": true
+        }
+      },
+      "conversationOpened": true
+    },
+    {
+      "scenario": "pacifica fresh arrival shop",
+      "openedByWorldClick": true,
+      "door": {
+        "x": 165.75,
+        "y": 425.79204107830554,
+        "clientX": 165.75,
+        "clientY": 425.79204107830554,
+        "visible": true
+      }
+    },
+    {
+      "scenario": "half-moon-bay fresh arrival shop",
+      "openedByWorldClick": true,
+      "door": {
+        "x": 165.75,
+        "y": 425.79204107830554,
+        "clientX": 165.75,
+        "clientY": 425.79204107830554,
+        "visible": true
+      }
+    }
+  ],
+  "errors": []
+}

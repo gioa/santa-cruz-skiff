@@ -1,5 +1,6 @@
 import {finishShoreRetrieve} from './helpers/shore-cast.js';
 import test from 'node:test';
+import {SHORE_MOVEMENT as M,shoreStandPosition,shoreWalkBoundaryY} from '../dist/shore-movement.js';
 import assert from 'node:assert/strict';
 import {PacificaSimulation, PIER_RULES, SHOP, WORLD} from '../dist/pacifica-sim.js';
 import {getShoreScene, sampleShore, shoreProfile, onPier} from '../dist/shore-data.js';
@@ -9,12 +10,12 @@ import {schoolAtBait, awaitBite} from './helpers/shore-fish.js';
 function advance(sim, seconds, input = {}, frame = .05) {
   for (let t = 0; t < seconds - 1e-8; t += frame) sim.update(Math.min(frame, seconds - t), typeof input === 'function' ? input(sim.state) : input);
 }
-function until(sim, predicate, limit = 90) {
+function until(sim, predicate, limit = 300) {
   for (let t = 0; t < limit && !predicate(); t += .05) sim.update(.05);
   assert.ok(predicate(), sim.state.message);
 }
 function surfAt(sim, x) {
-  Object.assign(sim.state.player, {x, y: sim.world.shoreY(x) + 25});
+  Object.assign(sim.state.player, shoreStandPosition(sim.scene,x));
   sim.refreshSample();
 }
 function gate(sim) {
@@ -53,13 +54,14 @@ test('both long beaches use the shared simulation but cannot load each other’s
 
 test('a long walk follows the varying coastline without entering the sea', () => {
   const sim = new PacificaSimulation({sceneId: 'half-moon-bay', rng: () => 0});
-  assert.ok(sim.walkTo(7200, sim.world.shoreY(7200) + 20).ok);
+  sim.state.wardenNextAt=1e9;
+  const destination=shoreStandPosition(sim.scene,2100);assert.ok(sim.walkTo(destination.x,destination.y).ok);
   until(sim, () => {
-    assert.ok(sim.state.player.y >= sim.world.shoreY(sim.state.player.x) + 19.999);
+    assert.ok(sim.state.player.y >= shoreWalkBoundaryY(sim.scene,sim.state.player.x)-1e-6);
     assert.equal(sim.state.inspection, null);
     return !sim.state.walkTarget;
   });
-  assert.ok(Math.abs(sim.state.player.x - 7200) < 2);
+  assert.ok(Math.abs(sim.state.player.x - 2100) < 2);
   assert.equal(sim.state.pierVisit, null);
 });
 
@@ -131,11 +133,11 @@ test('closed pier requires an explicit gate entry and L-deck paths never cut ove
   assert.ok(sim.onPier && sim.canCast);
   assert.ok(sim.walkTo(pier.tip.x, pier.tip.y).ok);
   until(sim, () => {
-    assert.ok(onPier(sim.scene, sim.state.player.x, sim.state.player.y, 4.999));
+    assert.ok(onPier(sim.scene, sim.state.player.x, sim.state.player.y, M.bodyRadius-.001));
     return !sim.state.walkTarget;
   });
   advance(sim, 1, {x: 1, y: 1});
-  assert.ok(onPier(sim.scene, sim.state.player.x, sim.state.player.y, 4.999));
+  assert.ok(onPier(sim.scene, sim.state.player.x, sim.state.player.y, M.bodyRadius-.001));
   assert.equal(sim.walkTo(pier.tip.x + 300, pier.tip.y).ok, false);
   assert.ok(sim.cast({power: 1}).ok);
   assert.ok(sim.state.cast.target.y < sim.state.cast.origin.y);
@@ -235,8 +237,8 @@ test('a pier patrol retrieves an active line and cannot turn its fish into a pai
   assert.ok(sim.cast({power: 1, aim: 1}).ok);
   finishShoreFlight(sim);
   until(sim, () => sim.state.presentation.bottomContact > .6, 60);
-  schoolAtBait(sim, 'surfperch');
-  awaitBite(sim, 30);
+  // This tests confiscation of an active fight; encounter probability has its own coverage.
+  Object.assign(sim.state,{phase:'bite',biteSpeciesId:'surfperch',biteLengthCm:25});
   assert.ok(sim.strike().ok);
   until(sim, () => sim.state.inspection, 100);
   assert.equal(sim.state.cast, null);

@@ -93,7 +93,7 @@ test('deep fish stay hidden; actual surface and aerial fish use their own specie
   close(visual.surfaceWorld.y-visual.world.y,.7*3.2);close(visual.world.x,visual.ground.x);
   const halibut=shoreFishVisual(id,{...jump,fish:{id:'halibut',length:70,weightKg:3}}),salmon=shoreFishVisual(id,{...jump,fish:{id:'chinook_salmon',length:75,weightKg:4}});
   assert.equal(halibut.kind,'halibut');assert.equal(salmon.kind,'salmon');assert.ok(halibut.length>visual.length);
-  const enlarged=shoreFishVisual(id,jump,{cameraScale:12});assert.ok(enlarged.length*12<=48);
+  const enlarged=shoreFishVisual(id,jump,{cameraScale:12});close(enlarged.length,32/100*3.2);
  }
 });
 
@@ -126,17 +126,17 @@ test('phase/layout updates do not reset the continuous world camera',()=>{
  }
 });
 
-test('charging preview uses the exact physical arc and landing point without creating a float',()=>{
+test('charging loads the actual rod without revealing or fitting a future landing location',()=>{
  for(const id of ['pacifica','half-moon-bay','benicia']){
   const s=state(id,{phase:'walk',cast:null}),castPreview=createShoreCast(id,s,{power:.7,aim:.25}),previewState={...s,castPreview,castCharge:.7};
-  const preview=shoreCastPreviewVisual(previewState);assert.deepEqual(preview.endpoint,castPreview.target);assert.deepEqual(preview.points.at(-1),castPreview.target);
-  close(preview.points[0].y,castPreview.origin.y-castPreview.trajectory[0].height*3.2);
+  assert.equal(shoreCastPreviewVisual(previewState),null);
+  const settings={width:900,height:600,top:70,bottom:100};
+  assert.deepEqual(shoreActionCameraTarget(id,previewState,settings),shoreActionCameraTarget(id,{...previewState,castPreview:{target:{x:9999,y:-9999}}},settings));
+  assert.notDeepEqual(shoreRodPose(previewState).tip,shoreRodPose({...previewState,castCharge:0}).tip);
   const art=canvas(),world=id==='benicia'?createBeniciaWorld(art):createPacificaWorld(art,{sceneId:id}),shot=world.draw(previewState,0);
-  assert.equal(shot.actionCamera.mode,'aiming');assert.deepEqual(shot.castPreview.endpoint,castPreview.target);assert.equal(shot.tackle,null);
-  assert.equal(shoreCastPreviewVisual({...previewState,phase:'fighting'}),null);
+  assert.equal(shot.actionCamera.mode,'charging');assert.equal(shot.castPreview,null);assert.equal(shot.tackle,null);
  }
 });
-
 
 test('measured overlay bounds remain authoritative beyond former percentage caps',()=>{
  for(const id of ['pacifica','benicia']){

@@ -1,4 +1,5 @@
 import {getShoreScene} from './shore-data.js';
+import {shoreCastRelease} from './shore-scale.js';
 
 const clamp=(value,low,high)=>Math.max(low,Math.min(high,value));
 const finite=(value,fallback)=>Number.isFinite(value)?value:fallback;
@@ -9,7 +10,7 @@ const finite=(value,fallback)=>Number.isFinite(value)?value:fallback;
 // the rod on either the beach or pier, not toward the geographic coastline.
 export function shoreFishPosition(sceneId,state={}){
   const scene=getShoreScene(sceneId),player=state.player||scene.spawn,cast=state.cast;
-  const origin=cast?.origin||{x:player.x,y:player.y-18};
+  const origin=cast?.origin||shoreCastRelease({...state,player});
   const target=cast?.target||{x:player.x,y:scene.shoreY(player.x)-32};
   const baseline=Math.max(1,finite(cast?.fightDistance,finite(cast?.distance,1)));
   const fraction=clamp(finite(state.lineDistance,baseline)/baseline,.025,1.5);

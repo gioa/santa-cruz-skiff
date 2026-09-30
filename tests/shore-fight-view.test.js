@@ -66,8 +66,8 @@ test('water entry lies between the elevated rod and submerged fish and uses metr
   const fx=(pose.fishWorld.x-s.player.x)/3.2,fz=(pose.fishWorld.y-s.cast.origin.y)/3.2;
   assert.ok(pose.depth>0&&tip.height>0);
   const fraction=tip.height/(tip.height+pose.depth);
-  close(pose.visual.lineEntry.x,fx*fraction);
-  close(pose.visual.lineEntry.z,fz*fraction);
+  close(pose.visual.lineEntry.x,tip.x+(fx-tip.x)*fraction);
+  close(pose.visual.lineEntry.z,tip.z+(fz-tip.z)*fraction);
   close((pose.entryWorld.x-s.player.x)/3.2,pose.visual.lineEntry.x);
   close((pose.entryWorld.y-s.cast.origin.y)/3.2,pose.visual.lineEntry.z);
   assert.ok(Math.hypot(pose.visual.lineEntry.x,pose.visual.lineEntry.z)<Math.hypot(fx,fz));

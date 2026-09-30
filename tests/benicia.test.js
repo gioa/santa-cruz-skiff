@@ -12,7 +12,7 @@ import {finishShoreFlight} from './helpers/shore-cast.js';
 import {schoolAtBait} from './helpers/shore-fish.js';
 const advance=(sim,t,input={})=>{for(let n=0;n<t/.05;n++)sim.update(.05,input);};
 const create=()=>new BeniciaSimulation({date:'2026-09-29',rng:()=>.5});
-function pier(sim){assert.ok(sim.enterPier().ok);assert.ok(sim.walkTo(1090,165).ok);advance(sim,3);}
+function pier(sim){assert.ok(sim.enterPier().ok);assert.ok(sim.walkTo(1090,165).ok);for(let t=0;t<60&&sim.state.walkTarget;t+=.05)sim.update(.05);assert.equal(sim.state.walkTarget,null);}
 function cast(sim){assert.ok(sim.cast({power:.65,aim:.5}).ok);finishShoreFlight(sim);}
 
 test('Benicia has an open public pier, shore-specific save and usable bait-free starting spoon',()=>{
@@ -43,8 +43,8 @@ test('lure availability and appeal depend on season, corridor, depth and retriev
 });
 test('peak-season crowds have distinctive outfits, clear gaps, local clues and crossing-line checks',()=>{
  const crowd=beniciaCrowd(0,51,9),winter=beniciaCrowd(0,51,1);assert.ok(crowd.length>winter.length);assert.ok(crowd.length>=12);assert.equal(new Set(BENICIA_ANGLERS.map(a=>a.style)).size,6);
- assert.ok(crowd.every(n=>Math.abs(n.x-1090)>=70));const n=crowd[0];assert.ok(crowdCastConflict({player:{x:n.x,y:n.y+8},crowd}, {x:n.x,y:n.y-80}));
- const sim=create(),local=sim.state.crowd.find(n=>n.id>6);Object.assign(sim.state.player,{x:local.x,y:local.y+45});assert.ok(sim.talkLocal(local.id).fresh);assert.equal(sim.talkLocal(local.id).fresh,false);
+ assert.ok(crowd.every(n=>Math.abs(n.x-1090)>=70));const n=crowd[0];assert.ok(crowdCastConflict({player:{x:n.x,y:n.y+3},crowd}, {x:n.x,y:n.y-80}));
+ const sim=create(),local=sim.state.crowd.find(n=>n.id>6);Object.assign(sim.state.player,{x:local.x,y:local.y+4.8});assert.ok(sim.talkLocal(local.id).fresh);assert.equal(sim.talkLocal(local.id).fresh,false);
  const restored=new BeniciaSimulation({saved:sim.snapshot()});assert.equal(restored.state.shoreLore.notes[0].sourceName,local.name);
 });
 test('broken lures need a real replacement; repeatedly casting consumes no imaginary bait',()=>{

@@ -63,7 +63,7 @@ test('he keeps only legal striped bass (18 in, 2 a day) and releases the rest', 
 
 test('talking to him gives tips into the notebook, free bait when out, and a rig when none are left', () => {
   const s = atHisSpot(), r = s.state.regular;
-  Object.assign(s.state.player, {x: r.x + 30, y: r.y + 10});
+  Object.assign(s.state.player, {x: r.x + 4, y: r.y + 2});
   assert.equal(nearbyShoreInteraction(s.scene, s.state)?.kind, 'regular');
   s.state.inventory = {sandcrab: 0, squid: 0, anchovy: 0, sandworm: 0, mussel: 0};
   for (const id of Object.keys(s.state.rodSupplies)) s.state.rodSupplies[id] = null;
