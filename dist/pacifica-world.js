@@ -1,3 +1,4 @@
+import {drawShorePerson} from './shore-people.js';
 import {ANGLERS} from './shore-lore.js';
 // Shared pixel-art shoreline renderer. Fixed bathymetry, animated surf and
 // game collision geometry all use shore-data; the camera follows a long coast.
@@ -350,17 +351,11 @@ export function createPacificaWorld(canvas,{sceneId='pacifica'}={}){
     shadow(ctx,x,y+4,12,4,.13);R(ctx,x-6,y-3,11,6,'#e9ead6');R(ctx,x-1,y-7,6,7,'#f6eed7');R(ctx,x-6,y-1,6,3,'#7e9490');R(ctx,x+5,y-5,4,2,'#cfa46b');R(ctx,x+2,y-6,1,1,'#3c5659');R(ctx,x-2,y+3,1,4,'#a19169');R(ctx,x+2,y+3,1,4,'#a19169');
   }
   function person(x,y,{staff=false,warden=false,walking=false,fishing=false,facing='up',small=false,veteran=null}={}){
-    if(!visible(x,y))return;const t=walking?Math.sin(now*11):0,leg=Math.round(t*3),s=small?.85:1;
-    shadow(ctx,x+2,y+1,25*s,8*s,.22);ctx.save();ctx.translate(Math.round(x),Math.round(y));ctx.scale(s,s);const bob=walking?-Math.abs(Math.round(t)):0;ctx.translate(0,bob);
-    R(ctx,-7,-10+leg,6,10-leg,'#405a58');R(ctx,2,-10-leg,6,10+leg,'#405a58');R(ctx,-8,-3+leg,8,4,'#2d494d');R(ctx,2,-3-leg,8,4,'#2d494d');
-    R(ctx,-10,-26,20,18,veteran?.coat||(warden?'#526553':staff?'#658c82':'#b76e50'));R(ctx,-7,-25,14,17,veteran?.coat||(warden?'#7f8768':staff?'#7fa395':'#d38f61'));R(ctx,-7,-24,4,12,staff?'#d9cba0':'#e7ad72');R(ctx,5,-22,3,12,staff?'#425e5b':'#9f624f');
-    if(!staff){R(ctx,-5,-22,10,13,'#827f59');R(ctx,-4,-21,8,2,'#b6a576');R(ctx,-4,-11,8,2,'#4c6457');}
-    R(ctx,-6,-36,13,11,'#d6aa81');R(ctx,-7,-35,3,7,'#b68664');
-    R(ctx,-8,-40,15,7,veteran?.hat||(warden?'#536853':staff?'#718376':'#476767'));R(ctx,-10,-35,21,3,staff?'#c4b58b':'#e0c292');R(ctx,-6,-40,12,2,staff?'#9baa8b':'#78988a');
-    const front=staff||warden||facing===2||facing==='down'||facing==='south';if(front){R(ctx,3,-30,2,2,'#394e4d');R(ctx,2,-27,4,1,'#b58164');}else R(ctx,-5,-31,11,3,'#644f45');
-    if(fishing){line(ctx,-10,-23,-13,-28,'#dcad81',4);line(ctx,9,-23,4,-27,'#e8bb8d',4);R(ctx,-14,-29,6,4,'#edc99b');}else{R(ctx,-13,-24,4,12+leg,'#dfb289');R(ctx,10,-24,4,12-leg,'#e7bb8d');}
-    if(warden){R(ctx,3,-23,4,5,'#e3c276');R(ctx,-11,-12,23,3,'#394f46');R(ctx,10,-24,12,14,'#e6d9b2');R(ctx,12,-22,7,2,'#778073');R(ctx,12,-18,5,1,'#778073');}if(staff){R(ctx,-5,-19,11,9,'#4b6b64');R(ctx,-2,-24,4,4,'#e6d2a2');}ctx.restore();
+    if(!visible(x,y))return;const scale=small?.85:1;
+    shadow(ctx,x+2,y+1,25*scale,8*scale,.22);ctx.save();ctx.translate(Math.round(x),Math.round(y));
+    drawShorePerson(ctx,{style:warden?'warden':staff?'staff':veteran?.style||'player',walking,fishing,facing,time:now,scale});ctx.restore();
   }
+
   // 空军大队长: his gear, the rod in a sand spike, and a line out to his real bait.
   function regularAngler(state){
     const r=state.regular;if(!r||r.mode==='away')return;

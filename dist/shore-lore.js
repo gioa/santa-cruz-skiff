@@ -2,11 +2,11 @@
 import {shoreZone} from './shore-data.js';
 import {REGULAR,regularNotes} from './shore-regular.js';
 export const ANGLERS=Object.freeze([
- {name:'戴旧渔帽的老钓友',coat:'#687b62',hat:'#c5b18a'},
- {name:'背帆布包的老钓友',coat:'#586e84',hat:'#9e7960'},
- {name:'穿防水衣的老钓友',coat:'#a58a48',hat:'#596f67'},
+ {name:'戴旧渔帽的老钓友',style:'oldhat',coat:'#687b62',hat:'#c5b18a'},
+ {name:'背帆布包的老钓友',style:'canvasbag',coat:'#586e84',hat:'#9e7960'},
+ {name:'穿防水衣的老钓友',style:'raincoat',coat:'#a58a48',hat:'#596f67'},
  // The Sharp Park regular (shore-regular.js); he is never a random encounter.
- {name:REGULAR.name,coat:REGULAR.coat,hat:REGULAR.hat},
+ {name:REGULAR.name,style:'regular',coat:REGULAR.coat,hat:REGULAR.hat},
 ]);
 const RANDOM_ANGLERS=3;
 const pick=(a,r)=>a[Math.min(a.length-1,Math.floor(r()*a.length))];
