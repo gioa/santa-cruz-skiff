@@ -7,7 +7,10 @@ import {SHORE_POPULATION_SPECIES} from '../dist/shore-fish-ecology.js';
 import {nearbyShoreInteraction} from '../dist/shore-interactions.js';
 
 const dates = Array.from({length: 40}, (_, i) => new Date(Date.UTC(2026, 5, 1 + i)).toISOString().slice(0, 10));
-const sim = (date, extra = {}) => new PacificaSimulation({date, loreSeed: 5, seaState: {waveHeightM: .9, wavePeriodS: 11}, ...extra});
+// loreSeed fixes the regular's schedule, but the fish population has its own
+// seed drawn from rng. Give every fixture an independent reproducible stream.
+function seeded(seed=17){let x=seed>>>0;return()=>((x=(Math.imul(1664525,x)+1013904223)>>>0)/4294967296);}
+const sim = (date, extra = {}) => new PacificaSimulation({date, loreSeed: 5, rng:seeded(), seaState: {waveHeightM: .9, wavePeriodS: 11}, ...extra});
 const run = (s, seconds, until = () => false) => {for (let t = 0; t < seconds && !until(); t += .1) s.update(.1);};
 // First date he turns up, with the player standing next to his spot.
 function atHisSpot() {
@@ -37,10 +40,12 @@ test('the population can serve several baits: his bites are his, the player keep
   placeSchool(s.population, w, 'surfperch', bait.x + .6, bait.y, {hunger: 1, count: 12});
   run(s, 300, () => r.mode === 'bite');
   assert.equal(r.mode, 'bite');assert.equal(r.bite.population, true, 'the bite came from a simulated school');
-  const bite = s.population.sideBites[r.bite.id], group = s.population.groups.find(g => g.id === bite.group), before = group.count;
+  const biteId = r.bite.id, bite = s.population.sideBites[biteId];
+  assert.ok(bite, 'the NPC bait owns a real pending population bite');
+  const group = s.population.groups.find(g => g.id === bite.group), before = group.count;
   assert.equal(s.population.pendingBite, null, 'no bite was routed to the player');
   run(s, 10, () => r.mode !== 'bite');
-  assert.equal(s.population.sideBites[bite.id], undefined, 'resolved');
+  assert.equal(s.population.sideBites[biteId], undefined, 'the NPC bait’s bite was resolved');
   if (r.mode === 'fighting') assert.equal(group.count, before - 1, 'the hooked fish left its school');
   assert.equal(s.state.phase, 'walk');
   // resolveBite by id leaves other baits alone.
