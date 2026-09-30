@@ -1,207 +1,238 @@
 {
- "generatedAt": "2026-09-29T04:07:02.168Z",
+ "generatedAt": "2026-09-30T01:54:27.231Z",
  "runs": 40,
  "limitSeconds": 600,
  "scenes": {
   "pacifica": {
    "trough · crab · Carolina · soak": {
     "runs": 40,
-    "biteWithin2min": 0.425,
-    "biteWithin10min": 0.8,
-    "medianSeconds": 141.74999999999798,
+    "biteWithin2min": 0.8,
+    "biteWithin10min": 0.975,
+    "medianSeconds": 47.29999999999945,
     "species": {
-     "surfperch": 31,
-     "white_croaker": 1
+     "surfperch": 23,
+     "calico_surfperch": 4,
+     "redtail_surfperch": 12
     }
    },
    "trough · crab · Carolina · recast 20 s": {
     "runs": 40,
-    "biteWithin2min": 0.3,
-    "biteWithin10min": 0.65,
-    "medianSeconds": 315.00000000003735,
+    "biteWithin2min": 0.6,
+    "biteWithin10min": 0.9,
+    "medianSeconds": 56.899999999998904,
     "species": {
-     "surfperch": 24,
-     "white_croaker": 1,
-     "jacksmelt": 1
+     "surfperch": 17,
+     "calico_surfperch": 2,
+     "redtail_surfperch": 15,
+     "silver_surfperch": 2
     }
    },
    "trough · squid · Carolina": {
     "runs": 40,
-    "biteWithin2min": 0.325,
-    "biteWithin10min": 0.75,
-    "medianSeconds": 219.7000000000157,
+    "biteWithin2min": 0.6,
+    "biteWithin10min": 0.85,
+    "medianSeconds": 64.29999999999849,
     "species": {
-     "white_croaker": 24,
-     "surfperch": 6
+     "surfperch": 6,
+     "white_croaker": 15,
+     "redtail_surfperch": 4,
+     "calico_surfperch": 2,
+     "silver_surfperch": 7
     }
    },
    "bar gap · anchovy · fish-finder": {
     "runs": 40,
-    "biteWithin2min": 0.225,
-    "biteWithin10min": 0.475,
-    "medianSeconds": null,
+    "biteWithin2min": 0.575,
+    "biteWithin10min": 0.975,
+    "medianSeconds": 101.1999999999964,
     "species": {
-     "halibut": 6,
-     "striped_bass": 9,
-     "white_croaker": 4
+     "striped_bass": 23,
+     "white_croaker": 15,
+     "halibut": 1
     }
    },
    "trough · squid · float": {
     "runs": 40,
-    "biteWithin2min": 0.65,
-    "biteWithin10min": 0.9,
-    "medianSeconds": 79.49999999999763,
+    "biteWithin2min": 0.575,
+    "biteWithin10min": 0.975,
+    "medianSeconds": 96.44999999999666,
     "species": {
-     "jacksmelt": 36
+     "jacksmelt": 37,
+     "walleye_surfperch": 2
     }
    },
    "trough · crab · fish-finder (big hook)": {
     "runs": 40,
-    "biteWithin2min": 0.225,
-    "biteWithin10min": 0.725,
-    "medianSeconds": 281.2500000000297,
+    "biteWithin2min": 0.575,
+    "biteWithin10min": 0.925,
+    "medianSeconds": 91.84999999999692,
     "species": {
-     "surfperch": 26,
-     "white_croaker": 1,
-     "striped_bass": 2
+     "redtail_surfperch": 15,
+     "calico_surfperch": 1,
+     "surfperch": 20,
+     "silver_surfperch": 1
     }
    },
    "max range · crab · Carolina": {
     "runs": 40,
-    "biteWithin2min": 0.025,
-    "biteWithin10min": 0.125,
+    "biteWithin2min": 0,
+    "biteWithin10min": 0.325,
     "medianSeconds": null,
     "species": {
-     "white_croaker": 5
+     "surfperch": 8,
+     "redtail_surfperch": 5
     }
    },
    "swash · crab · Carolina": {
     "runs": 40,
-    "biteWithin2min": 0.4,
-    "biteWithin10min": 0.675,
-    "medianSeconds": 141.74999999999798,
+    "biteWithin2min": 0.025,
+    "biteWithin10min": 0.8,
+    "medianSeconds": 424.2500000000622,
     "species": {
-     "surfperch": 26,
-     "white_croaker": 1
+     "surfperch": 19,
+     "redtail_surfperch": 9,
+     "silver_surfperch": 1,
+     "calico_surfperch": 3
     }
    },
    "trough · crab · Carolina · rough sea": {
     "runs": 40,
-    "biteWithin2min": 0.175,
-    "biteWithin10min": 0.4,
+    "biteWithin2min": 0.075,
+    "biteWithin10min": 0.075,
     "medianSeconds": null,
     "species": {
-     "surfperch": 16
+     "redtail_surfperch": 2,
+     "surfperch": 1
     }
    },
    "trough · crab · Carolina · midday": {
     "runs": 40,
-    "biteWithin2min": 0.35,
-    "biteWithin10min": 0.925,
-    "medianSeconds": 165.25000000000333,
+    "biteWithin2min": 0.45,
+    "biteWithin10min": 0.975,
+    "medianSeconds": 125.799999999995,
     "species": {
-     "surfperch": 37
+     "surfperch": 23,
+     "redtail_surfperch": 12,
+     "calico_surfperch": 3,
+     "silver_surfperch": 1
     }
    }
   },
   "half-moon-bay": {
    "trough · crab · Carolina · soak": {
     "runs": 40,
-    "biteWithin2min": 0.8,
-    "biteWithin10min": 0.925,
-    "medianSeconds": 56.9499999999989,
+    "biteWithin2min": 0.275,
+    "biteWithin10min": 0.8,
+    "medianSeconds": 170.0000000000044,
     "species": {
-     "surfperch": 36,
-     "white_croaker": 1
+     "surfperch": 18,
+     "redtail_surfperch": 11,
+     "calico_surfperch": 2,
+     "silver_surfperch": 1
     }
    },
    "trough · crab · Carolina · recast 20 s": {
     "runs": 40,
-    "biteWithin2min": 0.45,
-    "biteWithin10min": 0.825,
-    "medianSeconds": 170.05000000000442,
+    "biteWithin2min": 0.075,
+    "biteWithin10min": 0.625,
+    "medianSeconds": 393.5000000000552,
     "species": {
-     "surfperch": 32,
+     "surfperch": 10,
+     "redtail_surfperch": 8,
+     "calico_surfperch": 5,
+     "silver_surfperch": 1,
      "white_croaker": 1
     }
    },
    "trough · squid · Carolina": {
     "runs": 40,
-    "biteWithin2min": 0.525,
-    "biteWithin10min": 0.85,
-    "medianSeconds": 116.9499999999955,
+    "biteWithin2min": 0.225,
+    "biteWithin10min": 0.6,
+    "medianSeconds": 333.95000000004165,
     "species": {
-     "white_croaker": 21,
-     "surfperch": 13
+     "redtail_surfperch": 3,
+     "white_croaker": 18,
+     "silver_surfperch": 1,
+     "calico_surfperch": 1,
+     "surfperch": 1
     }
    },
    "bar gap · anchovy · fish-finder": {
     "runs": 40,
-    "biteWithin2min": 0.45,
-    "biteWithin10min": 1,
-    "medianSeconds": 136.19999999999672,
+    "biteWithin2min": 0.175,
+    "biteWithin10min": 0.7,
+    "medianSeconds": 396.1000000000558,
     "species": {
-     "halibut": 4,
-     "white_croaker": 14,
-     "striped_bass": 22
+     "striped_bass": 21,
+     "halibut": 2,
+     "white_croaker": 5
     }
    },
    "trough · squid · float": {
     "runs": 40,
-    "biteWithin2min": 0.525,
-    "biteWithin10min": 0.975,
-    "medianSeconds": 108.64999999999597,
+    "biteWithin2min": 0.65,
+    "biteWithin10min": 0.925,
+    "medianSeconds": 91.29999999999696,
     "species": {
-     "jacksmelt": 39
+     "jacksmelt": 37
     }
    },
    "trough · crab · fish-finder (big hook)": {
     "runs": 40,
-    "biteWithin2min": 0.325,
-    "biteWithin10min": 0.8,
-    "medianSeconds": 182.50000000000725,
+    "biteWithin2min": 0.275,
+    "biteWithin10min": 0.9,
+    "medianSeconds": 152.15000000000035,
     "species": {
-     "surfperch": 32
+     "redtail_surfperch": 12,
+     "surfperch": 21,
+     "silver_surfperch": 2,
+     "calico_surfperch": 1
     }
    },
    "max range · crab · Carolina": {
     "runs": 40,
-    "biteWithin2min": 0.175,
-    "biteWithin10min": 0.475,
-    "medianSeconds": null,
+    "biteWithin2min": 0.15,
+    "biteWithin10min": 0.5,
+    "medianSeconds": 477.2000000000742,
     "species": {
-     "surfperch": 13,
-     "white_croaker": 6
+     "calico_surfperch": 2,
+     "surfperch": 15,
+     "redtail_surfperch": 3
     }
    },
    "swash · crab · Carolina": {
     "runs": 40,
-    "biteWithin2min": 0.5,
-    "biteWithin10min": 0.875,
-    "medianSeconds": 118.24999999999542,
+    "biteWithin2min": 0,
+    "biteWithin10min": 0.975,
+    "medianSeconds": 358.2500000000472,
     "species": {
-     "surfperch": 34,
-     "jacksmelt": 1
+     "redtail_surfperch": 20,
+     "surfperch": 13,
+     "white_croaker": 1,
+     "calico_surfperch": 4,
+     "silver_surfperch": 1
     }
    },
    "trough · crab · Carolina · rough sea": {
     "runs": 40,
-    "biteWithin2min": 0.025,
-    "biteWithin10min": 0.025,
+    "biteWithin2min": 0.175,
+    "biteWithin10min": 0.45,
     "medianSeconds": null,
     "species": {
-     "white_croaker": 1
+     "surfperch": 17,
+     "redtail_surfperch": 1
     }
    },
    "trough · crab · Carolina · midday": {
     "runs": 40,
-    "biteWithin2min": 0.725,
-    "biteWithin10min": 0.925,
-    "medianSeconds": 72.949999999998,
+    "biteWithin2min": 0.45,
+    "biteWithin10min": 0.8,
+    "medianSeconds": 128.99999999999508,
     "species": {
-     "surfperch": 31,
-     "white_croaker": 5,
-     "jacksmelt": 1
+     "surfperch": 11,
+     "redtail_surfperch": 16,
+     "calico_surfperch": 3,
+     "silver_surfperch": 2
     }
    }
   }

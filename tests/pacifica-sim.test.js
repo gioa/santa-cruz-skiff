@@ -206,7 +206,7 @@ test('save restores settled catch and upgrades, with independent copies and vali
   assert.equal(validated.state.catches.length, 1);
   assert.notEqual(validated.state.catches[0].value, 999999);
   assert.deepEqual(validated.state.upgrades, ['surf_rod']);
-  assert.deepEqual(validated.state.inventory, {sandcrab: 0, squid: 0, anchovy: 0});
+  assert.deepEqual(validated.state.inventory, {sandcrab: 0, squid: 0, anchovy: 0, sandworm: 0, mussel: 0});
   assert.equal(validated.state.credits, 120);
   assert.deepEqual([validated.state.player.x, validated.state.player.y], [1100, 865]);
   const otherScene = new PacificaSimulation({saved: {...saved, scene: 'santa-cruz'}});

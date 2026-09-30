@@ -22,6 +22,14 @@ const records=[
  // Shore species modelled at Pacifica/Half Moon Bay (OEHHA name for barred surfperch).
  ['barred_surfperch','银双齿海鲫','Barred Surfperch','Amphistichus argenteus','barred_surfperch',[]],
  ['jacksmelt','加州似银汉鱼','Jacksmelt','Atherinopsis californiensis','jacksmelt',[]],
+ // More Embiotocidae at the shore scenes (CDFW ASFR ch. 13). Chinese labels are
+ // editorial descriptions (no official translations); IDs and Latin names decide.
+ ['calico_surfperch','斑纹海鲫','Calico Surfperch','Amphistichus koelzi','calico_surfperch',[]],
+ ['silver_surfperch','银海鲫','Silver Surfperch','Hyperprosopon ellipticum','silver_surfperch',[]],
+ ['walleye_surfperch','大眼海鲫','Walleye Surfperch','Hyperprosopon argenteum','walleye_surfperch',[]],
+ ['shiner_perch','小银海鲫','Shiner Perch','Cymatogaster aggregata','shiner_perch',[]],
+ ['pile_perch','桩海鲫','Pile Perch','Rhacochilus vacca','pile_perch',[]],
+ ['striped_seaperch','条纹海鲫','Striped Seaperch','Embiotoca lateralis','striped_seaperch',[]],
  // Distinct known identities without encounter art remain unknown silhouettes.
 
  ['sunset_rockfish','夕阳岩鱼','Sunset Rockfish','Sebastes crocotulus',null,[]],

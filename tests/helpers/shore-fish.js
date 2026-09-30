@@ -6,6 +6,9 @@ import {placeSchool} from '../../dist/fish-population.js';
 // nothing forces a bite phase or chooses the fish's size directly.
 export function schoolAtBait(sim, species, overrides = {}) {
   assert.ok(['waiting', 'casting'].includes(sim.state.phase), 'cast before placing fish');
+  // Keep the day calm when the sea comes from the date's climate, so a winter
+  // swell on the day the tests run cannot decide a test about bite mechanics.
+  if (!sim.state.seaState || sim.state.seaState.climate) sim.state.seaState = {waveHeightM: .6, wavePeriodS: 11};
   const world = sim.fishWorld(), target = sim.toPlane(sim.state.cast.target.x, sim.state.cast.target.y);
   // Remove other fish so the test is about this school only.
   sim.population.groups = [];

@@ -1,0 +1,20 @@
+<!doctype html><meta charset="utf-8"><title>Surf preview</title>
+<style>body{margin:0;background:#123}canvas{width:900px;image-rendering:pixelated;display:block}</style>
+<canvas id="c"></canvas>
+<script type="module">
+// QA-only harness: renders the shore world for a query-string sea state.
+// ?scene=pacifica&hs=1.2&tp=13&dir=0&x=2440&t=100&focus=40 (metres offshore)&scale
+import {createPacificaWorld} from '../../dist/pacifica-world.js';
+import {getShoreScene,sampleShore} from '../../dist/shore-data.js';
+const q=new URLSearchParams(location.search),sceneId=q.get('scene')||'pacifica',scene=getShoreScene(sceneId);
+const x=Number(q.get('x')||2440),t=Number(q.get('t')||100),focus=Number(q.get('focus')||40);
+const seaState={waveHeightM:Number(q.get('hs')||1.2),wavePeriodS:Number(q.get('tp')||13),waveDirectionDeg:Number(q.get('dir')||0)};
+if(q.get('tide'))seaState.tideM=Number(q.get('tide'));
+const canvas=document.getElementById('c'),world=createPacificaWorld(canvas,{sceneId});
+world.setInsets({top:0,bottom:0});world.resize(900,600);
+const state={sceneId,player:{x,y:scene.shoreY(x)+25,facing:-1},phase:'walk',elapsed:t,seaState,shoreLore:{encounter:null,notes:[]},catches:[],shoreSample:sampleShore(sceneId,x,scene.shoreY(x)-40,t,seaState)};
+world.focus(x,scene.shoreY(x)-focus*3.2);
+let t0=performance.now();
+function frame(now){const el=t+(q.get('animate')?(now-t0)/1000:0);state.elapsed=el;world.draw(state,el);if(q.get('animate'))requestAnimationFrame(frame);else window.ready=true;}
+requestAnimationFrame(frame);
+</script>

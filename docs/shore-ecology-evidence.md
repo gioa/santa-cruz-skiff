@@ -1,6 +1,6 @@
 # Shore encounter ecology: evidence and calibration
 
-Reviewed 2026-09-28. Applies to Pacifica and Half Moon Bay. The five represented species are barred surfperch, striped bass, California halibut, white croaker and jacksmelt. The model uses the same separation as Santa Cruz: species habitat, feeding and presentation change **absolute encounter rates**, then a fish is selected from those same rates. It does not normalize unsuitable tackle into an equally frequent different fish.
+Reviewed 2026-09-29. Applies to Pacifica and Half Moon Bay. Twelve species are represented: striped bass, California halibut, white croaker, jacksmelt and eight surfperches (barred, redtail, calico, silver and walleye surfperch; shiner perch; pile perch; striped seaperch). The model uses the same separation as Santa Cruz: species habitat, feeding and presentation change **absolute encounter rates**, then a fish is selected from those same rates. It does not normalize unsuitable tackle into an equally frequent different fish.
 
 ## Biological evidence
 
@@ -17,6 +17,33 @@ Reviewed 2026-09-28. Applies to Pacifica and Half Moon Bay. The five represented
 | [Smithsonian Tropical Research Institute, *Shorefishes of the Eastern Pacific*, Jacksmelt](https://biogeodb.stri.si.edu/sftep/en/thefishes/species/811) | Jacksmelt are coastal pelagic fish associated with surface and near-surface waters. This supports a feeding-layer response independent of bottom contact. | A fixed school depth or a requirement to fish only from a pier. The reported 0–29 m habitat depth is not a prescribed bait depth. |
 | [CDFW, *Guide to Central California Beach Fishing*, peak-month table](https://wildlife.ca.gov/Fishing/Ocean/Beach-Fishing) | April–August is listed as the peak beach-fishing period for jacksmelt, supporting stronger availability in those months. | Absence outside those months, an exact monthly multiplier, or a legal-season restriction. |
 
+## Surfperches
+
+The main source is CDFW's surfperch chapter of the [Annual Status of the Fisheries Report (ch. 13, Surfperches)](https://nrm.dfg.ca.gov/FileHandler.ashx?DocumentID=34400), Table 13.3: range, depth, main habitat, maximum size and food. The [CDFW barred and redtail surfperch species page](https://marinespecies.wildlife.ca.gov/barred-surfperch-and-redtail-surfperch/the-species/) supports it.
+
+| Species | Habitat in the report | Max size | How the game places it |
+|---|---|---|---|
+| Barred surfperch | Sandy beaches, surf zone | 17 in | Trough and swash on sand; sand crab or sandworm on a small hook |
+| Redtail surfperch | Sandy open-coast beaches; sometimes rocks, jetties, bays | 16 in | Same sandy water; centred north of San Francisco, so common at both beaches |
+| Calico surfperch | Sandy beaches | 12 in | Sandy trough, scarcer |
+| Silver surfperch | Surf zone of sandy beaches; around rocks and piers | 10.5 in | Sandy water and the pier; takes suspended baits too |
+| Walleye surfperch | Sandy beaches, piers, jetties, kelp | 12 in | Pier pilings and rock first, some sand; feeds at dawn and dusk |
+| Shiner perch | Bays, protected coast, eelgrass and piers | 7 in | Pier structure, in large schools |
+| Pile perch | Piers, underwater structure, rocky shores, kelp | 17.5 in | Pier pilings and Mori Point rock; shellfish (mussel) |
+| Striped seaperch | Kelp and rocky areas; also bays | 15.3 in | Mori Point rock and the pier; mussel and worms |
+
+- The report lists barred, calico, redtail, silver and spotfin surfperch as the beach species. Black perch, striped seaperch and other seaperches are associated with rock and kelp. Pile perch, shiner and walleye use several habitats, including piers.
+- Most surfperches eat small crustaceans, molluscs and polychaete worms, which supports the added sandworm and mussel baits. They are usually bottom feeders but may feed in midwater.
+- Structure-bound species get a structure habitat term from `sampleShore`: pier pilings within a few metres of the Pacifica deck, and Mori Point's rocky toe. Sand-beach species do not use it.
+- Densities, school sizes and bait preferences for these eight species are authored game values. Spotfin surfperch, black perch and the other rock and kelp seaperches are not represented.
+
+Regulations follow the CDFW ocean booklet (T14 CCR §28.59):
+- Surfperches: 20 fish combined, no more than 10 of any one species.
+- Redtail surfperch: minimum 10.5 in.
+- Shiner perch: a separate limit of 20, in addition to the general limit.
+
+The same rules are in the in-game handbook and the warden's check.
+
 The sources support qualitative relationships. They do not contain a measured per-second bite dataset for these two beaches. Local survey records establish occurrence, not present-day density; southern-California survey abundances are not used as quantitative Santa Cruz calibration. This is an evidence-informed game model, not a calibrated ecological population survey or a real fishing forecast. Seasonal affinity describes availability, not legal fishing seasons.
 
 Jacksmelt retains the English common name and the display name 加州似银汉鱼, consistent with the [Academia Sinica fish-name database](https://fishdb.sinica.edu.tw/chi/chinesequer2.php?R1=&T1=&cn=&dere=asc&fm=&gc=&me=&orderby=science&page=31&pz=100&vn=) entry for *Atherinopsis californiensis*.
@@ -29,7 +56,7 @@ The `float_rig` suspends a small bait portion at approximately 1 m below the sur
 
 Distances are measured in metres offshore from the local waterline and evaluated against that cross-section's trough/bar position. A smooth response follows the near trough for perch, the bar/channel vicinity for bass, farther sand for halibut, sandy-bottom areas for white croaker and nearshore water for jacksmelt. These are preferred search areas, not hard biological range limits. Depth is evaluated independently and tide changes the depth available over the same bottom geometry. Longer casts can skip the suitable feeding area entirely.
 
-The inventory contains sand crabs, squid strips and **cut** anchovy. It does not silently upgrade dead cut bait into live bait. Perch favor sand crab and the smaller bottom hook. Bass and halibut favor fish bait and the larger bottom rig. White croaker favor squid or cut fish near the bottom, with crab still possible. Jacksmelt favor a small suspended bait but can take sand crab on a Carolina rig. Incidental mismatches generally have much lower absolute rates. Unsupported bait/rig/habitat, unusable bait and dry water yield zero instead of a minimum species floor. Lack of bottom contact suppresses the bottom-oriented species; submerged jacksmelt presentations are evaluated by their feeding layer instead.
+The inventory contains sand crabs, sandworms, mussel, squid strips and **cut** anchovy. It does not silently upgrade dead cut bait into live bait. Perch favor sand crab and the smaller bottom hook. Bass and halibut favor fish bait and the larger bottom rig. White croaker favor squid or cut fish near the bottom, with crab still possible. Jacksmelt favor a small suspended bait but can take sand crab on a Carolina rig. Incidental mismatches generally have much lower absolute rates. Unsupported bait/rig/habitat, unusable bait and dry water yield zero instead of a minimum species floor. Lack of bottom contact suppresses the bottom-oriented species; submerged jacksmelt presentations are evaluated by their feeding layer instead.
 
 Moderate whitewater can help expose forage, while excessive orbital motion, turbulence and turbidity reduce effective feeding. Halibut receive a stronger visibility/turbulence penalty, not an absolute rough-water ban. Independently, the terminal-tackle simulation converts wave/current forcing and the rig's sinker into sinking, bottom contact, stability and drift. Both physical loss of presentation and reduced feeding opportunity affect the hazard. This deliberate separation makes waves matter to the bait as well as the fish. See [the wave model and its NOAA/NWS sources](shore-wave-model.md) for wave propagation and forcing; fish-response coefficients remain authored tuning.
 

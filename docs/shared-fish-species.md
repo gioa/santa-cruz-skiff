@@ -53,3 +53,19 @@
 - `pixel-fish-mass.js` 已有的加州比目鱼模型供两场景使用。新岸钓比目鱼由同一单调曲线生成长度；旧存档没有长度时保留“未记录”，不补造测量记录。其他两种岸钓鱼尚无经过核查的长度质量模型，本轮不套用通用关系。
 - 鱼图共享识别和测量板；新添红尾海鲫／条纹鲈专用像素图。有长度才显示尺，历史缺失长度使用无标尺肖像。
 - 场景的物种池、遇鱼权重和体型分布仍是当地玩法参数，不是生物身份。现有售价、放流积分、钱包与法规地理覆盖没有因统一资料而改变。
+
+## 2026-09-29 补充：岸钓海鲫扩充
+
+本轮在岸钓加入 barred surfperch 与另外六种海鲫，均在共享名录 `dist/fish-species.js` 中有独立 ID 与学名。中文名除银双齿海鲫（OEHHA 译名）外为本游戏编辑用名，不声称官方译名。
+
+| 稳定 ID | 岸钓 ID | 中文展示 | 英文 | 学名 |
+|---|---|---|---|---|
+| `barred_surfperch` | `surfperch`（新渔获带 `speciesId`） | 银双齿海鲫 | Barred surfperch | *Amphistichus argenteus* |
+| `calico_surfperch` | 同 ID | 斑纹海鲫 | Calico surfperch | *Amphistichus koelzi* |
+| `silver_surfperch` | 同 ID | 银海鲫 | Silver surfperch | *Hyperprosopon ellipticum* |
+| `walleye_surfperch` | 同 ID | 大眼海鲫 | Walleye surfperch | *Hyperprosopon argenteum* |
+| `shiner_perch` | 同 ID | 小银海鲫 | Shiner perch | *Cymatogaster aggregata* |
+| `pile_perch` | 同 ID | 桩海鲫 | Pile perch | *Rhacochilus vacca* |
+| `striped_seaperch` | 同 ID | 条纹海鲫 | Striped seaperch | *Embiotoca lateralis* |
+
+旧存档中没有 `speciesId` 的岸钓 `surfperch` 仍按上文第 2 条迁移为 redtail。新渔获带明确的 `speciesId`，不会再与 redtail 混淆。Barred 的 `argenteus` 与 walleye 的 *Hyperprosopon argenteum* 仍是两个物种。习性与法规依据见 [岸钓生态证据](shore-ecology-evidence.md)。

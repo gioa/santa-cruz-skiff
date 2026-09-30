@@ -20,7 +20,7 @@ Wave period and height now drive linear dispersion, shoaling, depth-limited brea
 
 Bites come from simulated fish schools rather than a timer or fixed chance. Distance relative to local troughs and bars, depth, sand, season, light and waves decide where schools are. The scent plume in the surf current, soak time, splashes, and the bait, rig and presentation decide whether they find and take a bait. A no-bite cast is a normal result, and reloading cannot reroll the fish. See [population model](fish-population-model.md).
 
-The depth, exact bars and channel locations, scenario wave heights, fish probabilities and compact distance scale are authored approximations. No local survey or live ocean feed is used. Walking time is compressed for play. This is a readable coastal model, not a numerical coastal-engineering solver.
+The depth, exact bars and channel locations, shoreline cusps, fish behaviour and compact distance scale are authored approximations. Wave height and period come from monthly NOAA buoy statistics rather than a live feed. No local survey is used. Walking time is compressed for play. This is a readable coastal model, not a numerical coastal-engineering solver.
 
 ## Fictional game content
 

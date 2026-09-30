@@ -49,20 +49,22 @@ The population is saved with each trip (`population` in the save) and uses its o
 
 `node scripts/calibrate-shore-population.mjs [runs] [--json file]` and `node scripts/calibrate-pixel-population.mjs [runs] [--json file]` replay fixed strategies through the real simulations over many seeds. They report how often a bite comes within 2 and 10 minutes, the median wait and which fish took the bait. The latest reports are in `reports/shore-population-calibration.json` and `reports/pixel-population-calibration.json`. `tests/shore-technique.test.js` and `tests/pixel-population.test.js` keep the key comparisons from regressing.
 
-Shore (40 seeds per strategy, 10-minute limit, 2026-09-28):
+Shore (40 seeds per strategy, 10-minute limit, 2026-09-29, September climate sea unless noted; rough sea is 2.8 m / 16 s):
 
 | Strategy | Pacifica ≤2 min | ≤10 min | median | Half Moon Bay ≤2 min | ≤10 min | median | Fish (Half Moon Bay) |
 |---|---|---|---|---|---|---|---|
-| trough · crab · Carolina · soak | 42% | 80% | 142 s | 80% | 92% | 57 s | surfperch 97%, white croaker 3% |
-| trough · crab · Carolina · recast 20 s | 30% | 65% | 315 s | 45% | 82% | 170 s | surfperch 97%, white croaker 3% |
-| trough · squid · Carolina | 32% | 75% | 220 s | 52% | 85% | 117 s | white croaker 62%, surfperch 38% |
-| bar gap · anchovy · fish-finder | 22% | 48% | >600 s | 45% | 100% | 136 s | striped bass 55%, white croaker 35%, halibut 10% |
-| trough · squid · float | 65% | 90% | 79 s | 52% | 98% | 109 s | jacksmelt 100% |
-| trough · crab · fish-finder (big hook) | 22% | 72% | 281 s | 32% | 80% | 183 s | surfperch 100% |
-| max range · crab · Carolina | 2% | 12% | >600 s | 18% | 48% | >600 s | surfperch 68%, white croaker 32% |
-| swash · crab · Carolina | 40% | 68% | 142 s | 50% | 88% | 118 s | surfperch 97%, jacksmelt 3% |
-| trough · crab · Carolina · rough sea | 18% | 40% | >600 s | 2% | 2% | >600 s | white croaker 100% |
-| trough · crab · Carolina · midday | 35% | 92% | 165 s | 72% | 92% | 73 s | surfperch 84%, white croaker 14%, jacksmelt 3% |
+| trough · crab · Carolina · soak | 80% | 98% | 47 s | 28% | 80% | 170 s | barred 56%, redtail 34%, calico 6%, silver 3% |
+| trough · crab · Carolina · recast 20 s | 60% | 90% | 57 s | 8% | 63% | 394 s | barred 40%, redtail 32%, calico 20%, silver 4%, white croaker 4% |
+| trough · squid · Carolina | 60% | 85% | 64 s | 23% | 60% | 334 s | white croaker 75%, redtail 13%, barred/calico/silver 4% each |
+| bar gap · anchovy · fish-finder | 57% | 98% | 101 s | 18% | 70% | 396 s | striped bass 75%, white croaker 18%, halibut 7% |
+| trough · squid · float | 57% | 98% | 96 s | 65% | 93% | 91 s | jacksmelt 100% |
+| trough · crab · fish-finder (big hook) | 57% | 93% | 92 s | 28% | 90% | 152 s | barred 58%, redtail 33%, silver 6%, calico 3% |
+| max range · crab · Carolina | 0% | 33% | >600 s | 15% | 50% | 477 s | barred 75%, redtail 15%, calico 10% |
+| swash · crab · Carolina | 3% | 80% | 424 s | 0% | 98% | 358 s | redtail 51%, barred 33%, calico 10%, silver 3%, white croaker 3% |
+| trough · crab · Carolina · rough sea | 8% | 8% | >600 s | 18% | 45% | >600 s | barred 94%, redtail 6% |
+| trough · crab · Carolina · midday | 45% | 98% | 126 s | 45% | 80% | 129 s | redtail 50%, barred 34%, calico 9%, silver 6% |
+
+At Pacifica the trough species are barred, redtail, calico and silver surfperch, and the float also turns up the odd walleye surfperch. The structure perches are not in these fixed beach strategies. A pier probe (June, 0.9 m sea, casting beside the Pacifica pilings) got 15 bites in 24 casts: walleye surfperch 8, pile perch 3, shiner perch 3 and silver surfperch 1, on mussel and sandworm.
 
 Santa Cruz (20 seeds, boat held over a mapped reef or sand cell, no wind):
 
@@ -75,8 +77,9 @@ Santa Cruz (20 seeds, boat held over a mapped reef or sand cell, no wind):
 | sand · feather jig held at depth | 5% | 5% | >600 s | Pacific mackerel 100% |
 
 The takeaways:
-- Good technique usually finds fish within a couple of minutes.
-- Recasting, oversized hooks, maximum-range casts, heavy surf and baits that don't suit the local fish are clearly slower.
+- Good technique usually finds fish within a couple of minutes at Sharp Park. Half Moon Bay's wider, flatter surf is slower.
+- Recasting, maximum-range casts, heavy surf and baits that don't suit the local fish are clearly slower. The oversized hook is slower at Sharp Park. At Half Moon Bay its 3 oz sinker holds so much better in the wide surf zone that it keeps pace with the Carolina rig.
+- Heavy winter surf almost shuts Sharp Park's trough down; sheltered Half Moon Bay still gives some fish.
 - The bait and rig decide the species.
 - A jig simply held at depth is slower than bait; jig action comes from rod lift strokes, which these fixed strategies do not perform.
 

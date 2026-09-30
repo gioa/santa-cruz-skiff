@@ -4,6 +4,8 @@ export const BAITS=Object.freeze([
  {id:'sandcrab',name:'沙蟹',kind:'bait',price:12,quantity:8,description:'适合在近岸浪脚、沙槽寻找海鲫的天然饵。要配合落点与钓组，空竿也很常见。装饵消耗一份。'},
  {id:'squid',name:'鱿鱼条',kind:'bait',price:20,quantity:8,description:'可用于底钓的天然条饵；不同鱼种的偏好不同，不能替代所有鱼饵。留意浸泡、浪冲和鱼讯造成的损耗。'},
  {id:'anchovy',name:'鳀鱼块',kind:'bait',price:24,quantity:6,description:'切块鱼饵，可尝试寻找条纹鲈。与活饵的游动呈现不同；不能仅凭换饵就在任意距离钓到比目鱼。'},
+ {id:'sandworm',name:'沙虫',kind:'bait',price:16,quantity:8,description:'活沙虫/血虫段，几乎所有海鲫都爱吃，小钩上也挂得住；对条纹鲈、比目鱼吸引力很低。容易被小鱼啄光。'},
+ {id:'mussel',name:'贻贝肉',kind:'bait',price:14,quantity:10,description:'撬开的贻贝肉，桩海鲫和条纹海鲫的最爱，适合在栈桥桩柱或礁石边下饵；在开阔沙滩效果一般，肉软易掉。'},
 ]);
 export const STARTER_ITEMS=Object.freeze([
  {id:'starter_rod',name:'入门岸钓竿',kind:'rod',description:'7 ft（2.13 m）岸钓竿，适配 14–42 g 抛投总重，包含钓组和鱼饵。适合轻组近投；重组超载会降低抛投表现。每根竿独立保存装配。'},

@@ -13,7 +13,7 @@ function setup({rng=()=>.5,sceneId='pacifica',seaState={waveHeightM:.4,wavePerio
 }
 function cast(sim){
   const p=shoreProfile(sim.scene,sim.state.player.x,sim.state.elapsed,sim.state.seaState);
-  castToOffshore(sim,p.troughDistance);
+  castToOffshore(sim,Math.min(p.troughDistance,sim.previewCast({power:1}).offshoreDistance-.5));
 }
 function advance(sim,seconds,frame=.1){for(let t=0;t<seconds-1e-9;t+=frame)sim.update(Math.min(frame,seconds-t));}
 

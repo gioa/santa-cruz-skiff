@@ -1,6 +1,6 @@
 import {fightViewGeometry} from './pixel-fight-view.js';
 import {drawCloseTackle} from './pixel-fight-tackle.js';
-import {getShoreScene,sampleShore,shoreWaveCrests} from './shore-data.js';
+import {getShoreScene,sampleShore,shoreSurfField} from './shore-data.js';
 import {shoreFishPosition} from './shore-line-geometry.js';
 import {shorePresentation} from './shore-presentation.js';
 
@@ -76,28 +76,26 @@ export function createShoreFightView(canvas,{sceneId='pacifica'}={}){
     if(hash(seed+12)>.36)rect(x,yy,span*(.4+hash(seed+27)),1,row%3?palette.sea:'#82aaa5');
    }
   }
-  // Perspective projects actual roots of the same phase as the overhead
-  // view and tackle simulation, including wave period, tide and sea overrides.
+  // Perspective projects the same individual waves as the overhead view and
+  // tackle simulation: swell lines, breaking lips, bores and foam.
   for(let worldX=pl.x-1800;worldX<=pl.x+1800;worldX+=22){
-   const shore=scene.shoreY(worldX),maxOffshore=pier?Math.max(220,(shore-pl.y)/3.2+220):220;
-   const crests=shoreWaveCrests(scene,worldX,t,s.seaState,maxOffshore);
-   for(const distance of crests){
-    const worldY=shore-distance*3.2,forward=(pier?pl.y-worldY:shore-worldY)/3.2;
+   const shore=scene.shoreY(worldX),field=shoreSurfField(scene,worldX,t,s.seaState);
+   for(const c of field.crests){
+    const worldY=shore-c.offshore*3.2,forward=(pier?pl.y-worldY:shore-worldY)/3.2;
     if(forward<.5||forward>220)continue;
     const scale=18/(18+forward),rawX=w*.5+(worldX-pl.x)/3.2*w*.025*scale;
     if(rawX<0||rawX>w)continue;
-    const sample=sampleShore(scene,worldX,worldY,t,s.seaState),p=shoreSurfaceProjection(w,h,scene,s,{x:worldX,y:worldY});
-    const segment=Math.max(2,22/3.2*w*.025*scale+1),breaking=sample.breakStrength>.10;
-    const rise=sample.surfaceElevation*scale*5;
-    if(breaking||hash(Math.round(sample.wavePhase/TAU)*727+Math.floor(worldX/22))>.28){
-     const thickness=breaking?Math.max(2,scale*sample.localWaveHeight*10*sample.breakStrength):1;
-     if(breaking)rect(rawX,p.y-rise-2,segment,thickness+4,palette.deep);
-     rect(rawX,p.y-rise,segment,thickness,breaking?palette.foam:'#91b6af');
-     if(breaking){
-      rect(rawX,p.y-rise+thickness,segment,2,palette.shallow);
-      if(hash(Math.floor(worldX/22)+437)>.3)rect(rawX+1,p.y-rise+thickness+3,Math.max(1,segment*.5),1,palette.foam);
-     }
+    const p=shoreSurfaceProjection(w,h,scene,s,{x:worldX,y:worldY}),segment=Math.max(2,22/3.2*w*.025*scale+1);
+    const rise=c.height*scale*6,broken=c.state==='breaking'||c.state==='bore';
+    if(!broken){
+     if(hash(c.index*727+Math.floor(worldX/22))>.25){rect(rawX,p.y-rise,segment,Math.max(1,rise*.35),palette.deep);rect(rawX,p.y-rise,segment,1,'#91b6af');}
+     continue;
     }
+    const thickness=Math.max(2,rise*(c.state==='breaking'?.9:.6));
+    rect(rawX,p.y-rise-2,segment,thickness+2,palette.deep);
+    rect(rawX,p.y-rise,segment,thickness,palette.foam);
+    rect(rawX,p.y-rise+thickness,segment,Math.max(1,thickness*.6),'#c9d9cc');
+    if(c.type==='plunging'&&c.state==='breaking'&&hash(Math.floor(worldX/22)+437)>.3)rect(rawX+1,p.y-rise-thickness,Math.max(1,segment*.5),2,palette.foam);
    }
   }
   if(pier){
@@ -107,8 +105,8 @@ export function createShoreFightView(canvas,{sceneId='pacifica'}={}){
    for(const x of [w*.06,w*.94]){rect(x-2,h*.76,4,h*.17,'#344c50');rect(x-1,h*.76,1,h*.17,'#98a9a0');}
    rect(0,h*.76,w,4,'#3d5658');rect(0,h*.76,w,1,'#adb7a6');
   }else{
-   const swash=sampleShore(scene,pl.x,scene.shoreY(pl.x),t,s.seaState);
-   const runup=swash.runupMeters*h*.0015,edge=h*.85+runup+(swash.tide-.4)*h*.012;
+   const swash=sampleShore(scene,pl.x,scene.shoreY(pl.x),t,s.seaState),field=shoreSurfField(scene,pl.x,t,s.seaState);
+   const edge=h*.85+field.swashMeters*h*.004+field.waterlineMeters*h*.004;
    const points=[{x:0,y:h},{x:0,y:edge}];
    for(let x=0;x<=w+8;x+=8)points.push({x,y:edge+Math.sin(x/w*7+pl.x/270)*h*.01});
    points.push({x:w,y:h});polygon(points,palette.wet);

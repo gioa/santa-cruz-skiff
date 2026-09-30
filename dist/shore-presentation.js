@@ -13,12 +13,14 @@ const BAIT_LOAD=Object.freeze({
   sandcrab:Object.freeze({grams:4,dragArea:.00014}),
   squid:Object.freeze({grams:7,dragArea:.00024}),
   anchovy:Object.freeze({grams:10,dragArea:.00035}),
+  sandworm:Object.freeze({grams:3,dragArea:.00012}),
+  mussel:Object.freeze({grams:6,dragArea:.0002}),
 });
 // Floating small hooks receive a trimmed 2.5 g piece. One stocked bait portion
 // still pays for one baiting action; trimming never creates extra inventory.
 export function shoreBaitLoad(rigId='carolina_rig',baitKind='sandcrab'){
   const bait=BAIT_LOAD[baitKind]||BAIT_LOAD.sandcrab;
-  const portion=rigId==='float_rig'&&['squid','anchovy'].includes(baitKind)?2.5/bait.grams:1;
+  const portion=rigId==='float_rig'&&['squid','anchovy','mussel'].includes(baitKind)?2.5/bait.grams:1;
   return{grams:bait.grams*portion,dragArea:bait.dragArea*portion**(2/3),portion};
 }
 export function shorePresentation(sample={},rigId='carolina_rig',depth=0){

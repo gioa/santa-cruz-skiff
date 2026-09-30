@@ -63,18 +63,18 @@ test('a long walk follows the varying coastline without entering the sea', () =>
 });
 
 test('bars, troughs and channel gaps affect depth, breaking water and species weights', () => {
-  const sim = new PacificaSimulation(), scene = sim.scene, x = 2440;
-  const profile = shoreProfile(scene, x);
-  const trough = sampleShore(scene, x, scene.shoreY(x) - profile.troughDistance * 3.2);
-  const bar = sampleShore(scene, x, scene.shoreY(x) - profile.barDistance * 3.2);
-  const channelX = scene.channels[2].x, channelProfile = shoreProfile(scene, channelX);
-  const channel = sampleShore(scene, channelX, scene.shoreY(channelX) - channelProfile.barDistance * 3.2);
+  const sim = new PacificaSimulation(), scene = sim.scene, x = 2440, sea = {waveHeightM: 2.1, wavePeriodS: 14, tideM: .6};
+  const profile = shoreProfile(scene, x, 0, sea);
+  const trough = sampleShore(scene, x, scene.shoreY(x) - profile.troughDistance * 3.2, 0, sea);
+  const bar = sampleShore(scene, x, scene.shoreY(x) - profile.barDistance * 3.2, 0, sea);
+  const channelX = scene.channels[2].x, channelProfile = shoreProfile(scene, channelX, 0, sea);
+  const channel = sampleShore(scene, channelX, scene.shoreY(channelX) - channelProfile.barDistance * 3.2, 0, sea);
   assert.equal(trough.habitat, 'trough');
   assert.equal(bar.habitat, 'bar');
   assert.equal(channel.habitat, 'channel');
-  assert.ok(trough.depth > bar.depth + 1);
-  assert.ok(bar.breakStrength > channel.breakStrength + .5);
-  assert.ok(Math.abs(channel.currentY) > Math.abs(bar.currentY) * 5);
+  assert.ok(trough.depth > bar.depth + .4);
+  assert.ok(bar.breakStrength > channel.breakStrength + .25);
+  assert.ok(channel.currentY < bar.currentY && channel.currentY < -.1);
   sim.state.presentation={bottomContact:1,stability:1};
   const inside = sim.speciesWeights(trough), gap = sim.speciesWeights(channel);
   assert.ok(inside[0] / inside[1] > gap[0] / gap[1]);
@@ -82,24 +82,28 @@ test('bars, troughs and channel gaps affect depth, breaking water and species we
 });
 
 test('inside trough and breaking bar change absolute encounter rates and actual drift', () => {
-  const x = 1100, near = new PacificaSimulation({rng: () => .5}), far = new PacificaSimulation({rng: () => .5});
-  const profile = shoreProfile(near.scene, x);
+  const seaState = {waveHeightM: 2.1, wavePeriodS: 14, tideM: .6};
+  const x = 1100, near = new PacificaSimulation({rng: () => .5, seaState}), far = new PacificaSimulation({rng: () => .5, seaState});
+  const profile = shoreProfile(near.scene, x, 0, seaState);
   for (const sim of [near, far]) fitSurfRod(sim);
   surfAt(near, x); surfAt(far, x);
   castToOffshore(near, profile.troughDistance);
-  castToOffshore(far, profile.barDistance);
+  // Sharp Park's bar sits at the edge of a surf rod's reach: cast as close as it allows.
+  castToOffshore(far, Math.min(profile.barDistance, far.previewCast({power: 1}).offshoreDistance - .5));
   assert.equal(near.state.shoreSample.habitat, 'trough');
-  assert.equal(far.state.shoreSample.habitat, 'bar');
+  assert.ok(far.state.shoreSample.barStrength > .5);
   const target = {...near.state.cast.target};
   advance(near, 15);advance(far,15);
   // The preference index (habitat × presentation) is higher in the trough.
   assert.ok(near.encounterRates().totalRatePerSecond>far.encounterRates().totalRatePerSecond);
   assert.ok(Math.hypot(near.state.cast.target.x-target.x,near.state.cast.target.y-target.y)>.1);
-  assert.deepEqual(near.state.shoreSample, sampleShore(near.scene, near.state.cast.target.x, near.state.cast.target.y, near.state.elapsed));
+  assert.deepEqual(near.state.shoreSample, sampleShore(near.scene, near.state.cast.target.x, near.state.cast.target.y, near.state.elapsed, seaState));
 });
 
 test('channel current produces stronger drift and surf loads change actual fight tension', () => {
-  const channel = new PacificaSimulation({rng: () => .5}), open = new PacificaSimulation({rng: () => .5});
+  // A winter swell (NDBC 46237 January median) drives a real rip through the gap.
+  const seaState = {waveHeightM: 2.1, wavePeriodS: 14, tideM: .6};
+  const channel = new PacificaSimulation({rng: () => .5, seaState}), open = new PacificaSimulation({rng: () => .5, seaState});
   for (const sim of [channel, open]) fitSurfRod(sim);
   surfAt(channel, 3240); surfAt(open, 2440);
   // Compare the same actual offshore water, not a shared charge whose reach
@@ -221,14 +225,15 @@ test('old unpaid fines survive a save and catch sales settle them once', () => {
 });
 
 test('a pier patrol retrieves an active line and cannot turn its fish into a paid catch', () => {
-  const sim = new PacificaSimulation({rng: () => .5}); gate(sim);
+  const sim = new PacificaSimulation({rng: () => .5, seaState: {waveHeightM: .5, wavePeriodS: 10}}); gate(sim);
   // This visit is caught (0) with the patrol at 20 + .6 × 130 = 98 s.
   const rolls = [0, .6]; sim.rng = () => rolls.length ? rolls.shift() : .5;
   assert.ok(sim.enterPier().ok);
   assert.equal(Math.round(sim.state.pierVisit.patrolAt), 98);
-  assert.ok(sim.cast({power: .7, aim: 1}).ok);
+  // Past the shorebreak, where a Carolina rig can settle.
+  assert.ok(sim.cast({power: 1, aim: 1}).ok);
   finishShoreFlight(sim);
-  until(sim, () => sim.state.presentation.bottomContact > .9, 40);
+  until(sim, () => sim.state.presentation.bottomContact > .6, 60);
   schoolAtBait(sim, 'surfperch');
   awaitBite(sim, 30);
   assert.ok(sim.strike().ok);

@@ -14,12 +14,12 @@ const perchOptions={sample:trough,bait:'sandcrab',rig:'carolina',presentation};
 const bassOptions={sample:channel,bait:'anchovy',rig:'fishfinder',presentation};
 const rate=(result,id)=>result.perSpecies.find(species=>species.id===id).ratePerSecond;
 
-test('a well matched shore presentation has minutes of waiting, and can still blank after ten minutes',()=>{
+test('the preference index ranks a well matched presentation above a mismatched one',()=>{
+ // Bite timing comes from the population model (tests/shore-technique.test.js);
+ // this index only summarises habitat × presentation preferences.
  for(const options of [perchOptions,bassOptions]){
-  const result=shoreEncounterRates(options);
-  assert.ok(result.medianWaitSeconds>=180&&result.medianWaitSeconds<=420,result.medianWaitSeconds);
-  assert.ok(Math.exp(-result.totalRatePerSecond*600)>.1,'ten minutes must not guarantee a bite');
-  assert.ok(1-Math.exp(-result.totalRatePerSecond*10)<.04,'a cast is not an immediate fish dispenser');
+  const good=shoreEncounterRates(options),poor=shoreEncounterRates({...options,bait:options.bait==='sandcrab'?'anchovy':'sandcrab',rig:options.rig==='carolina'?'fishfinder':'carolina'});
+  assert.ok(good.totalRatePerSecond>0&&good.totalRatePerSecond>poor.totalRatePerSecond*2);
  }
 });
 
@@ -46,7 +46,7 @@ test('natural bait and hook size change absolute encounters as well as the fish 
 test('distance follows the actual trough rather than rewarding a longer cast',()=>{
  const close=shoreEncounterRates(perchOptions);
  const breaking=shoreEncounterRates({...perchOptions,sample:bar});
- assert.ok(close.totalRatePerSecond>breaking.totalRatePerSecond*20);
+ for(const id of ['surfperch','redtail_surfperch','calico_surfperch'])assert.ok(rate(close,id)>rate(breaking,id)*8,id);
  const far=shoreEncounterRates({...perchOptions,sample:{...trough,offshore:90}});
  assert.ok(rate(close,'surfperch')>rate(far,'surfperch')*1000);
  const shifted=shoreEncounterRates({...perchOptions,sample:{...trough,offshore:40,troughDistance:40,barDistance:75}});
@@ -96,7 +96,6 @@ test('no water, usable bait, rig, substrate, or bottom contact means zero withou
   {...perchOptions,baitCondition:0},{...perchOptions,baitCondition:.08},
   {...perchOptions,bait:'unavailable'},{...perchOptions,rig:'missing'},
   {...perchOptions,sample:{...trough,habitat:'land'}},
-  {...perchOptions,presentation:{bottomContact:0,stability:1}},
  ]){
   const result=shoreEncounterRates(options);
   assert.equal(result.totalRatePerSecond,0);

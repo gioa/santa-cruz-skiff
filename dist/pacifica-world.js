@@ -1,12 +1,19 @@
 import {ANGLERS} from './shore-lore.js';
 // Shared pixel-art shoreline renderer. Fixed bathymetry, animated surf and
 // game collision geometry all use shore-data; the camera follows a long coast.
-import {getShoreScene, sampleShore, shoreWaveCrests, onPier} from './shore-data.js';
+import {getShoreScene, sampleShore, shoreSurfField, onPier} from './shore-data.js';
 import {shoreCastPosition} from './shore-casting.js';
 import {shoreFishPosition} from './shore-line-geometry.js';
 const TAU=Math.PI*2;
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const noise=(x,y=0)=>{let n=Math.imul(x|0,374761393)+Math.imul(y|0,668265263);n=Math.imul(n^(n>>>13),1274126177);return((n^(n>>>16))>>>0)/4294967295;};
+// Smooth value noise in [0, 1]: 1-D along the coast and 2-D for foam patches.
+const smooth=t=>t*t*(3-2*t);
+const vnoise=(x,seed)=>{const i=Math.floor(x),f=smooth(x-i),a=noise(i,seed),b=noise(i+1,seed);return a+(b-a)*f;};
+const vnoise2=(x,y,seed=0)=>{const i=Math.floor(x),j=Math.floor(y),fx=smooth(x-i),fy=smooth(y-j),h=(a,b)=>noise(a+seed*7919,b);
+  const top=h(i,j)+(h(i+1,j)-h(i,j))*fx,bottom=h(i,j+1)+(h(i+1,j+1)-h(i,j+1))*fx;return top+(bottom-top)*fy;};
+const hexRGB=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16));
+const mixTone=(a,b,t)=>{const p=hexRGB(a),q=hexRGB(b);return`rgb(${p.map((v,i)=>Math.round(v+(q[i]-v)*t)).join(',')})`;};
 const FONT={A:['01110','10001','10001','11111','10001','10001','10001'],B:['11110','10001','10001','11110','10001','10001','11110'],C:['01111','10000','10000','10000','10000','10000','01111'],D:['11110','10001','10001','10001','10001','10001','11110'],E:['11111','10000','10000','11110','10000','10000','11111'],F:['11111','10000','10000','11110','10000','10000','10000'],G:['01111','10000','10000','10111','10001','10001','01111'],H:['10001','10001','10001','11111','10001','10001','10001'],I:['111','010','010','010','010','010','111'],J:['00111','00010','00010','00010','10010','10010','01100'],K:['10001','10010','10100','11000','10100','10010','10001'],L:['10000','10000','10000','10000','10000','10000','11111'],M:['10001','11011','10101','10101','10001','10001','10001'],N:['10001','11001','10101','10011','10001','10001','10001'],O:['01110','10001','10001','10001','10001','10001','01110'],P:['11110','10001','10001','11110','10000','10000','10000'],Q:['01110','10001','10001','10001','10101','10010','01101'],R:['11110','10001','10001','11110','10100','10010','10001'],S:['01111','10000','10000','01110','00001','00001','11110'],T:['11111','00100','00100','00100','00100','00100','00100'],U:['10001','10001','10001','10001','10001','10001','01110'],V:['10001','10001','10001','10001','10001','01010','00100'],W:['10001','10001','10001','10101','10101','10101','01010'],X:['10001','10001','01010','00100','01010','10001','10001'],Y:['10001','10001','01010','00100','00100','00100','00100'],Z:['11111','00001','00010','00100','01000','10000','11111'],'&':['01100','10010','10100','01000','10101','10010','01101'],'/':['00001','00001','00010','00100','01000','10000','10000'],'-':['00000','00000','00000','11111','00000','00000','00000'],' ':['000'],0:['01110','10001','10011','10101','11001','10001','01110'],1:['010','110','010','010','010','010','111'],2:['01110','10001','00001','00110','01000','10000','11111'],3:['11110','00001','00001','01110','00001','00001','11110'],4:['10010','10010','10010','11111','00010','00010','00010'],5:['11111','10000','10000','11110','00001','00001','11110']};
 
 export function createPacificaWorld(canvas,{sceneId='pacifica'}={}){
@@ -81,18 +88,32 @@ export function createPacificaWorld(canvas,{sceneId='pacifica'}={}){
     // This is sampled once per cached tile, not painted as a repeating texture.
     const waterTones=hmb?['#93b9aa','#81ada4','#70a09e','#5a8d96','#477d8c','#3c7183']:
       ['#83a59a','#709b96','#5a8b90','#487d86','#3d6d7e','#315d70'];
-    for(let x=cx;x<cx+chunkSize;x+=16){
-      const sy=scene.shoreY(x+8);
-      for(let y=cy;y<Math.min(cy+chunkSize,sy+16);y+=16){
-        const bed=sampleShore(scene,x+8,y+8,0),idx=Math.min(5,Math.floor(bed.depth/1.05));
-        R(b,x,y,16,16,waterTones[idx]);
-        if(noise(x/16,y/16)>.72)R(b,x+2,y+3,10,1,idx<2?C.shallow:C.sea);
+    // Depth shading every 8 px, blended between neighbouring tones with a
+    // little grain so the bar, trough and rip channels shade without bands.
+    for(let x=cx;x<cx+chunkSize;x+=8){
+      const sy=scene.shoreY(x+4);
+      for(let y=cy;y<Math.min(cy+chunkSize,sy+16);y+=8){
+        const bed=sampleShore(scene,x+4,y+4,0,{},{surf:false});
+        const t=clamp(bed.depth/1.05+(noise(x>>3,(y>>3)+5)-.5)*.35,0,4.999),lo=Math.floor(t);
+        R(b,x,y,8,8,mixTone(waterTones[lo],waterTones[lo+1],smooth(t-lo)));
+        if(noise(x>>3,y>>3)>.93)R(b,x+noise(y,x)*6,y+noise(x,y+1)*6,4+noise(x+1,y)*9,1,t<2?C.shallow:C.sea);
       }
     }
     const coast=[];for(let x=cx-8;x<=cx+chunkSize+8;x+=8)coast.push([x,Math.round(scene.shoreY(x)/2)*2]);
     const bottom=cy+chunkSize+2;
-    for(const[dy,color]of[[0,C.wet],[28,hmb?'#b7b6a2':'#686c66'],[58,C.sand],[118,C.dry]]){
-      if(bottom>Math.min(...coast.map(p=>p[1]))+dy)poly(b,[...coast.map(([x,y])=>[x,y+dy]),[cx+chunkSize+8,bottom],[cx-8,bottom]],color);
+    // Swash-wetted sand, the damp band up to the high-tide line, then sand and
+    // dry sand. Each boundary wanders on its own; nothing runs parallel.
+    const bands=[[0,0,C.wet],[28,9,hmb?'#b7b6a2':'#686c66'],[58,16,C.sand],[118,26,C.dry]];
+    const edge=(x,y,k)=>y+bands[k][0]+(k?bands[k][1]*(2*vnoise(x/(150+60*k),40+k)-1)+bands[k][1]*.35*(2*vnoise(x/37,50+k)-1):0);
+    bands.forEach(([,,color],k)=>{
+      const pts=coast.map(([x,y])=>[x,edge(x,y,k)]);
+      if(bottom>Math.min(...pts.map(p=>p[1])))poly(b,[...pts,[cx+chunkSize+8,bottom],[cx-8,bottom]],color);
+    });
+    // Wrack line: broken strands of kelp and debris along the last high tide.
+    for(let x=Math.floor(cx/6)*6;x<cx+chunkSize+6;x+=6){
+      if(vnoise(x/90,61)<.42||noise(x,62)>.7)continue;
+      const y=edge(x,scene.shoreY(x),2)-2+noise(x,63)*5;if(y<cy-4||y>cy+chunkSize+4)continue;
+      R(b,x,y,3+noise(x,64)*6,noise(x,65)>.6?2:1,noise(x,66)>.5?(hmb?'#8c8a6d':'#3f4640'):(hmb?'#a39d7e':'#565a4f'));
     }
     // Coordinate-seeded grains continue across tile boundaries and do not swim.
     for(let gx=Math.floor(cx/18)*18;gx<cx+chunkSize;gx+=18)for(let gy=Math.floor(cy/19)*19;gy<cy+chunkSize;gy+=19){
@@ -224,52 +245,105 @@ export function createPacificaWorld(canvas,{sceneId='pacifica'}={}){
     const edge=[[5905,1040],[5950,892],[6010,821],[6070,667],[6130,575],[6180,429],[6240,368],[6285,238],[6360,152],[6530,146],[6750,208]];
     for(let i=1;i<edge.length;i++){const a=edge[i-1],z=edge[i];if(x<=z[0])return y>=a[1]+(z[1]-a[1])*(x-a[0])/(z[0]-a[0]);}return true;
   }
+  // Surf: every crest is an individual wave from shore-surf.js. Unbroken swell
+  // shows as a darker steepening face; breaking waves throw a white lip
+  // (plunging throws spray ahead of it), broken bores are wide white bands,
+  // foam lingers and fades behind them, and each bore runs up the beach face.
+  // Offscreen layers: cells are drawn opaque and each layer is composited once,
+  // so neighbouring cells never double-blend into a grid of seams.
+  const layers={};
+  function layer(name){
+    let l=layers[name];
+    if(!l||l.canvas.width!==canvas.width||l.canvas.height!==canvas.height){const c=document.createElement('canvas');c.width=canvas.width;c.height=canvas.height;l=layers[name]={canvas:c,g:c.getContext('2d')};}
+    l.g.setTransform(1,0,0,1,0,0);l.g.clearRect(0,0,l.canvas.width,l.canvas.height);l.g.setTransform(ctx.getTransform());return l.g;
+  }
+  function composite(name,alpha){ctx.save();ctx.setTransform(1,0,0,1,0,0);ctx.globalAlpha=alpha;ctx.drawImage(layers[name].canvas,0,0);ctx.restore();}
+  const FOAM=['#adcbc2','#c9ddd4','#e1ebdf','#f5f7ec'];
   function waves(){
-    const v=bounds(30),left=Math.floor(v.left/12)*12,right=v.right,sea=lastState?.seaState;
-    // Crest roots, local breaking, sets and swash come from the same model
-    // and elapsed time as tackle load; deep channel gaps stay dark.
-    for(let x=left;x<right;x+=12){
+    const v=bounds(30),step=8,left=Math.floor(v.left/step)*step,sea=lastState?.seaState,cell=2.5*3.2,cols=[];
+    for(let x=left;x<v.right;x+=step){
       const sy=scene.shoreY(x);
-      if(sy<v.top-50||sy-900>v.bottom)continue;
-      const crests=shoreWaveCrests(scene,x,now,sea,280);
-      for(let band=0;band<crests.length;band++){
-        const y=sy-crests[band]*3.2;if(y<v.top-8||y>v.bottom+8||moriLand(x,y))continue;
-        const water=sampleShore(scene,x,y,now,sea),crest=water.whitewater;
-        const n=noise(Math.floor(x/24),Math.round(water.wavePhase/TAU));
-        if(crest<.035){
-          if(n>.42){ctx.globalAlpha=.10+Math.min(.14,water.localWaveHeight*.07);R(ctx,x,y,13,1,C.shallow);}
+      if(sy<v.top-60||sy-1400>v.bottom){cols.push(null);continue;}
+      const f=shoreSurfField(scene,x,now,sea);
+      if(!f.crests.length&&!f.surfZoneWidth&&!f.foamReach){cols.push(null);continue;}
+      // Foam every 2.5 m from the real (tidal) waterline to beyond the outermost break.
+      const start=Math.min(0,-Math.floor(f.waterlineMeters/2.5)*2.5),reach=Math.min(420,Math.max(f.surfZoneWidth,f.foamReach)+30);
+      const foam=new Float32Array(Math.max(0,Math.ceil((reach-start)/2.5)));
+      for(let k=0;k<foam.length;k++)foam[k]=f.foamAt(start+k*2.5);
+      cols.push({x,sy,f,start,foam,col:Math.floor(x/step)});
+    }
+    const at=(c,d)=>{if(!c)return 0;const k=Math.round((d-c.start)/2.5);return k>=0&&k<c.foam.length?c.foam[k]:0;};
+    const shade=layer('shade'),g=layer('foam'),sheet=[];
+    for(let ci=0;ci<cols.length;ci++){
+      const c=cols[ci];if(!c){sheet.push(null);continue;}
+      const {x,sy,f,col}=c,metres=x/3.2;
+      // Foam mat. Whitewater spreads sideways into the unbroken part of a crest,
+      // floating foam gathers into patches that drift shoreward, and each cell
+      // fades in and out on its own slow clock.
+      for(let k=0;k<c.foam.length;k++){
+        const d=c.start+k*2.5,y=sy-d*3.2;if(y<v.top-8||y>v.bottom+8||moriLand(x,y))continue;
+        let a=c.foam[k];
+        for(let o=1;o<=3;o++)a=Math.max(a,(.95-o*.25)*Math.max(at(cols[ci-o],d),at(cols[ci+o],d)));
+        if(a<.04)continue;
+        const patch=.5+.9*vnoise2(metres/17+now*.006,(d+.5*now)/6,3);
+        if(a<.85)a=clamp(a*patch,0,1);
+        const row=Math.round(d/2.5),h=noise(col,row),twinkle=Math.abs(2*((h*7.3+now/(8+7*noise(row,col)))%1)-1);
+        if(twinkle>a*1.5)continue;
+        if(a>.6)R(g,x,y-cell,step+1,cell+1,FOAM[Math.min(3,Math.floor(a*3.99))]);
+        // Thin foam is lace: scattered streaks of varying length, off the cell grid.
+        else R(g,x+(noise(col,row+99)-.5)*6,y-cell+(noise(row,col+7)-.5)*5,3+noise(col+3,row)*9,a>.3?3:2,FOAM[Math.min(3,Math.floor(a*3.99))]);
+      }
+      for(const w of f.crests){
+        const y=sy-w.offshore*3.2;if(y<v.top-30||y>v.bottom+30||moriLand(x,y))continue;
+        const hPx=Math.max(1,w.height*3.2),n=noise(col,w.index);
+        if(w.state==='unbroken'||w.state==='reformed'){
+          // Steepening face: a darker band on the shoreward side and a lighter crest.
+          const steep=clamp(w.steepness/.78,0,1);if(steep<.12)continue;
+          R(shade,x,y,step+1,Math.max(1,hPx*.6*steep),steep>.55?C.deep:C.sea);
+          if(steep>.8)R(g,x,y-1,step+1,2,FOAM[1+Math.floor(n*2)]);
           continue;
         }
-        if(n>crest+.25)continue;
-        ctx.globalAlpha=clamp(.16+crest*.82,0,.9);
-        R(ctx,x,y,13,crest>.6?3:2,C.foam);
-        if(crest>.3&&n>.37){R(ctx,x+2,y+5,7,2,'#b7d0bd');if(n>.71)R(ctx,x+4,y+9,3,2,C.foam);}
-      }
-      if(sy>v.top-50&&sy<v.bottom+30&&!moriLand(x,sy)){
-        const water=sampleShore(scene,x,sy,now,sea);
-        const tideShift=(water.tide-.4)/water.slope*3.2,runup=water.runupMeters*3.2;
-        if(water.waveHeight>0){
-          ctx.globalAlpha=.2+.5*water.whitewater;R(ctx,x,sy+tideShift+runup,13,2,C.foam);
-          if(noise(x,74)>.55)R(ctx,x+3,sy+tideShift+runup+4,5,1,C.foam);
+        if(w.state==='breaking'&&w.sinceBreak!==null&&w.sinceBreak<Math.max(3,w.height*4)){
+          // Fresh break: the lip over its shadowed face. Plunging lips throw spray ahead.
+          R(g,x,y-2,step+1,Math.max(2,hPx*.55),FOAM[3]);
+          R(shade,x,y+Math.max(2,hPx*.55)-2,step+1,Math.max(1,hPx*.35),C.deep);
+          if(w.type==='plunging'||w.type==='surging'){
+            const throw_=hPx*(.6+.5*n);
+            R(g,x+2,y+throw_,3,2,FOAM[3]);if(n>.4)R(g,x+5,y+throw_*.7,2,2,FOAM[2]);if(w.height>1.2&&n>.6)R(g,x+1,y-hPx*.9,2,2,FOAM[3]);
+          }
+          continue;
+        }
+        // Broken bore: a lumpy white front with aerated, streaky water behind it.
+        const band=(1+1.8*w.height)*3.2*(.4+.6*w.roller),front=(n-.5)*3+(vnoise(metres/6,w.index)-.5)*4;
+        R(g,x,y+front-3,step+1,w.roller>.5?5:3,FOAM[w.roller>.3?3:2]);
+        for(let k=0;k<band;k+=3){
+          const m=noise(col*31+k,w.index),fade=1-k/band;
+          if(m>(.25+.6*fade)*(.5+.5*w.roller))continue;
+          R(g,x+(m>.8?2:0),y+front-3-k,step+1-(m>.8?3:0),3,FOAM[fade>.6?3:m>.5?1:2]);
         }
       }
+      // Swash: the last bore runs up the face as a sheet with a lobed, foamy
+      // front that differs from wave to wave, then drains back.
+      const wl=sy+f.waterlineMeters*3.2,lobe=.72+.56*vnoise(metres/13+f.swashWave*3.7,70);
+      const front=wl+Math.max(.6,f.swashMeters*3.2*lobe);
+      if(front>v.top-10&&wl<v.bottom+10&&!moriLand(x,wl)){
+        sheet.push({x,wl,front});
+        const rush=clamp(1-f.swashPhase/.4,0,1),bandPx=4+10*rush;
+        R(g,x,front-1,step+1,2,FOAM[rush>.2?3:1]);
+        for(let k=2;k<bandPx;k+=2){const m=noise(col*17+k,f.swashWave);if(m<rush*(1-k/bandPx)*1.3)R(g,x+(m>.5?1:0),front-1-k,step,2,FOAM[m<.3?3:2]);}
+        if(rush===0&&noise(col,f.swashWave)>.55)R(g,x+2,front+2,3,1,FOAM[1]);
+      }else sheet.push(null);
     }
-    // Foam is present only when this sea state generates whitewater, and
-    // travels with the mean modeled current (orbital motion is not net drift).
-    for(let gx=Math.floor(v.left/52)*52;gx<v.right+52;gx+=52){
-      const sy=scene.shoreY(gx);
-      for(let band=0;band<6;band++){
-        const seed=noise(gx,band+944),by=sy-28-band*54-seed*38;
-        if(by<v.top-70||by>v.bottom+70)continue;
-        const water=sampleShore(scene,gx,by,now,sea),age=(now*.22+seed*9)%6;
-        if(water.waveHeight===0)continue;
-        const x=gx+water.currentX*age*3.2,y=by+water.currentY*age*3.2;if(moriLand(x,y))continue;
-        ctx.globalAlpha=(.03+.29*water.whitewater)*Math.sin(age/6*Math.PI);
-        R(ctx,x,y,6+seed*11,1,C.foam);
-        if(water.channelStrength>.4)R(ctx,x+3,y-4,2,5,C.foam);
-      }
+    // One translucent water film per run of wet columns.
+    for(let i=0;i<sheet.length;){
+      if(!sheet[i]){i++;continue;}
+      let j=i;while(j+1<sheet.length&&sheet[j+1])j++;
+      const run=sheet.slice(i,j+1),last=run.at(-1);
+      ctx.globalAlpha=.36;poly(ctx,[...run.map(p=>[p.x,p.wl-2]),[last.x+step,last.wl-2],[last.x+step,last.front],...run.map(p=>[p.x,p.front]).reverse()],C.shallow);
+      i=j+1;
     }
     ctx.globalAlpha=1;
+    composite('shade',.4);composite('foam',.93);
   }
   function gull(x,y,flight=false,variant=0){
     if(flight){const wing=Math.sin(now*4+variant)>0?7:-3;line(ctx,x,y,x-8,y-wing,'#edf0db',2);line(ctx,x,y,x+8,y-wing,'#edf0db',2);R(ctx,x-2,y,4,3,'#4e6e70');R(ctx,x+8,y-wing,3,2,'#617e7d');return;}

@@ -10,7 +10,8 @@ import {assessShoreCatch,shoreFindingDetail} from './shore-regulations.js';
 import {shorePresentation,stepShorePresentation} from './shore-presentation.js';
 import {shoreFishPosition} from './shore-line-geometry.js';
 import {createShoreCast} from './shore-casting.js';
-import {gameCalendar} from './game-clock.js';
+import {gameCalendar,gameSeconds} from './game-clock.js';
+import {climateSeaState} from './shore-surf.js';
 import {formatLength,formatWeight} from './units.js';
 import {SHORE_RIG_PHYSICS} from './shore-presentation.js';
 export const SAVE_KEY = 'pacifica-surf-save-v1';
@@ -35,8 +36,16 @@ export const SPECIES = Object.freeze([
   species({id: 'halibut', speciesId: 'california_halibut', lengthCm: [33, 90], lw: [.0086, 3.12], baseValue: 30, valuePerKg: 14, strength: .88, color: '#bca176'}),
   species({id: 'white_croaker', speciesId: 'white_croaker', lengthCm: [14, 35], lw: [.0101, 3.1], baseValue: 5, valuePerKg: 12, strength: .25, color: '#c4bb95'}),
   species({id: 'jacksmelt', speciesId: 'jacksmelt', lengthCm: [18, 44], lw: [.0045, 3.1], baseValue: 4, valuePerKg: 12, strength: .3, color: '#b5cfce'}),
-  // Legacy only: catches from saves before barred surfperch replaced it. Never spawned.
-  species({id: 'redtail_surfperch', speciesId: 'redtail_surfperch', legacy: true, lengthCm: [18, 41], lw: [.025, 3], baseValue: 15, valuePerKg: 13, strength: .65, color: '#e6b98f'}),
+  // Surfperch family (CDFW maximum sizes): redtail 16 in, calico 12, silver 10.5,
+  // walleye 12, shiner 7, pile 17.5, striped seaperch 15.3. Old saves' plain
+  // `surfperch` catches resolve to the redtail entry through the catalogue.
+  species({id: 'redtail_surfperch', speciesId: 'redtail_surfperch', lengthCm: [18, 41], lw: [.025, 3], baseValue: 15, valuePerKg: 13, strength: .7, color: '#e6b98f'}),
+  species({id: 'calico_surfperch', speciesId: 'calico_surfperch', lengthCm: [14, 30], lw: [.026, 3], baseValue: 11, valuePerKg: 13, strength: .55, color: '#d9c49a'}),
+  species({id: 'silver_surfperch', speciesId: 'silver_surfperch', lengthCm: [11, 27], lw: [.022, 3], baseValue: 6, valuePerKg: 12, strength: .35, color: '#d8dfd4'}),
+  species({id: 'walleye_surfperch', speciesId: 'walleye_surfperch', lengthCm: [13, 30], lw: [.021, 3], baseValue: 7, valuePerKg: 12, strength: .4, color: '#c9d2cf'}),
+  species({id: 'shiner_perch', speciesId: 'shiner_perch', lengthCm: [7, 18], lw: [.018, 3], baseValue: 2, valuePerKg: 10, strength: .2, color: '#d9d5b0'}),
+  species({id: 'pile_perch', speciesId: 'pile_perch', lengthCm: [20, 44], lw: [.03, 3], baseValue: 14, valuePerKg: 12, strength: .85, color: '#9aa39a'}),
+  species({id: 'striped_seaperch', speciesId: 'striped_seaperch', lengthCm: [18, 39], lw: [.027, 3], baseValue: 14, valuePerKg: 12, strength: .75, color: '#c28a5c'}),
 ]);
 export const fishWeightKg = (sp, lengthCm, condition = 1) => sp.lw[0] * lengthCm ** sp.lw[1] * condition / 1000;
 
@@ -45,6 +54,8 @@ const finite = (value, fallback = 0) => typeof value === 'number' && Number.isFi
 const integer = (value, low, high, fallback = 0) => Math.floor(clamp(finite(value, fallback), low, high));
 const baitIds = BAITS.map(item => item.id);
 const upgradeIds = SHOP_ITEMS.filter(item => ['rod','reel','rig','book'].includes(item.kind)).map(item => item.id);
+// Small fish can be swung in without first tiring them out.
+const SMALL_FISH = new Set(['white_croaker', 'jacksmelt', 'silver_surfperch', 'walleye_surfperch', 'shiner_perch', 'calico_surfperch']);
 const statKeys = ['caught', 'kept', 'released', 'sold', 'casts', 'missed'];
 const saveVersions = [1, 2, 3, 4];
 const catchStatuses = new Set(['kept', 'released', 'sold', 'confiscated']);
@@ -123,7 +134,7 @@ export class PacificaSimulation {
       sceneId: this.scene.id,
       player: {...this.scene.spawn, facing: -1, walking: false},
       phase: 'walk', elapsed: 0, credits: 120,
-      inventory: {sandcrab: 12, squid: 0, anchovy: 0}, bait: 'sandcrab', rig: 'carolina', upgrades: [],
+      inventory: {sandcrab: 12, squid: 0, anchovy: 0, sandworm: 0, mussel: 0}, bait: 'sandcrab', rig: 'carolina', upgrades: [],
       catches: [], catchHistory: [], lastCatch: null, stats: Object.fromEntries(statKeys.map(key => [key, 0])),
       cast: null, lineDistance: 0, tension: 0, fish: null,
       biteRemaining: 0, fightElapsed: 0, lineStress: 0, slackTime: 0,
@@ -144,7 +155,18 @@ export class PacificaSimulation {
     const savedPopulation = saved?.scene === this.scene.id && saved.population?.version === 1 ? saved.population : null;
     this.population = savedPopulation ? restorePopulation(savedPopulation, 1, SHORE_POPULATION_SPECIES.map(d => d.id))
       : createPopulation(Math.floor(this.random() * 4294967295) + 1);
+    this.updateSea(true);
     this.refreshSample();
+  }
+
+  // The day's sea follows the scene's buoy climate for the trip date unless a
+  // fixed scenario was supplied (tests, QA). Climate states carry climate:true.
+  updateSea(force = false) {
+    const s = this.state;
+    if (s.seaState && !s.seaState.climate) return;
+    if (!force && s.seaState && s.elapsed - (this.seaAt ?? -Infinity) < 5) return;
+    this.seaAt = s.elapsed;
+    s.seaState = climateSeaState(this.scene.id, this.calendarDate(), 6 + gameSeconds(s.elapsed) / 3600);
   }
 
   talkAngler(id){return talkShoreAngler(this,id);}
@@ -365,7 +387,7 @@ export class PacificaSimulation {
   fishEnv(x, y) {
     const p = this.fromPlane(x, y);
     if (y < .3 || p.x < 20 || p.x > this.world.width - 20) return {water: false, depth: 0};
-    const sample = sampleShore(this.scene, p.x, p.y, this.state.elapsed, this.state.seaState || {});
+    const sample = sampleShore(this.scene, p.x, p.y, this.state.elapsed, this.state.seaState || {}, {surf: false});
     return {water: true, depth: sample.depth, currentX: sample.currentX, currentY: -sample.currentY, sample};
   }
 
@@ -543,6 +565,7 @@ export class PacificaSimulation {
     const s = this.state;
     if (s.inspection) return;
     s.elapsed += dt;
+    this.updateSea();
     stepShoreLore(this);
     if (this.checkPier(dt)) return;
     this.stepFish(dt);
@@ -632,7 +655,7 @@ export class PacificaSimulation {
       wearShoreSupplies(s,'break'); this.clearLine(); s.message = '鱼线绷断，钓组已丢失。下一次张力进入红区时，及时松开收线。';
     } else if (s.slackTime > 3) {
       wearShoreSupplies(s,'escape'); this.clearLine(); s.message = '鱼线松弛太久，鱼脱钩了。适时收线，让钓线保持张力。';
-    } else if (s.lineDistance <= 3 && (fish.stamina <= .32 || ['white_croaker','jacksmelt'].includes(fish.id)&&fish.weightKg<=.4)) {
+    } else if (s.lineDistance <= 3 && (fish.stamina <= .32 || SMALL_FISH.has(fish.id)&&fish.weightKg<=.4)) {
       wearShoreSupplies(s,'catch'); s.phase = 'landed'; s.stats.caught++; s.tension = 0; fish.run = 0; this.reeling = false;
       s.message = `${fish.name}上岸了！${formatLength(fish.length)} · ${formatWeight(fish.weightKg)}。留在鱼袋里，或放回海里。`;
     }

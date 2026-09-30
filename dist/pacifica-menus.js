@@ -12,7 +12,7 @@ import {drawFishArt,fishSpriteKind} from './pixel-fish-art.js';
 const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({'&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'}[char]));
 const heading = (eyebrow, title, description = '') => `<div class="eyebrow">${esc(eyebrow)}</div><h2 id="modal-title">${esc(title)}</h2>${description ? `<p class="modal-desc">${description}</p>` : ''}`;
 const balance = credits => `<span class="balance" aria-label="${Math.floor(credits)} 潮汐点">✦ ${Math.floor(credits)}</span>`;
-const iconIds = {starter_rod:'rod_light', surf_rod:'rod', starter_reel:'reel_smooth', sealed_reel:'reel_smooth', carolina_rig:'rig_slider', fishfinder_rig:'rig_slider', float_rig:'rig_float', sandcrab:'bait', squid:'bait', anchovy:'bait_anchovy', ca_fishing_regulations:'ca_fishing_regulations',};
+const iconIds = {starter_rod:'rod_light', surf_rod:'rod', starter_reel:'reel_smooth', sealed_reel:'reel_smooth', carolina_rig:'rig_slider', fishfinder_rig:'rig_slider', float_rig:'rig_float', sandcrab:'bait', squid:'bait', anchovy:'bait_anchovy', sandworm:'bait_soft', mussel:'bait_shrimp', ca_fishing_regulations:'ca_fishing_regulations',};
 const itemArt = id => `<canvas data-item-art="${iconIds[id] || 'tackle'}" width="32" height="32" aria-hidden="true"></canvas>`;
 const hasFishLength = fish => Number.isFinite(fish.length) && fish.length > 0;
 const fishLength = fish => hasFishLength(fish) ? formatLength(fish.length) : '未记录';

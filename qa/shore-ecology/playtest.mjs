@@ -154,7 +154,7 @@ try{
   }
   discoveryChecks.push({scene,checks:['no navigation shortcut buttons or arrival modal','distant E never starts a route','four walking viewports have no empty bottom panel','WASD doorway entry opens shop','close stays closed until walk out and reenter','manual WASD cancels pointer route without delayed opening','ground clicks around shop reach surf','walk into NPC starts conversation and note','nearby E can interact again','notes have no destination buttons',...(scene==='pacifica'?['silent pier gate; leaning on it is the hidden way on']:[])]});
   await page.evaluate(()=>{window.shoreQA.setup();window.shoreQA.advance(30);});
-  assert.equal((await state()).phase,'waiting');assert.equal((await state()).fish,null);
+  {const s=await state();assert.equal(s.phase,'waiting',`${scene}: ${s.message} ${JSON.stringify(s.seaState)}`);}assert.equal((await state()).fish,null);
   for(const [name,width,height] of viewports){
    await page.setViewportSize({width,height});await page.waitForTimeout(120);
    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);

@@ -251,6 +251,18 @@ function palmSprite(){return raster(50,70,({rect:r,line:l,poly:p})=>{
   r(23,22,4,4,'wood');r(27,23,4,4,'woodDark');r(24,22,2,2,'gold');
 });}
 
+// Markings from CDFW descriptions: calico mottling and reddish fins; silver
+// plain with pale orange fins; walleye with big eyes and black-tipped pelvic
+// fins; shiner with three yellow bars; pile perch dark with a broad bar and a
+// deeply forked tail; striped seaperch with blue and copper stripes.
+const PERCH_STYLES={
+ calico_surfperch:{body:'steel',flank:'light',belly:'white',tail:'coral',dorsal:'slate',fins:'coral',pattern:'mottle',mark:'#7d8a5c'},
+ silver_surfperch:{body:'steel',flank:'light',belly:'white',tail:'peach',dorsal:'slate',fins:'peach',pattern:'faint',mark:'#b9c8c4'},
+ walleye_surfperch:{body:'steel',flank:'light',belly:'white',tail:'slate',dorsal:'slate',fins:'light',pelvic:'ink',pattern:'plain',bigEye:true},
+ shiner_perch:{body:'steel',flank:'light',belly:'white',tail:'light',dorsal:'slate',fins:'light',pattern:'bars3',mark:'gold'},
+ pile_perch:{body:'slate',flank:'steel',belly:'light',tail:'slate',dorsal:'ink',fins:'steel',pattern:'band',mark:'ink',fork:true},
+ striped_seaperch:{body:'#b56f45',flank:'#c98a5a',belly:'#e0b27a',tail:'#9a5a3a',dorsal:'#8a4f33',fins:'#c98a5a',pattern:'stripes'},
+};
 export function createFishSprite(kind){return raster(48,24,({rect:r,px,poly:p,line:l})=>{
   if(kind==='unknown'){
     // Neutral silhouette for unsupported/imported identities, never a species claim.
@@ -288,6 +300,22 @@ export function createFishSprite(kind){return raster(48,24,({rect:r,px,poly:p,li
     for(const x of[18,26,30])px(x,12,'sand');
     p([[16,17],[18,21],[23,22],[26,20]],'light');p([[31,18],[33,23],[37,18]],'light');
     l(37,10,36,15,'slate');r(39,9,3,3,'ivory');px(40,10,'ink');l(41,14,43,13,'ink');
+  }else if(PERCH_STYLES[kind]){
+    // Shared deep-oval surfperch body; each species gets its own markings.
+    const st=PERCH_STYLES[kind];
+    p([[10,11],[15,7],[23,4],[32,5],[39,8],[44,11],[44,14],[38,18],[29,21],[20,20],[14,17],[10,14],[2,st.fork?21:19],[5,12],[2,st.fork?3:5]],'ink');
+    p([[10,12],[15,8],[23,5],[32,6],[38,9],[43,11],[43,14],[37,17],[29,20],[20,19],[14,16],[10,13],[4,st.fork?19:17],[7,12],[4,st.fork?5:7]],st.body);
+    p([[13,12],[20,8],[28,7],[35,9],[40,11],[41,14],[35,17],[27,19],[19,17],[13,14]],st.flank);
+    p([[15,14],[24,11],[35,11],[41,13],[38,15],[31,18],[22,18],[17,16]],st.belly);
+    p([[6,12],[4,st.fork?6:8],[10,11],[11,13],[4,st.fork?18:17]],st.tail);
+    p([[14,8],[16,4],[21,2],[26,3],[29,2],[33,4],[35,7]],st.dorsal);
+    p([[16,17],[18,21],[23,22],[26,20]],st.fins);p([[31,18],[33,23],[37,18]],st.pelvic||st.fins);
+    if(st.pattern==='mottle')for(const [x,y,w]of[[16,10,3],[21,13,2],[25,9,3],[29,14,2],[33,11,3],[19,16,2],[27,17,2]])r(x,y,w,2,st.mark);
+    if(st.pattern==='bars3')for(const x of[20,27,34])l(x,8,x,17,st.mark);
+    if(st.pattern==='band')r(24,6,4,13,st.mark);
+    if(st.pattern==='stripes'){for(const y of[9,11,13,15])l(14,y,40,y,y%4===1?'#6d8fb0':'#c07a4a');l(38,12,42,12,'#6d8fb0');}
+    if(st.pattern==='faint')for(const x of[19,25,31])l(x,9,x,16,st.mark);
+    const eye=st.bigEye?4:3;l(37,10,36,15,'slate');r(39,9,eye,eye,'ivory');px(40+(st.bigEye?1:0),10+(st.bigEye?1:0),'ink');l(41,14,43,13,'ink');
   }else if(kind==='jacksmelt'){
     // Jacksmelt: slender silver fish with a bright mid-side stripe and two
     // widely separated dorsal fins.
@@ -450,7 +478,7 @@ function iconSprite(kind){return raster(16,16,({rect:r,line:l,poly:p,px,oval:o})
 
 /** All canvases are original art at native pixel resolution. */
 export function createPixelSprites(){
-  const fish=Object.fromEntries(['unknown','anchovy','sardine','blue','copper','rockfish','vermilion','halibut','mackerel','lingcod','salmon','seabass','bonito','croaker','sanddab','surfperch','barred_surfperch','jacksmelt','striped_bass'].map(name=>[name,createFishSprite(name)]));
+  const fish=Object.fromEntries(['unknown','anchovy','sardine','blue','copper','rockfish','vermilion','halibut','mackerel','lingcod','salmon','seabass','bonito','croaker','sanddab','surfperch','barred_surfperch','jacksmelt','striped_bass','calico_surfperch','silver_surfperch','walleye_surfperch','shiner_perch','pile_perch','striped_seaperch'].map(name=>[name,createFishSprite(name)]));
   const icons=Object.fromEntries(['rod','anchor','engine','backpack','fish','coin','tackle','oar','map','sun','bait','reel'].map(name=>[name,iconSprite(name)]));
   const angler=personSprite(),anglerBack=personSprite({back:true});
   const hut=hutSprite();

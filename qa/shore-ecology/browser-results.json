@@ -7,12 +7,12 @@
   "castChecks": [
     {
       "scene": "pacifica",
-      "tapMetres": 5.145482170683859,
-      "tapOffshoreMetres": 2.443585175085179,
-      "heldMetres": 20.932827246703116,
+      "tapMetres": 5.145342051331241,
+      "tapOffshoreMetres": 2.621036863603834,
+      "heldMetres": 20.781589152131303,
       "keyboardRanges": [
-        20.67334631417431,
-        20.683402151740342
+        20.64068794753018,
+        20.633156915164097
       ],
       "checks": [
         "short pointer tap",
@@ -25,12 +25,12 @@
     },
     {
       "scene": "half-moon-bay",
-      "tapMetres": 5.145342051331241,
-      "tapOffshoreMetres": 2.952254403354413,
-      "heldMetres": 20.89746832933816,
+      "tapMetres": 5.145088948767604,
+      "tapOffshoreMetres": 2.8618309528628494,
+      "heldMetres": 20.731214842587118,
       "keyboardRanges": [
-        20.670832856513464,
-        20.668319666901844
+        20.64319934571685,
+        20.645710346909407
       ],
       "checks": [
         "short pointer tap",
@@ -77,5 +77,5 @@
   ],
   "errors": [],
   "fixture": "Test-only response route; no public game debug controls",
-  "verifiedAt": "2026-09-29T04:27:45.314Z"
+  "verifiedAt": "2026-09-30T01:53:37.239Z"
 }

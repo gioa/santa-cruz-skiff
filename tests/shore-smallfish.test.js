@@ -13,7 +13,7 @@ const rates=o=>shoreEncounterRates({...options,...o});
 const rate=(result,id)=>result.perSpecies.find(row=>row.id===id).ratePerSecond;
 
 test('all five encounter species can become named, persistent catches',()=>{
- const modelled=SPECIES.filter(f=>!f.legacy);assert.equal(modelled.length,5);
+ const modelled=SPECIES.filter(f=>!f.legacy);assert.equal(modelled.length,12);
  assert.deepEqual(SHORE_ECOLOGY.map(f=>f.id),modelled.map(f=>f.id));
  for(const id of ['white_croaker','jacksmelt']){
   const spec=SPECIES.find(f=>f.id===id);assert.ok(spec.maxKg<1&&spec.minKg>0&&spec.lengthCm[1]<=45);

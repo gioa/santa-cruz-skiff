@@ -10,6 +10,16 @@ export const SHORE_RULES=Object.freeze({
  halibut:Object.freeze({minimumCm:22*2.54,speciesBag:2,law:'T14 CCR §28.15'}),
  white_croaker:Object.freeze({minimumCm:0,speciesBag:10,law:'T14 CCR §27.60(a)'}),
  jacksmelt:Object.freeze({minimumCm:0,speciesBag:null,unlimited:true,law:'T14 CCR §27.60(b)'}),
+ // Surfperch (§28.59): 20 combined (shiner excluded), no more than 10 of one
+ // species; redtail 10.5 in minimum. Shiner perch have their own limit of 20,
+ // taken in addition to the general 20-finfish limit.
+ redtail_surfperch:Object.freeze({minimumCm:10.5*2.54,speciesBag:10,group:'surfperch',law:'T14 CCR §28.59'}),
+ calico_surfperch:Object.freeze({minimumCm:0,speciesBag:10,group:'surfperch',law:'T14 CCR §28.59'}),
+ silver_surfperch:Object.freeze({minimumCm:0,speciesBag:10,group:'surfperch',law:'T14 CCR §28.59'}),
+ walleye_surfperch:Object.freeze({minimumCm:0,speciesBag:10,group:'surfperch',law:'T14 CCR §28.59'}),
+ pile_perch:Object.freeze({minimumCm:0,speciesBag:10,group:'surfperch',law:'T14 CCR §28.59'}),
+ striped_seaperch:Object.freeze({minimumCm:0,speciesBag:10,group:'surfperch',law:'T14 CCR §28.59'}),
+ shiner_perch:Object.freeze({minimumCm:0,speciesBag:20,separate:true,law:'T14 CCR §28.59(c)(2)'}),
 });
 export const SHORE_GROUP_BAGS=Object.freeze({surfperch:20});
 export const GENERAL_FINFISH_BAG=20;
@@ -24,11 +34,11 @@ export function assessShoreCatch(carried=[],keptLog=[]){
   const rule=SHORE_RULES[k.species];if(!rule)continue;
   const n=day.species[k.species]=(day.species[k.species]||0)+1;
   const g=rule.group?day.group[rule.group]=(day.group[rule.group]||0)+1:0;
-  const general=rule.unlimited?day.general:++day.general;
+  const general=rule.unlimited||rule.separate?day.general:++day.general;
   const fish=carried.find(f=>f.catchId===k.catchId);if(!fish)continue;
   if(rule.speciesBag!=null&&n>rule.speciesBag){findings.push({catchId:fish.catchId,code:'daily_species_bag',category:'bag',actual:n,maximum:rule.speciesBag,date:k.date});flagged.add(fish.catchId);}
   else if(rule.group&&g>SHORE_GROUP_BAGS[rule.group]){findings.push({catchId:fish.catchId,code:'daily_group_bag',category:'bag',actual:g,maximum:SHORE_GROUP_BAGS[rule.group],date:k.date});flagged.add(fish.catchId);}
-  else if(!rule.unlimited&&general>GENERAL_FINFISH_BAG){findings.push({catchId:fish.catchId,code:'daily_general_bag',category:'bag',actual:general,maximum:GENERAL_FINFISH_BAG,date:k.date});flagged.add(fish.catchId);}
+  else if(!rule.unlimited&&!rule.separate&&general>GENERAL_FINFISH_BAG){findings.push({catchId:fish.catchId,code:'daily_general_bag',category:'bag',actual:general,maximum:GENERAL_FINFISH_BAG,date:k.date});flagged.add(fish.catchId);}
  }
  for(const fish of carried){
   const rule=SHORE_RULES[fish.id];
