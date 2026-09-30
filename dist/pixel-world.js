@@ -317,7 +317,7 @@ export function createPixelWorld(canvas,{sprites={},conditions={}}={}){
     const presentation=getFishingPresentation(state),mounted=['port','starboard'].includes(state.rodMount),equippedRod=state.profile?.loadout?.rod,readied=!state.moored&&state.controlPanel!=='helm'&&!state.standing&&state.fishState!=='landed'&&equippedRod&&(!Array.isArray(state.packed)||state.packed.includes(equippedRod));
     let rod=null;
     if(g.afloat&&(presentation.active||mounted||readied)){
-      rod=getRodCurve(state,{origin:{x:g.screenX,y:g.screenY},scale:g.scale,heading:g.heading,bodyX:state.standing?(state.deckX||0)*15:0,bodyY:state.standing?(state.deckZ??.8)*14-10:0});
+      rod=getRodCurve(state,{origin:{x:g.screenX,y:g.screenY},scale:g.scale,heading:g.heading,bodyX:state.standing?(state.deckX||0)*15:0,bodyY:state.standing?(state.deckZ??.8)*14-10:state.captain?.hired?-9:0});
       for(const p of[...rod.points,rod.butt,rod.reel])extend(primary,p,4*g.scale+1);
     }
     const all={...primary};
