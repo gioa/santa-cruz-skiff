@@ -406,7 +406,7 @@ export class PacificaSimulation {
     s.autoRetrieve=false;s.landingControl=0;
     s.phase = 'fighting'; s.tension = .33; s.biteRemaining = 0; s.fightElapsed = 0; s.lineStress = 0; s.slackTime = 0;
     s.reelFeedback={...emptyReelFeedback(),load:s.tension};
-    return this.result(true, '中鱼！按住收线；张力过高就松开，让鱼冲一阵。');
+    return this.result(true, '中鱼！连续点击摇轮收线；竿身压弯时停点，让鱼冲一阵。');
   }
 
   setReeling(value) { this.reeling = Boolean(value); }
@@ -745,7 +745,7 @@ export class PacificaSimulation {
     const controlled=s.lineDistance<=3&&!m.jumpActive&&m.run<.5&&m.depth<.8&&s.tension>.08&&s.tension<.85;
     s.landingControl=controlled?s.landingControl+dt:Math.max(0,s.landingControl-dt*2);
     if(s.lineStress>1.35||s.lineDistance>155){
-      wearShoreSupplies(s,'break');this.clearLine();s.message='鱼线绷断，钓组已丢失。放松泄力，降低竿尖并在冲刺时暂停收线。';
+      wearShoreSupplies(s,'break');this.clearLine();s.message='鱼线绷断，钓组已丢失。放松泄力，并在鱼冲刺时暂停点按收线。';
     }else if(s.slackTime>3){
       wearShoreSupplies(s,'escape');this.clearLine();s.message='鱼线松弛太久，鱼脱钩了。适时收线，让钓线保持张力。';
     }else if(s.landingControl>=1){

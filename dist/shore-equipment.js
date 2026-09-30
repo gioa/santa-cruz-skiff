@@ -13,7 +13,7 @@ export const STARTER_ITEMS=Object.freeze([
 ]);
 export const SHOP_ITEMS=Object.freeze([
  ...BAITS,
- {id:'salmon_spoon',name:'银色鲑鱼亮片',kind:'rig',price:22,hook:'1/0',artificial:true,description:'1 oz 亮片，1/0 单枚无倒刺钩。落水后停顿下沉，按住收线让亮片摆动；松开会继续沉降。挂底或断线会丢失。'},
+ {id:'salmon_spoon',name:'银色鲑鱼亮片',kind:'rig',price:22,hook:'1/0',artificial:true,description:'1 oz 亮片，1/0 单枚无倒刺钩。落水后停顿下沉，连续点按摇轮让亮片摆动；停点会继续沉降。挂底或断线会丢失。'},
  {id:'salmon_spinner',name:'铜色鲑鱼旋转亮片',kind:'rig',price:28,hook:'1/0',artificial:true,description:'3/4 oz 旋转亮片，1/0 单枚无倒刺钩。需要相对水流速度带动叶片；逆流收线阻力更大。停收太久会沉底。'},
  {id:'grub_jig',name:'卷尾软饵铅头钩',kind:'rig',price:16,hook:'2',artificial:true,description:'1/2 oz 铅头钩配卷尾软饵，#2 单钩。慢收贴近沙底，抬竿或轻抽会跳起，停顿后下落；可寻找海鲫、条纹鲈与比目鱼。'},
  {id:'ca_fishing_regulations',name:'加州休闲捕鱼规定',kind:'book',price:12,kg:.15,description:'按鱼种和海域自行查阅捕捞规则的纸质手册；购买后可从左下角打开，不提供自动识鱼功能。'},
