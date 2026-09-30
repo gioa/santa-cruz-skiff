@@ -1,6 +1,4 @@
-import {BENICIA_SCENE} from './benicia-data.js';
-import {SHORE_MOVEMENT as M,shoreStandPosition} from './shore-movement.js';
-import {shoreWorldMetres as m} from './shore-scale.js';
+import {beniciaShoreY} from './benicia-data.js';
 // Fictional regulars, never names/likenesses of real residents. Stable outfits.
 export const BENICIA_ANGLERS=Object.freeze([
  {name:'Ray',style:'benicia_denim',line:'别一味往最远抛。鱼有时候贴着岸走，试试沿岸斜着搜一遍。'},
@@ -13,14 +11,14 @@ export const BENICIA_ANGLERS=Object.freeze([
 const names=['Ray','Marta','Jun','Luis','Evelyn','Sam','Dale','Nina','Theo','Isa','Leon','Mai','Rosa','Ken','Ari','Jo','Pat','Vera','Max','Eli','Nora','Jae','Ruth','Tao','Alex','Lee','Ren','Sol'];
 const hash=n=>{let h=Math.imul(n|0,0x45d9f3b);h^=h>>>16;return(h>>>0)/4294967296;};
 export function beniciaCrowd(elapsed=0,seed=1,month=9){
- const busy=month>=8&&month<=10,block=Math.floor(elapsed/140),out=[],walkDistance=m(12),walkSeconds=walkDistance/M.walkSpeed;
+ const busy=month>=8&&month<=10,block=Math.floor(elapsed/140),out=[];
  for(let i=0;i<28;i++){
   // Always retain several gaps and a clear walkway behind the casting line.
   if(i%7===3)continue;
   const present=b=>hash(i*37+seed+b*701)<(busy?.84:.37),current=present(block),previous=present(Math.max(0,block-1)),arrival=elapsed%140;
-  if(!current&&(!previous||arrival>=walkSeconds))continue;
+  if(!current&&(!previous||arrival>=8))continue;
   const x=160+i*72;if(Math.abs(x-1090)<70)continue;
-  const a=BENICIA_ANGLERS[i%BENICIA_ANGLERS.length],cycle=(elapsed+hash(i+seed)*90)%(55+hash(i+78)*35),baseY=shoreStandPosition(BENICIA_SCENE,x).y,transition=current!==previous&&arrival<walkSeconds, y=baseY+(transition?(current?1-arrival/walkSeconds:arrival/walkSeconds)*walkDistance:0);
+  const a=BENICIA_ANGLERS[i%BENICIA_ANGLERS.length],cycle=(elapsed+hash(i+seed)*90)%(55+hash(i+78)*35),baseY=beniciaShoreY(x)+34,transition=current!==previous&&arrival<8, y=baseY+(transition?(current?1-arrival/8:arrival/8)*100:0);
   const mode=cycle<2?'casting':cycle<35?'retrieving':cycle<42?'rigging':'watching';
   out.push({...a,name:names[i],id:i,x,y,mode:transition?'walking':mode,walking:transition,phase:cycle,offset:hash(i+88),talked:false});
  }
@@ -30,11 +28,11 @@ export function crowdCastConflict(state,target){
  if(state.onPier)return null;
  const p=state.player,dx=target.x-p.x,dy=target.y-p.y;
  for(const n of state.crowd||[]){
-  if(Math.hypot(n.x-p.x,n.y-p.y)<m(1.2))return n;
+  if(Math.hypot(n.x-p.x,n.y-p.y)<30)return n;
   // Protect the neighbour's casting corridor; do not block empty water.
   if(n.mode==='casting'||n.mode==='retrieving'){
-   const corridorY=n.y-m(2),den=dx*dx+dy*dy,t=den?((n.x-p.x)*dx+(corridorY-p.y)*dy)/den:0;
-   if(t>0&&t<.6&&Math.hypot(p.x+dx*t-n.x,p.y+dy*t-corridorY)<m(.8))return n;
+   const den=dx*dx+dy*dy,t=den?((n.x-p.x)*dx+(n.y-42-p.y)*dy)/den:0;
+   if(t>0&&t<.6&&Math.hypot(p.x+dx*t-n.x,p.y+dy*t-(n.y-42))<16)return n;
   }
  }
  return null;

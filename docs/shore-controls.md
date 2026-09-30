@@ -38,11 +38,11 @@ Hooked fish use actual mass, species profile, energy and line loading. See [rese
 
 ## Consistent world scale
 
-The shore uses 3.2 world units per metre everywhere. People are 1.75 m tall, rods use their equipped 2.13 m or 3.05 m lengths, fish use recorded centimetres, and the projectile begins at the physical rod tip. Curving a rod cannot lengthen it. Zoom scales every object together: distant casts make the person smaller, then nearby retrieval and fish movement bring the continuous camera closer. Human-scale props and movement use the same conversion. Walking is 1.6 m/s; nearby conversations and shop access use metre-scale proximity.
+The shore uses the original authored pixel-art sizes for people, rods, fish and props, with a broad walking camera and closer action framing. This presentation was restored at the user's request after the metric visual correction. It intentionally differs from the simulation's 3.2 world units per metre. The physical model retains equipped rod length, cast payload, line pickup, sink depth and fish motion; screen artwork is not a ruler for those quantities.
 
-The working camera caps magnification in CSS pixels rather than enlarging the same small patch to fill larger windows. Near-shore walking includes waterline context; pier arrivals frame both edges and the coast, and long casts still fit their actual endpoints. Coastal caches retain fine terrain detail, storefronts render above the surf, and waves use continuous crest ribbons and small physical foam streaks. Thin fishing lines receive minimum raster coverage without moving their centreline or enlarging fish. The fictional beach storefronts sit 14 m inland, with narrow one-time migration for saves parked at their obsolete arrivals.
+Walking, shop collision and conversation reach follow the original scene layout. The beach shops and arrivals return to their original positions. Saves at the short-lived relocated entrance migrate once; unrelated trip positions and equipment remain intact. Reel clicks and twitches do not drive camera magnification. Only actual cast/fish positions and fight phases influence action framing.
 
-See `dist/shore-scale.js`, `dist/shore-movement.js` and [casting details](shore-casting-model.md). Screen-sized touch padding is an input aid; it does not extend the physical reach of a conversation.
+See `dist/shore-action-view.js`, `dist/shore-movement.js` and [casting details](shore-casting-model.md). Screen-sized touch padding is an input aid.
 
 ### Tap cadence
 

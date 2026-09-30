@@ -5,17 +5,17 @@ const distance=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
 function places(scene,state){
  const player=state.player;
  if(!player)return[];
- if(state.onPier){const point=shorePierExitPosition(scene);return point?[{id:'pier-exit',kind:'pier-exit',point,radius:M.pierReach,release:M.pierRelease,distance:distance(player,point)}]:[];}
+ if(state.onPier){const point=shorePierExitPosition(scene);return point?[{id:'pier-exit',kind:'pier-exit',point,radius:M.pierExitReach,release:M.pierExitRelease,distance:distance(player,point)}]:[];}
  const result=[{id:'shop',kind:'shop',point:scene.shop.door,radius:M.doorReach,release:M.doorRelease,distance:distance(player,scene.shop.door)}];
  // The closed gate is scenery: walking up to it opens nothing. (E beside it, or
  // tapping the deck from there, is how curious players find their way on.)
- if(scene.pier)result.push({id:'pier',kind:'pier',silent:true,point:scene.pier.gate,radius:M.pierReach,release:M.pierRelease,distance:distance(player,scene.pier.gate)});
+ if(scene.pier)result.push({id:'pier',kind:'pier',silent:true,point:scene.pier.gate,radius:M.pierDiscovery,release:M.pierRelease,distance:distance(player,scene.pier.gate)});
  const regular=state.regular;
  // The Sharp Park regular, wherever he is standing or walking.
- if(regular&&regular.mode!=='away')result.push({id:'regular',kind:'regular',point:{x:regular.x,y:regular.y},radius:M.talkReach,release:M.talkRelease,distance:distance(player,regular)});
+ if(regular&&regular.mode!=='away')result.push({id:'regular',kind:'regular',point:{x:regular.x,y:regular.y},radius:M.talkDiscovery,release:M.talkRelease,distance:distance(player,regular)});
  const angler=state.shoreLore?.encounter;
  if(angler&&angler.expiresAt>state.elapsed)result.push({id:`angler:${angler.id}`,kind:'angler',anglerId:angler.id,point:{x:angler.x,y:angler.y},
-  radius:M.talkReach,release:M.talkRelease,distance:distance(player,angler)});
+  radius:M.talkDiscovery,release:M.talkRelease,distance:distance(player,angler)});
  return result;
 }
 const available=state=>state.phase==='walk'&&!state.inspection&&!state.leavingPier;

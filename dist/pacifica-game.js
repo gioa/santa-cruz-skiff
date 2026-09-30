@@ -71,7 +71,7 @@ $('world').addEventListener('pointerdown',e=>{
   if(paused()||e.button>0)return;const p=world.screenToWorld(e.clientX,e.clientY);if(!p)return;
   if(sim.state.phase==='fighting')return;
   // Touch targets have screen-space padding; conversation reach stays physical.
-  const personHit=n=>{const foot=shorePersonFoot({player:n,onPier:onPier(scene,n.x,n.y)}),q=world.worldToScreen({x:foot.x,y:foot.y-shoreWorldMetres(.9)});return Math.hypot(e.clientX-q.clientX,e.clientY-q.clientY);};
+  const personHit=n=>{const foot=shorePersonFoot({player:n,onPier:onPier(scene,n.x,n.y)}),q=world.worldToScreen({x:foot.x,y:foot.y-26});return Math.hypot(e.clientX-q.clientX,e.clientY-q.clientY);};
   const local=sim.state.crowd?.filter(n=>personHit(n)<18).sort((a,b)=>personHit(a)-personHit(b))[0];
   if(local){if(Math.hypot(local.x-sim.state.player.x,local.y-sim.state.player.y)<=SHORE_MOVEMENT.talkReach){const r=sim.talkLocal(local.id);if(r.ok){openDialog('conversation',`<div class="eyebrow">FIRST STREET REGULAR</div><h2 id="modal-title">${esc(r.name)}</h2><div class="staff-banner"><p>「${esc(r.text)}」</p></div>${r.fresh?'<p class="credits-note">记进沿岸手记了。</p>':''}`);}else feedback(r);}else walkTo(local.x,local.y+shoreWorldMetres(1.5));return;}
   const regular=sim.state.regular;if(regular&&regular.mode!=='away'&&personHit(regular)<18){if(nearbyShoreInteraction(scene,sim.state)?.id==='regular')interactNearby();else walkTo(regular.x+shoreWorldMetres(1),regular.y+shoreWorldMetres(1));return;}
@@ -80,7 +80,7 @@ $('world').addEventListener('pointerdown',e=>{
   // Pick its visible projected surface, then walk to the actual deck point.
   const deckPoint=benicia?{x:p.x,y:p.y+shoreWorldMetres(3.5)}:p;
   if(scene.pier&&onPier(scene,deckPoint.x,deckPoint.y)){if(sim.onPier)walkTo(deckPoint.x,deckPoint.y);else if(sim.nearPier)feedback(sim.enterPier());else walkTo(scene.pier.gate.x,scene.pier.gate.y);return;}
-  if(p.x>=SHOP.door.x+(SHOP.x-17-SHOP.door.x)*.14&&p.x<=SHOP.door.x+(SHOP.x+SHOP.width+20-SHOP.door.x)*.14&&p.y>=SHOP.door.y+(SHOP.y-20-SHOP.door.y)*.14&&p.y<=SHOP.door.y+shoreWorldMetres(1)){if(nearbyShoreInteraction(scene,sim.state)?.kind==='shop')interactNearby();else walkTo(SHOP.door.x,SHOP.door.y);return;}
+  if(p.x>=SHOP.x-20&&p.x<=SHOP.x+SHOP.width+20&&p.y>=SHOP.y-65&&p.y<=SHOP.door.y+30){if(nearbyShoreInteraction(scene,sim.state)?.kind==='shop')interactNearby();else walkTo(SHOP.door.x,SHOP.door.y);return;}
   if(p.y<WORLD.shoreY(p.x)){if(sim.state.phase==='bite'){feedback(sim.strike());return;}if(sim.state.phase==='walk')aim=Math.max(-1,Math.min(1,Math.atan2(p.x-sim.state.player.x,sim.state.player.y-p.y)/(Math.PI/3)));updateUI();return;}
   walkTo(p.x,p.y);
 });

@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createPacificaWorld} from '../dist/pacifica-world.js';
 import {getShoreScene} from '../dist/shore-data.js';
+import {shoreRodPose} from '../dist/shore-action-view.js';
 import {shoreFishPosition} from '../dist/shore-line-geometry.js';
 
 function canvas(){
@@ -10,7 +11,7 @@ function canvas(){
 }
 globalThis.document={createElement:canvas};
 
-test('shore casting renders metre-scale flight from the launch origin through the physical samples',()=>{
+test('restored artwork releases from its visible rod and joins the physical landing without changing simulation',()=>{
   const scene=getShoreScene('pacifica'),x=2440,y=scene.shoreY(x);
   const trajectory=[{t:0,x,y:y-2,height:1.5},{t:.4,x:x+9,y:y-13,height:2.2},{t:.8,x:x+12,y:y-34,height:0}];
   const cast={origin:{x,y:y-2},target:{x:x+12,y:y-34},distance:Math.hypot(12,32)/3.2,flightDuration:.8,trajectory};
@@ -18,8 +19,11 @@ test('shore casting renders metre-scale flight from the launch origin through th
   const world=createPacificaWorld(canvas());world.resize(900,600);
   for(const point of trajectory){
     cast.flight=point.t;
-    const rendered=world.draw(state,point.t);
-    assert.deepEqual(rendered.castTarget,world.worldToScreen(point.x,point.y-point.height*3.2));
+    const before=JSON.stringify(state),rendered=world.draw(state,point.t);
+    assert.equal(JSON.stringify(state),before);
+    if(point.t===0)assert.deepEqual(rendered.castTarget,world.worldToScreen(shoreRodPose(state).tip));
+    else if(point.t===cast.flightDuration)assert.deepEqual(rendered.castTarget,world.worldToScreen(point.x,point.y));
+    else assert.ok(Number.isFinite(rendered.castTarget.x)&&Number.isFinite(rendered.castTarget.y));
   }
   state.phase='waiting';
   assert.deepEqual(world.draw(state,1).castTarget,world.worldToScreen(cast.target));

@@ -123,10 +123,10 @@ test('release earns no money and spends bait once, with no duplicate catch decis
 test('casting is charged and aimed, while a fitted surf rod extends physical reach', () => {
   const sim = new PacificaSimulation({rng: () => 0});
   toSurf(sim);
-  assert.ok(sim.cast({power: 0, aim: -1}).ok);
+  assert.ok(sim.cast({power: .1, aim: -.25}).ok);
   const short = {...sim.state.cast.target};
   const shortDistance=sim.state.cast.distance;
-  assert.ok(shortDistance>0 && shortDistance<10,'a tap gives a short toss');
+  assert.ok(shortDistance>0 && shortDistance<10,'a light cast clears the restored shore setback');
   assert.ok(short.x < sim.state.player.x);
   assert.ok(short.y < WORLD.shoreY(short.x));
   assert.ok(sim.retrieve().ok);finishShoreRetrieve(sim);

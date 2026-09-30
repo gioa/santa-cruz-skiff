@@ -1,28 +1,22 @@
-import {shoreWorldMetres} from './shore-scale.js';
-
-// All interaction distances are in the same world metres as casts and waves.
+// Authored navigation proportions match the original large character artwork.
+// Fishing distances keep their separate physical metre conversion.
 export const SHORE_MOVEMENT=Object.freeze({
- walkSpeed:shoreWorldMetres(1.6),bodyRadius:shoreWorldMetres(.32),
- shoreClearance:shoreWorldMetres(.65),stand:shoreWorldMetres(1.25),castReach:shoreWorldMetres(12),
- talkReach:shoreWorldMetres(2.2),talkRelease:shoreWorldMetres(3.2),
- shopReach:shoreWorldMetres(3),doorReach:shoreWorldMetres(2),doorRelease:shoreWorldMetres(3.2),
- pierReach:shoreWorldMetres(2.5),pierRelease:shoreWorldMetres(3.5),routeArrival:shoreWorldMetres(.12),
+ walkSpeed:112,bodyRadius:5,edgeClearance:20,bottomClearance:25,
+ shoreClearance:20,stand:25,castReach:130,
+ talkReach:70,talkDiscovery:55,talkRelease:80,
+ shopReach:88,doorReach:40,doorRelease:64,
+ pierReach:72,pierDiscovery:42,pierRelease:68,pierExitReach:34,pierExitRelease:54,pierPushReach:30,routeArrival:2,
 });
 export function shoreWalkBoundaryY(scene,x){
- const r=SHORE_MOVEMENT.bodyRadius;
- return Math.max(scene.shoreY(x-r),scene.shoreY(x),scene.shoreY(x+r))+SHORE_MOVEMENT.shoreClearance;
+ return scene.shoreY(x)+SHORE_MOVEMENT.shoreClearance;
 }
 export function shoreStandPosition(scene,x){return{x,y:shoreWalkBoundaryY(scene,x)+SHORE_MOVEMENT.stand-SHORE_MOVEMENT.shoreClearance};}
 export function shoreArrivalPosition(scene){
- if(scene.pier?.open)return{x:scene.pier.gate.x,y:scene.pier.gate.y+shoreWorldMetres(1.5)};
  return{...scene.spawn};
 }
-// The doorway remains the authored location; the shop artwork and footprint
-// share its metric scale (a seven-metre shop rather than a fifty-metre one).
+// The authored footprint includes clearance for the large character sprite.
 export function shoreShopBounds(shop){
- const scale=.14,r=SHORE_MOVEMENT.bodyRadius,d=shop.door;
- return{left:d.x+(shop.x-d.x)*scale-r,right:d.x+(shop.x+shop.width-d.x)*scale+r,
-  top:d.y+(shop.y-d.y)*scale-r,bottom:d.y+(shop.y+shop.height-d.y)*scale+r};
+ return{left:shop.x-18,right:shop.x+shop.width+18,top:shop.y-18,bottom:shop.y+shop.height+18};
 }
 // Entering/leaving the gate is a discrete access action. On the deck its
 // interaction belongs at the authored entry, not the remote landside gate.

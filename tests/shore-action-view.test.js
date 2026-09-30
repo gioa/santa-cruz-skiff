@@ -93,7 +93,7 @@ test('deep fish stay hidden; actual surface and aerial fish use their own specie
   close(visual.surfaceWorld.y-visual.world.y,.7*3.2);close(visual.world.x,visual.ground.x);
   const halibut=shoreFishVisual(id,{...jump,fish:{id:'halibut',length:70,weightKg:3}}),salmon=shoreFishVisual(id,{...jump,fish:{id:'chinook_salmon',length:75,weightKg:4}});
   assert.equal(halibut.kind,'halibut');assert.equal(salmon.kind,'salmon');assert.ok(halibut.length>visual.length);
-  const enlarged=shoreFishVisual(id,jump,{cameraScale:12});close(enlarged.length,32/100*3.2);
+  const enlarged=shoreFishVisual(id,jump,{cameraScale:12});assert.ok(enlarged.length*12<=48);
  }
 });
 
@@ -157,25 +157,23 @@ test('Benicia flood ripples move east on the south-facing view and wrap in eithe
  }
 });
 
-test('walking camera preserves coastal context and caps desktop magnification in CSS pixels',()=>{
- const scene=getShoreScene('pacifica'),s={phase:'walk',player:{...scene.spawn}};
- for(const [width,height] of [[390,844],[1440,900]])for(const pixelRatio of[1,.66]){
-  const target=shoreActionCameraTarget(scene,s,{width:width*pixelRatio,height:height*pixelRatio,top:140*pixelRatio,bottom:70*pixelRatio,pixelRatio});
-  const camera=advanceShoreActionCamera({width:width*pixelRatio,height:height*pixelRatio,x:0,y:0,scale:1},target,0,{initialized:false});
-  assert.ok(camera.scale/pixelRatio<=5.5+1e-8,'larger windows add scenery instead of magnifying the same tiny patch');
-  assert.ok(5.6*camera.scale/pixelRatio>=24,'the physical angler remains readable');
-  const coastlineY=(scene.shoreY(s.player.x)-camera.y)*camera.scale+target.screenY;
-  assert.ok(coastlineY>target.safeBounds.top&&coastlineY<target.safeBounds.bottom,'arrival includes the actual shoreline above the angler');
+test('walking restores the original broad view instead of metric close-up magnification',()=>{
+ for(const id of ['pacifica','half-moon-bay','benicia']){
+  const scene=getShoreScene(id),s={phase:'walk',player:{...scene.spawn}};
+  for(const [width,height,baseScale]of[[390,844,.65],[1440,900,.76]]){
+   const camera=shoreActionCameraTarget(scene,s,{width,height,top:140,bottom:70,baseScale});
+   close(camera.scale,baseScale);close(camera.y,s.player.y-130);
+   assert.ok(width/camera.scale>500,'walking keeps a broad stretch of the authored scenery');
+   assert.ok(41*camera.scale>=25,'original-size character remains readable');
+  }
  }
 });
 
-test('a fresh Benicia arrival shows both pier edges and the actual coastline',()=>{
- const scene=getShoreScene('benicia'),p={x:scene.pier.gate.x,y:scene.pier.gate.y+4.8},s={phase:'walk',player:p};
- const target=shoreActionCameraTarget(scene,s,{width:390,height:844,top:160,bottom:80});
- const camera=advanceShoreActionCamera({width:390,height:844,x:0,y:0,scale:1},target,0,{initialized:false}),bounds=target.safeBounds;
- for(const x of[scene.pier.x-scene.pier.width/2,scene.pier.x+scene.pier.width/2]){
-  const screenX=(x-camera.x)*camera.scale+195;assert.ok(screenX>=bounds.left&&screenX<=bounds.right,'the entrance does not fill the window with an edge-less slab');
+test('reel strokes and lure twitches cannot pump the restored action zoom',()=>{
+ const s=state('benicia',{phase:'waiting'}),options={width:1440,height:900,top:140,bottom:200,baseScale:.76};
+ const idle=shoreActionCameraTarget('benicia',s,options);
+ for(const presentation of [{retrieveSpeed:1,twitch:0},{retrieveSpeed:0,twitch:1}]){
+  const moving=shoreActionCameraTarget('benicia',{...s,presentation},options);
+  close(moving.focus,idle.focus);close(moving.scale,idle.scale);
  }
- const shoreY=(scene.shoreY(p.x)-camera.y)*camera.scale+target.screenY;
- assert.ok(shoreY>bounds.top&&shoreY<bounds.bottom);assert.ok(5.6*camera.scale>=16);
 });

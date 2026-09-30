@@ -39,7 +39,7 @@ test('rod and baited payload affect range; overload does not grant a distance bo
  light.state.upgrades.push('surf_rod');near(light.previewCast({power:1}).distance,a.distance);
 });
 test('preview is read-only; actual cast and visible trajectory have identical endpoints',()=>{
- const sim=simAt(),before=JSON.stringify(sim.state),plan=sim.previewCast({power:.5,aim:.2});
+ const sim=simAt({offset:25}),before=JSON.stringify(sim.state),plan=sim.previewCast({power:.5,aim:.2});
  assert.equal(JSON.stringify(sim.state),before);assert.ok(sim.cast({power:.5,aim:.2}).ok);
  assert.deepEqual(sim.state.cast,plan);near(sim.state.lineDistance,plan.distance);
  const start=shoreCastPosition(plan,0),end=shoreCastPosition(plan,plan.flightDuration);

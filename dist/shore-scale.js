@@ -1,5 +1,5 @@
-// One metric convention for the shore simulation, actors, tackle and props.
-// World geography is retained; camera zoom supplies readable close views.
+// Physical dimensions for the shore solver, independent of the restored
+// authored pixel-art proportions used by the scene renderer.
 export const SHORE_WORLD_UNITS_PER_METRE=3.2;
 export const SHORE_PERSON_HEIGHT_METRES=1.75;
 export const shoreWorldMetres=metres=>metres*SHORE_WORLD_UNITS_PER_METRE;

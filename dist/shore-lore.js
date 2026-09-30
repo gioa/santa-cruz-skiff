@@ -1,4 +1,3 @@
-import {SHORE_MOVEMENT as M} from './shore-movement.js';
 // Independent, saved random stream: conversations never change fishing or patrol rolls.
 import {BENICIA_ANGLERS} from './benicia-crowd.js';
 import {shoreZone} from './shore-data.js';
@@ -48,7 +47,7 @@ export function stepShoreLore(sim){
 export function talkShoreAngler(sim,id){
  const s=sim.state,l=s.shoreLore,e=l.encounter;
  if(!e||e.id!==id||e.expiresAt<=s.elapsed)return{ok:false,message:'那位钓友已经离开了。'};
- if(s.phase!=='walk'||s.onPier||s.inspection||Math.hypot(e.x-s.player.x,e.y-s.player.y)>M.talkReach)return{ok:false,message:'先走近一点，收好钓竿再打招呼。'};
+ if(s.phase!=='walk'||s.onPier||s.inspection||Math.hypot(e.x-s.player.x,e.y-s.player.y)>65)return{ok:false,message:'先走近一点，收好钓竿再打招呼。'};
  const clue=shoreClues(sim.scene).find(c=>c.id===e.clueId),known=clue&&l.notes.some(n=>n.id===clue.id),fresh=Boolean(clue&&!known&&!e.talked);
  if(fresh)l.notes.push({...clue,angler:e.angler,learnedAt:s.elapsed});e.talked=true;
  return{ok:true,name:ANGLERS[e.angler].name,text:clue?clue.text:'今天就想安静钓一会儿。听听浪声也挺好，祝你好运。',fresh,known:Boolean(known),clueId:clue?.id||null};

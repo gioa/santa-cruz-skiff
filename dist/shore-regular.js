@@ -1,4 +1,3 @@
-import {SHORE_MOVEMENT as M,shoreStandPosition} from './shore-movement.js';
 // 空军大队长 — a Sharp Park regular who really fishes. His sand crab on a
 // 3 oz fish-finder rig is a bait in the same fish population as the player's:
 // schools find it by scent, inspect it and bite through the ordinary model, and
@@ -18,7 +17,7 @@ export const REGULAR=Object.freeze({name:'空军大队长',coat:'#4d6b8c',hat:'#
 // Rip-channel edges: bass wait where the gap current carries food out.
 export const REGULAR_SPOTS=Object.freeze([{x:1760,weight:.4},{x:880,weight:.35},{x:3120,weight:.25}]);
 // Dawn and evening sessions (game hours). He turns up on most days.
-const SESSIONS=[[5.5,11],[16.5,20.5]],PRESENT=.85,WALK=M.walkSpeed,OFFSCREEN_M=95;
+const SESSIONS=[[5.5,11],[16.5,20.5]],PRESENT=.85,WALK=78,OFFSCREEN_M=95;
 const BAIT='sandcrab',RIG='fishfinder_rig';
 
 export const REGULAR_TIPS=Object.freeze([
@@ -82,7 +81,7 @@ export function serializeRegular(r){
 
 function hourOf(sim){const c=sim.calendar();return c.getUTCHours()+c.getUTCMinutes()/60;}
 function inSession(r,hour){return r.present&&SESSIONS.some(([a,b])=>hour>=a&&hour<b);}
-function standAt(sim,x){return shoreStandPosition(sim.scene,x);}
+function standAt(sim,x){return{x,y:sim.world.shoreY(x)+22};}
 function entryFor(sim,x){return{x:x+70,y:Math.min(sim.world.height-60,sim.world.shoreY(x)+420)};}
 // Walk inland of the pier's landward deck when moving along the beach.
 function routeAlong(sim,from,to){const lane=x=>sim.world.shoreY(x)+150;return[{x:from.x,y:lane(from.x)},{x:to.x,y:lane(to.x)},to];}
@@ -250,7 +249,7 @@ function gifts(sim,r){
 export function talkRegular(sim,{more=false}={}){
  const s=sim.state,r=s.regular;
  if(!regularVisible(r))return{ok:false,message:'大队长今天不在。'};
- if(s.phase!=='walk'||s.onPier||s.inspection||Math.hypot(r.x-s.player.x,r.y-s.player.y)>M.talkReach)return{ok:false,message:'先走近一点，收好钓竿再打招呼。'};
+ if(s.phase!=='walk'||s.onPier||s.inspection||Math.hypot(r.x-s.player.x,r.y-s.player.y)>70)return{ok:false,message:'先走近一点，收好钓竿再打招呼。'};
  if(!more||s.elapsed-r.talk.at>120)r.talk={at:s.elapsed,count:0};
  const busy=['fighting','bite'].includes(r.mode);
  if(busy)return{ok:true,name:REGULAR.name,line:moodLine(r),tip:null,gifts:[],more:false};

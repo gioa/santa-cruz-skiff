@@ -9,7 +9,7 @@ function meet(seed=12345,sceneId='pacifica'){
  for(let t=0;t<1200&&!sim.state.shoreLore.encounter;t+=.1)sim.update(.1);
  assert.ok(sim.state.shoreLore.encounter);return sim;
 }
-function near(sim){const e=sim.state.shoreLore.encounter;Object.assign(sim.state.player,{x:e.x,y:e.y+4});return e;}
+function near(sim){const e=sim.state.shoreLore.encounter;Object.assign(sim.state.player,{x:e.x,y:e.y+20});return e;}
 test('both beaches and legacy saves start with no information or known destinations',()=>{
  for(const sceneId of ['pacifica','half-moon-bay']){
   const sim=new PacificaSimulation({sceneId,loreSeed:42});assert.deepEqual(sim.state.shoreLore.notes,[]);assert.deepEqual(knownShoreZones(sim.scene,sim.state.shoreLore),[]);assert.equal(sim.state.shoreLore.encounter,null);

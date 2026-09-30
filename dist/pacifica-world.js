@@ -2,14 +2,11 @@ import {drawShorePerson} from './shore-people.js';
 import {ANGLERS} from './shore-lore.js';
 // Shared pixel-art shoreline renderer. Fixed bathymetry, animated surf and
 // game collision geometry all use shore-data; the camera follows a long coast.
-import {getShoreScene, sampleShore, shoreProfile, shoreSurfField, onPier} from './shore-data.js';
+import {getShoreScene, sampleShore, shoreSurfField, onPier} from './shore-data.js';
 import {shoreCastPosition} from './shore-casting.js';
 import {shoreFishPosition} from './shore-line-geometry.js';
 import {shoreWaterContact,shoreTackleLine,shoreRigUsesFloat,shoreLineWaterEntry} from './shore-tackle-visual.js';
 import {shoreRodPose,shoreActionCameraTarget,advanceShoreActionCamera,shoreFishVisual,drawShoreFish,shoreCastPreviewVisual,drawShoreCastPreview} from './shore-action-view.js';
-import {shoreWorldMetres as m,shorePersonScale,shorePersonFoot} from './shore-scale.js';
-import {shoreFineLine,drawMetricRod,drawMetricFloat,drawMetricWeight,withShoreProp} from './shore-metric-art.js';
-import {bedDepth} from './shore-surf.js';
 const TAU=Math.PI*2;
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const noise=(x,y=0)=>{let n=Math.imul(x|0,374761393)+Math.imul(y|0,668265263);n=Math.imul(n^(n>>>13),1274126177);return((n^(n>>>16))>>>0)/4294967295;};
@@ -28,36 +25,31 @@ export function createPacificaWorld(canvas,{sceneId='pacifica'}={}){
   const ctx=canvas.getContext('2d',{alpha:false});
   const camera={x:scene.spawn.x,y:scene.spawn.y-150,scale:.65,width:900,height:600};
   let cssWidth=900,cssHeight=600,insets={top:90,bottom:200},now=0,lastTime=null,lastState=null,manualFocus=null,initialized=false,b=null,lastTackle=null,drawOptions={};
-  const chunkSize=128,chunks=new Map();let deepTile=null;
-  const R=(g,x,y,w,h,c)=>{g.fillStyle=c;g.fillRect(x,y,w,h);};
-  function poly(g,pts,c){g.fillStyle=c;g.beginPath();pts.forEach(([x,y],i)=>i?g.lineTo(x,y):g.moveTo(x,y));g.closePath();g.fill();}
-  function line(g,x0,y0,x1,y1,c,w=2){if(w<1){shoreFineLine(g,{x:x0,y:y0},{x:x1,y:y1},c,w);return;}x0=Math.round(x0);y0=Math.round(y0);x1=Math.round(x1);y1=Math.round(y1);const dx=Math.abs(x1-x0),sx=x0<x1?1:-1,dy=-Math.abs(y1-y0),sy=y0<y1?1:-1;let err=dx+dy;for(let i=0;i<4000;i++){R(g,x0,y0,w,w,c);if(x0===x1&&y0===y1)break;const e=err*2;if(e>=dy){err+=dy;x0+=sx;}if(e<=dx){err+=dx;y0+=sy;}}}
+  const chunkSize=512,chunks=new Map();let deepTile=null;
+  const R=(g,x,y,w,h,c)=>{g.fillStyle=c;g.fillRect(Math.round(x),Math.round(y),Math.round(w),Math.round(h));};
+  function poly(g,pts,c){g.fillStyle=c;g.beginPath();pts.forEach(([x,y],i)=>i?g.lineTo(Math.round(x),Math.round(y)):g.moveTo(Math.round(x),Math.round(y)));g.closePath();g.fill();}
+  function line(g,x0,y0,x1,y1,c,w=2){x0=Math.round(x0);y0=Math.round(y0);x1=Math.round(x1);y1=Math.round(y1);const dx=Math.abs(x1-x0),sx=x0<x1?1:-1,dy=-Math.abs(y1-y0),sy=y0<y1?1:-1;let err=dx+dy;for(let i=0;i<4000;i++){R(g,x0,y0,w,w,c);if(x0===x1&&y0===y1)break;const e=err*2;if(e>=dy){err+=dy;x0+=sx;}if(e<=dx){err+=dx;y0+=sy;}}}
   function text(g,label,x,y,size=2,color=C.ink,align='center'){
     const chars=[...label.toUpperCase()].map(c=>FONT[c]||FONT[' ']);const width=chars.reduce((n,p)=>n+(p[0].length+1)*size,0)-size;
     let px=x-(align==='center'?width/2:0);for(const glyph of chars){for(let row=0;row<glyph.length;row++)for(let col=0;col<glyph[row].length;col++)if(glyph[row][col]==='1')R(g,px+col*size,y+row*size,size,size,color);px+=(glyph[0].length+1)*size;}
   }
   function shadow(g,x,y,w=26,h=8,alpha=.16){g.globalAlpha=alpha;R(g,x-w/2+4,y-h/2,w-8,h,'#375454');R(g,x-w/2,y-h/2+2,w,h-4,'#375454');g.globalAlpha=1;}
-  function grass(g,x,y,size=1,tone=C.grass){withShoreProp(g,x,y,.12,()=>grassArt(g,x,y,size,tone));}
-  function grassArt(g,x,y,size=1,tone=C.grass){
+  function grass(g,x,y,size=1,tone=C.grass){
     shadow(g,x,y+2,21*size,5*size,.09);for(let i=0;i<5;i++){const lean=(i-2)*4*size;line(g,x+(i-2)*2*size,y,x+lean,y-(6+noise(i,x)*10)*size,tone,2*size);}R(g,x-8*size,y,18*size,2*size,'#a3a879');
   }
   function rock(g,x,y,w,h){shadow(g,x+4,y+3,w+10,9,.16);poly(g,[[x-w/2,y],[x-w/2,y-h*.6],[x-w*.25,y-h],[x+w*.2,y-h],[x+w/2,y-h*.55],[x+w/2,y]],'#7a8d83');poly(g,[[x-w/2+3,y-h*.6],[x-w*.25,y-h],[x+w*.2,y-h],[x+w*.37,y-h*.6]],'#afbaa0');R(g,x-w*.3,y-h*.55,w*.5,2,'#c2c7ac');R(g,x+w*.24,y-h*.5,3,h*.5,'#5b756f');}
-  function crate(g,x,y,size=21){withShoreProp(g,x,y,m(.5)/21,()=>crateArt(g,x,y,size));}
-  function crateArt(g,x,y,size=21){shadow(g,x+size/2,y+size,25,6,.16);R(g,x,y,size,size,'#886c4e');R(g,x+2,y+2,size-4,size-4,'#bb9565');for(let yy=y+5;yy<y+size;yy+=6)R(g,x+2,yy,size-4,2,'#96734e');R(g,x,y,3,size,'#d6b37b');R(g,x+size-3,y,3,size,'#d6b37b');R(g,x+2,y+2,size-4,2,'#edcb92');}
-  function bucket(g,x,y,color){withShoreProp(g,x,y,m(.35)/22,()=>bucketArt(g,x,y,color));}
-  function bucketArt(g,x,y,color='#6b9896'){shadow(g,x,y+1,22,5,.16);R(g,x-9,y-15,18,15,color);R(g,x-11,y-17,22,4,'#dbe0ba');R(g,x-7,y-15,14,3,'#395f65');R(g,x-6,y-9,3,8,'#a0c5b7');line(g,x-10,y-15,x-8,y-23,'#708982');line(g,x-8,y-23,x+8,y-23,'#708982');line(g,x+8,y-23,x+10,y-15,'#708982');}
-  function cottage(g,x,y,w=98,color){withShoreProp(g,x+w/2,y+73,m(10)/98,()=>cottageArt(g,x,y,w,color));}
-  function cottageArt(g,x,y,w=98,color='#d5a77d'){
+  function crate(g,x,y,size=21){shadow(g,x+size/2,y+size,25,6,.16);R(g,x,y,size,size,'#886c4e');R(g,x+2,y+2,size-4,size-4,'#bb9565');for(let yy=y+5;yy<y+size;yy+=6)R(g,x+2,yy,size-4,2,'#96734e');R(g,x,y,3,size,'#d6b37b');R(g,x+size-3,y,3,size,'#d6b37b');R(g,x+2,y+2,size-4,2,'#edcb92');}
+  function bucket(g,x,y,color='#6b9896'){shadow(g,x,y+1,22,5,.16);R(g,x-9,y-15,18,15,color);R(g,x-11,y-17,22,4,'#dbe0ba');R(g,x-7,y-15,14,3,'#395f65');R(g,x-6,y-9,3,8,'#a0c5b7');line(g,x-10,y-15,x-8,y-23,'#708982');line(g,x-8,y-23,x+8,y-23,'#708982');line(g,x+8,y-23,x+10,y-15,'#708982');}
+  function cottage(g,x,y,w=98,color='#d5a77d'){
     shadow(g,x+w/2+8,y+78,w+18,18,.18);R(g,x,y+24,w,49,'#5b7067');R(g,x+4,y+24,w-8,45,color);for(let yy=y+33;yy<y+68;yy+=7)R(g,x+4,yy,w-8,2,'#b89876');
     poly(g,[[x-7,y+27],[x+15,y],[x+w-19,y],[x+w+5,y+27]],'#4e7775');R(g,x-6,y+26,w+10,5,'#355c60');for(let dy=6;dy<25;dy+=6)R(g,x+17-dy*.65,y+dy,w-37+dy*1.1,2,'#78a096');
     R(g,x+w-24,y-9,10,18,'#be9270');R(g,x+w-27,y-10,15,3,'#e4c59b');
     for(const xx of[x+12,x+w-32]){R(g,xx,y+41,21,20,'#ede1b9');R(g,xx+3,y+44,15,14,'#507f86');R(g,xx+10,y+44,2,14,'#efe4bd');R(g,xx+3,y+50,15,2,'#efe4bd');R(g,xx-2,y+61,25,3,'#688b73');}
     R(g,x+w/2-10,y+43,20,30,'#49686a');R(g,x+w/2-7,y+47,14,14,'#87b5ab');R(g,x+w/2+4,y+64,2,2,'#e8c786');R(g,x+w/2-15,y+73,30,5,'#c3ad85');
   }
-  function shop(target){const previous=b;b=target;withShoreProp(b,scene.shop.door.x,scene.shop.door.y,.14,()=>shopArt());b=previous;}
-  function shopArt(){
-    const {x,y,width:w}=scene.shop;
-    shadow(b,x+w/2+12,y+140,w+44,28,.2);
+  function shop(){
+    const x=1050,y=670,w=160;
+    shadow(b,x+w/2+12,790,w+44,28,.2);
     R(b,x-5,y+31,w+10,93,'#53655b');R(b,x,y+27,w,94,'#8ea497');R(b,x+4,y+32,w-8,85,'#a8b5a0');
     for(let yy=y+38;yy<y+120;yy+=8){R(b,x+4,yy,w-8,2,'#80968a');R(b,x+4,yy+2,w-8,1,'#c4c8ac');}
     // Hand-tiled sea-green roof, a cream fascia and warm striped canvas.
@@ -74,7 +66,7 @@ export function createPacificaWorld(canvas,{sceneId='pacifica'}={}){
     // Outdoor tackle wall and bait coolers make the storefront readable at a glance.
     R(b,x-47,y+81,33,4,'#a5865e');R(b,x-46,y+113,31,4,'#a5865e');
     for(let i=0;i<4;i++){line(b,x-43+i*9,y+119,x-46+i*9,y+53+i*3,'#405958',2);R(b,x-45+i*9,y+107,4,10,'#c5a574');R(b,x-47+i*9,y+99,6,5,'#e2c998');}
-    crateArt(b,x+w+23,y+113,23);crateArt(b,x+w+26,y+94,19);bucketArt(b,x-30,y+138);
+    crate(b,x+w+23,y+113,23);crate(b,x+w+26,y+94,19);bucket(b,x-30,y+138);
     R(b,x+w+7,y+133,32,19,'#9daea0');R(b,x+w+5,y+130,36,6,'#f2e4be');R(b,x+w+10,y+138,26,2,'#567772');R(b,x+w+21,y+134,4,5,'#406563');
     // Small glowing OPEN board and a sand crab pictogram chalkboard.
     R(b,x+119,y+86,24,12,'#e9d295');text(b,'OPEN',x+131,y+88,1,'#465f54');
@@ -83,8 +75,7 @@ export function createPacificaWorld(canvas,{sceneId='pacifica'}={}){
     R(b,x+w+24,y+22,3,72,'#657d70');poly(b,[[x+w+27,y+25],[x+w+54,y+30],[x+w+27,y+37]],'#d38a63');R(b,x+w+23,y+20,5,5,'#e4c995');
   }
 
-  function beachSign(g,label,sub,x,y){withShoreProp(g,x,y+63,m(1.6)/63,()=>beachSignArt(g,label,sub,x,y));}
-  function beachSignArt(g,label,sub,x,y){
+  function beachSign(g,label,sub,x,y){
     const width=Math.max(86,label.length*7+16);
     R(g,x-width/2+8,y+14,5,49,'#82765d');R(g,x+width/2-13,y+14,5,49,'#82765d');
     R(g,x-width/2,y-2,width,40,'#355d60');R(g,x-width/2-3,y-5,width+6,5,'#c6bc99');
@@ -92,26 +83,26 @@ export function createPacificaWorld(canvas,{sceneId='pacifica'}={}){
     if(sub)text(g,sub,x,y+24,1,'#c7d5bd');
   }
   function creekX(creek,y){return creek.x+Math.sin((y-460)/155)*43+Math.sin(y/63)*9;}
-  function terrainChunk(cx,cy,resolution){
-    const cache=document.createElement('canvas');cache.width=chunkSize*resolution;cache.height=chunkSize*resolution;
-    b=cache.getContext('2d',{alpha:false});b.scale(resolution,resolution);b.translate(-cx,-cy);
+  function terrainChunk(cx,cy){
+    const cache=document.createElement('canvas');cache.width=chunkSize;cache.height=chunkSize;
+    b=cache.getContext('2d',{alpha:false});b.translate(-cx,-cy);
     R(b,cx,cy,chunkSize,chunkSize,C.dry);
     // Submerged bars are pale; deeper troughs and channel cuts remain dark.
     // This is sampled once per cached tile, not painted as a repeating texture.
     const waterTones=hmb?['#93b9aa','#81ada4','#70a09e','#5a8d96','#477d8c','#3c7183']:
       ['#83a59a','#709b96','#5a8b90','#487d86','#3d6d7e','#315d70'];
-    // Fine depth shading is cached at the working camera's resolution. The
-    // bathymetry stays in metres; the old 8-world-unit squares were 2.5m wide.
-    const cell=2;
-    for(let x=cx;x<cx+chunkSize;x+=cell){
-      const sy=scene.shoreY(x+cell/2),profile=shoreProfile(scene,x+cell/2,0,{});
-      for(let y=cy;y<Math.min(cy+chunkSize,sy+cell);y+=cell){
-        const depth=bedDepth(profile.shape,Math.max(0,(sy-y-cell/2)/3.2),profile.tide,0);
-        const t=clamp(depth/1.05,0,4.999),lo=Math.floor(t);
-        R(b,x,y,cell,cell,mixTone(waterTones[lo],waterTones[lo+1],smooth(t-lo)));
+    // Depth shading every 8 px, blended between neighbouring tones with a
+    // little grain so the bar, trough and rip channels shade without bands.
+    for(let x=cx;x<cx+chunkSize;x+=8){
+      const sy=scene.shoreY(x+4);
+      for(let y=cy;y<Math.min(cy+chunkSize,sy+16);y+=8){
+        const bed=sampleShore(scene,x+4,y+4,0,{},{surf:false});
+        const t=clamp(bed.depth/1.05+(noise(x>>3,(y>>3)+5)-.5)*.35,0,4.999),lo=Math.floor(t);
+        R(b,x,y,8,8,mixTone(waterTones[lo],waterTones[lo+1],smooth(t-lo)));
+        if(noise(x>>3,y>>3)>.93)R(b,x+noise(y,x)*6,y+noise(x,y+1)*6,4+noise(x+1,y)*9,1,t<2?C.shallow:C.sea);
       }
     }
-    const coast=[];for(let x=cx-2;x<=cx+chunkSize+2;x+=2)coast.push([x,scene.shoreY(x)]);
+    const coast=[];for(let x=cx-8;x<=cx+chunkSize+8;x+=8)coast.push([x,Math.round(scene.shoreY(x)/2)*2]);
     const bottom=cy+chunkSize+2;
     // Swash-wetted sand, the damp band up to the high-tide line, then sand and
     // dry sand. Each boundary wanders on its own; nothing runs parallel.
@@ -121,18 +112,19 @@ export function createPacificaWorld(canvas,{sceneId='pacifica'}={}){
       const pts=coast.map(([x,y])=>[x,edge(x,y,k)]);
       if(bottom>Math.min(...pts.map(p=>p[1])))poly(b,[...pts,[cx+chunkSize+8,bottom],[cx-8,bottom]],color);
     });
-    // Wrack and grains have centimetre-scale detail, independent of zoom.
-    for(let x=Math.floor(cx)*1;x<cx+chunkSize+1;x++){
-      if(vnoise(x/18,61)<.42||noise(x,62)>.62)continue;
-      const y=edge(x,scene.shoreY(x),2)+noise(x,63)*1.5;
-      if(y<cy-1||y>cy+chunkSize+1)continue;
-      R(b,x,y,.2+noise(x,64)*.8,.05+noise(x,65)*.12,hmb?'#9d9475':'#51594e');
+    // Wrack line: broken strands of kelp and debris along the last high tide.
+    for(let x=Math.floor(cx/6)*6;x<cx+chunkSize+6;x+=6){
+      if(vnoise(x/90,61)<.42||noise(x,62)>.7)continue;
+      const y=edge(x,scene.shoreY(x),2)-2+noise(x,63)*5;if(y<cy-4||y>cy+chunkSize+4)continue;
+      R(b,x,y,3+noise(x,64)*6,noise(x,65)>.6?2:1,noise(x,66)>.5?(hmb?'#8c8a6d':'#3f4640'):(hmb?'#a39d7e':'#565a4f'));
     }
-    for(let gx=Math.floor(cx/2)*2;gx<cx+chunkSize;gx+=2)for(let gy=Math.floor(cy/2)*2;gy<cy+chunkSize;gy+=2){
-      const x=gx+noise(gx,gy)*1.8,y=gy+noise(gy,gx)*1.8,off=y-scene.shoreY(x);
-      if(off<1||off>660)continue;
-      R(b,x,y,.05+noise(gx+1,gy)*.16,.03+noise(gx+2,gy)*.07,noise(gx,gy+1)>.5?C.grain:C.grainDark);
-      if(!hmb&&off<35&&noise(gx+7,gy)>.83){R(b,x,y,.2,.12,'#4b5353');R(b,x,y,.12,.04,'#82857b');}
+    // Coordinate-seeded grains continue across tile boundaries and do not swim.
+    for(let gx=Math.floor(cx/18)*18;gx<cx+chunkSize;gx+=18)for(let gy=Math.floor(cy/19)*19;gy<cy+chunkSize;gy+=19){
+      const x=gx+noise(gx,gy)*15,y=gy+noise(gy,gx)*16,shore=scene.shoreY(x),off=y-shore;
+      if(off<8||off>660)continue;
+      R(b,x,y,noise(gx+1,gy)>.83?4:2,noise(gx+2,gy)>.9?2:1,noise(gx,gy+1)>.5?C.grain:C.grainDark);
+      if(!hmb&&off<63&&noise(gx+7,gy)>.56){R(b,x,y,4,3,'#333d41');R(b,x,y,3,1,'#82857b');}
+      if(!hmb&&off>30&&off<110&&noise(Math.floor(x/95),Math.floor(y/19))>.77){R(b,x-4,y,13,2,'#4b5353');R(b,x,y+3,9,1,'#59605b');}
     }
     if(hmb){
       // A low vegetated dune ridge, with the two creek mouths cutting across it.
@@ -143,7 +135,7 @@ export function createPacificaWorld(canvas,{sceneId='pacifica'}={}){
       }
       for(let x=Math.floor(cx/31)*31;x<cx+chunkSize+31;x+=31){const y=954+noise(x,73)*250;if(y>cy-30&&y<cy+chunkSize+35)grass(b,x,y,.65+noise(x,31)*.65,noise(x,99)>.45?C.grass:'#747f66');}
       for(const creek of scene.creeks||[]){
-        if(Math.abs(creek.x-(cx+chunkSize/2))>360)continue;
+        if(Math.abs(creek.x-(cx+256))>360)continue;
         for(let y=Math.max(cy-16,scene.shoreY(creek.x)+3);y<cy+chunkSize+16;y+=8){
           const x=creekX(creek,y),w=19+15*Math.sin(y/213)**2+4*Math.sin(y/29);
           R(b,x-w-13,y,w*2+26,9,'#a4ac9c');R(b,x-w,y,w*2,9,'#67948e');if(noise(creek.x,y)>.77)R(b,x-w+6+noise(y,creek.x)*12,y+1,5+noise(y,17)*10,1,'#93b2a1');
@@ -151,15 +143,15 @@ export function createPacificaWorld(canvas,{sceneId='pacifica'}={}){
       }
       // Francis Beach has a campground behind the dune, not enclosing cliffs.
       for(let x=5550;x<7330;x+=175){const y=1055+Math.sin(x/87)*29;if(x>cx-140&&x<cx+chunkSize+140&&y>cy-120&&y<cy+chunkSize+80){
-        withShoreProp(b,x,y+20,.14,()=>{shadow(b,x,y+20,99,16,.12);poly(b,[[x-40,y+16],[x-5,y-26],[x+37,y+16]],noise(x,81)>.5?'#92a599':'#c59770');
+        shadow(b,x,y+20,99,16,.12);poly(b,[[x-40,y+16],[x-5,y-26],[x+37,y+16]],noise(x,81)>.5?'#92a599':'#c59770');
         poly(b,[[x-5,y-26],[x+8,y+16],[x+37,y+16]],'#627e76');R(b,x-27,y+15,66,4,'#5d756c');
-        line(b,x+48,y+7,x+96,y+7,'#a08e6c',6);line(b,x+55,y+7,x+54,y+23,'#766c55',4);line(b,x+89,y+7,x+90,y+23,'#766c55',4);});
+        line(b,x+48,y+7,x+96,y+7,'#a08e6c',6);line(b,x+55,y+7,x+54,y+23,'#766c55',4);line(b,x+89,y+7,x+90,y+23,'#766c55',4);
       }}
     }else{
       // Sharp Park's long levee and promenade run behind the dark beach.
       for(let x=Math.floor(cx/16)*16;x<cx+chunkSize+16;x+=16){const y=899+Math.sin(x/820)*8;
         R(b,x,y,17,60,'#797e71');R(b,x,y+7,17,7,'#8e9281');R(b,x,y+42,17,27,'#b3af94');R(b,x,y+46,17,3,'#d2c7a9');
-        if(noise(x,133)>.42)withShoreProp(b,x,y+27,.14,()=>rock(b,x,y+27,13+noise(x,134)*12,8+noise(x,135)*9));
+        if(noise(x,133)>.42)rock(b,x,y+27,13+noise(x,134)*12,8+noise(x,135)*9);
       }
       for(let x=Math.floor(cx/60)*60;x<cx+chunkSize+60;x+=60){const y=1000+noise(x,321)*95;if(y>cy-35&&y<cy+chunkSize+35)grass(b,x,y,.8+noise(x,113)*.8);}
       if(cy+chunkSize>950&&cy<1150)for(let x=80;x<5350;x+=297)if(x>cx-120&&x<cx+chunkSize)cottage(b,x,1030+noise(x,64)*25,88+noise(x,94)*17,noise(x,81)>.5?'#c0b69e':'#a6afa0');
@@ -175,9 +167,11 @@ export function createPacificaWorld(canvas,{sceneId='pacifica'}={}){
     // Sparse driftwood, kelp and shells add scale without filling every beach tile.
     for(let x=Math.floor(cx/240)*240;x<cx+chunkSize+240;x+=240){
       const sy=scene.shoreY(x),y=sy+139+noise(x,32)*135;
-      if(y>cy-35&&y<cy+chunkSize+35&&noise(x,17)>.42){withShoreProp(b,x,y,m(2)/46,()=>{line(b,x,y,x+46,y+6,'#918972',6);line(b,x+2,y-1,x+43,y+4,'#b4aa8c',2);line(b,x+19,y+2,x+27,y-6,'#918972',3);});}
-      if(sy+55>cy-30&&sy+55<cy+chunkSize+30)withShoreProp(b,x+53,sy+68,.12,()=>{R(b,x+45,sy+68,17,2,'#757c56');R(b,x+51,sy+65,9,2,'#7e845b');R(b,x+58,sy+68,2,8,'#727653');});
+      if(y>cy-35&&y<cy+chunkSize+35&&noise(x,17)>.42){line(b,x,y,x+46,y+6,'#918972',6);line(b,x+2,y-1,x+43,y+4,'#b4aa8c',2);line(b,x+19,y+2,x+27,y-6,'#918972',3);}
+      if(sy+55>cy-30&&sy+55<cy+chunkSize+30){R(b,x+45,sy+68,17,2,'#757c56');R(b,x+51,sy+65,9,2,'#7e845b');R(b,x+58,sy+68,2,8,'#727653');}
     }
+    if(cx<1300&&cx+chunkSize>970&&cy<870&&cy+chunkSize>640)shop();
+    if(cx<1070&&cx+chunkSize>900&&cy<850&&cy+chunkSize>760)beachSign(b,hmb?'HALF MOON BAY':'PACIFICA',hmb?'DUNES / VENICE':'SHARP PARK',974,781);
     const labels=hmb?['DUNES','FRENCHMANS','VENICE','PILARCITOS','FRANCIS','SOUTH BEACH']:['NORTH BEACH','OLD PIER','SAND TROUGH','BAR GAP','SOUTH BEACH','MORI POINT'];
     scene.zones.forEach((zone,i)=>{if(zone.x>cx-100&&zone.x<cx+chunkSize+100&&cy<885&&cy+chunkSize>770)beachSign(b,labels[i]||'BEACH','COAST TRAIL',zone.x,805);});
     b=null;return cache;
@@ -190,15 +184,15 @@ export function createPacificaWorld(canvas,{sceneId='pacifica'}={}){
   function drawTerrain(){
     const v=bounds(12),firstX=Math.floor(v.left/chunkSize),lastX=Math.floor(v.right/chunkSize),firstY=Math.floor(v.top/chunkSize),lastY=Math.floor(v.bottom/chunkSize);
     for(let tx=firstX;tx<=lastX;tx++)for(let ty=firstY;ty<=lastY;ty++){
-      const resolution=Math.min(8,Math.max(1,2**Math.ceil(Math.log2(camera.scale*2)))),key=tx+','+ty+','+resolution,farOffshore=(ty+1)*chunkSize<=-512;let tile=farOffshore?offshoreTile():chunks.get(key);
-      if(!tile){tile=terrainChunk(tx*chunkSize,ty*chunkSize,resolution);chunks.set(key,tile);}
+      const key=tx+','+ty,farOffshore=(ty+1)*chunkSize<=-512;let tile=farOffshore?offshoreTile():chunks.get(key);
+      if(!tile){tile=terrainChunk(tx*chunkSize,ty*chunkSize);chunks.set(key,tile);}
       else if(!farOffshore){chunks.delete(key);chunks.set(key,tile);}
       // Snap shared edges in screen pixels so scaled tiles cannot show seams.
       const a=project(tx*chunkSize,ty*chunkSize),z=project((tx+1)*chunkSize,(ty+1)*chunkSize);
       ctx.save();ctx.setTransform(1,0,0,1,0,0);ctx.drawImage(tile,a.x,a.y,z.x-a.x,z.y-a.y);ctx.restore();
     }
     // Bounded LRU: a long walk does not retain a canvas for the entire coastline.
-    const visibleLandRows=Math.max(0,lastY-Math.max(firstY,-1)+1),tileBudget=Math.max(16,(lastX-firstX+1)*visibleLandRows+4);
+    const visibleLandRows=Math.max(0,lastY-Math.max(firstY,-1)+1),tileBudget=Math.max(54,(lastX-firstX+1)*visibleLandRows+4);
     while(chunks.size>tileBudget)chunks.delete(chunks.keys().next().value);
   }
   function pier(){
@@ -214,15 +208,15 @@ export function createPacificaWorld(canvas,{sceneId='pacifica'}={}){
     for(let y=Math.max(p.top+4,Math.floor(v.top/19)*19);y<Math.min(p.bottom,v.bottom+30);y+=19){
       R(ctx,p.x-22,y,44,1,'#999f90');if(noise(y,349)>.57){R(ctx,p.x-19+noise(y,351)*29,y+8,7,2,'#7b857d');R(ctx,p.x-17+noise(y,352)*29,y+10,4,1,'#d0cfb6');}
     }
-    function rail(x0,y0,x1,y1){const height=m(1.1),spacing=m(2.4);line(ctx,x0,y0-height,x1,y1-height,'#d0cdb3',m(.05));line(ctx,x0,y0-height*.48,x1,y1-height*.48,'#8b9789',m(.035));const dist=Math.hypot(x1-x0,y1-y0),n=Math.ceil(dist/spacing);for(let i=0;i<=n;i++){const x=x0+(x1-x0)*i/n,y=y0+(y1-y0)*i/n;if(!visible(x,y,10))continue;line(ctx,x,y,x,y-height,'#6e7b74',m(.055));}}
+    function rail(x0,y0,x1,y1){line(ctx,x0,y0-15,x1,y1-15,'#d0cdb3',2);line(ctx,x0,y0-6,x1,y1-6,'#8b9789',1);const dist=Math.hypot(x1-x0,y1-y0),n=Math.ceil(dist/24);for(let i=0;i<=n;i++){const x=x0+(x1-x0)*i/n,y=y0+(y1-y0)*i/n;if(!visible(x,y,50))continue;R(ctx,x-1,y-19,3,24,'#6e7b74');R(ctx,x,y-18,1,15,'#c1c2ac');if(i%7===3)R(ctx,x-1,y-7,2,5,'#8f7862');}}
     rail(p.x-27,p.top,p.x+190,p.top);rail(p.x-27,p.top,p.x-27,p.bottom);rail(p.x+27,p.top+60,p.x+27,p.bottom);rail(p.x+190,p.top,p.x+190,p.top+60);rail(p.x+27,p.top+60,p.x+190,p.top+60);
     for(let y=p.top+130;y<p.bottom-70;y+=254){if(!visible(p.x,y,100))continue;R(ctx,p.x-19,y-13,15,6,'#6a7e76');R(ctx,p.x-18,y-6,3,7,'#727f74');R(ctx,p.x-7,y-6,3,7,'#727f74');}
     // The locked work fence is an explicit game boundary. No bypass is drawn.
-    const gy=p.gate.y;ctx.save();ctx.translate(0,gy);ctx.scale(1,.16);ctx.translate(0,-gy);R(ctx,p.x-39,gy-43,3,57,'#566d69');R(ctx,p.x+37,gy-43,3,57,'#566d69');
+    const gy=p.gate.y;R(ctx,p.x-39,gy-43,3,57,'#566d69');R(ctx,p.x+37,gy-43,3,57,'#566d69');
     line(ctx,p.x-38,gy-42,p.x+38,gy-42,'#aeb9a8',3);line(ctx,p.x-38,gy+5,p.x+38,gy+5,'#7c9286',2);
     for(let dx=-38;dx<=38;dx+=8){line(ctx,p.x+dx,gy-40,p.x+Math.min(38,dx+26),gy+2,'#92a799',1);line(ctx,p.x+dx,gy+2,p.x+Math.min(38,dx+26),gy-40,'#849c91',1);}
     R(ctx,p.x-27,gy-33,54,27,'#cf8c5b');R(ctx,p.x-25,gy-31,50,23,'#ead7a8');text(ctx,'CLOSED',p.x,gy-28,1,'#664f40');text(ctx,'REPAIR',p.x,gy-17,1,'#775c43');
-    for(const x of[p.x-47,p.x+48]){R(ctx,x-7,gy+16,14,3,'#725f48');poly(ctx,[[x-5,gy+15],[x-2,gy-4],[x+2,gy-4],[x+6,gy+15]],'#c77f4f');R(ctx,x-4,gy+5,8,4,'#eadbb8');}ctx.restore();
+    for(const x of[p.x-47,p.x+48]){R(ctx,x-7,gy+16,14,3,'#725f48');poly(ctx,[[x-5,gy+15],[x-2,gy-4],[x+2,gy-4],[x+6,gy+15]],'#c77f4f');R(ctx,x-4,gy+5,8,4,'#eadbb8');}
   }
 
   function resize(width,height){
@@ -234,7 +228,7 @@ export function createPacificaWorld(canvas,{sceneId='pacifica'}={}){
   function cameraTarget(state,options){
     const compact=cssWidth<720||cssHeight<520,v=viewport(),available=Math.max(100,canvas.height-v.top-v.bottom);
     const baseScale=Math.max(.25,compact?Math.min(.86,canvas.width/510,available/365):Math.min(.76,canvas.width/1150,available/680));
-    return shoreActionCameraTarget(scene,state,{width:canvas.width,height:canvas.height,top:v.top,bottom:v.bottom,left:v.left,right:v.right,baseScale,pixelRatio:canvas.width/cssWidth,manualFocus,actionFocus:options.actionFocus,rodLift:options.rodLift,rodSweep:options.rodSweep});
+    return shoreActionCameraTarget(scene,state,{width:canvas.width,height:canvas.height,top:v.top,bottom:v.bottom,left:v.left,right:v.right,baseScale,manualFocus,actionFocus:options.actionFocus,rodLift:options.rodLift,rodSweep:options.rodSweep});
   }
   let offset={x:0,y:0};
   function project(x,y){return{x:Math.round((x-camera.x)*camera.scale+canvas.width/2),y:Math.round((y-camera.y)*camera.scale+offset.y)};}
@@ -261,91 +255,132 @@ export function createPacificaWorld(canvas,{sceneId='pacifica'}={}){
   function composite(name,alpha){ctx.save();ctx.setTransform(1,0,0,1,0,0);ctx.globalAlpha=alpha;ctx.drawImage(layers[name].canvas,0,0);ctx.restore();}
   const FOAM=['#adcbc2','#c9ddd4','#e1ebdf','#f5f7ec'];
   function waves(){
-    const v=bounds(8),step=Math.max(2,8/camera.scale),left=Math.floor(v.left/step)*step,sea=lastState?.seaState,cols=[];
-    for(let x=left;x<=v.right+step;x+=step){
+    const v=bounds(30),step=8,left=Math.floor(v.left/step)*step,sea=lastState?.seaState,cell=2.5*3.2,cols=[];
+    for(let x=left;x<v.right;x+=step){
       const sy=scene.shoreY(x);
-      cols.push({x,sy,f:shoreSurfField(scene,x,now,sea)});
+      if(sy<v.top-60||sy-1400>v.bottom){cols.push(null);continue;}
+      const f=shoreSurfField(scene,x,now,sea);
+      if(!f.crests.length&&!f.surfZoneWidth&&!f.foamReach){cols.push(null);continue;}
+      // Foam every 2.5 m from the real (tidal) waterline to beyond the outermost break.
+      const start=Math.min(0,-Math.floor(f.waterlineMeters/2.5)*2.5),reach=Math.min(420,Math.max(f.surfZoneWidth,f.foamReach)+30);
+      const foam=new Float32Array(Math.max(0,Math.ceil((reach-start)/2.5)));
+      for(let k=0;k<foam.length;k++)foam[k]=f.foamAt(start+k*2.5);
+      cols.push({x,sy,f,start,foam,col:Math.floor(x/step)});
     }
-    const shade=layer('shade'),foam=layer('foam');
-    const ribbon=(g,x,y,xx,yy,width,color)=>poly(g,[[x,y],[xx,yy],[xx,yy+width],[x,y+width]],color);
-    for(let i=0;i<cols.length-1;i++){
-      const a=cols[i],b=cols[i+1],x=a.x,xx=b.x,f=a.f;
-      // Each front follows the same physical crest across adjacent columns.
-      // Connected ribbons replace square blocks; their texture is decimetres.
-      for(const crest of f.crests){
-        const next=b.f.crests.find(c=>c.index===crest.index)||crest;
-        const y=a.sy-crest.offshore*3.2,yy=b.sy-next.offshore*3.2;
-        if(Math.max(y,yy)<v.top-12||Math.min(y,yy)>v.bottom+12||moriLand(x,y))continue;
-        const height=m(crest.height),broken=['breaking','bore'].includes(crest.state),n=noise(Math.floor(x),crest.index);
-        if(!broken){
-          const steep=clamp(crest.steepness/.78,0,1);if(steep<.12)continue;
-          ribbon(shade,x,y,xx,yy,Math.max(.12,height*.55*steep),C.deep);
-          ribbon(foam,x,y-.06,xx,yy-.06,.04+steep*.09,steep>.75?FOAM[1]:'#83aaa2');
-        }else{
-          const roller=crest.roller||.4,thickness=m(.08+crest.height*.16),front=(n-.5)*m(.12);
-          ribbon(shade,x,y+thickness,xx,yy+thickness,height*.22,C.deep);
-          ribbon(foam,x,y+front,xx,yy+front,thickness,FOAM[3]);
-          for(let q=x;q<xx;q+=.65){
-            const t=(q-x)/(xx-x),cy=y+(yy-y)*t;
-            for(let k=0;k<4;k++){
-              const h=noise(Math.floor(q*8)+k,crest.index);
-              if(h>.35+.45*roller)continue;
-              R(foam,q,cy-m(.12+k*.2)-h*.2,.25+h*.55,.05+h*.09,FOAM[k<2?2:1]);
-            }
-            if(crest.type==='plunging'&&crest.sinceBreak<3&&noise(Math.floor(q*9),crest.index)>.6)R(foam,q,cy+height*.4,.08,.12,FOAM[3]);
+    const at=(c,d)=>{if(!c)return 0;const k=Math.round((d-c.start)/2.5);return k>=0&&k<c.foam.length?c.foam[k]:0;};
+    const shade=layer('shade'),g=layer('foam'),sheet=[];
+    for(let ci=0;ci<cols.length;ci++){
+      const c=cols[ci];if(!c){sheet.push(null);continue;}
+      const {x,sy,f,col}=c,metres=x/3.2;
+      // Foam mat. Whitewater spreads sideways into the unbroken part of a crest,
+      // floating foam gathers into patches that drift shoreward, and each cell
+      // fades in and out on its own slow clock.
+      for(let k=0;k<c.foam.length;k++){
+        const d=c.start+k*2.5,y=sy-d*3.2;if(y<v.top-8||y>v.bottom+8||moriLand(x,y))continue;
+        let a=c.foam[k];
+        for(let o=1;o<=3;o++)a=Math.max(a,(.95-o*.25)*Math.max(at(cols[ci-o],d),at(cols[ci+o],d)));
+        if(a<.04)continue;
+        const patch=.5+.9*vnoise2(metres/17+now*.006,(d+.5*now)/6,3);
+        if(a<.85)a=clamp(a*patch,0,1);
+        const row=Math.round(d/2.5),h=noise(col,row),twinkle=Math.abs(2*((h*7.3+now/(8+7*noise(row,col)))%1)-1);
+        if(twinkle>a*1.5)continue;
+        if(a>.6)R(g,x,y-cell,step+1,cell+1,FOAM[Math.min(3,Math.floor(a*3.99))]);
+        // Thin foam is lace: scattered streaks of varying length, off the cell grid.
+        else R(g,x+(noise(col,row+99)-.5)*6,y-cell+(noise(row,col+7)-.5)*5,3+noise(col+3,row)*9,a>.3?3:2,FOAM[Math.min(3,Math.floor(a*3.99))]);
+      }
+      for(const w of f.crests){
+        const y=sy-w.offshore*3.2;if(y<v.top-30||y>v.bottom+30||moriLand(x,y))continue;
+        const hPx=Math.max(1,w.height*3.2),n=noise(col,w.index);
+        if(w.state==='unbroken'||w.state==='reformed'){
+          // Steepening face: a darker band on the shoreward side and a lighter crest.
+          const steep=clamp(w.steepness/.78,0,1);if(steep<.12)continue;
+          R(shade,x,y,step+1,Math.max(1,hPx*.6*steep),steep>.55?C.deep:C.sea);
+          if(steep>.8)R(g,x,y-1,step+1,2,FOAM[1+Math.floor(n*2)]);
+          continue;
+        }
+        if(w.state==='breaking'&&w.sinceBreak!==null&&w.sinceBreak<Math.max(3,w.height*4)){
+          // Fresh break: the lip over its shadowed face. Plunging lips throw spray ahead.
+          R(g,x,y-2,step+1,Math.max(2,hPx*.55),FOAM[3]);
+          R(shade,x,y+Math.max(2,hPx*.55)-2,step+1,Math.max(1,hPx*.35),C.deep);
+          if(w.type==='plunging'||w.type==='surging'){
+            const throw_=hPx*(.6+.5*n);
+            R(g,x+2,y+throw_,3,2,FOAM[3]);if(n>.4)R(g,x+5,y+throw_*.7,2,2,FOAM[2]);if(w.height>1.2&&n>.6)R(g,x+1,y-hPx*.9,2,2,FOAM[3]);
           }
+          continue;
+        }
+        // Broken bore: a lumpy white front with aerated, streaky water behind it.
+        const band=(1+1.8*w.height)*3.2*(.4+.6*w.roller),front=(n-.5)*3+(vnoise(metres/6,w.index)-.5)*4;
+        R(g,x,y+front-3,step+1,w.roller>.5?5:3,FOAM[w.roller>.3?3:2]);
+        for(let k=0;k<band;k+=3){
+          const m=noise(col*31+k,w.index),fade=1-k/band;
+          if(m>(.25+.6*fade)*(.5+.5*w.roller))continue;
+          R(g,x+(m>.8?2:0),y+front-3-k,step+1-(m>.8?3:0),3,FOAM[fade>.6?3:m>.5?1:2]);
         }
       }
-      // Small interrupted foam streaks use the actual lingering foam field.
-      // They drift across the surface without a visible sampling-cell grid.
-      const start=Math.max(-f.waterlineMeters,(a.sy-v.bottom)/3.2),end=Math.min((a.sy-v.top)/3.2,Math.max(f.surfZoneWidth,f.foamReach)+10);
-      for(let d=Math.floor(start/.5)*.5;d<end;d+=.5){
-        const amount=f.foamAt(d);if(amount<.08)continue;
-        for(let q=x;q<xx;q+=.8){
-          const h=noise(Math.floor(q*5),Math.floor(d*2)),patch=vnoise2(q/15-now*.02,d/3+now*.03,3);
-          if(h>amount*(.25+patch*.55))continue;
-          const y=a.sy-d*3.2+h*.7;if(moriLand(q,y))continue;
-          R(foam,q+h*.4,y,.18+h*.65,.04+amount*.1,FOAM[amount>.55?2:0]);
-        }
-      }
-      const wl=a.sy+f.waterlineMeters*3.2,wl2=b.sy+b.f.waterlineMeters*3.2;
-      const front=wl+Math.max(.3,f.swashMeters*3.2*(.85+.3*vnoise(x/28+f.swashWave*3.7,70)));
-      const front2=wl2+Math.max(.3,b.f.swashMeters*3.2*(.85+.3*vnoise(xx/28+b.f.swashWave*3.7,70)));
-      if(Math.max(front,front2)>v.top&&Math.min(wl,wl2)<v.bottom&&!moriLand(x,wl)){
-        ctx.globalAlpha=.27;poly(ctx,[[x,wl-.2],[xx,wl2-.2],[xx,front2],[x,front]],C.shallow);ctx.globalAlpha=1;
-        const rush=clamp(1-f.swashPhase/.4,0,1);
-        ribbon(foam,x,front,xx,front2,.08+rush*.17,FOAM[rush>.2?3:1]);
-        for(let q=x;q<xx;q+=.7){const n=noise(Math.floor(q*7),f.swashWave);if(n>.4+rush*.4)continue;R(foam,q,front+(front2-front)*(q-x)/(xx-x)-n*m(.7),.2+n*.5,.06,FOAM[1]);}
-      }
+      // Swash: the last bore runs up the face as a sheet with a lobed, foamy
+      // front that differs from wave to wave, then drains back.
+      const wl=sy+f.waterlineMeters*3.2,lobe=.72+.56*vnoise(metres/13+f.swashWave*3.7,70);
+      const front=wl+Math.max(.6,f.swashMeters*3.2*lobe);
+      if(front>v.top-10&&wl<v.bottom+10&&!moriLand(x,wl)){
+        sheet.push({x,wl,front});
+        const rush=clamp(1-f.swashPhase/.4,0,1),bandPx=4+10*rush;
+        R(g,x,front-1,step+1,2,FOAM[rush>.2?3:1]);
+        for(let k=2;k<bandPx;k+=2){const m=noise(col*17+k,f.swashWave);if(m<rush*(1-k/bandPx)*1.3)R(g,x+(m>.5?1:0),front-1-k,step,2,FOAM[m<.3?3:2]);}
+        if(rush===0&&noise(col,f.swashWave)>.55)R(g,x+2,front+2,3,1,FOAM[1]);
+      }else sheet.push(null);
     }
-    composite('shade',.32);composite('foam',.84);
+    // One translucent water film per run of wet columns.
+    for(let i=0;i<sheet.length;){
+      if(!sheet[i]){i++;continue;}
+      let j=i;while(j+1<sheet.length&&sheet[j+1])j++;
+      const run=sheet.slice(i,j+1),last=run.at(-1);
+      ctx.globalAlpha=.36;poly(ctx,[...run.map(p=>[p.x,p.wl-2]),[last.x+step,last.wl-2],[last.x+step,last.front],...run.map(p=>[p.x,p.front]).reverse()],C.shallow);
+      i=j+1;
+    }
+    ctx.globalAlpha=1;
+    composite('shade',.4);composite('foam',.93);
   }
-  function gull(x,y,flight=false,variant=0){withShoreProp(ctx,x,y,m(flight?1.2:.5)/(flight?16:15),()=>gullArt(x,y,flight,variant));}
-  function gullArt(x,y,flight=false,variant=0){
+  function gull(x,y,flight=false,variant=0){
     if(flight){const wing=Math.sin(now*4+variant)>0?7:-3;line(ctx,x,y,x-8,y-wing,'#edf0db',2);line(ctx,x,y,x+8,y-wing,'#edf0db',2);R(ctx,x-2,y,4,3,'#4e6e70');R(ctx,x+8,y-wing,3,2,'#617e7d');return;}
     shadow(ctx,x,y+4,12,4,.13);R(ctx,x-6,y-3,11,6,'#e9ead6');R(ctx,x-1,y-7,6,7,'#f6eed7');R(ctx,x-6,y-1,6,3,'#7e9490');R(ctx,x+5,y-5,4,2,'#cfa46b');R(ctx,x+2,y-6,1,1,'#3c5659');R(ctx,x-2,y+3,1,4,'#a19169');R(ctx,x+2,y+3,1,4,'#a19169');
   }
-  function person(x,y,{staff=false,warden=false,walking=false,fishing=false,facing='up',veteran=null}={}){
-    if(!visible(x,y))return;const style=warden?'warden':staff?'staff':veteran?.style||'player',scale=shorePersonScale(style),foot=shorePersonFoot({player:{x,y},onPier:onPier(scene,x,y)});
-    ctx.save();ctx.translate(foot.x,foot.y);ctx.fillStyle='#687c6d';ctx.fillRect(-m(.3),0,m(.6),m(.12));
-    drawShorePerson(ctx,{style,walking,fishing,facing,time:now,scale});ctx.restore();
+  function person(x,y,{staff=false,warden=false,walking=false,fishing=false,facing='up',small=false,veteran=null}={}){
+    if(!visible(x,y))return;const scale=small?.85:1;
+    shadow(ctx,x+2,y+1,25*scale,8*scale,.22);ctx.save();ctx.translate(Math.round(x),Math.round(y));
+    drawShorePerson(ctx,{style:warden?'warden':staff?'staff':veteran?.style||'player',walking,fishing,facing,time:now,scale});ctx.restore();
   }
 
   // 空军大队长: his gear, the rod in a sand spike, and a line out to his real bait.
   function regularAngler(state){
     const r=state.regular;if(!r||r.mode==='away')return;
     const walking=['arriving','moving','leaving'].includes(r.mode),holding=['casting','bite','fighting','landed'].includes(r.mode);
-    if(!visible(r.x,r.y)&&!(r.bait&&visible(r.bait.x,r.bait.y)))return;
-    if(!walking){ctx.fillStyle='#dcd6bd';ctx.fillRect(r.x+m(.55),r.y-m(.3),m(.6),m(.3));bucket(ctx,r.x-m(.6),r.y);}
+    const far=r.bait||r.fight?.from;if(!visible(r.x,r.y)&&!(far&&visible(far.x,far.y)))return;
+    if(!walking){
+      // Cooler with a ruler on the lid, bait bucket and sand spike.
+      shadow(ctx,r.x+27,r.y+1,24,6,.16);R(ctx,r.x+17,r.y-13,20,13,'#dcd6bd');R(ctx,r.x+17,r.y-15,20,4,'#3f6a8c');R(ctx,r.x+19,r.y-14,16,1,'#e8c77c');
+      bucket(ctx,r.x-27,r.y+4,'#b87150');line(ctx,r.x+12,r.y+3,r.x+12,r.y-14,'#8a8f86',2);
+    }
     person(r.x,r.y,{veteran:ANGLERS[3],walking,fishing:holding,facing:walking?(r.route?.[0]?.x>r.x?1:3):-1});
-    const rod=shoreRodPose({player:r,phase:holding?'waiting':'walk',tension:r.mode==='fighting'?.45:0},{style:'regular'});drawMetricRod(ctx,rod);
-    if(walking)return;let end=null;
-    if(r.mode==='casting'&&r.bait){const k=clamp(1-r.timer/1.8,0,1);end={x:rod.tip.x+(r.bait.x-rod.tip.x)*k,y:rod.tip.y+(r.bait.y-rod.tip.y)*k-Math.sin(k*Math.PI)*m(3)};}
-    else if(['soaking','bite'].includes(r.mode)&&r.bait)end=r.bait;
-    else if(r.mode==='fighting'&&r.fight){const k=clamp(r.fight.elapsed/r.fight.duration,0,1);end={x:r.fight.from.x+(r.x-r.fight.from.x)*k,y:r.fight.from.y+(scene.shoreY(r.x)-m(.7)-r.fight.from.y)*k};}
-    if(end)shoreFineLine(ctx,rod.tip,end,'#e6eadb',.025);
+    if(walking){line(ctx,r.x+9,r.y-34,r.x+14,r.y-84,'#3b4f55',2);return;}
+    let tip;
+    if(holding){const bend=r.mode==='fighting'?Math.sin(now*6)*2:0,butt={x:r.x-10,y:r.y-23};tip=r.mode==='fighting'?{x:r.x-24+bend,y:r.y-50}:{x:r.x-21,y:r.y-64};
+      line(ctx,butt.x,butt.y,(butt.x+tip.x)/2-(r.mode==='fighting'?4:0),(butt.y+tip.y)/2,'#3b4f55',2);line(ctx,(butt.x+tip.x)/2-(r.mode==='fighting'?4:0),(butt.y+tip.y)/2,tip.x,tip.y,'#3b4f55',2);}
+    else{tip={x:r.x+3,y:r.y-64};line(ctx,r.x+12,r.y-10,tip.x,tip.y,'#3b4f55',2);if(r.mode==='soaking')R(ctx,tip.x-1,tip.y-1,3,3,'#e2c56e');}
+    let end=null;
+    if(r.mode==='casting'&&r.bait){const k=clamp(1-r.timer/1.8,0,1);end={x:tip.x+(r.bait.x-tip.x)*k,y:tip.y+(r.bait.y-tip.y)*k-Math.sin(k*Math.PI)*60};}
+    else if(['soaking','bite'].includes(r.mode)&&r.bait)end={x:r.bait.x,y:r.bait.y};
+    else if(r.mode==='fighting'&&r.fight){const k=clamp(r.fight.elapsed/r.fight.duration,0,1),shore=scene.shoreY(r.x)+4;
+      end={x:r.fight.from.x+(r.x-r.fight.from.x)*k+Math.sin(now*1.7)*14*(1-k),y:r.fight.from.y+(shore-r.fight.from.y)*k};
+      ctx.globalAlpha=.7;R(ctx,end.x-4,end.y-1,9,2,'#f3f4e7');ctx.globalAlpha=1;}
+    if(end){if(r.mode==='bite'){tip.x+=Math.sin(now*28)*1.5;}ctx.globalAlpha=.5;line(ctx,tip.x,tip.y,end.x,end.y,'#e6eadb',1);ctx.globalAlpha=1;}
+    if(r.mode==='landed'&&r.landed){
+      // The fish in his hands: a silver striper with dark lines, or a perch.
+      const bass=r.landed.species==='striped_bass',len=bass?30:18,x=r.x+8,y=r.y-30;
+      R(ctx,x,y,len,bass?7:8,bass?'#c8d0c8':'#d8c89a');poly(ctx,[[x+len,y+3],[x+len+6,y-2],[x+len+6,y+9]],bass?'#8e9a96':'#b59c68');
+      if(bass)for(let i=0;i<4;i++)R(ctx,x+3,y+1+i*1.6,len-6,1,'#4d5a5c');R(ctx,x+2,y+2,2,2,'#2f4546');
+    }
   }
-  function ring(x,y,r,color,alpha=1){ctx.globalAlpha=alpha;const points=[];for(let i=0;i<20;i++){const a=i/20*TAU;points.push([x+Math.cos(a)*r,y+Math.sin(a)*r*.42]);}for(let i=0;i<points.length;i++){const p=points[i],q=points[(i+1)%points.length];line(ctx,p[0],p[1],q[0],q[1],color,.045);}ctx.globalAlpha=1;}
+  function ring(x,y,r,color,alpha=1){ctx.globalAlpha=alpha;const points=[];for(let i=0;i<20;i++){const a=i/20*TAU;points.push([x+Math.cos(a)*r,y+Math.sin(a)*r*.42]);}for(let i=0;i<points.length;i++){const p=points[i],q=points[(i+1)%points.length];line(ctx,p[0],p[1],q[0],q[1],color,2);}ctx.globalAlpha=1;}
   function fishing(state){
     lastTackle=null;
     const p=state.player||{x:1100,y:865},cast=state.cast,active=cast&&!['walk','landed'].includes(state.phase);
@@ -361,29 +396,50 @@ export function createPacificaWorld(canvas,{sceneId='pacifica'}={}){
       const entryWorld=casting?ground:shoreLineWaterEntry(scene,state,ground,depth);
       const contact=casting?null:shoreWaterContact(scene,entryWorld,now,state.seaState);
       const target={x:entryWorld.x,y:entryWorld.y-(casting?ground.height*3.2:contact.height*3.2)};
+      if(casting){
+        // Bridge the authored large rod to the physical flight, with no
+        // change to its landing point or the simulation's paid line.
+        const start=shoreCastPosition(cast,0),remaining=1-clamp((cast.flight||0)/Math.max(.01,cast.flightDuration||1),0,1);
+        target.x+=(rod.tip.x-start.x)*remaining*remaining;
+        target.y+=(rod.tip.y-(start.y-start.height*3.2))*remaining*remaining;
+      }
       const tension=clamp(Number.isFinite(state.tension)?state.tension:0,0,1);
       const bend=rod.bend,rodTip=rod.tip;
       const airHeight=fight?Math.max(0,state.fishMotion?.airHeight||0):0;
-      const attachment={x:target.x,y:target.y+(floating&&bite?m(.04):0)-(floating?0:airHeight*3.2)};
-      const strand=shoreTackleLine(rodTip,attachment,{tension,sag:casting?m(.25):fight?m(.08):m(.2),
-        flowX:contact?.flowX,flowY:contact?.flowY,scale:.08});
+      const attachment={x:target.x,y:target.y+(floating&&bite?.04*3.2:0)-(floating?0:airHeight*3.2)};
+      const strand=shoreTackleLine(rodTip,attachment,{tension,sag:casting?17:fight?6:17,
+        flowX:contact?.flowX,flowY:contact?.flowY,scale:1});
       lastTackle={rodTip,waterEntry:target,entryWorld,terminalPosition:ground,attachment,line:strand,bend,surfaceHeight:contact?.height||0,
         tilt:floating?contact.tilt:0,breaking:contact?.breaking||0,floatVisible:floating,rodControls:rod.controls,rodPoints:rod.points,airHeight};
-      for(let i=1;i<strand.length;i++)line(ctx,strand[i-1].x,strand[i-1].y,strand[i].x,strand[i].y,i>strand.length-4&&!casting?'#b4d0bd':'#e9dfb6',.025);
-      if(casting)drawMetricWeight(ctx,target);
+      for(let i=1;i<strand.length;i++)line(ctx,strand[i-1].x,strand[i-1].y,strand[i].x,strand[i].y,i>strand.length-4&&!casting?'#b4d0bd':'#e9dfb6',1);
+      if(casting){shadow(ctx,ground.x,ground.y,8,3,.22);R(ctx,target.x-2,target.y-3,4,6,'#d27a59');R(ctx,target.x-2,target.y-4,4,2,'#fff0c2');}
       else{
+        const flow=Math.hypot(contact.flowX,contact.flowY),radius=4+Math.min(6,flow*3+contact.breaking*3);
+        if(floating)ring(target.x,target.y,radius,'#e0ead0',.35+contact.foam*.4);
         if(floating){
-          if(contact.breaking>.05)ring(target.x,target.y,m(.12+contact.breaking*.12),C.foam,contact.breaking*.6);
-          drawMetricFloat(ctx,attachment,contact);
+          // The float marks the suspended hook; a bite dips its bright tip.
+          const floatY=attachment.y,lean=contact.tilt*8;
+          R(ctx,target.x+lean-1,floatY-9,2,5,'#e26e50');R(ctx,target.x+lean*.4-3,floatY-4,6,4,'#fff0cf');R(ctx,target.x-2,floatY,4,2,'#c96a47');
+        }else if(!airHeight){
+          // The underwater rig/fish has no surface sprite or target ring.
+          // Small separated streaks mark only the line cutting into the sea.
+          R(ctx,target.x-4,target.y,2,1,'#a9cbb5');R(ctx,target.x+2,target.y,2,1,'#a9cbb5');
         }
-        if(floating&&airHeight>0)shoreFineLine(ctx,attachment,{x:ground.x,y:ground.y-contact.height*3.2-airHeight*3.2},'#e9dfb6',.025);
+        // A passing roller washes over the water contact, never over the tip
+        // or the dry span. Persistent foam alone does not submerge the float.
+        if(contact.breaking>.05){const wash=2+contact.breaking*5;R(ctx,target.x-wash,target.y-1,wash*2,1+contact.breaking*2,C.foam);}
+        if(floating&&airHeight>0)line(ctx,attachment.x,attachment.y,ground.x,ground.y-contact.height*3.2-airHeight*3.2,'#e9dfb6',1);
+        if(bite){const cue=floating?target:rodTip;ring(cue.x,cue.y,21+(now*20)%16,'#ffe2a0',.7);R(ctx,cue.x-2,cue.y-35,4,13,'#fff1b7');R(ctx,cue.x-2,cue.y-17,4,4,'#fff1b7');}
       }
-      drawMetricRod(ctx,rod);
+      // The flexing rod is connected to the hands, and line starts at its tip.
+      for(let i=1;i<rod.points.length;i++)line(ctx,rod.points[i-1].x,rod.points[i-1].y,rod.points[i].x,rod.points[i].y,'#354e50',i<4?3:2);
+      line(ctx,p.x-12,p.y-28,p.x-17,p.y-39,'#caa374',3);R(ctx,p.x-14,p.y-32,6,5,'#aeb4a0');
       // Keep navigation/debug castTarget on the simulated horizontal point;
       // only tackle artwork receives the surface-height projection.
       return casting?target:ground;
     }
-    drawMetricRod(ctx,rod);return null;
+    if(state.castCharge>0){for(let i=1;i<rod.points.length;i++)line(ctx,rod.points[i-1].x,rod.points[i-1].y,rod.points[i].x,rod.points[i].y,'#354e50',i<4?3:2);return null;}
+    line(ctx,p.x+11,p.y-19,p.x+21,p.y-65,'#3e5656',2);R(ctx,p.x+10,p.y-20,3,10,'#c1a071');R(ctx,p.x+8,p.y-23,6,5,'#aab3a0');return null;
   }
 
   function draw(state={},time=0,options={}){
@@ -393,30 +449,31 @@ export function createPacificaWorld(canvas,{sceneId='pacifica'}={}){
     ctx.setTransform(1,0,0,1,0,0);ctx.imageSmoothingEnabled=false;R(ctx,0,0,canvas.width,canvas.height,C.deep);
     const origin=project(0,0);ctx.setTransform(camera.scale,0,0,camera.scale,origin.x,origin.y);
     drawTerrain();waves();pier();
-    // Buildings and signs stand above the swash layer, retaining their detail
-    // and occluding water behind them instead of baking roofs into the ground.
-    if(visible(scene.shop.door.x,scene.shop.door.y,180)){
-      shop(ctx);beachSign(ctx,hmb?'HALF MOON BAY':'PACIFICA',hmb?'DUNES / VENICE':'SHARP PARK',scene.shop.door.x+26,scene.shop.door.y-63);
-    }
     const castPreview=shoreCastPreviewVisual(state);drawShoreCastPreview(castPreview,(...args)=>line(ctx,...args));
     const v=bounds(80);
     for(let i=Math.floor(v.left/430);i<Math.ceil(v.right/430);i++){const x=i*430+Math.sin(now*.07+i)*68,y=scene.shoreY(x)-160+Math.sin(now*.11+i*2)*43;if(visible(x,y))gull(x,y,true,i);}
     for(let x=Math.floor(v.left/575)*575;x<v.right;x+=575){const y=scene.shoreY(x)+87;if(visible(x,y)){gull(x+13,y);if(noise(x,71)>.5)gull(x+34,y+10);}}
     const p=state.player||scene.spawn,onDeck=onPier(scene,p.x,p.y);
-    if(state.walkTarget&&!onDeck){const dx=state.walkTarget.x-p.x,dy=state.walkTarget.y-p.y,d=Math.hypot(dx,dy)||1;if(p.y>scene.shoreY(p.x)+35)for(let i=1;i<5;i++){const xx=p.x-dx/d*i*m(.65)+(i%2?m(.08):-m(.08)),yy=p.y-dy/d*i*m(.65);R(ctx,xx,yy,m(.1),m(.24),hmb?'#b8b19c':'#696e66');}}
-    if(state.walkTarget&&Math.hypot(state.walkTarget.x-p.x,state.walkTarget.y-p.y)>18&&visible(state.walkTarget.x,state.walkTarget.y)){ring(state.walkTarget.x,state.walkTarget.y,m(.3),'#eee7bf',.65);}
-    const encounter=state.shoreLore?.encounter;if(encounter&&visible(encounter.x,encounter.y)){person(encounter.x,encounter.y,{veteran:ANGLERS[encounter.angler],fishing:true});drawMetricRod(ctx,shoreRodPose({player:encounter},{style:ANGLERS[encounter.angler]?.style}));bucket(ctx,encounter.x+m(.7),encounter.y);}
+    if(state.walkTarget&&!onDeck){const dx=state.walkTarget.x-p.x,dy=state.walkTarget.y-p.y,d=Math.hypot(dx,dy)||1;if(p.y>scene.shoreY(p.x)+35)for(let i=1;i<5;i++){const xx=p.x-dx/d*i*13+(i%2?3:-3),yy=p.y-dy/d*i*13;R(ctx,xx,yy,3,5,hmb?'#b8b19c':'#696e66');}}
+    if(state.walkTarget&&Math.hypot(state.walkTarget.x-p.x,state.walkTarget.y-p.y)>18&&visible(state.walkTarget.x,state.walkTarget.y)){ring(state.walkTarget.x,state.walkTarget.y,11,'#eee7bf',.8);R(ctx,state.walkTarget.x-2,state.walkTarget.y-2,4,3,'#859178');}
+    const encounter=state.shoreLore?.encounter;if(encounter&&visible(encounter.x,encounter.y)){person(encounter.x,encounter.y,{veteran:ANGLERS[encounter.angler],fishing:true});line(ctx,encounter.x-11,encounter.y-25,encounter.x-21,encounter.y-61,'#496463',2);bucket(ctx,encounter.x+22,encounter.y+4);}
 
-    person(scene.shop.door.x+m(.8),scene.shop.door.y-m(.2),{staff:true,facing:'down'});
+    person(scene.shop.x+147,scene.shop.door.y-2,{staff:true,small:true,facing:'down'});
     regularAngler(state);
     const warden=state.warden;if(warden&&visible(warden.x,warden.y))person(warden.x,warden.y,{warden:true,walking:true,facing:warden.facing??-1});
     const fishVisual=shoreFishVisual(scene,state,{time:now,reducedMotion,cameraScale:camera.scale});
-    person(p.x,p.y,{walking:state.player?.walking,facing:state.player?.facing,fishing:true});
+    person(p.x,p.y,{walking:state.player?.walking,facing:state.player?.facing,fishing:!!state.cast&&!['walk','landed'].includes(state.phase)});
     const castTarget=fishing(state);drawShoreFish(ctx,fishVisual,{line:(...args)=>line(ctx,...args),ring,foam:C.foam});
     if(state.inspection){
-      const inspection=state.inspection,ix=inspection.x??inspection.position?.x??p.x+m(1.2),iy=inspection.y??inspection.position?.y??p.y+m(.8);
-      person(ix,iy,{warden:true,facing:'down'});
+      const inspection=state.inspection,ix=inspection.x??inspection.position?.x??p.x+15,iy=inspection.y??inspection.position?.y??p.y+28;
+      person(ix,iy,{warden:true,facing:'down'});R(ctx,ix-13,iy-57,29,12,'#e6d7ae');text(ctx,'CHECK',ix+1,iy-55,1,'#4b6357');
     }
+    if(state.phase==='landed'){ring(p.x,p.y+2,23,'#f0d292',.5);if(state.fish){
+      const smelt=state.fish.id==='jacksmelt',croaker=state.fish.id==='white_croaker';
+      R(ctx,p.x+21,p.y-25,smelt?24:18,smelt?4:7,croaker?'#bdc4ac':smelt?'#adc7ba':'#8caa91');
+      const tailX=p.x+(smelt?44:38);poly(ctx,[[tailX,p.y-22],[tailX+6,p.y-28],[tailX+6,p.y-17]],croaker?'#aeaa80':'#607f74');
+      if(smelt)R(ctx,p.x+23,p.y-23,20,1,'#e7ecd4');if(croaker)R(ctx,p.x+27,p.y-23,2,2,'#6a756b');R(ctx,p.x+22,p.y-25,2,2,'#34595d');
+    }}
     ctx.setTransform(1,0,0,1,0,0);
     return{player:worldToScreen(p),shop:worldToScreen(scene.shop.door),pier:scene.pier?worldToScreen(scene.pier.gate):null,castTarget:castTarget?worldToScreen(castTarget):null,camera:{...camera},tackle:lastTackle,actionCamera:{mode:target.mode,focus:target.focus,desiredScale:target.scale,safeBounds:target.safeBounds},fishVisual,castPreview};
   }

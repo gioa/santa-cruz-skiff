@@ -43,8 +43,8 @@ test('lure availability and appeal depend on season, corridor, depth and retriev
 });
 test('peak-season crowds have distinctive outfits, clear gaps, local clues and crossing-line checks',()=>{
  const crowd=beniciaCrowd(0,51,9),winter=beniciaCrowd(0,51,1);assert.ok(crowd.length>winter.length);assert.ok(crowd.length>=12);assert.equal(new Set(BENICIA_ANGLERS.map(a=>a.style)).size,6);
- assert.ok(crowd.every(n=>Math.abs(n.x-1090)>=70));const n=crowd[0];assert.ok(crowdCastConflict({player:{x:n.x,y:n.y+3},crowd}, {x:n.x,y:n.y-80}));
- const sim=create(),local=sim.state.crowd.find(n=>n.id>6);Object.assign(sim.state.player,{x:local.x,y:local.y+4.8});assert.ok(sim.talkLocal(local.id).fresh);assert.equal(sim.talkLocal(local.id).fresh,false);
+ assert.ok(crowd.every(n=>Math.abs(n.x-1090)>=70));const n=crowd[0];assert.ok(crowdCastConflict({player:{x:n.x,y:n.y+8},crowd}, {x:n.x,y:n.y-80}));
+ const sim=create(),local=sim.state.crowd.find(n=>n.id>6);Object.assign(sim.state.player,{x:local.x,y:local.y+45});assert.ok(sim.talkLocal(local.id).fresh);assert.equal(sim.talkLocal(local.id).fresh,false);
  const restored=new BeniciaSimulation({saved:sim.snapshot()});assert.equal(restored.state.shoreLore.notes[0].sourceName,local.name);
 });
 test('broken lures need a real replacement; repeatedly casting consumes no imaginary bait',()=>{

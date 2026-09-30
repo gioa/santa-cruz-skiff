@@ -27,7 +27,7 @@ export const SHOP = getShoreScene('pacifica').shop;
 // One roll per pier visit: 10% of visits meet a patrol at a random moment
 // 20–150 active seconds after climbing on. Being caught costs every carried fish.
 export const PIER_RULES = Object.freeze({catchChance: .1, earliestSeconds: 20, latestSeconds: 150});
-export const WARDEN_RULES = Object.freeze({firstAfter: [240, 540], between: [420, 900], speed: SHORE_MOVEMENT.walkSpeed, reach: SHORE_MOVEMENT.talkReach});
+export const WARDEN_RULES = Object.freeze({firstAfter: [240, 540], between: [420, 900], speed: 70, reach: 42});
 export const PIXELS_PER_METRE = 3.2;
 export {BAITS,SHOP_ITEMS} from './shore-equipment.js';
 // Length–weight relations W(g) = a·L(cm)^b are representative published-style
@@ -89,7 +89,7 @@ const baitIds = BAITS.map(item => item.id);
 const upgradeIds = SHOP_ITEMS.filter(item => ['rod','reel','rig','book'].includes(item.kind)).map(item => item.id);
 const statKeys = ['caught', 'kept', 'released', 'sold', 'casts', 'missed'];
 const saveVersions = [1, 2, 3, 4];
-const SHORE_LAYOUT_REVISION = 1;
+const SHORE_LAYOUT_REVISION = 2;
 const catchStatuses = new Set(['kept', 'released', 'sold', 'confiscated']);
 const shopBounds = shoreShopBounds;
 const inBuilding = (building, x, y) => x > building.left && x < building.right && y > building.top && y < building.bottom;
@@ -257,7 +257,7 @@ export class PacificaSimulation {
   }
 
   onSand(x, y) {
-    return x >= SHORE_MOVEMENT.bodyRadius && x <= this.world.width - SHORE_MOVEMENT.bodyRadius && y >= shoreWalkBoundaryY(this.scene,x) && y <= this.world.height - SHORE_MOVEMENT.bodyRadius && !inBuilding(this.building, x, y);
+    return x >= SHORE_MOVEMENT.edgeClearance && x <= this.world.width - SHORE_MOVEMENT.edgeClearance && y >= shoreWalkBoundaryY(this.scene,x) && y <= this.world.height - SHORE_MOVEMENT.bottomClearance && !inBuilding(this.building, x, y);
   }
 
   refreshSample() {
@@ -278,8 +278,8 @@ export class PacificaSimulation {
     if (!Number.isFinite(x) || !Number.isFinite(y)) return this.result(false, '请选择沙滩上的位置。');
     if (s.onPier) return this.walkPierTo(x, y);
     if (this.scene.pier && onPier(this.scene, x, y) && y < this.world.shoreY(x) + SHORE_MOVEMENT.shoreClearance) return this.result(false, '栈桥入口被维修围栏挡住了。');
-    x = clamp(x, SHORE_MOVEMENT.bodyRadius, this.world.width - SHORE_MOVEMENT.bodyRadius);
-    y = clamp(y, shoreWalkBoundaryY(this.scene,x), this.world.height - SHORE_MOVEMENT.bodyRadius);
+    x = clamp(x, SHORE_MOVEMENT.edgeClearance, this.world.width - SHORE_MOVEMENT.edgeClearance);
+    y = clamp(y, shoreWalkBoundaryY(this.scene,x), this.world.height - SHORE_MOVEMENT.bottomClearance);
     if (inBuilding(this.building, x, y)) return this.result(false, '商店入口在建筑下方，走到门前即可交易。');
     const target = point(x, y), route = routeAroundShop(this.building, s.player, target);
     if (!route.length) return this.result(false, '这里暂时无法到达。');
@@ -699,7 +699,7 @@ export class PacificaSimulation {
     }
     // Undocumented: leaning on the closed gate long enough finds the gap in it.
     const gate = this.scene.pier?.gate;
-    if (gate && !s.onPier && manual && my < -.5 && Math.hypot(player.x - gate.x, player.y - gate.y) <= SHORE_MOVEMENT.pierReach) {
+    if (gate && !s.onPier && manual && my < -.5 && Math.hypot(player.x - gate.x, player.y - gate.y) <= SHORE_MOVEMENT.pierPushReach) {
       s.pierPush = (s.pierPush || 0) + dt;
       if (s.pierPush >= 1.2) {this.enterPier(); return;}
     } else s.pierPush = 0;
@@ -711,8 +711,8 @@ export class PacificaSimulation {
       // Following a sloped shoreline must not turn one walking step into a
       // several-metre sideways/shoreward teleport on Benicia's steep banks.
       for(let n=0;n<8;n++){
-        x=clamp(player.x+dx*fraction,SHORE_MOVEMENT.bodyRadius,this.world.width-SHORE_MOVEMENT.bodyRadius);
-        y=s.onPier?player.y+dy*fraction:clamp(player.y+dy*fraction,shoreWalkBoundaryY(this.scene,x),this.world.height-SHORE_MOVEMENT.bodyRadius);
+        x=clamp(player.x+dx*fraction,SHORE_MOVEMENT.edgeClearance,this.world.width-SHORE_MOVEMENT.edgeClearance);
+        y=s.onPier?player.y+dy*fraction:clamp(player.y+dy*fraction,shoreWalkBoundaryY(this.scene,x),this.world.height-SHORE_MOVEMENT.bottomClearance);
         const travel=Math.hypot(x-player.x,y-player.y);if(travel<=step+1e-8)break;
         fraction*=step/Math.max(travel,1e-9);
       }
@@ -823,11 +823,16 @@ export class PacificaSimulation {
     for (const key of statKeys) s.stats[key] = integer(saved.stats?.[key], 0, 1e8);
     s.nextCatchId = s.catchHistory.reduce((next, fish) => Math.max(next, fish.catchId + 1), integer(saved.nextCatchId, 1, 1e9, 1));
     const x = finite(saved.player?.x, s.player.x), y = finite(saved.player?.y, s.player.y);
-    // Only the two obsolete beach arrival areas move with the fictional shop.
-    // Recording the layout revision keeps later visits to those places intact.
-    const oldArrival = ['pacifica', 'half-moon-bay'].includes(this.scene.id) && finite(saved.shoreLayoutRevision) < SHORE_LAYOUT_REVISION
-      && [{x: 1130, y: 823}, {x: 1100, y: 865}].some(p => Math.hypot(x-p.x, y-p.y) <= 5*PIXELS_PER_METRE);
+    // Only revision 1 relocated the entrance toward the water. Return saves
+    // parked there to the original shop; keep all unrelated walks intact.
+    const displacedArrival = {x:1130+PIXELS_PER_METRE,y:this.scene.shoreY(1130)+(14+2.2)*PIXELS_PER_METRE};
+    const oldArrival = ['pacifica', 'half-moon-bay'].includes(this.scene.id) && saved.shoreLayoutRevision === 1
+      && Math.hypot(x-displacedArrival.x, y-displacedArrival.y) <= 5*PIXELS_PER_METRE;
+    const shoreY = this.scene.shoreY(x), restoredStandY = shoreY + SHORE_MOVEMENT.stand;
+    const oldShoreStand = finite(saved.shoreLayoutRevision) < SHORE_LAYOUT_REVISION && saved.onPier !== true
+      && y >= shoreY && y < shoreY + SHORE_MOVEMENT.shoreClearance && this.onSand(x, restoredStandY);
     if (oldArrival) Object.assign(s.player, shoreArrivalPosition(this.scene));
+    else if (oldShoreStand) {s.player.x = x; s.player.y = restoredStandY;}
     else if (this.onSand(x, y)) {s.player.x = x; s.player.y = y;}
     if (saved.version >= 2) {
       s.fineDebt = integer(saved.fineDebt, 0, 1e7);
