@@ -13,7 +13,8 @@ import {assessShoreCatch,shoreFindingDetail} from './shore-regulations.js';
 import {shorePresentation,stepShorePresentation} from './shore-presentation.js';
 import {shoreFishPosition} from './shore-line-geometry.js';
 import {createShoreCast} from './shore-casting.js';
-import {gameCalendar,gameSeconds} from './game-clock.js';
+import {gameCalendar,gameSeconds,formatGameClock} from './game-clock.js';
+import {shoreWorldTime,shoreWorldCalendar,shoreDayHash,shoreDayUnit} from './shore-day.js';
 import {climateSeaState} from './shore-surf.js';
 import {formatLength,formatWeight} from './units.js';
 import {SHORE_RIG_PHYSICS} from './shore-presentation.js';
@@ -155,12 +156,16 @@ function safeFish(raw) {
 }
 
 export class PacificaSimulation {
-  constructor({sceneId = 'pacifica', saved, rng = Math.random, loreSeed, seaState = null, date = new Date().toISOString().slice(0,10), regular = true} = {}) {
+  constructor({sceneId = 'pacifica', saved, rng, loreSeed, seaState = null, date, regular = true, clockMode = 'trip', now = () => new Date()} = {}) {
     this.scene = getShoreScene(sceneId);
     this.world = this.scene.world;
     this.shop = this.scene.shop;
     this.building = shopBounds(this.shop);
-    this.rng = typeof rng === 'function' ? rng : Math.random;
+    this.rng = typeof rng === 'function' ? rng : null;
+    this.now=now;this.clockMode=clockMode==='shared'?'shared':'trip';
+    const currentWorld=shoreWorldTime(this.now());
+    this.sharedWorld=this.clockMode==='shared'?{...currentWorld,sceneId:this.scene.id}:null;
+    date=date??currentWorld.date;
     this.reeling = false;
     this.state = {
       sceneId: this.scene.id,
@@ -173,7 +178,7 @@ export class PacificaSimulation {
       biteRemaining: 0, fightElapsed: 0, lineStress: 0, slackTime: 0,
       encounter: null, biteSpeciesId: null, biteLengthCm: null, presentation: null, castId: 0, soakSeconds: 0,
       keptLog: [], warden: null, wardenNextAt: null, pierVisit: null,
-      fishingDate: /^\d{4}-\d{2}-\d{2}$/.test(date)&&Number.isFinite(Date.parse(date))?date:new Date().toISOString().slice(0,10),
+      fishingDate: /^\d{4}-\d{2}-\d{2}$/.test(date)&&Number.isFinite(Date.parse(date))?date:currentWorld.date,
       seaState: seaState && typeof seaState==='object' ? {...seaState} : null,
       walkTarget: null, walkRoute: [],
       message: '',
@@ -183,15 +188,25 @@ export class PacificaSimulation {
     };
     if (saved?.scene === this.scene.id && saveVersions.includes(saved.version)) this.restore(saved);
     restoreShoreEquipment(this.state,saved?.scene===this.scene.id&&saveVersions.includes(saved.version)?saved:null);
-    this.state.shoreLore=createShoreLore(this.scene,saved?.scene===this.scene.id?saved.shoreLore:null,this.state.elapsed,loreSeed);
+    this.state.shoreLore=createShoreLore(this.scene,saved?.scene===this.scene.id?saved.shoreLore:null,this.state.elapsed,loreSeed??shoreDayHash(this.scene.id,this.calendarDate(),'lore'));
     // Sharp Park's regular angler keeps his own random stream too.
     this.state.regular=regular?createShoreRegular(this.scene,saved?.scene===this.scene.id?saved.regular:null,(this.state.shoreLore.rngState^0x2545f491)>>>0):null;
-    // Fish live in their own saved random stream, so reloading cannot reroll them.
+    // Shared play uses a public date/time school field; trip fixtures retain their saved stream.
     const savedPopulation = saved?.scene === this.scene.id && saved.population?.version === 1 ? saved.population : null;
     this.population = savedPopulation ? restorePopulation(savedPopulation, 1, SHORE_POPULATION_SPECIES.map(d => d.id))
-      : createPopulation(Math.floor(this.random() * 4294967295) + 1);
+      : createPopulation(Math.floor(this.random('population') * 4294967295) + 1);
+    this.syncSharedWorld();
     this.updateSea(true);
     this.refreshSample();
+    if(this.sharedWorld)stepShoreLore(this);
+  }
+
+  syncSharedWorld(){
+    if(this.clockMode!=='shared')return;
+    this.sharedWorld={...shoreWorldTime(this.now()),sceneId:this.scene.id};
+    this.state.sharedWorld={...this.sharedWorld};
+    this.state.fishingDate=this.sharedWorld.date;
+    if(this.state.seaState)this.state.seaState.environmentSeconds=this.sharedWorld.environmentSeconds;
   }
 
   // The day's sea follows the scene's buoy climate for the trip date unless a
@@ -199,15 +214,26 @@ export class PacificaSimulation {
   updateSea(force = false) {
     const s = this.state;
     if (s.seaState && !s.seaState.climate) return;
+    if(this.sharedWorld){
+      const world=this.sharedWorld,minute=Math.floor(world.timeSeconds/60),key=world.date+':'+minute;
+      if(!force&&this.sharedSeaKey===key)return;
+      this.sharedSeaKey=key;
+      s.seaState={...climateSeaState(this.scene.id,world.date,minute/60),environmentSeconds:world.environmentSeconds};
+      return;
+    }
     if (!force && s.seaState && s.elapsed - (this.seaAt ?? -Infinity) < 5) return;
     this.seaAt = s.elapsed;
-    s.seaState = climateSeaState(this.scene.id, this.calendarDate(), 6 + gameSeconds(s.elapsed) / 3600);
+    s.seaState=climateSeaState(this.scene.id,this.calendarDate(),6+gameSeconds(s.elapsed)/3600);
   }
 
   talkAngler(id){return talkShoreAngler(this,id);}
   talkRegular(options){return talkRegular(this,options);}
 
-  random() { return clamp(finite(this.rng(), .5), 0, .999999); }
+  random(channel='event',key='') {
+    if(this.rng)return clamp(finite(this.rng(),.5),0,.999999);
+    const time=this.sharedWorld?.timeSeconds??this.state.elapsed;
+    return shoreDayUnit(this.scene.id,this.calendarDate(),key?'identity':Math.floor(time*2),channel,key);
+  }
 
   recordCatch(fish, status) {
     const s = this.state, clean = safeFish(fish);
@@ -292,8 +318,8 @@ export class PacificaSimulation {
     const s = this.state;
     s.onPier = true; s.player.x = this.scene.pier.entry.x; s.player.y = this.scene.pier.entry.y;
     s.walkTarget = null; s.walkRoute = []; s.player.walking = false; s.pierPush = 0;
-    const caught = !this.scene.pier.open && this.random() < PIER_RULES.catchChance;
-    s.pierVisit = {time: 0, patrolAt: caught ? PIER_RULES.earliestSeconds + this.random() * (PIER_RULES.latestSeconds - PIER_RULES.earliestSeconds) : null};
+    const caught = !this.scene.pier.open && this.random('pier-patrol') < PIER_RULES.catchChance;
+    s.pierVisit = {time: 0, patrolAt: caught ? PIER_RULES.earliestSeconds + this.random('pier-patrol-time') * (PIER_RULES.latestSeconds - PIER_RULES.earliestSeconds) : null};
     this.refreshSample();
     return this.result(true, this.scene.pier.open?'':'你从围栏的缝隙挤上了旧栈桥。');
   }
@@ -399,23 +425,23 @@ export class PacificaSimulation {
     if (!species) return this.result(false, '还没有真实鱼讯，继续观察竿尖。');
     // The fish that bit belongs to a real school; its size comes from that cohort.
     const lengthCm = clamp(finite(s.biteLengthCm, (species.lengthCm[0] + species.lengthCm[1]) / 2), species.lengthCm[0], species.lengthCm[1]);
-    const weightKg = Math.round(fishWeightKg(species, lengthCm, .92 + this.random() * .16) * 100) / 100;
+    const weightKg = Math.round(fishWeightKg(species, lengthCm, .92 + this.random('fish-condition',s.biteWorldKey||s.biteSpeciesId) * .16) * 100) / 100;
     resolveBite(this.population, 'hooked', this.fishWorld().species);
-    s.fish = {...safeFish({id: species.id, speciesId: species.speciesId, weightKg, length: lengthCm, lengthType: 'total', catchId: s.nextCatchId++, caughtDate: this.calendarDate()}), stamina: 1, run: 0, runOffset: this.random() * Math.PI * 2};
+    s.fish = {...safeFish({id: species.id, speciesId: species.speciesId, weightKg, length: lengthCm, lengthType: 'total', catchId: s.nextCatchId++, caughtDate: this.calendarDate()}), stamina: 1, run: 0, runOffset: this.random('fish-run',s.biteWorldKey||s.biteSpeciesId) * Math.PI * 2};
     s.cast.fightDistance = Math.max(1,s.lineDistance);
-    s.fishMotion=createShoreFightMotion(s.fish,{depth:s.presentation?.depth||1,seed:s.castId*7919+s.fish.catchId,energy:1});
+    s.fishMotion=createShoreFightMotion(s.fish,{depth:s.presentation?.depth||1,seed:this.sharedWorld?shoreDayHash(this.scene.id,this.calendarDate(),'fight',s.biteWorldKey):s.castId*7919+s.fish.catchId,energy:1});
     if(s.presentation)s.presentation.twitch=0;
     s.autoRetrieve=false;s.landingControl=0;
     s.phase = 'fighting'; s.tension = .33; s.biteRemaining = 0; s.fightElapsed = 0; s.lineStress = 0; s.slackTime = 0;
     s.reelFeedback={...emptyReelFeedback(),load:s.tension};
-    return this.result(true, '中鱼！连续点击摇轮收线；竿身压弯时停点，让鱼冲一阵。');
+    return this.result(true, '中鱼！按住按钮收线；竿身压弯时松手，让鱼冲一阵。');
   }
 
   setReeling(value) { this.reeling = Boolean(value); }
 
   encounterRates(sample = this.refreshSample()) {
     const s=this.state,supply=shoreSupply(s);
-    const calendar=gameCalendar(s.fishingDate,s.elapsed);
+    const calendar=this.calendar();
     return shoreEncounterRates({sample,bait:supply?.bait?.kind,rig:supply?.id,
       baitCondition:isShoreLure(supply?.id)?supply.condition:supply?.bait?.condition||0,month:calendar.getUTCMonth()+1,
       hour:calendar.getUTCHours()+calendar.getUTCMinutes()/60,
@@ -427,7 +453,8 @@ export class PacificaSimulation {
     return SPECIES.map(fish=>rates.perSpecies.find(row=>row.id===fish.id)?.ratePerSecond||0);
   }
 
-  calendar() { return gameCalendar(this.state.fishingDate, this.state.elapsed); }
+  calendar() { return this.sharedWorld?shoreWorldCalendar(this.sharedWorld):gameCalendar(this.state.fishingDate, this.state.elapsed); }
+  clock() { return this.sharedWorld?.clock??formatGameClock(this.state.elapsed); }
   calendarDate() { return this.calendar().toISOString().slice(0, 10); }
 
   // Engine plane: x metres along the beach, y metres offshore from the shoreline.
@@ -460,7 +487,7 @@ export class PacificaSimulation {
         appeal:def=>shoreLureAppeal(def.id,{rig:supply.id,presentation:p,waterDepth:sample.depth,condition:supply.condition})};
     }
     const daylight = clamp(Math.sin((hour - 5.3) * Math.PI / 13.9) * 1.4, .1, 1);
-    return {species: SHORE_POPULATION_SPECIES, center, radius: 110, cellSize: 4, stimulus, stimuli: regularStimuli(this),
+    return {sharedField:this.sharedWorld, species: SHORE_POPULATION_SPECIES, center, radius: 110, cellSize: 4, stimulus, stimuli: regularStimuli(this),
       env: (x, y) => this.fishEnv(x, y),
       suitability: (def, x, y) => { const e = this.fishEnv(x, y); return e.water ? shoreSuitability(def.id, e.sample, {month}) : 0; },
       feeding: def => .35 + .65 * shoreFeeding(def.id, hour), light: daylight,
@@ -477,6 +504,7 @@ export class PacificaSimulation {
       if (event.type !== 'bite') continue;
       if (s.phase !== 'waiting') { resolveBite(this.population, 'refused', this.fishWorld().species); continue; }
       s.biteSpeciesId = event.species; s.biteLengthCm = event.lengthCm;
+      s.biteWorldKey=`${event.group}:${Math.floor((this.sharedWorld?.timeSeconds??s.elapsed)*2)}`;
       s.phase = 'bite'; wearShoreSupplies(s, 'bite'); s.biteRemaining = 3.2;
       s.message = '咬钩了！现在扬竿！';
     }
@@ -596,10 +624,10 @@ export class PacificaSimulation {
   // outside the warden's beat (the pier has its own patrol).
   stepWarden(dt) {
     const s = this.state, rules = WARDEN_RULES;
-    s.wardenNextAt ??= s.elapsed + rules.firstAfter[0] + this.random() * (rules.firstAfter[1] - rules.firstAfter[0]);
+    s.wardenNextAt ??= s.elapsed + rules.firstAfter[0] + this.random('warden-first') * (rules.firstAfter[1] - rules.firstAfter[0]);
     if (!s.warden) {
       if (s.elapsed < s.wardenNextAt || s.onPier || s.inspection) return;
-      const side = this.random() < .5 ? -1 : 1, x = clamp(s.player.x + side * (280 + this.random() * 180), 40, this.world.width - 40);
+      const side = this.random('warden-side') < .5 ? -1 : 1, x = clamp(s.player.x + side * (280 + this.random('warden-position') * 180), 40, this.world.width - 40);
       s.warden = {x, y: clamp(this.world.shoreY(x) + 150, this.world.shoreY(x) + 25, this.world.height - 30), phase: 'approach', walking: true, age: 0};
       return;
     }
@@ -610,7 +638,7 @@ export class PacificaSimulation {
     const dx = tx - w.x, dy = ty - w.y, d = Math.hypot(dx, dy), step = rules.speed * dt;
     if (d > 1) {w.x += dx / d * Math.min(step, d); w.y += dy / d * Math.min(step, d); w.facing = Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 1 : 3) : (dy > 0 ? 2 : -1);}
     if (leaving) {
-      if (d < 4 || w.x < 20 || w.x > this.world.width - 20) {s.warden = null; s.wardenNextAt = s.elapsed + rules.between[0] + this.random() * (rules.between[1] - rules.between[0]);}
+      if (d < 4 || w.x < 20 || w.x > this.world.width - 20) {s.warden = null; s.wardenNextAt = s.elapsed + rules.between[0] + this.random('warden-return') * (rules.between[1] - rules.between[0]);}
       return;
     }
     // The check waits until any fish on the line is dealt with.
@@ -640,6 +668,7 @@ export class PacificaSimulation {
   update(dt, input = {}) {
     // Background tabs must not skip a bite window or simulate hours at once.
     dt = clamp(finite(dt), 0, .25);
+    this.syncSharedWorld();
     input=input||{};this.setFishingControls(input);
     if (dt === 0) return;
     const twitch=Boolean(input.twitch)&&!this.twitchHeld;this.twitchHeld=Boolean(input.twitch);
@@ -767,7 +796,7 @@ export class PacificaSimulation {
     const controlled=s.lineDistance<=3&&!m.jumpActive&&m.run<.5&&m.depth<.8&&s.tension>.08&&s.tension<.85;
     s.landingControl=controlled?s.landingControl+dt:Math.max(0,s.landingControl-dt*2);
     if(s.lineStress>1.35||s.lineDistance>155){
-      wearShoreSupplies(s,'break');this.clearLine();s.message='鱼线绷断，钓组已丢失。放松泄力，并在鱼冲刺时暂停点按收线。';
+      wearShoreSupplies(s,'break');this.clearLine();s.message='鱼线绷断，钓组已丢失。放松泄力，并在鱼冲刺时松开按钮暂停收线。';
     }else if(s.slackTime>3){
       wearShoreSupplies(s,'escape');this.clearLine();s.message='鱼线松弛太久，鱼脱钩了。适时收线，让钓线保持张力。';
     }else if(s.landingControl>=1){
@@ -780,7 +809,7 @@ export class PacificaSimulation {
     const s = this.state;
     return JSON.parse(JSON.stringify({
       scene: this.scene.id, version: 4, shoreLayoutRevision: SHORE_LAYOUT_REVISION, elapsed: s.elapsed, credits: s.credits,
-      fishingDate:s.fishingDate, population: serializePopulation(this.population), keptLog: s.keptLog,
+      fishingDate:s.fishingDate, worldVersion:this.sharedWorld?.version, population: serializePopulation(this.population), keptLog: s.keptLog,
       wardenNextAt: s.wardenNextAt, pierVisit: s.onPier ? s.pierVisit : null,
       fishingControls:s.fishingControls,activeRod:s.activeRod,activeReel:s.activeReel,rodSupplies:s.rodSupplies,rigStock:s.rigStock,inventorySlots:s.inventorySlots,
       inventory: s.inventory, bait: s.bait, upgrades: s.upgrades, catches: s.catches, catchHistory: s.catchHistory,
@@ -795,7 +824,7 @@ export class PacificaSimulation {
     const s = this.state;
     s.elapsed = clamp(finite(saved.elapsed), 0, 1e9);
     this.setFishingControls(saved.fishingControls||{});
-    if(typeof saved.fishingDate==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(saved.fishingDate)&&Number.isFinite(Date.parse(saved.fishingDate)))s.fishingDate=saved.fishingDate;
+    if(this.clockMode!=='shared'&&typeof saved.fishingDate==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(saved.fishingDate)&&Number.isFinite(Date.parse(saved.fishingDate)))s.fishingDate=saved.fishingDate;
     s.keptLog = (Array.isArray(saved.keptLog) ? saved.keptLog : []).filter(k => k && Number.isFinite(k.catchId) && typeof k.species === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(k.date)).slice(-300).map(k => ({catchId: k.catchId, species: k.species, date: k.date}));
     if (Number.isFinite(saved.wardenNextAt)) s.wardenNextAt = clamp(saved.wardenNextAt, s.elapsed, s.elapsed + 3600);
     s.credits = integer(saved.credits, 0, 1e7, 120);
@@ -842,7 +871,7 @@ export class PacificaSimulation {
         // The visit's patrol roll survives reloads; old saves roll once now.
         const visit = saved.pierVisit;
         s.pierVisit = visit && Number.isFinite(visit.time) ? {time: Math.max(0, visit.time), patrolAt: Number.isFinite(visit.patrolAt) ? clamp(visit.patrolAt, PIER_RULES.earliestSeconds, PIER_RULES.latestSeconds) : null}
-          : {time: 0, patrolAt: this.random() < PIER_RULES.catchChance ? PIER_RULES.earliestSeconds + this.random() * (PIER_RULES.latestSeconds - PIER_RULES.earliestSeconds) : null};
+          : {time: 0, patrolAt: this.random('pier-patrol') < PIER_RULES.catchChance ? PIER_RULES.earliestSeconds + this.random('pier-patrol-time') * (PIER_RULES.latestSeconds - PIER_RULES.earliestSeconds) : null};
       }
       if (saved.inspection && typeof saved.inspection === 'object' && (this.scene.pier || saved.inspection.kind === 'beach')) {
         const id = integer(saved.inspection.id, 1, 1e8, 1), fine = integer(saved.inspection.fine, 0, 1e6), paid = integer(saved.inspection.paid, 0, fine);

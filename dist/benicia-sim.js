@@ -1,3 +1,4 @@
+import {shoreDayHash} from './shore-day.js';
 import {SHORE_MOVEMENT as M} from './shore-movement.js';
 import {PacificaSimulation,PIXELS_PER_METRE} from './pacifica-sim.js';
 import {beniciaSea,beniciaSample} from './benicia-data.js';
@@ -25,8 +26,8 @@ export class BeniciaSimulation extends PacificaSimulation{
  constructor(options={}){
   super({...options,sceneId:'benicia',regular:false});
   const s=this.state,valid=options.saved?.scene==='benicia';
-  s.crowdSeed=valid?Math.max(1,Number(options.saved.crowdSeed)||1):Math.floor(this.random()*1e6)+1;
-  s.crowd=beniciaCrowd(s.elapsed,s.crowdSeed,this.calendar().getUTCMonth()+1);
+  s.crowdSeed=this.sharedWorld?shoreDayHash('benicia',this.calendarDate(),'crowd'):valid?Math.max(1,Number(options.saved.crowdSeed)||1):Math.floor(this.random()*1e6)+1;
+  s.crowd=beniciaCrowd(this.sharedWorld?.timeSeconds??s.elapsed,s.crowdSeed,this.calendar().getUTCMonth()+1);
   if(!valid){
    s.rodSupplies.starter_rod={id:'salmon_spoon',condition:1,bait:null};
    s.rigStock.salmon_spoon=[{id:'salmon_spoon',condition:1,bait:null}];
@@ -35,7 +36,7 @@ export class BeniciaSimulation extends PacificaSimulation{
   if(valid&&options.saved.population)this.population=restorePopulation(options.saved.population,1,BENICIA_SPECIES.map(d=>d.id));
   s.retrieveSpeed=0;s.snagSeconds=0;s.crowdHintAt=-Infinity;
  }
- updateSea(){const s=this.state;if(s.seaState&&!s.seaState.climate)return;s.seaState=beniciaSea(this.calendarDate(),this.calendar().getUTCHours());}
+ updateSea(){const s=this.state;if(s.seaState&&!s.seaState.climate)return;s.seaState={...beniciaSea(this.calendarDate(),this.sharedWorld?this.sharedWorld.timeSeconds/3600:this.calendar().getUTCHours()),...(this.sharedWorld?{environmentSeconds:this.sharedWorld.environmentSeconds}:{})};}
  cast(options){
   const s=this.state;if(s.phase==='walk'){
    const n=crowdCastConflict(s,this.previewCast(options).target);
@@ -48,7 +49,7 @@ export class BeniciaSimulation extends PacificaSimulation{
   w.species=BENICIA_SPECIES;w.stimuli=[];
   w.suitability=(def,x,y)=>{
    const env=this.fishEnv(x,y);if(!env.water)return 0;const e=env.sample;
-   if(def.id==='chinook_salmon')return beniciaSalmonSuitability(e,month,s.elapsed);
+   if(def.id==='chinook_salmon')return beniciaSalmonSuitability(e,month,this.sharedWorld?.timeSeconds??s.elapsed);
    if(def.id==='striped_bass')return clamp(e.depth/2,0,1)*.5;
    if(def.id==='pile_perch'||def.id==='shiner_perch')return Math.max(e.rockStructure,e.pierStructure)*.65;
    return e.depth>.3?.22:0;
@@ -63,7 +64,8 @@ export class BeniciaSimulation extends PacificaSimulation{
  tick(dt,input){
   this.state.retrieveInput=Boolean(input?.reel);
   super.tick(dt,input);
-  this.state.crowd=beniciaCrowd(this.state.elapsed,this.state.crowdSeed||1,this.calendar().getUTCMonth()+1);
+  if(this.sharedWorld)this.state.crowdSeed=shoreDayHash('benicia',this.calendarDate(),'crowd');
+  this.state.crowd=beniciaCrowd(this.sharedWorld?.timeSeconds??this.state.elapsed,this.state.crowdSeed||1,this.calendar().getUTCMonth()+1);
  }
  drift(dt,input={}){
   const s=this.state,supply=shoreSupply(s),crankDriven=Number.isFinite(input.crankRate);

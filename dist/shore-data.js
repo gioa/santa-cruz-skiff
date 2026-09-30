@@ -92,7 +92,7 @@ export function shoreProfile(sceneId,x,elapsed=0,seaState={}){
   let gap=0,feeder=0;
   for(const c of s.channels){const delta=x-c.x,a=bell(delta,c.width);gap=Math.max(gap,a);feeder+=-delta/c.width*a*.46;}
   // One M2-like 12.42-hour cycle on the shared game clock; the bed stays fixed.
-  const tidePhase=gameSeconds(elapsed)*TAU/TIDE_PERIOD-.5;
+  const tidePhase=finite(sea.environmentSeconds,gameSeconds(elapsed))*TAU/TIDE_PERIOD-.5;
   const tide=clamp(finite(sea.tideM,.65+.52*Math.sin(tidePhase)),-1,3);
   // Alongshore exposure: Pillar Point shelters the north of Half Moon Bay.
   const [lo,hi]=climate.exposure,exposure=hmb?lo+(hi-lo)*clamp(x/s.width,0,1):lo+(hi-lo)*(.5+.5*Math.sin(x/930));
@@ -102,7 +102,7 @@ export function shoreProfile(sceneId,x,elapsed=0,seaState={}){
   const waveDirectionDeg=clamp(finite(sea.waveDirectionDeg,hmb?14:4),-75,75);
   const zone=shoreZone(s,x);
   return{barDistance:shape.barDistance,troughDistance:shape.troughDistance,slope:shape.nearSlope,faceSlope:shape.faceSlope,faceWidth:shape.faceWidth,shape,
-    gap,feeder,tide,waveHeight,wavePeriod,waveDirectionDeg,exposure,
+    gap,feeder,tide,waveHeight,wavePeriod,waveDirectionDeg,exposure,waveTime:finite(sea.environmentSeconds,elapsed),
     zoneId:zone.id,zoneName:zone.name,tideLabel:Number.isFinite(sea.tideM)?'固定潮位':Math.cos(tidePhase)>0?'涨潮':'退潮',
     seaStateSource:sea.climate?'climate':Number.isFinite(sea.waveHeightM)?'authored':'climate-median'};
 }
@@ -117,7 +117,7 @@ function waveTravel(offshore,p){
 }
 function wavePhaseAt(x,offshore,elapsed,p){
   const theta=p.waveDirectionDeg*Math.PI/180,omega=TAU/p.wavePeriod,kDeep=omega*omega/GRAVITY;
-  return omega*(elapsed+waveTravel(offshore,p)*Math.cos(theta))-kDeep*x/PIXELS_PER_METRE*Math.sin(theta);
+  return omega*(finite(p.waveTime,elapsed)+waveTravel(offshore,p)*Math.cos(theta))-kDeep*x/PIXELS_PER_METRE*Math.sin(theta);
 }
 function column(s,x,elapsed,p){
   return surfColumn({sceneId:s.id,shape:p.shape,tide:p.tide,gap:p.gap,period:p.wavePeriod,hs:p.waveHeight,

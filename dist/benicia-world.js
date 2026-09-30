@@ -48,7 +48,7 @@ export function createBeniciaWorld(canvas){
   // sampling offset. Include the whole edge rock before culling it offscreen.
   const rockStart=Math.floor((v.left-32)/12)*12,rockEnd=v.right+32;
   for(let x=rockStart;x<rockEnd;x+=12){const y=beniciaShoreY(x);
-   if(x<800){const exposed=(1.7-beniciaTide(now).height)*20;rect(x,y-exposed,13,exposed+12,'#909583');if(hash(x,2)>.45)rect(x,y-exposed+4,8,1,'#bdbaa0');}
+   if(x<800){const exposed=(1.7-beniciaTide(now,lastState?.seaState?.environmentSeconds).height)*20;rect(x,y-exposed,13,exposed+12,'#909583');if(hash(x,2)>.45)rect(x,y-exposed+4,8,1,'#bdbaa0');}
    else if(visible(x,y))rock(x,y+10,12+hash(x,4)*9);
    rect(x,y+22,13,4,'#d4c9a6');
   }
@@ -86,7 +86,7 @@ export function createBeniciaWorld(canvas){
   rect(p.x-68,p.bottom+10,136,22,'#355e5d');label('BENICIA FISHING PIER',p.x,p.bottom+25,9,'#f1dfb4');
  }
  function water(){
-  const v=view(),tide=beniciaTide(now);rect(v.left,v.top,v.right-v.left,v.bottom-v.top,'#608c86');
+  const v=view(),tide=beniciaTide(now,lastState?.seaState?.environmentSeconds);rect(v.left,v.top,v.right-v.left,v.bottom-v.top,'#608c86');
   // Authored estuarine depth tones and turbid shallow pocket.
   for(let x=Math.floor(v.left/16)*16;x<v.right+16;x+=16){const sy=beniciaShoreY(x);
    for(let y=Math.floor(v.top/16)*16;y<Math.min(v.bottom,sy);y+=16){const d=(sy-y)/3.2;rect(x,y,17,17,d<12?'#8aaba0':d<32?'#769c91':d<70?'#638f87':'#557f7e');}

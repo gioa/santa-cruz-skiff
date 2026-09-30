@@ -1,0 +1,5478 @@
+{
+  "status": "passed_with_observations",
+  "instant": "2026-09-30T12:00:00-07:00",
+  "sourceHashes": {
+    "pacifica-world.js": "d306bc527608a6e3428f28be05f012b41d5fa421f5a933dac5c31da3b5b3de9c",
+    "benicia-world.js": "5606810b90b5c8163f772b1ebdfd107c9162143961c7aa6593e09ec2ce2440b8",
+    "shore-action-view.js": "5698d80f0a7cfd24a340712463e245af4debe4a503396ecdd6472edaaeaf1563",
+    "shore-people.js": "9c719c5b56254ce265bfaa792397af4d01e4eb82598ba0e65d2ceae954a23f1b",
+    "shore-scale.js": "465cce9efa4028ac2398916291d2761a668dd14d1a2a1da299ad8b058b6c7747",
+    "shore-line-geometry.js": "9becb3c7021171392b52b75cc93a19ffee56d08ab4ed73bf78cd2138a6e78145",
+    "shore-tackle-visual.js": "4d1ffa06e86fc24b0c6d373deb208b6cbdf5e4a9d3de78cbb9b38381c1014c53",
+    "pacifica-game.js": "e144376cb836b2f0ec0e186c44101264fe1a5adaa73d06c574417db16bd39ea9",
+    "pacifica.css": "f08623c385c2fa2a9c6583724f3c612373be49fc0b55b9a371b4909ff4a3427e",
+    "pacifica.html": "1663ea9cfb85b0b68d444bfc8d4711b0a133293fd930b7d1fea42112955f1b83",
+    "half-moon-bay.html": "b62dff4c3ae25d77df4d626bee4467b52f6420b6e52c9f0502310f74fe583097",
+    "benicia.html": "750450a7b15abb1b07b28c179082abe74ab22015288e2321999b1c3b7069588f",
+    "shore-day.js": "28baac16ec9284836bbd0885cd1c2dc13894104a63438d7d19a0f072d087e801",
+    "shore-data.js": "5df84c5e589a7978a1f0a84d974a95bb7f968e3605aa91eebeeacd0074e71998",
+    "benicia-data.js": "e3ec84eb59bba027f150fdeb7a35616159400027821bb4b1a3297f8bfd70a74f",
+    "shore-surf.js": "c17dbb470107063cc596f371070a5541bd3c7358bca8ea753e1ee0cc87a35885",
+    "shore-movement.js": "141f74f9ff12e166be91e6a6c7fa3dadf53fe2a1200b5940a8ad149f9b5bb6e9",
+    "pacifica-sim.js": "4013f3809eff8cab60eea6df0b87032241e91716e0d9cc6e87423aa3699b3524",
+    "benicia-sim.js": "53f1b00d5d1ed46d68b1ed745c385ed55589f53dc2877e6b68d72af263c55cb1",
+    "benicia-crowd.js": "f57b2659c681619001e2c631b0fa5804762f2bb4938771f0ad1db4f19f1a058c",
+    "shore-lore.js": "73c10544ce97617f5e7888ed00ff73ed4e5724b3186b726bf9424c135aaa32de",
+    "shore-regular.js": "37445c41a2b42948bc1c1913d162c751618c4cbbcd46904c70106f148ebbd722",
+    "shore-reel-input.js": "a0908080c454a3e47c01f14a2b3f92150d1c6f00b08d554318e685e4e0a488b6",
+    "shore-reel-feedback.js": "9013967a2f8b9eb24db0370cd929cbd8a4df032e78f8c9f07a5949e332031cc1",
+    "shore-presentation.js": "bc78cf6526197806e76392cb033a0cab93bb97b1e2c1bcb12eecb5b09e1d6cfb",
+    "shore-fish-fight.js": "a92dd549dc9b2ec500ade7cc4827da19f4173d753839594f2ea9ae40f4046024",
+    "shore-fish-field.js": "98b899d393fb4255d0d99734f5297147c142f4adbac25aa8997081452845e1e9",
+    "fish-population.js": "c7fadaae31950a4c2de952f79a56d4f5c620d907eac7925a91f75e756c8a474e"
+  },
+  "artifactHashes": {
+    "visual-pacifica-phone-arrival.png": "1c6fcc2f0e238937749ef260b7698b90a8621b2438157261b2507d17896f9f1a",
+    "visual-pacifica-phone-cast.png": "486eb75158b3c3af7ed9786d6a9946b92c55ce81aa7f3e2c61acbd91830ff405",
+    "visual-pacifica-phone-fight.png": "d4b810f48847d07f2895f756c48dd8b12ef558d953e17c9ade0eab777f4aed7c",
+    "visual-pacifica-desktop-arrival.png": "00be18e57ace0801fe3af3376b9dcd1f2a4ea8343d098bb5358365ebb009c3ff",
+    "visual-pacifica-desktop-cast.png": "2c57f6ed72b6a613c6ec2cec18f98c45fbf8096125afdbd0758e741e68cd12e8",
+    "visual-pacifica-desktop-fight.png": "0953aaa4c851e0140f8141b493c68e63767ce42512f1bd4cfa69e5369fe02251",
+    "visual-half-moon-bay-phone-arrival.png": "f4b58b02180fe8b30295522d8c07c77cd4cbb444dd4d5ab6864377c3ef894766",
+    "visual-half-moon-bay-phone-cast.png": "b0974a4b94be7852655bd261b222d597b9a5cb2edbcd9b4ae56e6432516c4555",
+    "visual-half-moon-bay-phone-fight.png": "3f5e68791aa5df79030dd7cfde6dc91fdc6d94981d5af4c330db016a76f6ad85",
+    "visual-half-moon-bay-desktop-arrival.png": "1e7a0ca1a9ed2ab085dd53b4f3356505a484df72ddbba3c56b957e3163d24cf4",
+    "visual-half-moon-bay-desktop-cast.png": "e49cec7135e510993d172edbdc30cdc6c6598776d5cc4aa6c603120a7c336f87",
+    "visual-half-moon-bay-desktop-fight.png": "5802a4cf9b60b010e2855be091a58c17d018d4c010e248c73187cfdee989cbcd",
+    "visual-benicia-phone-arrival.png": "09f600358f5de93d159f38324023d0d792f7c5f98adc72d54875cdad6990c613",
+    "visual-benicia-phone-cast.png": "47dd03feb7c5601125dac635f17a336348eb3772e957116712357f487038d08f",
+    "visual-benicia-phone-fight.png": "a29b193912514a23654deb9aec912295c192283d50547b424cc9c1bd693ea549",
+    "visual-benicia-desktop-arrival.png": "87e70392423b18890dc32d55a0b05a7f1a0979e891f9ec09f558a0d1852c69de",
+    "visual-benicia-desktop-cast.png": "800115a7fc82e0eb83848c934126fc73eeb38efd4cc410c6e3ccb5d83c0be830",
+    "visual-benicia-desktop-fight.png": "eb579987aa9440380284cb0a84891cb74066313db1a916c1e43ad60fc6560539"
+  },
+  "method": "Fresh constructor arrivals at California noon; fixed shared now provider advances only for actual cast/fight physics. Production daily sea, crowd and visitor schedule retained. Cast/fight fixtures move to a valid shoreline gap and use a mounted Carolina rig. Fights explicitly inject a known jacksmelt bite, then use the actual current one-button hold model and simulation; these images are not natural encounter/catch-rate evidence. Tide-call wrapper records arguments without changing results.",
+  "frames": [
+    {
+      "scene": "pacifica",
+      "phase": "walk",
+      "sharedWorld": {
+        "version": 1,
+        "date": "2026-09-30",
+        "timeSeconds": 43200,
+        "instantMs": 1790794800000,
+        "environmentSeconds": 1790794800,
+        "clock": "12:00",
+        "sceneId": "pacifica"
+      },
+      "sea": {
+        "waveHeightM": 1.0644945316607344,
+        "wavePeriodS": 12.962883039948874,
+        "waveDirectionDeg": -2.956078824458837,
+        "month": 9,
+        "source": "NDBC 46237 San Francisco Bar",
+        "climate": true,
+        "environmentSeconds": 1790794800
+      },
+      "elapsed": 0,
+      "player": {
+        "x": 1100,
+        "y": 865,
+        "facing": -1,
+        "walking": false
+      },
+      "crowdCount": 0,
+      "regularMode": "away",
+      "visitor": null,
+      "rig": "carolina_rig",
+      "cast": null,
+      "lineDistance": 0,
+      "fish": null,
+      "fishMotion": null,
+      "camera": {
+        "x": 1137.919332543444,
+        "y": 735,
+        "scale": 0.7058823529411765,
+        "width": 360,
+        "height": 779
+      },
+      "cameraCSSScale": 0.7647058823529411,
+      "points": {
+        "angler": {
+          "x": 165.75,
+          "y": 540.6367137355584,
+          "clientX": 165.75,
+          "clientY": 540.6367137355584,
+          "visible": true
+        }
+      },
+      "safeBoundsCSS": {
+        "left": 30.333333333333332,
+        "right": 301.6723933649289,
+        "top": 131.98825039494469,
+        "bottom": 750.9245655608214
+      },
+      "fishVisible": false,
+      "floatVisible": false,
+      "controls": {
+        "boat-console": {
+          "visible": false,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "right": 0,
+          "bottom": 0
+        },
+        "beach-cast": {
+          "visible": false,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "right": 0,
+          "bottom": 0
+        },
+        "beach-reel": {
+          "visible": false,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "right": 0,
+          "bottom": 0
+        },
+        "shore-drag-control": {
+          "visible": false,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "right": 0,
+          "bottom": 0
+        },
+        "beach-twitch": {
+          "visible": false
+        }
+      },
+      "frameMeanMs": 1.9166666666666667,
+      "frameMaxMs": 2.700000047683716,
+      "tideCalls": [],
+      "viewport": "phone",
+      "condition": "arrival"
+    },
+    {
+      "scene": "pacifica",
+      "phase": "waiting",
+      "sharedWorld": {
+        "version": 1,
+        "date": "2026-09-30",
+        "timeSeconds": 43203.089,
+        "instantMs": 1790794803089,
+        "environmentSeconds": 1790794803.089,
+        "clock": "12:00",
+        "sceneId": "pacifica"
+      },
+      "sea": {
+        "waveHeightM": 1.0644945316607344,
+        "wavePeriodS": 12.962883039948874,
+        "waveDirectionDeg": -2.956078824458837,
+        "month": 9,
+        "source": "NDBC 46237 San Francisco Bar",
+        "climate": true,
+        "environmentSeconds": 1790794803.089
+      },
+      "elapsed": 3.089330617238362,
+      "player": {
+        "x": 2440,
+        "y": 454.7354136121566,
+        "facing": -1,
+        "walking": false
+      },
+      "crowdCount": 0,
+      "regularMode": "away",
+      "visitor": {
+        "id": 1263178214,
+        "publicKey": "pacifica:2026-09-30:visitor:trough:180",
+        "publicDeparture": 43410,
+        "x": 2032.9637019505026,
+        "y": 511.4472464552317,
+        "angler": 2,
+        "clueId": null,
+        "expiresAt": 210.0003306172366,
+        "talked": false
+      },
+      "rig": "carolina_rig",
+      "cast": {
+        "origin": {
+          "x": 2438.360975609756,
+          "y": 449.3643323155729
+        },
+        "target": {
+          "x": 2438.3613256188078,
+          "y": 343.21127244852335
+        },
+        "distance": 33.171492734067876,
+        "paidLength": 33.070270853615646
+      },
+      "lineDistance": 33.1728312086333,
+      "fish": null,
+      "fishMotion": null,
+      "camera": {
+        "x": 2462.078213999094,
+        "y": 396.47334303033995,
+        "scale": 1.2123529411764706,
+        "width": 360,
+        "height": 779
+      },
+      "cameraCSSScale": 1.3133823529411763,
+      "points": {
+        "angler": {
+          "x": 165.75,
+          "y": 488.63157894736844,
+          "clientX": 165.75,
+          "clientY": 488.63157894736844,
+          "visible": true
+        },
+        "rod": {
+          "x": 139.75,
+          "y": 410.6238767650834,
+          "clientX": 139.75,
+          "clientY": 410.6238767650834,
+          "visible": true
+        },
+        "waterEntry": {
+          "x": 163.58333333333334,
+          "y": 353.201540436457,
+          "clientX": 163.58333333333334,
+          "clientY": 353.201540436457,
+          "visible": true
+        }
+      },
+      "safeBoundsCSS": {
+        "left": 30.333333333333332,
+        "right": 301.6723933649289,
+        "top": 131.98825039494469,
+        "bottom": 692.9302922590838
+      },
+      "fishVisible": false,
+      "floatVisible": false,
+      "controls": {
+        "boat-console": {
+          "visible": true,
+          "x": 10,
+          "y": 706,
+          "width": 370,
+          "height": 130,
+          "right": 380,
+          "bottom": 836
+        },
+        "beach-cast": {
+          "visible": false,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "right": 0,
+          "bottom": 0
+        },
+        "beach-reel": {
+          "visible": true,
+          "x": 145.765625,
+          "y": 779.5,
+          "width": 226.234375,
+          "height": 48,
+          "right": 372,
+          "bottom": 827.5
+        },
+        "shore-drag-control": {
+          "visible": true,
+          "x": 18,
+          "y": 779,
+          "width": 119.765625,
+          "height": 49,
+          "right": 137.765625,
+          "bottom": 828
+        },
+        "beach-twitch": {
+          "visible": false
+        }
+      },
+      "frameMeanMs": 1.3333333333333333,
+      "frameMaxMs": 1.7999999523162842,
+      "tideCalls": [],
+      "viewport": "phone",
+      "condition": "cast"
+    },
+    {
+      "scene": "pacifica",
+      "phase": "fighting",
+      "sharedWorld": {
+        "version": 1,
+        "date": "2026-09-30",
+        "timeSeconds": 43205.181,
+        "instantMs": 1790794805181,
+        "environmentSeconds": 1790794805.181,
+        "clock": "12:00",
+        "sceneId": "pacifica"
+      },
+      "sea": {
+        "waveHeightM": 1.0644945316607344,
+        "wavePeriodS": 12.962883039948874,
+        "waveDirectionDeg": -2.956078824458837,
+        "month": 9,
+        "source": "NDBC 46237 San Francisco Bar",
+        "climate": true,
+        "environmentSeconds": 1790794805.181
+      },
+      "elapsed": 5.181739036889983,
+      "player": {
+        "x": 2440,
+        "y": 454.7354136121566,
+        "facing": -1,
+        "walking": false
+      },
+      "crowdCount": 0,
+      "regularMode": "away",
+      "visitor": {
+        "id": 1263178214,
+        "publicKey": "pacifica:2026-09-30:visitor:trough:180",
+        "publicDeparture": 43410,
+        "x": 2032.9637019505026,
+        "y": 511.4472464552317,
+        "angler": 2,
+        "clueId": null,
+        "expiresAt": 210.0007390368919,
+        "talked": false
+      },
+      "rig": "carolina_rig",
+      "cast": {
+        "origin": {
+          "x": 2438.360975609756,
+          "y": 449.3643323155729
+        },
+        "target": {
+          "x": 2438.287198354814,
+          "y": 408.20693988890247
+        },
+        "distance": 12.866846865152244,
+        "paidLength": 12.885942460263669
+      },
+      "lineDistance": 9.261486667196829,
+      "fish": {
+        "id": "jacksmelt",
+        "speciesId": "jacksmelt",
+        "color": "#b5cfce",
+        "catchId": 1,
+        "weightKg": 0.25,
+        "kg": 0.25,
+        "length": 33,
+        "lengthType": "total",
+        "caughtDate": "2026-09-30",
+        "value": 7,
+        "strength": 0.3,
+        "stamina": 0.9215545861331281,
+        "run": 0.9697575765990888,
+        "name": "加州似银汉鱼",
+        "commonName": "Jacksmelt",
+        "nameEn": "Jacksmelt",
+        "latin": "Atherinopsis californiensis",
+        "runOffset": 1.56883572617944
+      },
+      "fishMotion": {
+        "speciesId": "jacksmelt",
+        "seed": 484223439,
+        "variation": 0.02261742833070457,
+        "elapsed": 3.0250000000000092,
+        "depth": 0,
+        "airHeight": 0,
+        "jumpActive": false,
+        "jumpVelocity": 0,
+        "jumpCooldown": 0,
+        "jumpCount": 0,
+        "splash": 0,
+        "run": 0.9697575765990888,
+        "headShake": 0.020110268222425044,
+        "lateral": 0.6816320268885091,
+        "lateralVelocity": 0.5876878117569828,
+        "diveVelocity": -0.514,
+        "energy": 0.9215545861331281,
+        "phase": "run",
+        "pull": 0.3212655154460925,
+        "verticalPickup": 0,
+        "surfaceStartleUsed": false,
+        "surfaceBurstSeconds": 0
+      },
+      "camera": {
+        "x": 2457.5803777567276,
+        "y": 426.2354136121566,
+        "scale": 1.522526310191613,
+        "width": 360,
+        "height": 779
+      },
+      "cameraCSSScale": 1.6494035027075808,
+      "points": {
+        "angler": {
+          "x": 165.75,
+          "y": 459.37869062901154,
+          "clientX": 165.75,
+          "clientY": 459.37869062901154,
+          "visible": true
+        },
+        "rod": {
+          "x": 143,
+          "y": 368.3697047496791,
+          "clientX": 143,
+          "clientY": 368.3697047496791,
+          "visible": true
+        },
+        "waterEntry": {
+          "x": 166.83333333333334,
+          "y": 401.9563543003851,
+          "clientX": 166.83333333333334,
+          "clientY": 401.9563543003851,
+          "visible": true
+        },
+        "fish": {
+          "x": 166.83333333333334,
+          "y": 401.9563543003851,
+          "clientX": 166.83333333333334,
+          "clientY": 401.9563543003851,
+          "visible": true
+        }
+      },
+      "safeBoundsCSS": {
+        "left": 30.333333333333332,
+        "right": 301.6723933649289,
+        "top": 131.98825039494469,
+        "bottom": 692.9302922590838
+      },
+      "fishVisible": true,
+      "floatVisible": false,
+      "controls": {
+        "boat-console": {
+          "visible": true,
+          "x": 10,
+          "y": 706,
+          "width": 370,
+          "height": 130,
+          "right": 380,
+          "bottom": 836
+        },
+        "beach-cast": {
+          "visible": false,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "right": 0,
+          "bottom": 0
+        },
+        "beach-reel": {
+          "visible": true,
+          "x": 145.765625,
+          "y": 779.5,
+          "width": 226.234375,
+          "height": 48,
+          "right": 372,
+          "bottom": 827.5
+        },
+        "shore-drag-control": {
+          "visible": true,
+          "x": 18,
+          "y": 779,
+          "width": 119.765625,
+          "height": 49,
+          "right": 137.765625,
+          "bottom": 828
+        },
+        "beach-twitch": {
+          "visible": false
+        }
+      },
+      "frameMeanMs": 0.9333333373069763,
+      "frameMaxMs": 1.5,
+      "tideCalls": [],
+      "viewport": "phone",
+      "condition": "fight"
+    },
+    {
+      "scene": "pacifica",
+      "phase": "walk",
+      "sharedWorld": {
+        "version": 1,
+        "date": "2026-09-30",
+        "timeSeconds": 43200,
+        "instantMs": 1790794800000,
+        "environmentSeconds": 1790794800,
+        "clock": "12:00",
+        "sceneId": "pacifica"
+      },
+      "sea": {
+        "waveHeightM": 1.0644945316607344,
+        "wavePeriodS": 12.962883039948874,
+        "waveDirectionDeg": -2.956078824458837,
+        "month": 9,
+        "source": "NDBC 46237 San Francisco Bar",
+        "climate": true,
+        "environmentSeconds": 1790794800
+      },
+      "elapsed": 0,
+      "player": {
+        "x": 1100,
+        "y": 865,
+        "facing": -1,
+        "walking": false
+      },
+      "crowdCount": 0,
+      "regularMode": "away",
+      "visitor": null,
+      "rig": "carolina_rig",
+      "cast": null,
+      "lineDistance": 0,
+      "fish": null,
+      "fishMotion": null,
+      "camera": {
+        "x": 1100,
+        "y": 735,
+        "scale": 0.6532058823529412,
+        "width": 950,
+        "height": 594
+      },
+      "cameraCSSScale": 0.9901226006191951,
+      "points": {
+        "angler": {
+          "x": 720,
+          "y": 612.1212121212121,
+          "clientX": 720,
+          "clientY": 612.1212121212121,
+          "visible": true
+        }
+      },
+      "safeBoundsCSS": {
+        "left": 42.4421052631579,
+        "right": 1397.5578947368422,
+        "top": 165.25136842105266,
+        "bottom": 802.1557894736843
+      },
+      "fishVisible": false,
+      "floatVisible": false,
+      "controls": {
+        "boat-console": {
+          "visible": false,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "right": 0,
+          "bottom": 0
+        },
+        "beach-cast": {
+          "visible": false,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "right": 0,
+          "bottom": 0
+        },
+        "beach-reel": {
+          "visible": false,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "right": 0,
+          "bottom": 0
+        },
+        "shore-drag-control": {
+          "visible": false,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "right": 0,
+          "bottom": 0
+        },
+        "beach-twitch": {
+          "visible": false
+        }
+      },
+      "frameMeanMs": 4.675000001986821,
+      "frameMaxMs": 5.799999952316284,
+      "tideCalls": [],
+      "viewport": "desktop",
+      "condition": "arrival"
+    },
+    {
+      "scene": "pacifica",
+      "phase": "waiting",
+      "sharedWorld": {
+        "version": 1,
+        "date": "2026-09-30",
+        "timeSeconds": 43203.089,
+        "instantMs": 1790794803089,
+        "environmentSeconds": 1790794803.089,
+        "clock": "12:00",
+        "sceneId": "pacifica"
+      },
+      "sea": {
+        "waveHeightM": 1.0644945316607344,
+        "wavePeriodS": 12.962883039948874,
+        "waveDirectionDeg": -2.956078824458837,
+        "month": 9,
+        "source": "NDBC 46237 San Francisco Bar",
+        "climate": true,
+        "environmentSeconds": 1790794803.089
+      },
+      "elapsed": 3.089330617238362,
+      "player": {
+        "x": 2440,
+        "y": 454.7354136121566,
+        "facing": -1,
+        "walking": false
+      },
+      "crowdCount": 0,
+      "regularMode": "away",
+      "visitor": {
+        "id": 1263178214,
+        "publicKey": "pacifica:2026-09-30:visitor:trough:180",
+        "publicDeparture": 43410,
+        "x": 2032.9637019505026,
+        "y": 511.4472464552317,
+        "angler": 2,
+        "clueId": null,
+        "expiresAt": 210.0003306172366,
+        "talked": false
+      },
+      "rig": "carolina_rig",
+      "cast": {
+        "origin": {
+          "x": 2438.360975609756,
+          "y": 449.3643323155729
+        },
+        "target": {
+          "x": 2438.3613256188078,
+          "y": 343.21127244852335
+        },
+        "distance": 33.171492734067876,
+        "paidLength": 33.070270853615646
+      },
+      "lineDistance": 33.1728312086333,
+      "fish": null,
+      "fishMotion": null,
+      "camera": {
+        "x": 2440,
+        "y": 396.47334303033995,
+        "scale": 2.30145,
+        "width": 950,
+        "height": 594
+      },
+      "cameraCSSScale": 3.488513684210526,
+      "points": {
+        "angler": {
+          "x": 720,
+          "y": 657.5757575757576,
+          "clientX": 720,
+          "clientY": 657.5757575757576,
+          "visible": true
+        },
+        "rod": {
+          "x": 648.7578947368421,
+          "y": 450,
+          "clientX": 648.7578947368421,
+          "clientY": 450,
+          "visible": true
+        },
+        "waterEntry": {
+          "x": 713.9368421052632,
+          "y": 298.4848484848485,
+          "clientX": 713.9368421052632,
+          "clientY": 298.4848484848485,
+          "visible": true
+        }
+      },
+      "safeBoundsCSS": {
+        "left": 42.4421052631579,
+        "right": 1397.5578947368422,
+        "top": 165.25136842105266,
+        "bottom": 744.1313684210527
+      },
+      "fishVisible": false,
+      "floatVisible": false,
+      "controls": {
+        "boat-console": {
+          "visible": true,
+          "x": 515,
+          "y": 762,
+          "width": 410,
+          "height": 130,
+          "right": 925,
+          "bottom": 892
+        },
+        "beach-cast": {
+          "visible": false,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "right": 0,
+          "bottom": 0
+        },
+        "beach-reel": {
+          "visible": true,
+          "x": 664.609375,
+          "y": 835.5,
+          "width": 252.390625,
+          "height": 48,
+          "right": 917,
+          "bottom": 883.5
+        },
+        "shore-drag-control": {
+          "visible": true,
+          "x": 523,
+          "y": 835,
+          "width": 133.609375,
+          "height": 49,
+          "right": 656.609375,
+          "bottom": 884
+        },
+        "beach-twitch": {
+          "visible": false
+        }
+      },
+      "frameMeanMs": 1.4333333273728688,
+      "frameMaxMs": 1.899999976158142,
+      "tideCalls": [],
+      "viewport": "desktop",
+      "condition": "cast"
+    },
+    {
+      "scene": "pacifica",
+      "phase": "fighting",
+      "sharedWorld": {
+        "version": 1,
+        "date": "2026-09-30",
+        "timeSeconds": 43205.181,
+        "instantMs": 1790794805181,
+        "environmentSeconds": 1790794805.181,
+        "clock": "12:00",
+        "sceneId": "pacifica"
+      },
+      "sea": {
+        "waveHeightM": 1.0644945316607344,
+        "wavePeriodS": 12.962883039948874,
+        "waveDirectionDeg": -2.956078824458837,
+        "month": 9,
+        "source": "NDBC 46237 San Francisco Bar",
+        "climate": true,
+        "environmentSeconds": 1790794805.181
+      },
+      "elapsed": 5.181739036889983,
+      "player": {
+        "x": 2440,
+        "y": 454.7354136121566,
+        "facing": -1,
+        "walking": false
+      },
+      "crowdCount": 0,
+      "regularMode": "away",
+      "visitor": {
+        "id": 1263178214,
+        "publicKey": "pacifica:2026-09-30:visitor:trough:180",
+        "publicDeparture": 43410,
+        "x": 2032.9637019505026,
+        "y": 511.4472464552317,
+        "angler": 2,
+        "clueId": null,
+        "expiresAt": 210.0007390368919,
+        "talked": false
+      },
+      "rig": "carolina_rig",
+      "cast": {
+        "origin": {
+          "x": 2438.360975609756,
+          "y": 449.3643323155729
+        },
+        "target": {
+          "x": 2438.287198354814,
+          "y": 408.20693988890247
+        },
+        "distance": 12.866846865152244,
+        "paidLength": 12.885942460263669
+      },
+      "lineDistance": 9.261486667196829,
+      "fish": {
+        "id": "jacksmelt",
+        "speciesId": "jacksmelt",
+        "color": "#b5cfce",
+        "catchId": 1,
+        "weightKg": 0.25,
+        "kg": 0.25,
+        "length": 33,
+        "lengthType": "total",
+        "caughtDate": "2026-09-30",
+        "value": 7,
+        "strength": 0.3,
+        "stamina": 0.9215545861331281,
+        "run": 0.9697575765990888,
+        "name": "加州似银汉鱼",
+        "commonName": "Jacksmelt",
+        "nameEn": "Jacksmelt",
+        "latin": "Atherinopsis californiensis",
+        "runOffset": 1.56883572617944
+      },
+      "fishMotion": {
+        "speciesId": "jacksmelt",
+        "seed": 484223439,
+        "variation": 0.02261742833070457,
+        "elapsed": 3.0250000000000092,
+        "depth": 0,
+        "airHeight": 0,
+        "jumpActive": false,
+        "jumpVelocity": 0,
+        "jumpCooldown": 0,
+        "jumpCount": 0,
+        "splash": 0,
+        "run": 0.9697575765990888,
+        "headShake": 0.020110268222425044,
+        "lateral": 0.6816320268885091,
+        "lateralVelocity": 0.5876878117569828,
+        "diveVelocity": -0.514,
+        "energy": 0.9215545861331281,
+        "phase": "run",
+        "pull": 0.3212655154460925,
+        "verticalPickup": 0,
+        "surfaceStartleUsed": false,
+        "surfaceBurstSeconds": 0
+      },
+      "camera": {
+        "x": 2440,
+        "y": 426.2354136121566,
+        "scale": 2.8952574002506903,
+        "width": 950,
+        "height": 594
+      },
+      "cameraCSSScale": 4.388600690906309,
+      "points": {
+        "angler": {
+          "x": 720,
+          "y": 578.7878787878788,
+          "clientX": 720,
+          "clientY": 578.7878787878788,
+          "visible": true
+        },
+        "rod": {
+          "x": 657.8526315789474,
+          "y": 337.8787878787879,
+          "clientX": 657.8526315789474,
+          "clientY": 337.8787878787879,
+          "visible": true
+        },
+        "waterEntry": {
+          "x": 721.5157894736842,
+          "y": 425.75757575757575,
+          "clientX": 721.5157894736842,
+          "clientY": 425.75757575757575,
+          "visible": true
+        },
+        "fish": {
+          "x": 721.5157894736842,
+          "y": 425.75757575757575,
+          "clientX": 721.5157894736842,
+          "clientY": 425.75757575757575,
+          "visible": true
+        }
+      },
+      "safeBoundsCSS": {
+        "left": 42.4421052631579,
+        "right": 1397.5578947368422,
+        "top": 164.25094736842107,
+        "bottom": 744.1313684210527
+      },
+      "fishVisible": true,
+      "floatVisible": false,
+      "controls": {
+        "boat-console": {
+          "visible": true,
+          "x": 515,
+          "y": 762,
+          "width": 410,
+          "height": 130,
+          "right": 925,
+          "bottom": 892
+        },
+        "beach-cast": {
+          "visible": false,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "right": 0,
+          "bottom": 0
+        },
+        "beach-reel": {
+          "visible": true,
+          "x": 664.609375,
+          "y": 835.5,
+          "width": 252.390625,
+          "height": 48,
+          "right": 917,
+          "bottom": 883.5
+        },
+        "shore-drag-control": {
+          "visible": true,
+          "x": 523,
+          "y": 835,
+          "width": 133.609375,
+          "height": 49,
+          "right": 656.609375,
+          "bottom": 884
+        },
+        "beach-twitch": {
+          "visible": false
+        }
+      },
+      "frameMeanMs": 1.0500000019868214,
+      "frameMaxMs": 1.5,
+      "tideCalls": [],
+      "viewport": "desktop",
+      "condition": "fight"
+    },
+    {
+      "scene": "half-moon-bay",
+      "phase": "walk",
+      "sharedWorld": {
+        "version": 1,
+        "date": "2026-09-30",
+        "timeSeconds": 43200,
+        "instantMs": 1790794800000,
+        "environmentSeconds": 1790794800,
+        "clock": "12:00",
+        "sceneId": "half-moon-bay"
+      },
+      "sea": {
+        "waveHeightM": 2.1634691705155884,
+        "wavePeriodS": 11.72982974579851,
+        "waveDirectionDeg": 18.151356559433736,
+        "month": 9,
+        "source": "NDBC 46012 Half Moon Bay (offshore), Pillar Point sheltering applied",
+        "climate": true,
+        "environmentSeconds": 1790794800
+      },
+      "elapsed": 0,
+      "player": {
+        "x": 1100,
+        "y": 865,
+        "facing": -1,
+        "walking": false
+      },
+      "crowdCount": 0,
+      "regularMode": null,
+      "visitor": null,
+      "rig": "carolina_rig",
+      "cast": null,
+      "lineDistance": 0,
+      "fish": null,
+      "fishMotion": null,
+      "camera": {
+        "x": 1137.919332543444,
+        "y": 735,
+        "scale": 0.7058823529411765,
+        "width": 360,
+        "height": 779
+      },
+      "cameraCSSScale": 0.7647058823529411,
+      "points": {
+        "angler": {
+          "x": 165.75,
+          "y": 540.6367137355584,
+          "clientX": 165.75,
+          "clientY": 540.6367137355584,
+          "visible": true
+        }
+      },
+      "safeBoundsCSS": {
+        "left": 30.333333333333332,
+        "right": 301.6723933649289,
+        "top": 131.98825039494469,
+        "bottom": 750.9245655608214
+      },
+      "fishVisible": false,
+      "floatVisible": false,
+      "controls": {
+        "boat-console": {
+          "visible": false,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "right": 0,
+          "bottom": 0
+        },
+        "beach-cast": {
+          "visible": false,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "right": 0,
+          "bottom": 0
+        },
+        "beach-reel": {
+          "visible": false,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "right": 0,
+          "bottom": 0
+        },
+        "shore-drag-control": {
+          "visible": false,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "right": 0,
+          "bottom": 0
+        },
+        "beach-twitch": {
+          "visible": false
+        }
+      },
+      "frameMeanMs": 2.3333333333333335,
+      "frameMaxMs": 3,
+      "tideCalls": [],
+      "viewport": "phone",
+      "condition": "arrival"
+    },
+    {
+      "scene": "half-moon-bay",
+      "phase": "waiting",
+      "sharedWorld": {
+        "version": 1,
+        "date": "2026-09-30",
+        "timeSeconds": 43203.089,
+        "instantMs": 1790794803089,
+        "environmentSeconds": 1790794803.089,
+        "clock": "12:00",
+        "sceneId": "half-moon-bay"
+      },
+      "sea": {
+        "waveHeightM": 2.1634691705155884,
+        "wavePeriodS": 11.72982974579851,
+        "waveDirectionDeg": 18.151356559433736,
+        "month": 9,
+        "source": "NDBC 46012 Half Moon Bay (offshore), Pillar Point sheltering applied",
+        "climate": true,
+        "environmentSeconds": 1790794803.089
+      },
+      "elapsed": 3.089330617238362,
+      "player": {
+        "x": 2440,
+        "y": 522.4445851571821,
+        "facing": -1,
+        "walking": false
+      },
+      "crowdCount": 0,
+      "regularMode": null,
+      "visitor": null,
+      "rig": "carolina_rig",
+      "cast": {
+        "origin": {
+          "x": 2438.360975609756,
+          "y": 517.0735038605984
+        },
+        "target": {
+          "x": 2438.8955308215604,
+          "y": 410.87315135273815
+        },
+        "distance": 33.171492734067876,
+        "paidLength": 33.070270853615646
+      },
+      "lineDistance": 33.188030572012735,
+      "fish": null,
+      "fishMotion": null,
+      "camera": {
+        "x": 2462.078213999094,
+        "y": 464.1588682549601,
+        "scale": 1.2123529411764706,
+        "width": 360,
+        "height": 779
+      },
+      "cameraCSSScale": 1.3133823529411763,
+      "points": {
+        "angler": {
+          "x": 165.75,
+          "y": 488.63157894736844,
+          "clientX": 165.75,
+          "clientY": 488.63157894736844,
+          "visible": true
+        },
+        "rod": {
+          "x": 140.83333333333334,
+          "y": 411.7073170731707,
+          "clientX": 140.83333333333334,
+          "clientY": 411.7073170731707,
+          "visible": true
+        },
+        "waterEntry": {
+          "x": 164.66666666666666,
+          "y": 352.1181001283697,
+          "clientX": 164.66666666666666,
+          "clientY": 352.1181001283697,
+          "visible": true
+        }
+      },
+      "safeBoundsCSS": {
+        "left": 30.333333333333332,
+        "right": 301.6723933649289,
+        "top": 131.98825039494469,
+        "bottom": 692.9302922590838
+      },
+      "fishVisible": false,
+      "floatVisible": false,
+      "controls": {
+        "boat-console": {
+          "visible": true,
+          "x": 10,
+          "y": 706,
+          "width": 370,
+          "height": 130,
+          "right": 380,
+          "bottom": 836
+        },
+        "beach-cast": {
+          "visible": false,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "right": 0,
+          "bottom": 0
+        },
+        "beach-reel": {
+          "visible": true,
+          "x": 145.765625,
+          "y": 779.5,
+          "width": 226.234375,
+          "height": 48,
+          "right": 372,
+          "bottom": 827.5
+        },
+        "shore-drag-control": {
+          "visible": true,
+          "x": 18,
+          "y": 779,
+          "width": 119.765625,
+          "height": 49,
+          "right": 137.765625,
+          "bottom": 828
+        },
+        "beach-twitch": {
+          "visible": false
+        }
+      },
+      "frameMeanMs": 1.7833333313465118,
+      "frameMaxMs": 2.200000047683716,
+      "tideCalls": [],
+      "viewport": "phone",
+      "condition": "cast"
+    },
+    {
+      "scene": "half-moon-bay",
+      "phase": "fighting",
+      "sharedWorld": {
+        "version": 1,
+        "date": "2026-09-30",
+        "timeSeconds": 43205.181,
+        "instantMs": 1790794805181,
+        "environmentSeconds": 1790794805.181,
+        "clock": "12:00",
+        "sceneId": "half-moon-bay"
+      },
+      "sea": {
+        "waveHeightM": 2.1634691705155884,
+        "wavePeriodS": 11.72982974579851,
+        "waveDirectionDeg": 18.151356559433736,
+        "month": 9,
+        "source": "NDBC 46012 Half Moon Bay (offshore), Pillar Point sheltering applied",
+        "climate": true,
+        "environmentSeconds": 1790794805.181
+      },
+      "elapsed": 5.181739036889983,
+      "player": {
+        "x": 2440,
+        "y": 522.4445851571821,
+        "facing": -1,
+        "walking": false
+      },
+      "crowdCount": 0,
+      "regularMode": null,
+      "visitor": null,
+      "rig": "carolina_rig",
+      "cast": {
+        "origin": {
+          "x": 2438.360975609756,
+          "y": 517.0735038605984
+        },
+        "target": {
+          "x": 2438.985111512447,
+          "y": 475.8333843936675
+        },
+        "distance": 12.866846865152244,
+        "paidLength": 12.885942460263669
+      },
+      "lineDistance": 9.222705913249285,
+      "fish": {
+        "id": "jacksmelt",
+        "speciesId": "jacksmelt",
+        "color": "#b5cfce",
+        "catchId": 1,
+        "weightKg": 0.23,
+        "kg": 0.23,
+        "length": 33,
+        "lengthType": "total",
+        "caughtDate": "2026-09-30",
+        "value": 7,
+        "strength": 0.3,
+        "stamina": 0.9192919839404348,
+        "run": 1.0400905506785671,
+        "name": "加州似银汉鱼",
+        "commonName": "Jacksmelt",
+        "nameEn": "Jacksmelt",
+        "latin": "Atherinopsis californiensis",
+        "runOffset": 3.4655246194335456
+      },
+      "fishMotion": {
+        "speciesId": "jacksmelt",
+        "seed": 53952299,
+        "variation": 0.2945970355067402,
+        "elapsed": 3.0250000000000092,
+        "depth": 0.027574025205569338,
+        "airHeight": 0,
+        "jumpActive": false,
+        "jumpVelocity": 0,
+        "jumpCooldown": 0.6623075491282893,
+        "jumpCount": 0,
+        "splash": 0,
+        "run": 1.0400905506785671,
+        "headShake": 0.5255426781147349,
+        "lateral": -0.27249222805012074,
+        "lateralVelocity": -1.0451725002795225,
+        "diveVelocity": 0.008113544829367943,
+        "energy": 0.9192919839404348,
+        "phase": "run",
+        "pull": 0.34722622347973425,
+        "verticalPickup": 0,
+        "surfaceStartleUsed": false,
+        "surfaceBurstSeconds": 0
+      },
+      "camera": {
+        "x": 2457.550332829182,
+        "y": 493.94458515718213,
+        "scale": 1.5251327674663233,
+        "width": 360,
+        "height": 779
+      },
+      "cameraCSSScale": 1.6522271647551834,
+      "points": {
+        "angler": {
+          "x": 165.75,
+          "y": 459.37869062901154,
+          "clientX": 165.75,
+          "clientY": 459.37869062901154,
+          "visible": true
+        },
+        "rod": {
+          "x": 143,
+          "y": 368.3697047496791,
+          "clientX": 143,
+          "clientY": 368.3697047496791,
+          "visible": true
+        },
+        "waterEntry": {
+          "x": 162.5,
+          "y": 403.0397946084724,
+          "clientX": 162.5,
+          "clientY": 403.0397946084724,
+          "visible": true
+        },
+        "fish": {
+          "x": 162.5,
+          "y": 401.9563543003851,
+          "clientX": 162.5,
+          "clientY": 401.9563543003851,
+          "visible": true
+        }
+      },
+      "safeBoundsCSS": {
+        "left": 30.333333333333332,
+        "right": 301.6723933649289,
+        "top": 131.98825039494469,
+        "bottom": 692.9302922590838
+      },
+      "fishVisible": true,
+      "floatVisible": false,
+      "controls": {
+        "boat-console": {
+          "visible": true,
+          "x": 10,
+          "y": 706,
+          "width": 370,
+          "height": 130,
+          "right": 380,
+          "bottom": 836
+        },
+        "beach-cast": {
+          "visible": false,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "right": 0,
+          "bottom": 0
+        },
+        "beach-reel": {
+          "visible": true,
+          "x": 145.765625,
+          "y": 779.5,
+          "width": 226.234375,
+          "height": 48,
+          "right": 372,
+          "bottom": 827.5
+        },
+        "shore-drag-control": {
+          "visible": true,
+          "x": 18,
+          "y": 779,
+          "width": 119.765625,
+          "height": 49,
+          "right": 137.765625,
+          "bottom": 828
+        },
+        "beach-twitch": {
+          "visible": false
+        }
+      },
+      "frameMeanMs": 1.133333335320155,
+      "frameMaxMs": 1.600000023841858,
+      "tideCalls": [],
+      "viewport": "phone",
+      "condition": "fight"
+    },
+    {
+      "scene": "half-moon-bay",
+      "phase": "walk",
+      "sharedWorld": {
+        "version": 1,
+        "date": "2026-09-30",
+        "timeSeconds": 43200,
+        "instantMs": 1790794800000,
+        "environmentSeconds": 1790794800,
+        "clock": "12:00",
+        "sceneId": "half-moon-bay"
+      },
+      "sea": {
+        "waveHeightM": 2.1634691705155884,
+        "wavePeriodS": 11.72982974579851,
+        "waveDirectionDeg": 18.151356559433736,
+        "month": 9,
+        "source": "NDBC 46012 Half Moon Bay (offshore), Pillar Point sheltering applied",
+        "climate": true,
+        "environmentSeconds": 1790794800
+      },
+      "elapsed": 0,
+      "player": {
+        "x": 1100,
+        "y": 865,
+        "facing": -1,
+        "walking": false
+      },
+      "crowdCount": 0,
+      "regularMode": null,
+      "visitor": null,
+      "rig": "carolina_rig",
+      "cast": null,
+      "lineDistance": 0,
+      "fish": null,
+      "fishMotion": null,
+      "camera": {
+        "x": 1100,
+        "y": 735,
+        "scale": 0.6532058823529412,
+        "width": 950,
+        "height": 594
+      },
+      "cameraCSSScale": 0.9901226006191951,
+      "points": {
+        "angler": {
+          "x": 720,
+          "y": 612.1212121212121,
+          "clientX": 720,
+          "clientY": 612.1212121212121,
+          "visible": true
+        }
+      },
+      "safeBoundsCSS": {
+        "left": 42.4421052631579,
+        "right": 1397.5578947368422,
+        "top": 165.25136842105266,
+        "bottom": 802.1557894736843
+      },
+      "fishVisible": false,
+      "floatVisible": false,
+      "controls": {
+        "boat-console": {
+          "visible": false,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "right": 0,
+          "bottom": 0
+        },
+        "beach-cast": {
+          "visible": false,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "right": 0,
+          "bottom": 0
+        },
+        "beach-reel": {
+          "visible": false,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "right": 0,
+          "bottom": 0
+        },
+        "shore-drag-control": {
+          "visible": false,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "right": 0,
+          "bottom": 0
+        },
+        "beach-twitch": {
+          "visible": false
+        }
+      },
+      "frameMeanMs": 5.916666656732559,
+      "frameMaxMs": 6.600000023841858,
+      "tideCalls": [],
+      "viewport": "desktop",
+      "condition": "arrival"
+    },
+    {
+      "scene": "half-moon-bay",
+      "phase": "waiting",
+      "sharedWorld": {
+        "version": 1,
+        "date": "2026-09-30",
+        "timeSeconds": 43203.089,
+        "instantMs": 1790794803089,
+        "environmentSeconds": 1790794803.089,
+        "clock": "12:00",
+        "sceneId": "half-moon-bay"
+      },
+      "sea": {
+        "waveHeightM": 2.1634691705155884,
+        "wavePeriodS": 11.72982974579851,
+        "waveDirectionDeg": 18.151356559433736,
+        "month": 9,
+        "source": "NDBC 46012 Half Moon Bay (offshore), Pillar Point sheltering applied",
+        "climate": true,
+        "environmentSeconds": 1790794803.089
+      },
+      "elapsed": 3.089330617238362,
+      "player": {
+        "x": 2440,
+        "y": 522.4445851571821,
+        "facing": -1,
+        "walking": false
+      },
+      "crowdCount": 0,
+      "regularMode": null,
+      "visitor": null,
+      "rig": "carolina_rig",
+      "cast": {
+        "origin": {
+          "x": 2438.360975609756,
+          "y": 517.0735038605984
+        },
+        "target": {
+          "x": 2438.8955308215604,
+          "y": 410.87315135273815
+        },
+        "distance": 33.171492734067876,
+        "paidLength": 33.070270853615646
+      },
+      "lineDistance": 33.188030572012735,
+      "fish": null,
+      "fishMotion": null,
+      "camera": {
+        "x": 2440,
+        "y": 464.1588682549601,
+        "scale": 2.30145,
+        "width": 950,
+        "height": 594
+      },
+      "cameraCSSScale": 3.488513684210526,
+      "points": {
+        "angler": {
+          "x": 720,
+          "y": 657.5757575757576,
+          "clientX": 720,
+          "clientY": 657.5757575757576,
+          "visible": true
+        },
+        "rod": {
+          "x": 651.7894736842105,
+          "y": 451.5151515151515,
+          "clientX": 651.7894736842105,
+          "clientY": 451.5151515151515,
+          "visible": true
+        },
+        "waterEntry": {
+          "x": 715.4526315789474,
+          "y": 293.93939393939394,
+          "clientX": 715.4526315789474,
+          "clientY": 293.93939393939394,
+          "visible": true
+        }
+      },
+      "safeBoundsCSS": {
+        "left": 42.4421052631579,
+        "right": 1397.5578947368422,
+        "top": 165.25136842105266,
+        "bottom": 744.1313684210527
+      },
+      "fishVisible": false,
+      "floatVisible": false,
+      "controls": {
+        "boat-console": {
+          "visible": true,
+          "x": 515,
+          "y": 762,
+          "width": 410,
+          "height": 130,
+          "right": 925,
+          "bottom": 892
+        },
+        "beach-cast": {
+          "visible": false,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "right": 0,
+          "bottom": 0
+        },
+        "beach-reel": {
+          "visible": true,
+          "x": 664.609375,
+          "y": 835.5,
+          "width": 252.390625,
+          "height": 48,
+          "right": 917,
+          "bottom": 883.5
+        },
+        "shore-drag-control": {
+          "visible": true,
+          "x": 523,
+          "y": 835,
+          "width": 133.609375,
+          "height": 49,
+          "right": 656.609375,
+          "bottom": 884
+        },
+        "beach-twitch": {
+          "visible": false
+        }
+      },
+      "frameMeanMs": 1.741666664679845,
+      "frameMaxMs": 3.4000000953674316,
+      "tideCalls": [],
+      "viewport": "desktop",
+      "condition": "cast"
+    },
+    {
+      "scene": "half-moon-bay",
+      "phase": "fighting",
+      "sharedWorld": {
+        "version": 1,
+        "date": "2026-09-30",
+        "timeSeconds": 43205.181,
+        "instantMs": 1790794805181,
+        "environmentSeconds": 1790794805.181,
+        "clock": "12:00",
+        "sceneId": "half-moon-bay"
+      },
+      "sea": {
+        "waveHeightM": 2.1634691705155884,
+        "wavePeriodS": 11.72982974579851,
+        "waveDirectionDeg": 18.151356559433736,
+        "month": 9,
+        "source": "NDBC 46012 Half Moon Bay (offshore), Pillar Point sheltering applied",
+        "climate": true,
+        "environmentSeconds": 1790794805.181
+      },
+      "elapsed": 5.181739036889983,
+      "player": {
+        "x": 2440,
+        "y": 522.4445851571821,
+        "facing": -1,
+        "walking": false
+      },
+      "crowdCount": 0,
+      "regularMode": null,
+      "visitor": null,
+      "rig": "carolina_rig",
+      "cast": {
+        "origin": {
+          "x": 2438.360975609756,
+          "y": 517.0735038605984
+        },
+        "target": {
+          "x": 2438.985111512447,
+          "y": 475.8333843936675
+        },
+        "distance": 12.866846865152244,
+        "paidLength": 12.885942460263669
+      },
+      "lineDistance": 9.222705913249285,
+      "fish": {
+        "id": "jacksmelt",
+        "speciesId": "jacksmelt",
+        "color": "#b5cfce",
+        "catchId": 1,
+        "weightKg": 0.23,
+        "kg": 0.23,
+        "length": 33,
+        "lengthType": "total",
+        "caughtDate": "2026-09-30",
+        "value": 7,
+        "strength": 0.3,
+        "stamina": 0.9192919839404348,
+        "run": 1.0400905506785671,
+        "name": "加州似银汉鱼",
+        "commonName": "Jacksmelt",
+        "nameEn": "Jacksmelt",
+        "latin": "Atherinopsis californiensis",
+        "runOffset": 3.4655246194335456
+      },
+      "fishMotion": {
+        "speciesId": "jacksmelt",
+        "seed": 53952299,
+        "variation": 0.2945970355067402,
+        "elapsed": 3.0250000000000092,
+        "depth": 0.027574025205569338,
+        "airHeight": 0,
+        "jumpActive": false,
+        "jumpVelocity": 0,
+        "jumpCooldown": 0.6623075491282893,
+        "jumpCount": 0,
+        "splash": 0,
+        "run": 1.0400905506785671,
+        "headShake": 0.5255426781147349,
+        "lateral": -0.27249222805012074,
+        "lateralVelocity": -1.0451725002795225,
+        "diveVelocity": 0.008113544829367943,
+        "energy": 0.9192919839404348,
+        "phase": "run",
+        "pull": 0.34722622347973425,
+        "verticalPickup": 0,
+        "surfaceStartleUsed": false,
+        "surfaceBurstSeconds": 0
+      },
+      "camera": {
+        "x": 2440,
+        "y": 493.94458515718213,
+        "scale": 2.9002138759861356,
+        "width": 950,
+        "height": 594
+      },
+      "cameraCSSScale": 4.396113664652669,
+      "points": {
+        "angler": {
+          "x": 720,
+          "y": 578.7878787878788,
+          "clientX": 720,
+          "clientY": 578.7878787878788,
+          "visible": true
+        },
+        "rod": {
+          "x": 659.3684210526316,
+          "y": 337.8787878787879,
+          "clientX": 659.3684210526316,
+          "clientY": 337.8787878787879,
+          "visible": true
+        },
+        "waterEntry": {
+          "x": 710.9052631578948,
+          "y": 427.27272727272725,
+          "clientX": 710.9052631578948,
+          "clientY": 427.27272727272725,
+          "visible": true
+        },
+        "fish": {
+          "x": 710.9052631578948,
+          "y": 425.75757575757575,
+          "clientX": 710.9052631578948,
+          "clientY": 425.75757575757575,
+          "visible": true
+        }
+      },
+      "safeBoundsCSS": {
+        "left": 42.4421052631579,
+        "right": 1397.5578947368422,
+        "top": 164.25094736842107,
+        "bottom": 744.1313684210527
+      },
+      "fishVisible": true,
+      "floatVisible": false,
+      "controls": {
+        "boat-console": {
+          "visible": true,
+          "x": 515,
+          "y": 762,
+          "width": 410,
+          "height": 130,
+          "right": 925,
+          "bottom": 892
+        },
+        "beach-cast": {
+          "visible": false,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "right": 0,
+          "bottom": 0
+        },
+        "beach-reel": {
+          "visible": true,
+          "x": 664.609375,
+          "y": 835.5,
+          "width": 252.390625,
+          "height": 48,
+          "right": 917,
+          "bottom": 883.5
+        },
+        "shore-drag-control": {
+          "visible": true,
+          "x": 523,
+          "y": 835,
+          "width": 133.609375,
+          "height": 49,
+          "right": 656.609375,
+          "bottom": 884
+        },
+        "beach-twitch": {
+          "visible": false
+        }
+      },
+      "frameMeanMs": 1.3916666706403096,
+      "frameMaxMs": 1.8000000715255737,
+      "tideCalls": [],
+      "viewport": "desktop",
+      "condition": "fight"
+    },
+    {
+      "scene": "benicia",
+      "phase": "walk",
+      "sharedWorld": {
+        "version": 1,
+        "date": "2026-09-30",
+        "timeSeconds": 43200,
+        "instantMs": 1790794800000,
+        "environmentSeconds": 1790794800,
+        "clock": "12:00",
+        "sceneId": "benicia"
+      },
+      "sea": {
+        "climate": true,
+        "waveHeightM": 0.16071067811865475,
+        "wavePeriodS": 3.4,
+        "waveDirectionDeg": 65,
+        "environmentSeconds": 1790794800
+      },
+      "elapsed": 0,
+      "player": {
+        "x": 1115,
+        "y": 405,
+        "facing": -1,
+        "walking": false
+      },
+      "crowdCount": 20,
+      "regularMode": null,
+      "visitor": null,
+      "rig": "salmon_spoon",
+      "cast": null,
+      "lineDistance": 0,
+      "fish": null,
+      "fishMotion": null,
+      "camera": {
+        "x": 1152.919332543444,
+        "y": 275,
+        "scale": 0.7058823529411765,
+        "width": 360,
+        "height": 779
+      },
+      "cameraCSSScale": 0.7647058823529411,
+      "points": {
+        "angler": {
+          "x": 166.0028633491311,
+          "y": 523.9215812127161,
+          "clientX": 166.0028633491311,
+          "clientY": 523.9215812127161,
+          "visible": true
+        }
+      },
+      "safeBoundsCSS": {
+        "left": 30.333333333333332,
+        "right": 301.6723933649289,
+        "top": 131.98825039494469,
+        "bottom": 716.9279225908373
+      },
+      "fishVisible": false,
+      "floatVisible": false,
+      "controls": {
+        "boat-console": {
+          "visible": true,
+          "x": 10,
+          "y": 730,
+          "width": 370,
+          "height": 106,
+          "right": 380,
+          "bottom": 836
+        },
+        "beach-cast": {
+          "visible": true,
+          "x": 18,
+          "y": 780,
+          "width": 354,
+          "height": 48,
+          "right": 372,
+          "bottom": 828
+        },
+        "beach-reel": {
+          "visible": false,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "right": 0,
+          "bottom": 0
+        },
+        "shore-drag-control": {
+          "visible": false,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "right": 0,
+          "bottom": 0
+        },
+        "beach-twitch": {
+          "visible": false
+        }
+      },
+      "frameMeanMs": 0.3583333392937978,
+      "frameMaxMs": 0.6000000238418579,
+      "tideCalls": [
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        }
+      ],
+      "viewport": "phone",
+      "condition": "arrival"
+    },
+    {
+      "scene": "benicia",
+      "phase": "waiting",
+      "sharedWorld": {
+        "version": 1,
+        "date": "2026-09-30",
+        "timeSeconds": 43203.013,
+        "instantMs": 1790794803013,
+        "environmentSeconds": 1790794803.013,
+        "clock": "12:00",
+        "sceneId": "benicia"
+      },
+      "sea": {
+        "climate": true,
+        "waveHeightM": 0.1607261699469273,
+        "wavePeriodS": 3.4,
+        "waveDirectionDeg": 65,
+        "environmentSeconds": 1790794803.013
+      },
+      "elapsed": 3.013101494313768,
+      "player": {
+        "x": 1888,
+        "y": 576.6546257034375,
+        "facing": -1,
+        "walking": false
+      },
+      "crowdCount": 20,
+      "regularMode": null,
+      "visitor": null,
+      "rig": "carolina_rig",
+      "cast": {
+        "origin": {
+          "x": 1886.360975609756,
+          "y": 571.2835444068538
+        },
+        "target": {
+          "x": 1886.3421115914755,
+          "y": 473.3297345890828
+        },
+        "distance": 30.61030976470036,
+        "paidLength": 30.515467333431385
+      },
+      "lineDistance": 30.610566135685744,
+      "fish": null,
+      "fishMotion": null,
+      "camera": {
+        "x": 1910.078213999094,
+        "y": 522.4921801462601,
+        "scale": 1.2123529411764706,
+        "width": 360,
+        "height": 779
+      },
+      "cameraCSSScale": 1.3133823529411763,
+      "points": {
+        "angler": {
+          "x": 166.00286334913108,
+          "y": 483.6430245771964,
+          "clientX": 166.00286334913108,
+          "clientY": 483.6430245771964,
+          "visible": true
+        },
+        "rod": {
+          "x": 139.53426393419477,
+          "y": 405.6110798226019,
+          "clientX": 139.53426393419477,
+          "clientY": 405.6110798226019,
+          "visible": true
+        },
+        "waterEntry": {
+          "x": 163.8274124326138,
+          "y": 358.3029999826688,
+          "clientX": 163.8274124326138,
+          "clientY": 358.3029999826688,
+          "visible": true
+        }
+      },
+      "safeBoundsCSS": {
+        "left": 30.333333333333332,
+        "right": 301.6723933649289,
+        "top": 131.98825039494469,
+        "bottom": 692.9302922590838
+      },
+      "fishVisible": false,
+      "floatVisible": false,
+      "controls": {
+        "boat-console": {
+          "visible": true,
+          "x": 10,
+          "y": 706,
+          "width": 370,
+          "height": 130,
+          "right": 380,
+          "bottom": 836
+        },
+        "beach-cast": {
+          "visible": false,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "right": 0,
+          "bottom": 0
+        },
+        "beach-reel": {
+          "visible": true,
+          "x": 145.765625,
+          "y": 779.5,
+          "width": 226.234375,
+          "height": 48,
+          "right": 372,
+          "bottom": 827.5
+        },
+        "shore-drag-control": {
+          "visible": true,
+          "x": 18,
+          "y": 779,
+          "width": 119.765625,
+          "height": 49,
+          "right": 137.765625,
+          "bottom": 828
+        },
+        "beach-twitch": {
+          "visible": false
+        }
+      },
+      "frameMeanMs": 0.23333333929379782,
+      "frameMaxMs": 0.5,
+      "tideCalls": [
+        {
+          "elapsed": 3.013101494313768,
+          "environmentSeconds": 1790794803.013
+        },
+        {
+          "elapsed": 3.013101494313768,
+          "environmentSeconds": 1790794803.013
+        },
+        {
+          "elapsed": 3.013101494313768,
+          "environmentSeconds": 1790794803.013
+        },
+        {
+          "elapsed": 3.013101494313768,
+          "environmentSeconds": 1790794803.013
+        },
+        {
+          "elapsed": 3.013101494313768,
+          "environmentSeconds": 1790794803.013
+        },
+        {
+          "elapsed": 3.013101494313768,
+          "environmentSeconds": 1790794803.013
+        },
+        {
+          "elapsed": 3.013101494313768,
+          "environmentSeconds": 1790794803.013
+        },
+        {
+          "elapsed": 3.013101494313768,
+          "environmentSeconds": 1790794803.013
+        },
+        {
+          "elapsed": 3.013101494313768,
+          "environmentSeconds": 1790794803.013
+        },
+        {
+          "elapsed": 3.013101494313768,
+          "environmentSeconds": 1790794803.013
+        },
+        {
+          "elapsed": 3.013101494313768,
+          "environmentSeconds": 1790794803.013
+        },
+        {
+          "elapsed": 3.013101494313768,
+          "environmentSeconds": 1790794803.013
+        },
+        {
+          "elapsed": 3.013101494313768,
+          "environmentSeconds": 1790794803.013
+        },
+        {
+          "elapsed": 3.013101494313768,
+          "environmentSeconds": 1790794803.013
+        },
+        {
+          "elapsed": 3.013101494313768,
+          "environmentSeconds": 1790794803.013
+        },
+        {
+          "elapsed": 3.013101494313768,
+          "environmentSeconds": 1790794803.013
+        },
+        {
+          "elapsed": 3.013101494313768,
+          "environmentSeconds": 1790794803.013
+        },
+        {
+          "elapsed": 3.013101494313768,
+          "environmentSeconds": 1790794803.013
+        },
+        {
+          "elapsed": 3.013101494313768,
+          "environmentSeconds": 1790794803.013
+        },
+        {
+          "elapsed": 3.013101494313768,
+          "environmentSeconds": 1790794803.013
+        },
+        {
+          "elapsed": 3.013101494313768,
+          "environmentSeconds": 1790794803.013
+        },
+        {
+          "elapsed": 3.013101494313768,
+          "environmentSeconds": 1790794803.013
+        },
+        {
+          "elapsed": 3.013101494313768,
+          "environmentSeconds": 1790794803.013
+        },
+        {
+          "elapsed": 3.013101494313768,
+          "environmentSeconds": 1790794803.013
+        },
+        {
+          "elapsed": 3.013101494313768,
+          "environmentSeconds": 1790794803.013
+        },
+        {
+          "elapsed": 3.013101494313768,
+          "environmentSeconds": 1790794803.013
+        },
+        {
+          "elapsed": 3.013101494313768,
+          "environmentSeconds": 1790794803.013
+        },
+        {
+          "elapsed": 3.013101494313768,
+          "environmentSeconds": 1790794803.013
+        },
+        {
+          "elapsed": 3.013101494313768,
+          "environmentSeconds": 1790794803.013
+        },
+        {
+          "elapsed": 3.013101494313768,
+          "environmentSeconds": 1790794803.013
+        },
+        {
+          "elapsed": 3.013101494313768,
+          "environmentSeconds": 1790794803.013
+        },
+        {
+          "elapsed": 3.013101494313768,
+          "environmentSeconds": 1790794803.013
+        },
+        {
+          "elapsed": 3.013101494313768,
+          "environmentSeconds": 1790794803.013
+        },
+        {
+          "elapsed": 3.013101494313768,
+          "environmentSeconds": 1790794803.013
+        },
+        {
+          "elapsed": 3.013101494313768,
+          "environmentSeconds": 1790794803.013
+        },
+        {
+          "elapsed": 3.013101494313768,
+          "environmentSeconds": 1790794803.013
+        }
+      ],
+      "viewport": "phone",
+      "condition": "cast"
+    },
+    {
+      "scene": "benicia",
+      "phase": "fighting",
+      "sharedWorld": {
+        "version": 1,
+        "date": "2026-09-30",
+        "timeSeconds": 43205.157,
+        "instantMs": 1790794805157,
+        "environmentSeconds": 1790794805.157,
+        "clock": "12:00",
+        "sceneId": "benicia"
+      },
+      "sea": {
+        "climate": true,
+        "waveHeightM": 0.16073719160299327,
+        "wavePeriodS": 3.4,
+        "waveDirectionDeg": 65,
+        "environmentSeconds": 1790794805.157
+      },
+      "elapsed": 5.157893916387045,
+      "player": {
+        "x": 1888,
+        "y": 576.6546257034375,
+        "facing": -1,
+        "walking": false
+      },
+      "crowdCount": 20,
+      "regularMode": null,
+      "visitor": null,
+      "rig": "carolina_rig",
+      "cast": {
+        "origin": {
+          "x": 1886.360975609756,
+          "y": 571.2835444068538
+        },
+        "target": {
+          "x": 1886.3516398663164,
+          "y": 531.9272440064342
+        },
+        "distance": 12.298516110200808,
+        "paidLength": 12.326666433365826
+      },
+      "lineDistance": 8.607584589951086,
+      "fish": {
+        "id": "jacksmelt",
+        "speciesId": "jacksmelt",
+        "color": "#b5cfce",
+        "catchId": 1,
+        "weightKg": 0.24,
+        "kg": 0.24,
+        "length": 33,
+        "lengthType": "total",
+        "caughtDate": "2026-09-30",
+        "value": 7,
+        "strength": 0.3,
+        "stamina": 0.9219849101657703,
+        "run": 1.0437858388786188,
+        "name": "加州似银汉鱼",
+        "commonName": "Jacksmelt",
+        "nameEn": "Jacksmelt",
+        "latin": "Atherinopsis californiensis",
+        "runOffset": 1.3488522624594688
+      },
+      "fishMotion": {
+        "speciesId": "jacksmelt",
+        "seed": 1545809085,
+        "variation": 0.3659939512144774,
+        "elapsed": 3.0250000000000092,
+        "depth": 0.027437960313316218,
+        "airHeight": 0,
+        "jumpActive": false,
+        "jumpVelocity": 0,
+        "jumpCooldown": 0.9621745951007803,
+        "jumpCount": 0,
+        "splash": 0,
+        "run": 1.0437858388786188,
+        "headShake": 0.6900104433333865,
+        "lateral": -0.6024487495330862,
+        "lateralVelocity": -0.9342106196053028,
+        "diveVelocity": 0.0062481917087882505,
+        "energy": 0.9219849101657703,
+        "phase": "run",
+        "pull": 0.35882346778356033,
+        "verticalPickup": 0,
+        "surfaceStartleUsed": false,
+        "surfaceBurstSeconds": 0
+      },
+      "camera": {
+        "x": 1905.548757110608,
+        "y": 548.1546257034375,
+        "scale": 1.5252697104996193,
+        "width": 360,
+        "height": 779
+      },
+      "cameraCSSScale": 1.6523755197079208,
+      "points": {
+        "angler": {
+          "x": 166.00286334913105,
+          "y": 459.59735252420774,
+          "clientX": 166.00286334913105,
+          "clientY": 459.59735252420774,
+          "visible": true
+        },
+        "rod": {
+          "x": 143.06858330183425,
+          "y": 368.68176879116965,
+          "clientX": 143.06858330183425,
+          "clientY": 368.68176879116965,
+          "visible": true
+        },
+        "waterEntry": {
+          "x": 160.14118798919085,
+          "y": 405.8220145136845,
+          "clientX": 160.14118798919085,
+          "clientY": 405.8220145136845,
+          "visible": true
+        },
+        "fish": {
+          "x": 160.0983008334188,
+          "y": 405.24024706218296,
+          "clientX": 160.0983008334188,
+          "clientY": 405.24024706218296,
+          "visible": true
+        }
+      },
+      "safeBoundsCSS": {
+        "left": 30.333333333333332,
+        "right": 301.6723933649289,
+        "top": 131.98825039494469,
+        "bottom": 692.9302922590838
+      },
+      "fishVisible": true,
+      "floatVisible": false,
+      "controls": {
+        "boat-console": {
+          "visible": true,
+          "x": 10,
+          "y": 706,
+          "width": 370,
+          "height": 130,
+          "right": 380,
+          "bottom": 836
+        },
+        "beach-cast": {
+          "visible": false,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "right": 0,
+          "bottom": 0
+        },
+        "beach-reel": {
+          "visible": true,
+          "x": 145.765625,
+          "y": 779.5,
+          "width": 226.234375,
+          "height": 48,
+          "right": 372,
+          "bottom": 827.5
+        },
+        "shore-drag-control": {
+          "visible": true,
+          "x": 18,
+          "y": 779,
+          "width": 119.765625,
+          "height": 49,
+          "right": 137.765625,
+          "bottom": 828
+        },
+        "beach-twitch": {
+          "visible": false
+        }
+      },
+      "frameMeanMs": 0.25833332538604736,
+      "frameMaxMs": 0.5999999046325684,
+      "tideCalls": [
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        }
+      ],
+      "viewport": "phone",
+      "condition": "fight"
+    },
+    {
+      "scene": "benicia",
+      "phase": "walk",
+      "sharedWorld": {
+        "version": 1,
+        "date": "2026-09-30",
+        "timeSeconds": 43200,
+        "instantMs": 1790794800000,
+        "environmentSeconds": 1790794800,
+        "clock": "12:00",
+        "sceneId": "benicia"
+      },
+      "sea": {
+        "climate": true,
+        "waveHeightM": 0.16071067811865475,
+        "wavePeriodS": 3.4,
+        "waveDirectionDeg": 65,
+        "environmentSeconds": 1790794800
+      },
+      "elapsed": 0,
+      "player": {
+        "x": 1115,
+        "y": 405,
+        "facing": -1,
+        "walking": false
+      },
+      "crowdCount": 20,
+      "regularMode": null,
+      "visitor": null,
+      "rig": "salmon_spoon",
+      "cast": null,
+      "lineDistance": 0,
+      "fish": null,
+      "fishMotion": null,
+      "camera": {
+        "x": 1115,
+        "y": 275,
+        "scale": 0.6202058823529412,
+        "width": 950,
+        "height": 594
+      },
+      "cameraCSSScale": 0.9401015479876161,
+      "points": {
+        "angler": {
+          "x": 720,
+          "y": 588.6617647058823,
+          "clientX": 720,
+          "clientY": 588.6617647058823,
+          "visible": true
+        }
+      },
+      "safeBoundsCSS": {
+        "left": 42.4421052631579,
+        "right": 1397.5578947368422,
+        "top": 165.25136842105266,
+        "bottom": 768.1414736842105
+      },
+      "fishVisible": false,
+      "floatVisible": false,
+      "controls": {
+        "boat-console": {
+          "visible": true,
+          "x": 515,
+          "y": 786,
+          "width": 410,
+          "height": 106,
+          "right": 925,
+          "bottom": 892
+        },
+        "beach-cast": {
+          "visible": true,
+          "x": 523,
+          "y": 836,
+          "width": 394,
+          "height": 48,
+          "right": 917,
+          "bottom": 884
+        },
+        "beach-reel": {
+          "visible": false,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "right": 0,
+          "bottom": 0
+        },
+        "shore-drag-control": {
+          "visible": false,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "right": 0,
+          "bottom": 0
+        },
+        "beach-twitch": {
+          "visible": false
+        }
+      },
+      "frameMeanMs": 1.0666666726271312,
+      "frameMaxMs": 3.399999976158142,
+      "tideCalls": [
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        },
+        {
+          "elapsed": 0,
+          "environmentSeconds": 1790794800
+        }
+      ],
+      "viewport": "desktop",
+      "condition": "arrival"
+    },
+    {
+      "scene": "benicia",
+      "phase": "waiting",
+      "sharedWorld": {
+        "version": 1,
+        "date": "2026-09-30",
+        "timeSeconds": 43203.013,
+        "instantMs": 1790794803013,
+        "environmentSeconds": 1790794803.013,
+        "clock": "12:00",
+        "sceneId": "benicia"
+      },
+      "sea": {
+        "climate": true,
+        "waveHeightM": 0.1607261699469273,
+        "wavePeriodS": 3.4,
+        "waveDirectionDeg": 65,
+        "environmentSeconds": 1790794803.013
+      },
+      "elapsed": 3.013101494313768,
+      "player": {
+        "x": 1888,
+        "y": 576.6546257034375,
+        "facing": -1,
+        "walking": false
+      },
+      "crowdCount": 20,
+      "regularMode": null,
+      "visitor": null,
+      "rig": "carolina_rig",
+      "cast": {
+        "origin": {
+          "x": 1886.360975609756,
+          "y": 571.2835444068538
+        },
+        "target": {
+          "x": 1886.3421115914755,
+          "y": 473.3297345890828
+        },
+        "distance": 30.61030976470036,
+        "paidLength": 30.515467333431385
+      },
+      "lineDistance": 30.610566135685744,
+      "fish": null,
+      "fishMotion": null,
+      "camera": {
+        "x": 1888,
+        "y": 522.4921801462601,
+        "scale": 2.30145,
+        "width": 950,
+        "height": 594
+      },
+      "cameraCSSScale": 3.488513684210526,
+      "points": {
+        "angler": {
+          "x": 720,
+          "y": 643.3669095872212,
+          "clientX": 720,
+          "clientY": 643.3669095872212,
+          "visible": true
+        },
+        "rod": {
+          "x": 649.6959708236407,
+          "y": 436.2116425393688,
+          "clientX": 649.6959708236407,
+          "clientY": 436.2116425393688,
+          "visible": true
+        },
+        "waterEntry": {
+          "x": 714.2217205259353,
+          "y": 310.6205407978551,
+          "clientX": 714.2217205259353,
+          "clientY": 310.6205407978551,
+          "visible": true
+        }
+      },
+      "safeBoundsCSS": {
+        "left": 42.4421052631579,
+        "right": 1397.5578947368422,
+        "top": 165.25136842105266,
+        "bottom": 744.1313684210527
+      },
+      "fishVisible": false,
+      "floatVisible": false,
+      "controls": {
+        "boat-console": {
+          "visible": true,
+          "x": 515,
+          "y": 762,
+          "width": 410,
+          "height": 130,
+          "right": 925,
+          "bottom": 892
+        },
+        "beach-cast": {
+          "visible": false,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "right": 0,
+          "bottom": 0
+        },
+        "beach-reel": {
+          "visible": true,
+          "x": 664.609375,
+          "y": 835.5,
+          "width": 252.390625,
+          "height": 48,
+          "right": 917,
+          "bottom": 883.5
+        },
+        "shore-drag-control": {
+          "visible": true,
+          "x": 523,
+          "y": 835,
+          "width": 133.609375,
+          "height": 49,
+          "right": 656.609375,
+          "bottom": 884
+        },
+        "beach-twitch": {
+          "visible": false
+        }
+      },
+      "frameMeanMs": 0.24166666467984518,
+      "frameMaxMs": 0.5,
+      "tideCalls": [
+        {
+          "elapsed": 3.013101494313768,
+          "environmentSeconds": 1790794803.013
+        },
+        {
+          "elapsed": 3.013101494313768,
+          "environmentSeconds": 1790794803.013
+        },
+        {
+          "elapsed": 3.013101494313768,
+          "environmentSeconds": 1790794803.013
+        },
+        {
+          "elapsed": 3.013101494313768,
+          "environmentSeconds": 1790794803.013
+        },
+        {
+          "elapsed": 3.013101494313768,
+          "environmentSeconds": 1790794803.013
+        },
+        {
+          "elapsed": 3.013101494313768,
+          "environmentSeconds": 1790794803.013
+        },
+        {
+          "elapsed": 3.013101494313768,
+          "environmentSeconds": 1790794803.013
+        },
+        {
+          "elapsed": 3.013101494313768,
+          "environmentSeconds": 1790794803.013
+        },
+        {
+          "elapsed": 3.013101494313768,
+          "environmentSeconds": 1790794803.013
+        },
+        {
+          "elapsed": 3.013101494313768,
+          "environmentSeconds": 1790794803.013
+        },
+        {
+          "elapsed": 3.013101494313768,
+          "environmentSeconds": 1790794803.013
+        },
+        {
+          "elapsed": 3.013101494313768,
+          "environmentSeconds": 1790794803.013
+        },
+        {
+          "elapsed": 3.013101494313768,
+          "environmentSeconds": 1790794803.013
+        },
+        {
+          "elapsed": 3.013101494313768,
+          "environmentSeconds": 1790794803.013
+        },
+        {
+          "elapsed": 3.013101494313768,
+          "environmentSeconds": 1790794803.013
+        },
+        {
+          "elapsed": 3.013101494313768,
+          "environmentSeconds": 1790794803.013
+        },
+        {
+          "elapsed": 3.013101494313768,
+          "environmentSeconds": 1790794803.013
+        },
+        {
+          "elapsed": 3.013101494313768,
+          "environmentSeconds": 1790794803.013
+        },
+        {
+          "elapsed": 3.013101494313768,
+          "environmentSeconds": 1790794803.013
+        },
+        {
+          "elapsed": 3.013101494313768,
+          "environmentSeconds": 1790794803.013
+        },
+        {
+          "elapsed": 3.013101494313768,
+          "environmentSeconds": 1790794803.013
+        },
+        {
+          "elapsed": 3.013101494313768,
+          "environmentSeconds": 1790794803.013
+        },
+        {
+          "elapsed": 3.013101494313768,
+          "environmentSeconds": 1790794803.013
+        },
+        {
+          "elapsed": 3.013101494313768,
+          "environmentSeconds": 1790794803.013
+        },
+        {
+          "elapsed": 3.013101494313768,
+          "environmentSeconds": 1790794803.013
+        },
+        {
+          "elapsed": 3.013101494313768,
+          "environmentSeconds": 1790794803.013
+        },
+        {
+          "elapsed": 3.013101494313768,
+          "environmentSeconds": 1790794803.013
+        },
+        {
+          "elapsed": 3.013101494313768,
+          "environmentSeconds": 1790794803.013
+        },
+        {
+          "elapsed": 3.013101494313768,
+          "environmentSeconds": 1790794803.013
+        },
+        {
+          "elapsed": 3.013101494313768,
+          "environmentSeconds": 1790794803.013
+        },
+        {
+          "elapsed": 3.013101494313768,
+          "environmentSeconds": 1790794803.013
+        },
+        {
+          "elapsed": 3.013101494313768,
+          "environmentSeconds": 1790794803.013
+        },
+        {
+          "elapsed": 3.013101494313768,
+          "environmentSeconds": 1790794803.013
+        },
+        {
+          "elapsed": 3.013101494313768,
+          "environmentSeconds": 1790794803.013
+        },
+        {
+          "elapsed": 3.013101494313768,
+          "environmentSeconds": 1790794803.013
+        },
+        {
+          "elapsed": 3.013101494313768,
+          "environmentSeconds": 1790794803.013
+        }
+      ],
+      "viewport": "desktop",
+      "condition": "cast"
+    },
+    {
+      "scene": "benicia",
+      "phase": "fighting",
+      "sharedWorld": {
+        "version": 1,
+        "date": "2026-09-30",
+        "timeSeconds": 43205.157,
+        "instantMs": 1790794805157,
+        "environmentSeconds": 1790794805.157,
+        "clock": "12:00",
+        "sceneId": "benicia"
+      },
+      "sea": {
+        "climate": true,
+        "waveHeightM": 0.16073719160299327,
+        "wavePeriodS": 3.4,
+        "waveDirectionDeg": 65,
+        "environmentSeconds": 1790794805.157
+      },
+      "elapsed": 5.157893916387045,
+      "player": {
+        "x": 1888,
+        "y": 576.6546257034375,
+        "facing": -1,
+        "walking": false
+      },
+      "crowdCount": 20,
+      "regularMode": null,
+      "visitor": null,
+      "rig": "carolina_rig",
+      "cast": {
+        "origin": {
+          "x": 1886.360975609756,
+          "y": 571.2835444068538
+        },
+        "target": {
+          "x": 1886.3516398663164,
+          "y": 531.9272440064342
+        },
+        "distance": 12.298516110200808,
+        "paidLength": 12.326666433365826
+      },
+      "lineDistance": 8.607584589951086,
+      "fish": {
+        "id": "jacksmelt",
+        "speciesId": "jacksmelt",
+        "color": "#b5cfce",
+        "catchId": 1,
+        "weightKg": 0.24,
+        "kg": 0.24,
+        "length": 33,
+        "lengthType": "total",
+        "caughtDate": "2026-09-30",
+        "value": 7,
+        "strength": 0.3,
+        "stamina": 0.9219849101657703,
+        "run": 1.0437858388786188,
+        "name": "加州似银汉鱼",
+        "commonName": "Jacksmelt",
+        "nameEn": "Jacksmelt",
+        "latin": "Atherinopsis californiensis",
+        "runOffset": 1.3488522624594688
+      },
+      "fishMotion": {
+        "speciesId": "jacksmelt",
+        "seed": 1545809085,
+        "variation": 0.3659939512144774,
+        "elapsed": 3.0250000000000092,
+        "depth": 0.027437960313316218,
+        "airHeight": 0,
+        "jumpActive": false,
+        "jumpVelocity": 0,
+        "jumpCooldown": 0.9621745951007803,
+        "jumpCount": 0,
+        "splash": 0,
+        "run": 1.0437858388786188,
+        "headShake": 0.6900104433333865,
+        "lateral": -0.6024487495330862,
+        "lateralVelocity": -0.9342106196053028,
+        "diveVelocity": 0.0062481917087882505,
+        "energy": 0.9219849101657703,
+        "phase": "run",
+        "pull": 0.35882346778356033,
+        "verticalPickup": 0,
+        "surfaceStartleUsed": false,
+        "surfaceBurstSeconds": 0
+      },
+      "camera": {
+        "x": 1888,
+        "y": 548.1546257034375,
+        "scale": 2.9004742887802584,
+        "width": 950,
+        "height": 594
+      },
+      "cameraCSSScale": 4.396508395624813,
+      "points": {
+        "angler": {
+          "x": 720,
+          "y": 579.2477533791475,
+          "clientX": 720,
+          "clientY": 579.2477533791475,
+          "visible": true
+        },
+        "rod": {
+          "x": 658.9783051292275,
+          "y": 337.4725367390198,
+          "clientX": 658.9783051292275,
+          "clientY": 337.4725367390198,
+          "visible": true
+        },
+        "waterEntry": {
+          "x": 704.4037238357539,
+          "y": 436.2409831034629,
+          "clientX": 704.4037238357539,
+          "clientY": 436.2409831034629,
+          "visible": true
+        },
+        "fish": {
+          "x": 704.2896131277657,
+          "y": 434.6938671323001,
+          "clientX": 704.2896131277657,
+          "clientY": 434.6938671323001,
+          "visible": true
+        }
+      },
+      "safeBoundsCSS": {
+        "left": 42.4421052631579,
+        "right": 1397.5578947368422,
+        "top": 164.25094736842107,
+        "bottom": 744.1313684210527
+      },
+      "fishVisible": true,
+      "floatVisible": false,
+      "controls": {
+        "boat-console": {
+          "visible": true,
+          "x": 515,
+          "y": 762,
+          "width": 410,
+          "height": 130,
+          "right": 925,
+          "bottom": 892
+        },
+        "beach-cast": {
+          "visible": false,
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "right": 0,
+          "bottom": 0
+        },
+        "beach-reel": {
+          "visible": true,
+          "x": 664.609375,
+          "y": 835.5,
+          "width": 252.390625,
+          "height": 48,
+          "right": 917,
+          "bottom": 883.5
+        },
+        "shore-drag-control": {
+          "visible": true,
+          "x": 523,
+          "y": 835,
+          "width": 133.609375,
+          "height": 49,
+          "right": 656.609375,
+          "bottom": 884
+        },
+        "beach-twitch": {
+          "visible": false
+        }
+      },
+      "frameMeanMs": 0.2666666607062022,
+      "frameMaxMs": 0.5999999046325684,
+      "tideCalls": [
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        },
+        {
+          "elapsed": 5.157893916387045,
+          "environmentSeconds": 1790794805.157
+        }
+      ],
+      "viewport": "desktop",
+      "condition": "fight"
+    }
+  ],
+  "artifacts": [
+    "visual-pacifica-phone-arrival.png",
+    "visual-pacifica-phone-cast.png",
+    "visual-pacifica-phone-fight.png",
+    "visual-pacifica-desktop-arrival.png",
+    "visual-pacifica-desktop-cast.png",
+    "visual-pacifica-desktop-fight.png",
+    "visual-half-moon-bay-phone-arrival.png",
+    "visual-half-moon-bay-phone-cast.png",
+    "visual-half-moon-bay-phone-fight.png",
+    "visual-half-moon-bay-desktop-arrival.png",
+    "visual-half-moon-bay-desktop-cast.png",
+    "visual-half-moon-bay-desktop-fight.png",
+    "visual-benicia-phone-arrival.png",
+    "visual-benicia-phone-cast.png",
+    "visual-benicia-phone-fight.png",
+    "visual-benicia-desktop-arrival.png",
+    "visual-benicia-desktop-cast.png",
+    "visual-benicia-desktop-fight.png"
+  ],
+  "errors": [],
+  "visualReview": {
+    "status": "passed_with_observations",
+    "inspectedArtifacts": [
+      "visual-pacifica-phone-arrival.png",
+      "visual-pacifica-phone-cast.png",
+      "visual-pacifica-phone-fight.png",
+      "visual-pacifica-desktop-arrival.png",
+      "visual-pacifica-desktop-cast.png",
+      "visual-pacifica-desktop-fight.png",
+      "visual-half-moon-bay-phone-arrival.png",
+      "visual-half-moon-bay-phone-cast.png",
+      "visual-half-moon-bay-phone-fight.png",
+      "visual-half-moon-bay-desktop-arrival.png",
+      "visual-half-moon-bay-desktop-cast.png",
+      "visual-half-moon-bay-desktop-fight.png",
+      "visual-benicia-phone-arrival.png",
+      "visual-benicia-phone-cast.png",
+      "visual-benicia-phone-fight.png",
+      "visual-benicia-desktop-arrival.png",
+      "visual-benicia-desktop-cast.png",
+      "visual-benicia-desktop-fight.png"
+    ],
+    "reinspectedAfterSurfFix": [
+      "visual-pacifica-phone-fight.png",
+      "visual-pacifica-desktop-arrival.png",
+      "visual-pacifica-desktop-fight.png",
+      "visual-half-moon-bay-phone-arrival.png",
+      "visual-half-moon-bay-phone-cast.png",
+      "visual-half-moon-bay-phone-fight.png",
+      "visual-half-moon-bay-desktop-arrival.png",
+      "visual-half-moon-bay-desktop-cast.png",
+      "visual-half-moon-bay-desktop-fight.png"
+    ],
+    "identicalToPreviouslyInspectedArtifacts": [
+      "visual-pacifica-phone-arrival.png",
+      "visual-pacifica-phone-cast.png",
+      "visual-pacifica-desktop-cast.png",
+      "visual-benicia-phone-arrival.png",
+      "visual-benicia-phone-cast.png",
+      "visual-benicia-phone-fight.png",
+      "visual-benicia-desktop-arrival.png",
+      "visual-benicia-desktop-cast.png",
+      "visual-benicia-desktop-fight.png"
+    ],
+    "findings": [
+      "Actual fresh arrivals preserve the classic shop/coast and Benicia pier composition.",
+      "All three scenes retain the current one-button fishing action, post-cast drag on the left, and no separate twitch action. Controls remain within the viewport and clear of the angler, rod and line entry.",
+      "Carolina rigs show no bobber. Deep fish remain hidden; the recorded fight frames reach the near-surface visibility threshold through actual simulation.",
+      "Benicia retains 20 public anglers. All observed tide calls during drawing receive the same shared epoch as the sea state.",
+      "No new composition, camera, control or tide-rendering regression observed after the surf cache fix."
+    ],
+    "observations": [
+      {
+        "severity": "nonblocking",
+        "scope": "classic near-fish presentation",
+        "description": "At less than ten metres, a small near-surface fish and the line endpoint can overlap the large authored angler silhouette around the hat. This existing art/physics projection limitation appears in the explicit near-fish fixtures."
+      },
+      {
+        "severity": "nonblocking",
+        "scope": "Half Moon Bay phone cast",
+        "description": "Bright moving foam behind the unbacked location/instruction text can briefly reduce contrast. The backed clock and action controls stay legible."
+      }
+    ],
+    "fixtureDisclosure": "Known jacksmelt bites are injected solely to exercise fight rendering. These screenshots do not support natural bite-frequency or catch-rate claims. Render timings cover 12 repeated world draws per frame and are not whole-game performance benchmarks.",
+    "finalSeedFixRecapture": {
+      "imagesIdenticalToInspectedSet": 18,
+      "changedImages": [],
+      "method": "All eighteen final screenshots matched SHA256 hashes of the personally inspected post-surf-fix set."
+    },
+    "finalCodepointSortRecapture": {
+      "imagesIdenticalToInspectedSet": 18,
+      "changedImages": [],
+      "method": "All eighteen final screenshots matched SHA256 hashes of the personally inspected set after the public fish-field sorting fix."
+    }
+  },
+  "sourceHashGate": {
+    "status": "passed",
+    "sourceCount": 28,
+    "verifiedAt": "2026-09-30T17:56:22.463742+00:00",
+    "checkedDuringCapture": true,
+    "checkedAfterVisualReview": true
+  },
+  "summary": {
+    "scenes": 3,
+    "viewports": 2,
+    "conditionsPerScene": 3,
+    "screenshots": 18,
+    "browserErrors": 0,
+    "tideCallsVerified": 684,
+    "maximumMeanRenderMs": 5.916666656732559,
+    "maximumSingleRenderMs": 6.600000023841858
+  }
+}

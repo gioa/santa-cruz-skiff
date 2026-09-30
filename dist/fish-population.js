@@ -15,6 +15,7 @@
  * All densities, speeds, sensory ranges and bite rates are authored game
  * parameters informed by general fish behaviour, not measured values.
  */
+import {sampleShoreFishField,shoreFieldRandom,shoreFieldKey} from './shore-fish-field.js';
 const TAU=Math.PI*2;
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const finite=(v,f=0)=>Number.isFinite(v)?v:f;
@@ -26,6 +27,15 @@ export function createPopulation(seed=1){
   maintainAt:0,center:null,pendingBite:null,sideBites:{},stimulusId:0,lastStimulus:null};
 }
 function random(pop){let x=pop.rng>>>0;x^=x<<13;x^=x>>>17;x^=x<<5;pop.rng=x>>>0||1;return pop.rng/4294967296;}
+function schoolRandom(pop,world,g,channel,stimulus){
+ if(world.sharedField&&g.fieldId)return shoreFieldRandom(g.fieldId,Math.floor(world.sharedField.timeSeconds/POPULATION_STEP),channel,stimulus?.side?`side:${stimulus.id}`:'player');
+ return random(pop);
+}
+function schoolGaussian(pop,world,g,channel,stimulus){
+ if(!world.sharedField||!g.fieldId)return gaussian(pop);
+ const u=schoolRandom(pop,world,g,channel+':u',stimulus),v=schoolRandom(pop,world,g,channel+':v',stimulus);
+ return Math.sqrt(-2*Math.log(Math.max(1e-9,u)))*Math.cos(TAU*v);
+}
 function gaussian(pop){const u=Math.max(1e-9,random(pop)),v=random(pop);return Math.sqrt(-2*Math.log(u))*Math.cos(TAU*v);}
 function poisson(pop,mean){if(!(mean>0))return 0;if(mean>30)return Math.max(0,Math.round(mean+Math.sqrt(mean)*gaussian(pop)));let k=0,p=1;const l=Math.exp(-mean);do{k++;p*=random(pop);}while(p>l);return k-1;}
 
@@ -38,16 +48,20 @@ export function restorePopulation(saved,seed=1,speciesIds=null){
  pop.center=saved.center&&Number.isFinite(saved.center.x)&&Number.isFinite(saved.center.y)?{x:saved.center.x,y:saved.center.y}:null;
  const valid=g=>g&&typeof g==='object'&&(!speciesIds||speciesIds.includes(g.species))&&['x','y','depth','heading','count','lengthCm','hunger'].every(k=>Number.isFinite(g[k]))&&g.count>=1;
  pop.groups=(Array.isArray(saved.groups)?saved.groups:[]).filter(valid).slice(0,400).map(g=>({
-  id:Math.floor(finite(g.id,pop.nextId++)),species:g.species,x:g.x,y:g.y,depth:Math.max(0,g.depth),heading:g.heading,
+  id:typeof g.fieldId==='string'?g.fieldId:Math.floor(finite(g.id,pop.nextId++)),...(typeof g.fieldId==='string'?{fieldId:g.fieldId}:{}),species:g.species,x:g.x,y:g.y,depth:Math.max(0,g.depth),heading:g.heading,
   count:Math.min(500,Math.floor(g.count)),lengthCm:Math.max(1,g.lengthCm),hunger:clamp(g.hunger,0,1),alarm:clamp(finite(g.alarm),0,1),
   // Interrupted approaches resume as ordinary roaming; the bait was retrieved on load.
   mode:'roam',speed:0,steerAt:0,fleeUntil:0,ignoreUntil:clamp(finite(g.ignoreUntil),0,pop.clock+600),interest:0,fleeX:0,fleeY:0}));
- for(const g of pop.groups)pop.nextId=Math.max(pop.nextId,g.id+1);
+ for(const g of pop.groups)if(Number.isFinite(g.id))pop.nextId=Math.max(pop.nextId,g.id+1);
+ if(saved.sharedDepleted&&typeof saved.sharedDepleted==='object')pop.sharedDepleted=Object.fromEntries(Object.entries(saved.sharedDepleted).filter(([id,n])=>id.startsWith('shore-field-')&&Number.isFinite(n)&&n>0).map(([id,n])=>[id,Math.floor(n)]));
+ if(saved.sharedStep&&typeof saved.sharedStep.key==='string'&&Number.isFinite(saved.sharedStep.index)){pop.sharedStep={key:saved.sharedStep.key,index:Math.floor(saved.sharedStep.index)};pop._sharedNeedsSync=true;}
  return pop;
 }
 export function serializePopulation(pop){
  return{version:1,rng:pop.rng,nextId:pop.nextId,clock:Math.round(pop.clock*100)/100,center:pop.center,
-  groups:pop.groups.map(g=>({id:g.id,species:g.species,x:+g.x.toFixed(2),y:+g.y.toFixed(2),depth:+g.depth.toFixed(2),heading:+g.heading.toFixed(3),
+  ...(pop.sharedDepleted?{sharedDepleted:{...pop.sharedDepleted}}:{}),
+  ...(pop.sharedStep?{sharedStep:{...pop.sharedStep}}:{}),
+  groups:pop.groups.map(g=>({id:g.id,...(g.fieldId?{fieldId:g.fieldId}:{}),species:g.species,x:+g.x.toFixed(2),y:+g.y.toFixed(2),depth:+g.depth.toFixed(2),heading:+g.heading.toFixed(3),
    count:g.count,lengthCm:+g.lengthCm.toFixed(1),hunger:+g.hunger.toFixed(3),alarm:+g.alarm.toFixed(3),ignoreUntil:+g.ignoreUntil.toFixed(1)}))};
 }
 
@@ -61,6 +75,29 @@ function suitability(pop,world,def,x,y){
  return value;
 }
 const schoolMean=def=>(def.school[0]+def.school[1])/2;
+const backgroundGroup=(pop,g)=>g.mode==='roam'&&g.alarm<=1e-8&&g.ignoreUntil<=pop.clock&&pop.pendingBite?.group!==g.id&&!Object.values(pop.sideBites||{}).some(b=>b.group===g.id);
+function syncSharedField(pop,world){
+ pop.sharedDepleted??={};
+ const fieldKey=shoreFieldKey(world.sharedField);
+ const old=new Map(pop.groups.filter(g=>g.fieldId).map(g=>[g.fieldId,g])),groups=[];
+ for(const base of sampleShoreFishField(world)){
+  const previous=old.get(base.fieldId);old.delete(base.fieldId);
+  const count=Math.max(0,base.count-finite(pop.sharedDepleted[base.fieldId]));
+  if(!count)continue;
+  if(previous&&!backgroundGroup(pop,previous)){previous.count=count;previous._fieldBase=false;groups.push(previous);continue;}
+  groups.push({...base,count,alarm:0,mode:'roam',steerAt:pop.clock+STEER_EVERY,fleeUntil:0,ignoreUntil:0,interest:0,fleeX:0,fleeY:0,_fieldBase:true});
+ }
+ // A locally engaged fish is not deleted because the underlying tide/date
+ // changed. Uninteracted background schools are resampled canonically.
+ for(const g of old.values())if(g.count>0&&!backgroundGroup(pop,g)){g._fieldBase=false;groups.push(g);}
+ if(pop.sharedFieldKey!==fieldKey||pop._oldDepletion){
+  const active=new Set(groups.filter(g=>!backgroundGroup(pop,g)).map(g=>g.fieldId));pop._oldDepletion=false;
+  for(const id of Object.keys(pop.sharedDepleted))if(!id.startsWith(fieldKey+'|')){
+   if(active.has(id))pop._oldDepletion=true;else delete pop.sharedDepleted[id];
+  }
+ }
+ pop.groups=groups.sort((a,b)=>a.fieldId<b.fieldId?-1:a.fieldId>b.fieldId?1:0);pop.center={...world.center};pop.sharedFieldKey=fieldKey;
+}
 function spawnGroup(pop,world,def,x,y){
  const count=def.school[0]+Math.floor(random(pop)*(def.school[1]-def.school[0]+1));
  // Cohorts: fish in a school are of similar size; smaller fish are commoner.
@@ -133,12 +170,12 @@ function steer(pop,world,def,g){
  const probe=def.probeMeters||6,angles=[-.8,0,.8];
  const scores=angles.map(a=>{const h=g.heading+a;return Math.pow(suitability(pop,world,def,g.x+Math.cos(h)*probe,g.y+Math.sin(h)*probe),2)+.02;});
  const here=suitability(pop,world,def,g.x,g.y);
- let total=scores.reduce((a,b)=>a+b,0),roll=random(pop)*total,choice=1;
+ let total=scores.reduce((a,b)=>a+b,0),roll=schoolRandom(pop,world,g,'steer-choice')*total,choice=1;
  for(let i=0;i<3;i++){roll-=scores[i];if(roll<0){choice=i;break;}}
  // In poor water, turn decisively; in good water, meander.
- g.heading+=angles[choice]*(here<.08?1.6:.6)+gaussian(pop)*(def.turnNoise??.35);
+ g.heading+=angles[choice]*(here<.08?1.6:.6)+schoolGaussian(pop,world,g,'steer-noise')*(def.turnNoise??.35);
  // Kinesis: fish linger (swim slowly) where habitat is good, travel where it is poor.
- g.speed=def.cruise*(.55+.45*clamp(1-here,0,1))*(.7+.3*random(pop));
+ g.speed=def.cruise*(.55+.45*clamp(1-here,0,1))*(.7+.3*schoolRandom(pop,world,g,'steer-speed'));
 }
 
 function moveGroup(pop,world,def,g,dt,stimulus){
@@ -152,14 +189,14 @@ function moveGroup(pop,world,def,g,dt,stimulus){
   targetDepth=finite(stimulus.depth,targetDepth);
  }else{
   if(g.mode==='flee')g.mode='roam';
-  if(pop.clock>=g.steerAt){steer(pop,world,def,g);g.steerAt=pop.clock+STEER_EVERY*(.6+.8*random(pop));}
+  if(pop.clock>=g.steerAt){steer(pop,world,def,g);g.steerAt=pop.clock+STEER_EVERY*(.6+.8*schoolRandom(pop,world,g,'steer-time'));}
   if(g.mode==='leave'){const c=world.center,dx=g.x-c.x,dy=g.y-c.y,d=Math.hypot(dx,dy)||1;g.heading=Math.atan2(dy,dx);g.speed=def.cruise*1.5;vx=dx/d*g.speed;vy=dy/d*g.speed;}
   else{vx=Math.cos(g.heading)*g.speed;vy=Math.sin(g.heading)*g.speed;}
  }
  // Fish hold station against most of the current; a little still carries them.
  vx+=finite(env.currentX)*.15;vy+=finite(env.currentY)*.15;
  const nx=g.x+vx*dt,ny=g.y+vy*dt,next=world.env(nx,ny);
- if(next&&next.water!==false&&finite(next.depth)>.15){g.x=nx;g.y=ny;}else{g.heading+=Math.PI*(.6+.8*random(pop));}
+ if(next&&next.water!==false&&finite(next.depth)>.15){g.x=nx;g.y=ny;}else{g.heading+=Math.PI*(.6+.8*schoolRandom(pop,world,g,'boundary-turn'));}
  const floor=Math.max(.1,finite((next&&next.water!==false?next:env).depth,bottom)-.05);
  g.depth=clamp(g.depth+clamp(targetDepth-g.depth,-.35*dt,.35*dt),.05,floor);
 }
@@ -177,6 +214,20 @@ function moveGroup(pop,world,def,g,dt,stimulus){
  *    until `resolveBite(pop, outcome, defs, id)`.
  * Returns events: {type:'bite'|'nibble'|'arrive'|'leave', group, species, lengthCm}. */
 export function stepPopulation(pop,dt,world){
+ if(world.sharedField){
+  const events=[],seconds=Math.max(0,finite(dt));if(!seconds)return events;
+  // Align daily background sampling and decision rolls to the same civil
+  // half-second boundary even when clients entered or resumed at other times.
+  const key=shoreFieldKey(world.sharedField),index=Math.floor(world.sharedField.timeSeconds/POPULATION_STEP);
+  if(pop.sharedStep?.key===key&&pop.sharedStep.index===index){
+   if(pop._sharedNeedsSync){syncSharedField(pop,{...world,sharedField:{...world.sharedField,timeSeconds:index*POPULATION_STEP}});pop._sharedNeedsSync=false;}
+   return events;
+  }
+  const difference=pop.sharedStep?.key===key?index-pop.sharedStep.index:1;
+  const count=Math.max(1,Math.min(difference,Math.ceil(seconds/POPULATION_STEP)));
+  for(let i=count-1;i>=0;i--)tick(pop,POPULATION_STEP,{...world,sharedField:{...world.sharedField,timeSeconds:(index-i)*POPULATION_STEP}},events);
+  pop.sharedStep={key,index};return events;
+ }
  const events=[];pop.accumulator+=Math.max(0,finite(dt));
  while(pop.accumulator>=POPULATION_STEP){pop.accumulator-=POPULATION_STEP;tick(pop,POPULATION_STEP,world,events);}
  return events;
@@ -185,9 +236,12 @@ function tick(pop,dt,world,events){
  pop.clock+=dt;
  const c=world.center,r=world.radius,defs=Object.fromEntries(world.species.map(d=>[d.id,d]));
  // A large jump (teleport, new destination, fast boat run) refills the area.
- const jumped=!pop.center||Math.hypot(pop.center.x-c.x,pop.center.y-c.y)>r*.75;
- if(jumped){pop.groups=pop.groups.filter(g=>Math.hypot(g.x-c.x,g.y-c.y)<=r*1.3&&defs[g.species]);pop.center={x:c.x,y:c.y};maintain(pop,world,true);pop.maintainAt=pop.clock+MAINTAIN_EVERY;}
- else if(pop.clock>=pop.maintainAt){pop.maintainAt=pop.clock+MAINTAIN_EVERY;pop.center={x:c.x,y:c.y};maintain(pop,world,false);}
+ if(world.sharedField)syncSharedField(pop,world);
+ else{
+  const jumped=!pop.center||Math.hypot(pop.center.x-c.x,pop.center.y-c.y)>r*.75;
+  if(jumped){pop.groups=pop.groups.filter(g=>Math.hypot(g.x-c.x,g.y-c.y)<=r*1.3&&defs[g.species]);pop.center={x:c.x,y:c.y};maintain(pop,world,true);pop.maintainAt=pop.clock+MAINTAIN_EVERY;}
+  else if(pop.clock>=pop.maintainAt){pop.maintainAt=pop.clock+MAINTAIN_EVERY;pop.center={x:c.x,y:c.y};maintain(pop,world,false);}
+ }
  let stimulus=world.stimulus&&Number.isFinite(world.stimulus.x)?world.stimulus:null;
  // Other anglers' baits in the same water (a beach regular, for instance).
  // Their bites are held in `sideBites` by bait id; the player's stays `pendingBite`.
@@ -214,7 +268,7 @@ function tick(pop,dt,world,events){
   }else if(g.mode==='roam'){
    for(const o of live.values()){if(!open(o))continue;senseAndDecide(pop,world,def,g,dt,o,events);if(g.mode!=='roam'){g.target=o.id;target=o;break;}}
   }else if(stimulus&&open(stimulus))senseAndDecide(pop,world,def,g,dt,stimulus,events);
-  moveGroup(pop,world,def,g,dt,g.mode==='track'||g.mode==='inspect'?target:null);
+  if(!(world.sharedField&&g._fieldBase&&backgroundGroup(pop,g)))moveGroup(pop,world,def,g,dt,g.mode==='track'||g.mode==='inspect'?target:null);
  }
  const before=pop.groups.length;
  pop.groups=pop.groups.filter(g=>g.count>0&&Math.hypot(g.x-c.x,g.y-c.y)<=r*1.4);
@@ -231,7 +285,7 @@ function senseAndDecide(pop,world,def,g,dt,stimulus,events){
   const felt=finite(stimulus.motion)*clamp(1-d3/(def.lateralMeters||4),0,1);
   const appetite=Math.pow(g.hunger,1.5)*(1-g.alarm);
   const rate=(def.smell*8*scent+def.sightDrive*3*seen+2*felt)*appetite;
-  if(random(pop)<1-Math.exp(-rate*dt)){g.mode='track';g.interest=1;}
+  if(schoolRandom(pop,world,g,'sense',stimulus)<1-Math.exp(-rate*dt)){g.mode='track';g.interest=1;}
   return;
  }
  if(g.mode==='track'){
@@ -246,16 +300,16 @@ function senseAndDecide(pop,world,def,g,dt,stimulus,events){
  // Appeal matters twice: a poor bait or rig is taken less often and the fish
  // also give up on it sooner.
  const rate=def.biteRate*appeal*appeal*Math.pow(g.hunger,1.2)*(1-g.alarm)*competition;
- if(random(pop)<1-Math.exp(-rate*dt)){
-  const lengthCm=clamp(g.lengthCm*(1+(def.cohortSd??.07)*gaussian(pop)),def.lengthCm[0]*.9,def.lengthCm[1]*1.05);
+ if(schoolRandom(pop,world,g,'bite',stimulus)<1-Math.exp(-rate*dt)){
+  const lengthCm=clamp(g.lengthCm*(1+(def.cohortSd??.07)*schoolGaussian(pop,world,g,'bite-length',stimulus)),def.lengthCm[0]*.9,def.lengthCm[1]*1.05);
   const bite={group:g.id,species:g.species,lengthCm};
   if(stimulus.side){pop.sideBites??={};pop.sideBites[stimulus.id]=bite;events.push({type:'bite',...bite,stimulus:stimulus.id});return;}
   pop.pendingBite=bite;
   events.push({type:'bite',...bite});return;
  }
- if(appeal>.05&&random(pop)<.08*dt)events.push({type:'nibble',group:g.id,species:g.species,...(stimulus.side?{stimulus:stimulus.id}:{})});
+ if(appeal>.05&&schoolRandom(pop,world,g,'nibble',stimulus)<.08*dt)events.push({type:'nibble',group:g.id,species:g.species,...(stimulus.side?{stimulus:stimulus.id}:{})});
  g.interest-=dt/(def.patience||20)*(1+2*(1-Math.min(1,appeal)));
- if(g.interest<=0){g.mode='roam';g.ignoreUntil=pop.clock+90+random(pop)*150;}
+ if(g.interest<=0){g.mode='roam';g.ignoreUntil=pop.clock+90+schoolRandom(pop,world,g,'ignore-duration',stimulus)*150;}
 }
 
 /** Outcome of the most recent bite. `hooked` removes that fish from its school;
@@ -268,6 +322,7 @@ export function resolveBite(pop,outcome,defs=[],stimulusId=null){
  const g=pop.groups.find(x=>x.id===bite.group);if(!g)return bite;
  const def=defs.find(d=>d.id===g.species)||{};
  if(outcome==='hooked'){
+  if(g.fieldId){pop.sharedDepleted??={};pop.sharedDepleted[g.fieldId]=finite(pop.sharedDepleted[g.fieldId])+1;if(pop.sharedFieldKey&&!g.fieldId.startsWith(pop.sharedFieldKey+'|'))pop._oldDepletion=true;}
   g.count--;g.hunger=Math.max(0,g.hunger-.05);
   // A struggling schoolmate alarms wary species; bold schools stay nearby.
   g.alarm=clamp(g.alarm+.15+.55*finite(def.wariness,.5),0,1);

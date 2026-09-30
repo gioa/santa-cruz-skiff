@@ -24,20 +24,20 @@ export const BENICIA_SCENE=Object.freeze({id:'benicia',name:'Benicia · First St
   {id:'west-bank',name:'西段岸线',x:1910,description:'往西走人少一些，顺流收线和逆流收线的速度感不同。'},
  ]),
 });
-export function beniciaTide(elapsed=0){
- const phase=gameSeconds(elapsed)*TAU/44712+.45;
+export function beniciaTide(elapsed=0,environmentSeconds){
+ const phase=(Number.isFinite(environmentSeconds)?environmentSeconds:gameSeconds(elapsed))*TAU/44712+.45;
  // Current is phase-shifted from HEIGHT; no tidal-height-as-speed shortcut.
  return{phase,height:.85+.7*Math.sin(phase),speed:.82*Math.cos(phase-.35)};
 }
 export function beniciaSample(x,y,elapsed=0,sea={}){
- const offshore=Math.max(0,(beniciaShoreY(x)-y)/3.2),t=beniciaTide(elapsed);
+ const offshore=Math.max(0,(beniciaShoreY(x)-y)/3.2),t=beniciaTide(elapsed,sea.environmentSeconds);
  const tip=Math.exp(-(((x-1090)/245)**2)),pocket=x<800,rocks=x>1280&&x<1670||x>650&&x<870;
  const tide=Number.isFinite(sea.tideM)?sea.tideM:t.height;
  const depth=Math.max(.05,(pocket?.018:.045)*offshore+tip*(1.25+offshore*.055)+tide-.65);
  // South-facing camera: flood runs east (screen-left), ebb west.
  const currentX=-t.speed*(.35+.65*Math.min(1,offshore/30))*(1+.22*tip),currentY=.06*t.speed*Math.sin(x/190);
  const waveHeight=clamp(Number.isFinite(sea.waveHeightM)?sea.waveHeightM:.18,0,.9);
- const wavePhase=elapsed*TAU/3.4-x*.055-y*.11,waveVelocityX=waveHeight*.2*Math.cos(wavePhase),waveVelocityY=waveHeight*.15*Math.sin(wavePhase);
+ const wavePhase=(Number.isFinite(sea.environmentSeconds)?sea.environmentSeconds:elapsed)*TAU/3.4-x*.055-y*.11,waveVelocityX=waveHeight*.2*Math.cos(wavePhase),waveVelocityY=waveHeight*.15*Math.sin(wavePhase);
  const zone=BENICIA_SCENE.zones.reduce((a,z)=>Math.abs(z.x-x)<Math.abs(a.x-x)?z:a);
  return{sceneId:'benicia',offshore,depth,tide,tideLabel:t.speed>.08?'涨潮':t.speed<-.08?'退潮':'平潮',waveHeight,wavePeriod:3.4,waveDirectionDeg:65,
   zoneId:zone.id,zoneName:zone.name,habitat:rocks&&offshore<18?'rock':'channel',substrate:rocks&&offshore<18?'rock':pocket?'mud':'sand',

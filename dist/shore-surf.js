@@ -144,8 +144,8 @@ const marchCache=new Map();
 function cacheSet(key,value){if(marchCache.size>24000)marchCache.clear();marchCache.set(key,value);return value;}
 /** Cross-shore profile of one column: depth every STEP metres, from
  * SURF_INLAND_M inland of the reference shoreline out to SURF_DOMAIN_M. */
-function columnDepths(sceneId,shape,tide,gap,period){
- const key=`d:${sceneId}:${shape.barDistance.toFixed(1)}:${tide.toFixed(2)}:${gap.toFixed(2)}:${period.toFixed(1)}`;
+function columnDepths(shape,tide,gap,period,profileKey){
+ const key=`d:${profileKey}`;
  const hit=marchCache.get(key);if(hit)return hit;
  const n=SURF_DOMAIN_M/STEP+INLAND+1,depth=new Float32Array(n),cg=new Float32Array(n);
  for(let i=0;i<n;i++){depth[i]=bedDepth(shape,(i-INLAND)*STEP,tide,gap);cg[i]=groupSpeed(period,Math.max(.05,depth[i]));}
@@ -205,8 +205,14 @@ const TYPE_NAMES=['none','spilling','plunging','surging'];
  * traveling wave phase; `hs` the domain-edge significant height. */
 export function surfColumn({sceneId,shape,tide,gap,period,hs,phaseAt,omega,alongshore=null}){
  tide=Math.round(tide*20)/20;period=Math.round(period*10)/10;
- const depths=columnDepths(sceneId,shape,tide,gap,period),n=depths.length;
- const hsKey=Math.round(hs*20)/20,base=`${sceneId}:${shape.barDistance.toFixed(1)}:${tide.toFixed(2)}:${gap.toFixed(2)}:${period.toFixed(1)}`;
+ // Quantize the inputs themselves, not just their cache labels. Otherwise
+ // the first sampled point in a bucket changes later players' surf physics.
+ // Every bedDepth input belongs in the key, including custom beach profiles.
+ shape={...shape,barDistance:Math.round(shape.barDistance*10)/10,troughDistance:Math.round(shape.troughDistance*10)/10,datum:finite(shape.datum,0)};
+ gap=Math.round(gap*100)/100;
+ const base=[sceneId,shape.faceWidth,shape.faceSlope,shape.nearSlope,shape.barDistance,shape.barAmp,shape.troughDistance,shape.troughAmp,shape.channelDepth,shape.datum,tide,gap,period].join(':');
+ const depths=columnDepths(shape,tide,gap,period,base),n=depths.length;
+ const hsKey=Math.round(hs*20)/20;
  const memo=new Map();
  const wave=index=>{
   let w=memo.get(index);if(w!==undefined)return w;

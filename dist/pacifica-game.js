@@ -13,7 +13,6 @@ import {shoreWorldMetres,shorePersonFoot} from './shore-scale.js';
 
 import {getShoreScene,sampleShore,onPier} from './shore-data.js';
 import {shoreCastPower} from './shore-casting.js';
-import {formatGameClock} from './game-clock.js';
 
 import {createShoreNavigation,habitatName} from './shore-navigation.js';
 import {createShoreInteractions,nearbyShoreInteraction} from './shore-interactions.js';
@@ -24,7 +23,7 @@ const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;
 const scene=getShoreScene($('app').dataset.location),WORLD=scene.world,SHOP=scene.shop,SAVE_KEY=scene.saveKey;
 let saved;try{saved=JSON.parse(localStorage.getItem(SAVE_KEY)||'null');}catch{}
 const benicia=scene.id==='benicia';
-const sim=benicia?new BeniciaSimulation({saved}):new PacificaSimulation({saved,sceneId:scene.id}),world=benicia?createBeniciaWorld($('world')):createPacificaWorld($('world'),{sceneId:scene.id});
+const sim=benicia?new BeniciaSimulation({saved,clockMode:'shared'}):new PacificaSimulation({saved,sceneId:scene.id,clockMode:'shared'}),world=benicia?createBeniciaWorld($('world')):createPacificaWorld($('world'),{sceneId:scene.id});
 sim.setFishingControls({rodLift:SHORE_ROD_REST_LIFT,rodSweep:0});
 const interactions=createShoreInteractions(scene);interactions.reset(sim.state);
 const reducedMotion=matchMedia('(prefers-reduced-motion: reduce)');
@@ -192,7 +191,7 @@ function updateUI(){
   syncFishingScene();syncControlUI();
   const s=sim.state,bait=BAITS.find(b=>b.id===s.bait),atShore=sim.onPier||s.player.y-WORLD.shoreY(s.player.x)<=SHORE_MOVEMENT.castReach,fishing=atShore||s.phase!=='walk';
   $('credits').textContent=Math.floor(s.credits);show('map-btn',s.shoreLore.notes.length>0);
-  $('clock').textContent=formatGameClock(s.elapsed);
+  $('clock').textContent=sim.clock();$('intro-clock').textContent=sim.clock();
   $('active-rod-name').textContent=s.activeRod==='surf_rod'?'长节沙滩竿':'岸钓竿';
   $('rod-config-btn').disabled=s.phase!=='walk';const supply=s.rodSupplies[s.activeRod];$('tackle-name').textContent=`${supply?supply.id==='float_rig'?'浮钓 · #6':supply.id==='fishfinder_rig'?'滑铅 3 oz · 2/0':'Carolina 1 oz · #1':'未装钓组'} · ${supply?.bait?.condition>.08?bait?.name:'需装饵'}`;
   if(isShoreLure(supply?.id)){const item=SHORE_ITEMS.find(i=>i.id===supply.id),weight={salmon_spoon:'1 oz',salmon_spinner:'3/4 oz',grub_jig:'1/2 oz'}[supply.id];$('tackle-name').textContent=`${item.name} · ${item.hook.includes('/')?item.hook:'#'+item.hook} · ${weight}`;}
