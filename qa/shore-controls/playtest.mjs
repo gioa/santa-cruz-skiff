@@ -65,7 +65,7 @@ try{
   // A held cast charges the real rod; there is no trajectory forecast.
   const castButton=await page.locator('#beach-cast').boundingBox();
   await page.mouse.move(castButton.x+castButton.width/2,castButton.y+castButton.height/2);await page.mouse.down();await page.waitForTimeout(950);
-  assert.equal(await page.locator('#cast-charge').isVisible(),true);const charging=await page.evaluate(()=>window.shorePlay.frame());assert.ok(charging.castCharge>.4);assert.equal(charging.world.castPreview,null);await shot(scene+'-cast');await page.mouse.up();
+  assert.equal(await page.locator('#cast-charge').count(),0);assert.deepEqual(await page.locator('#beach-cast').boundingBox(),castButton,'charging must not move the held button');const charging=await page.evaluate(()=>window.shorePlay.frame());assert.ok(charging.castCharge>.4);assert.equal(charging.world.castPreview,null);await shot(scene+'-cast');await page.mouse.up();
   await page.waitForFunction(()=>JSON.parse(document.getElementById('beach-state').textContent).phase==='waiting');await assertScene();
   let s=await state();const initialDepth=s.presentation.depth,handleBefore=s.reelVisual.handleAngle;
   // Holding the pointer does nothing; completing one click makes one bounded stroke.

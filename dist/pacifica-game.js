@@ -47,7 +47,7 @@ function stopReeling(){
   const pointers=[...reelPointers];reelPointers.clear();
   for(const id of pointers)if($('beach-reel').hasPointerCapture(id))$('beach-reel').releasePointerCapture(id);
 }
-function resetInput(){keys.clear();chargeStart=0;castCharge=0;castPreview=null;stopReeling();show('cast-charge',false);}
+function resetInput(){keys.clear();chargeStart=0;castCharge=0;castPreview=null;stopReeling();}
 function paused(){return !started||Boolean(modalType)||scenePickerOpen||document.hidden||!focused;}
 function syncFishingScene(){
   if(!sim.canReel)stopReeling();
@@ -92,8 +92,8 @@ $('world').addEventListener('pointerdown',e=>{
   walkTo(p.x,p.y);
 });
 function primaryAction(){if(sim.state.phase==='bite')feedback(sim.strike());else if(sim.state.phase==='landed')openCatch();}
-function beginCharge(){if(paused())return;if(sim.state.phase!=='walk'){primaryAction();return;}if(!sim.tackleReady){toast('先打开鱼竿配置，装好钓组和鱼饵。');return;}if(!sim.canCast){toast('走到岸边，面朝水面再抛竿。');return;}chargeStart=performance.now();show('cast-charge',true);}
-function finishCharge(cancel=false){if(!chargeStart)return;const power=shoreCastPower(performance.now()-chargeStart);chargeStart=0;castCharge=0;castPreview=null;show('cast-charge',false);if(!cancel)feedback(sim.cast({power,aim}));}
+function beginCharge(){if(paused())return;if(sim.state.phase!=='walk'){primaryAction();return;}if(!sim.tackleReady){toast('先打开鱼竿配置，装好钓组和鱼饵。');return;}if(!sim.canCast){toast('走到岸边，面朝水面再抛竿。');return;}chargeStart=performance.now();}
+function finishCharge(cancel=false){if(!chargeStart)return;const power=shoreCastPower(performance.now()-chargeStart);chargeStart=0;castCharge=0;castPreview=null;if(!cancel)feedback(sim.cast({power,aim}));}
 $('beach-cast').addEventListener('pointerdown',e=>{if(e.button>0)return;e.preventDefault();$('beach-cast').setPointerCapture(e.pointerId);beginCharge();});
 $('beach-cast').addEventListener('pointerup',()=>finishCharge());
 $('beach-cast').addEventListener('pointercancel',()=>finishCharge(true));

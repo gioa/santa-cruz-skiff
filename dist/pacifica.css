@@ -7,7 +7,6 @@
 #app[data-shore-scene] #boat-fishing #beach-reel.active{background:#a8764d}
 #app[data-shore-scene] #boat-fishing .fish-status{grid-column:1/-1;grid-row:auto}
 #app[data-shore-scene] #boat-fishing .fishing-toolbar{grid-row:auto!important}
-#app[data-shore-scene] #boat-fishing #cast-charge{position:relative;width:100%;margin:0;padding:3px;text-align:center;font-size:11px;color:#f0dba9;pointer-events:none}
 #app[data-shore-scene]:not(.is-intro) #toast{bottom:calc(var(--shore-console-height,100px) + var(--safe-bottom))}
 #app[data-shore-scene] #boat-console.is-bite .fish-status{border-color:#c48249}
 @media(max-height:500px) and (orientation:landscape){
@@ -51,7 +50,6 @@
 #app[data-shore-scene] .shore-adjustments input:focus-visible{outline:2px solid #ffd993;outline-offset:1px}
 #app[data-shore-scene] #boat-fishing .fishing-toolbar .reel-actions{grid-column:2;display:grid;grid-template-columns:minmax(0,1fr);gap:5px;min-height:48px;height:auto;width:100%;order:0}
 #app[data-shore-scene] #boat-fishing .fishing-toolbar .reel-actions button{flex:1 1 0;min-width:0;width:auto;height:48px;min-height:48px;padding:3px;border:1px solid #bfceb2;box-shadow:0 2px 0 #16353a;line-height:1.25;font-size:12px;touch-action:none}
-#app[data-shore-scene] #boat-fishing #cast-charge{grid-column:1/-1;order:0}
 #app[data-shore-scene].shore-fighting #boat-console{border-color:#e5c88c}
 #app[data-shore-scene] #boat-fishing #beach-reel{display:flex;align-items:center;justify-content:center;gap:4px}
 #shore-reel-mechanism{width:36px;height:30px;flex:none;overflow:visible}
@@ -69,7 +67,6 @@
  #app[data-shore-scene] #boat-console #boat-fishing.no-instruments .fishing-toolbar{grid-column:1/-1;grid-row:2!important;grid-template-columns:minmax(96px,.9fr) minmax(0,1.7fr);gap:3px 10px}
  #app[data-shore-scene] #boat-fishing .fishing-toolbar .reel-actions{grid-column:2;align-self:end;display:grid;grid-template-columns:minmax(0,1fr);height:auto}
  #app[data-shore-scene] #boat-fishing .fishing-toolbar .reel-actions button{width:100%;height:44px;min-height:44px;font-size:11px}
- #app[data-shore-scene] #boat-fishing #cast-charge{grid-column:1/-1}
 }
 
 #app[data-shore-scene] #shore-drag-control{grid-column:1;grid-row:1;align-self:center;padding:2px 4px}
