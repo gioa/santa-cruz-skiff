@@ -5,6 +5,8 @@ import {PacificaSimulation,SPECIES} from '../dist/pacifica-sim.js';
 import {BeniciaSimulation} from '../dist/benicia-sim.js';
 import {shorePresentation} from '../dist/shore-presentation.js';
 import {createShoreFightMotion} from '../dist/shore-fish-fight.js';
+import {shoreRodGeometry} from '../dist/shore-scale.js';
+import {shoreTetherReach} from '../dist/shore-tether.js';
 const close=(a,b,e=1e-8)=>assert.ok(Math.abs(a-b)<e,`${a} != ${b}`);
 function cadence(hz,{seconds=8,dt=.01,sim=null}={}){
  let state=createShoreReelInput(),turns=0,feedbackTurns=0,nextTap=0;
@@ -21,6 +23,7 @@ function rig(Simulation=PacificaSimulation){
  s.seaState={waveHeightM:0,tideM:1};s.rodSupplies[s.activeRod]={id:'grub_jig',condition:1,bait:null};
  const sample={...sim.refreshSample(),currentX:0,currentY:0,waveVelocityX:0,waveVelocityY:0,waveLoad:0,orbitalVelocity:0,whitewater:0};
  sim.refreshSample=()=>{s.shoreSample=sample;return sample;};s.presentation=shorePresentation(sample,'grub_jig',1);
+ s.cast.paidLength=shoreTetherReach(shoreRodGeometry(s).tipWorld,s.cast.target,s.presentation.depth);
  return sim;
 }
 
@@ -58,18 +61,22 @@ test('pause/disable discards pending strokes and no input reappears after resume
 
 test('unloaded lure recovery follows crank turns, not a hidden speed preset',()=>{
  const slow=rig(),fast=rig();slow.state.fishingControls.reelSpeed=1;fast.state.fishingControls.reelSpeed=.2;
+ const initial=slow.state.cast.paidLength;
  const a=cadence(1,{sim:slow}),b=cadence(2,{sim:fast});
- close(60-slow.state.lineDistance,a.turns*SHORE_CRANK_TURN_METRES,1e-6);
- close(60-fast.state.lineDistance,b.turns*SHORE_CRANK_TURN_METRES,1e-6);
- close(60-fast.state.lineDistance,2*(60-slow.state.lineDistance),1e-6);
+ // The spool winds actual line, not the horizontal projection of a sloping
+ // line from an elevated rod to a sinking lure.
+ close(initial-slow.state.cast.paidLength,a.turns*SHORE_CRANK_TURN_METRES,1e-6);
+ close(initial-fast.state.cast.paidLength,b.turns*SHORE_CRANK_TURN_METRES,1e-6);
+ close(initial-fast.state.cast.paidLength,2*(initial-slow.state.cast.paidLength),1e-6);
+ assert.ok(fast.state.lineDistance<slow.state.lineDistance&&slow.state.lineDistance<60);
  close(a.feedbackTurns,a.turns);close(b.feedbackTurns,b.turns);
 });
 
 test('explicit stopped crank suppresses stale held input and reel-home in both scenes',()=>{
  for(const Simulation of [PacificaSimulation,BeniciaSimulation]){
   const sim=rig(Simulation),s=sim.state;s.autoRetrieve=true;sim.setReeling(true);s.snagSeconds=10;
-  sim.drift(.1,{reel:true,crankRate:0});
-  assert.equal(s.phase,'waiting');assert.equal(s.autoRetrieve,false);assert.equal(s.retrieveInput,false);assert.equal(s.reelFeedback.handleRate,0);close(s.lineDistance,60);
+  const length=s.cast.paidLength;sim.drift(.1,{reel:true,crankRate:0});
+  assert.equal(s.phase,'waiting');assert.equal(s.autoRetrieve,false);assert.equal(s.retrieveInput,false);assert.equal(s.reelFeedback.handleRate,0);close(s.cast.paidLength,length);
  }
 });
 
