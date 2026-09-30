@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {PacificaSimulation} from '../dist/pacifica-sim.js';
 import {shoreOwnedItems,shoreSupply,wearShoreSupplies} from '../dist/shore-equipment.js';
+import {finishShoreRetrieve} from './helpers/shore-cast.js';
 import {personalInventorySlots} from '../dist/personal-inventory.js';
 const surf=sim=>Object.assign(sim.state.player,{x:730,y:sim.world.shoreY(730)+25});
 for(const sceneId of ['pacifica','half-moon-bay']){
@@ -30,7 +31,7 @@ for(const sceneId of ['pacifica','half-moon-bay']){
  });
  test(`${sceneId}: recasting costs no extra bait; catches require replacement; line break loses mounted rig`,()=>{
   const sim=new PacificaSimulation({sceneId});surf(sim);
-  for(let n=0;n<5;n++){assert.ok(sim.cast().ok);assert.equal(sim.configureEquipment('sandcrab').ok,false);assert.ok(sim.retrieve().ok);}
+  for(let n=0;n<5;n++){assert.ok(sim.cast().ok);assert.equal(sim.configureEquipment('sandcrab').ok,false);assert.ok(sim.retrieve().ok);finishShoreRetrieve(sim);}
   assert.equal(sim.state.inventory.sandcrab,12);
   wearShoreSupplies(sim.state,'catch');assert.equal(sim.cast().ok,false);
   assert.ok(sim.equipBait('sandcrab').ok);assert.equal(sim.state.inventory.sandcrab,11);
@@ -76,7 +77,7 @@ test('zero-stock supplies disappear, existing slots remain stable, and restockin
 test('rig wear and configured reel survive restores; owning unused upgrades gives no performance bonus',()=>{
  const sim=new PacificaSimulation(),baseline=new PacificaSimulation();sim.state.credits=500;sim.buy('surf_rod');sim.buy('sealed_reel');
  for(const outfit of [sim,baseline]){surf(outfit);assert.ok(outfit.cast({power:1}).ok);}
- assert.equal(sim.state.cast.distance,baseline.state.cast.distance,'stored rod and reel do not boost the fitted outfit');sim.retrieve();
+ assert.equal(sim.state.cast.distance,baseline.state.cast.distance,'stored rod and reel do not boost the fitted outfit');sim.retrieve();finishShoreRetrieve(sim);
  assert.equal(sim.state.activeReel,'starter_reel');assert.ok(sim.configureEquipment('sealed_reel').ok);
  const restored=new PacificaSimulation({saved:sim.snapshot()});assert.equal(restored.state.activeReel,'sealed_reel');
  restored.configureEquipment('starter_reel');assert.equal(new PacificaSimulation({saved:restored.snapshot()}).state.activeReel,'starter_reel');

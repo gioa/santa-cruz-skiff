@@ -5,6 +5,8 @@ import {ANGLERS} from './shore-lore.js';
 import {getShoreScene, sampleShore, shoreSurfField, onPier} from './shore-data.js';
 import {shoreCastPosition} from './shore-casting.js';
 import {shoreFishPosition} from './shore-line-geometry.js';
+import {shoreWaterContact,shoreTackleLine,shoreRigUsesFloat,shoreLineWaterEntry} from './shore-tackle-visual.js';
+import {shoreRodPose,shoreActionCameraTarget,advanceShoreActionCamera,shoreFishVisual,drawShoreFish,shoreCastPreviewVisual,drawShoreCastPreview} from './shore-action-view.js';
 const TAU=Math.PI*2;
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const noise=(x,y=0)=>{let n=Math.imul(x|0,374761393)+Math.imul(y|0,668265263);n=Math.imul(n^(n>>>13),1274126177);return((n^(n>>>16))>>>0)/4294967295;};
@@ -22,7 +24,7 @@ export function createPacificaWorld(canvas,{sceneId='pacifica'}={}){
   const C={ink:'#314e51',darkGrass:'#536f5d',coral:'#c97459',...scene.palette};
   const ctx=canvas.getContext('2d',{alpha:false});
   const camera={x:scene.spawn.x,y:scene.spawn.y-150,scale:.65,width:900,height:600};
-  let cssWidth=900,cssHeight=600,insets={top:90,bottom:200},now=0,lastTime=null,lastState=null,manualFocus=null,initialized=false,b=null;
+  let cssWidth=900,cssHeight=600,insets={top:90,bottom:200},now=0,lastTime=null,lastState=null,manualFocus=null,initialized=false,b=null,lastTackle=null,drawOptions={};
   const chunkSize=512,chunks=new Map();let deepTile=null;
   const R=(g,x,y,w,h,c)=>{g.fillStyle=c;g.fillRect(Math.round(x),Math.round(y),Math.round(w),Math.round(h));};
   function poly(g,pts,c){g.fillStyle=c;g.beginPath();pts.forEach(([x,y],i)=>i?g.lineTo(Math.round(x),Math.round(y)):g.moveTo(Math.round(x),Math.round(y)));g.closePath();g.fill();}
@@ -222,19 +224,11 @@ export function createPacificaWorld(canvas,{sceneId='pacifica'}={}){
     const widthLogical=Math.min(1000,Math.max(360,Math.round(width*.66)));
     canvas.width=widthLogical;canvas.height=Math.round(widthLogical*height/width);camera.width=canvas.width;camera.height=canvas.height;ctx.imageSmoothingEnabled=false;initialized=false;
   }
-  function viewport(){const s=canvas.height/cssHeight;return{top:Math.min(insets.top*s,canvas.height*.3),bottom:Math.min(insets.bottom*s,canvas.height*.5)};}
-  function cameraTarget(state){
-    const compact=cssWidth<720||cssHeight<520,pl=state.player||scene.spawn,v=viewport(),available=Math.max(100,canvas.height-v.top-v.bottom);
-    let scale=compact?Math.min(.86,canvas.width/510,available/365):Math.min(.76,canvas.width/1150,available/680);
-    scale=Math.max(.25,scale);
-    const centerY=v.top+available*.5;
-    let target=manualFocus||{x:pl.x,y:pl.y-(compact?140:180)};
-    if(!manualFocus&&state.cast&&!['walk','landed'].includes(state.phase)){
-      const fish=state.phase==='fighting'?shoreFishPosition(scene,state):state.cast.target;
-      const minY=fish.y-65,maxY=pl.y+36,minX=Math.min(pl.x-40,fish.x)-45,maxX=Math.max(pl.x+40,fish.x)+45;
-      scale=Math.min(scale,available/(maxY-minY),canvas.width/(maxX-minX));target={x:(minX+maxX)/2,y:(minY+maxY)/2};
-    }
-    return{x:target.x,y:target.y,scale,screenY:centerY};
+  function viewport(){const s=canvas.height/cssHeight;return{top:insets.top*s,bottom:insets.bottom*s,left:(insets.left||0)*s,right:(insets.right||0)*s};}
+  function cameraTarget(state,options){
+    const compact=cssWidth<720||cssHeight<520,v=viewport(),available=Math.max(100,canvas.height-v.top-v.bottom);
+    const baseScale=Math.max(.25,compact?Math.min(.86,canvas.width/510,available/365):Math.min(.76,canvas.width/1150,available/680));
+    return shoreActionCameraTarget(scene,state,{width:canvas.width,height:canvas.height,top:v.top,bottom:v.bottom,left:v.left,right:v.right,baseScale,manualFocus,actionFocus:options.actionFocus,rodLift:options.rodLift,rodSweep:options.rodSweep});
   }
   let offset={x:0,y:0};
   function project(x,y){return{x:Math.round((x-camera.x)*camera.scale+canvas.width/2),y:Math.round((y-camera.y)*camera.scale+offset.y)};}
@@ -388,42 +382,66 @@ export function createPacificaWorld(canvas,{sceneId='pacifica'}={}){
   }
   function ring(x,y,r,color,alpha=1){ctx.globalAlpha=alpha;const points=[];for(let i=0;i<20;i++){const a=i/20*TAU;points.push([x+Math.cos(a)*r,y+Math.sin(a)*r*.42]);}for(let i=0;i<points.length;i++){const p=points[i],q=points[(i+1)%points.length];line(ctx,p[0],p[1],q[0],q[1],color,2);}ctx.globalAlpha=1;}
   function fishing(state){
+    lastTackle=null;
     const p=state.player||{x:1100,y:865},cast=state.cast,active=cast&&!['walk','landed'].includes(state.phase);
-    const tip={x:p.x-21,y:p.y-66};
+    const rod=shoreRodPose(state,drawOptions);
     if(active){
       const fight=state.phase==='fighting',bite=state.phase==='bite',casting=state.phase==='casting';
       const ground=casting?shoreCastPosition(cast,cast.flight||0):fight?shoreFishPosition(scene,state):cast.target;
       // Flight height is measured in metres by the shared casting model. The
       // sprite rod stays readable, while lure and shadow keep the world scale.
-      const target={x:ground.x,y:ground.y-(casting?ground.height*3.2:0)};
-      const bend=fight?12*(state.tension||0):0;
-      const rodTip={x:tip.x+bend,y:tip.y+bend*.7};
-      const mid={x:(rodTip.x+target.x)/2,y:(rodTip.y+target.y)/2+(fight?3:17)};
-      line(ctx,rodTip.x,rodTip.y,mid.x,mid.y,'#e9dfb6',1);line(ctx,mid.x,mid.y,target.x,target.y,'#e9dfb6',1);
+      const floating=!casting&&shoreRigUsesFloat(state);
+      const sample=casting||floating?null:sampleShore(scene,ground.x,ground.y,now,state.seaState);
+      const depth=sample?(fight?Number.isFinite(state.fishMotion?.depth)?state.fishMotion.depth:sample.depth*.72:Number.isFinite(state.presentation?.depth)?state.presentation.depth:sample.depth):0;
+      const entryWorld=casting?ground:shoreLineWaterEntry(scene,state,ground,depth);
+      const contact=casting?null:shoreWaterContact(scene,entryWorld,now,state.seaState);
+      const target={x:entryWorld.x,y:entryWorld.y-(casting?ground.height*3.2:contact.height*3.2)};
+      const tension=clamp(Number.isFinite(state.tension)?state.tension:0,0,1);
+      const bend=rod.bend,rodTip=rod.tip;
+      const airHeight=fight?Math.max(0,state.fishMotion?.airHeight||0):0;
+      const attachment={x:target.x,y:target.y+(floating&&bite?2:0)-(floating?0:airHeight*3.2)};
+      const strand=shoreTackleLine(rodTip,attachment,{tension,sag:casting?17:fight?6:17,
+        flowX:contact?.flowX,flowY:contact?.flowY,scale:1});
+      lastTackle={rodTip,waterEntry:target,entryWorld,terminalPosition:ground,attachment,line:strand,bend,surfaceHeight:contact?.height||0,
+        tilt:floating?contact.tilt:0,breaking:contact?.breaking||0,floatVisible:floating,rodControls:rod.controls,rodPoints:rod.points,airHeight};
+      for(let i=1;i<strand.length;i++)line(ctx,strand[i-1].x,strand[i-1].y,strand[i].x,strand[i].y,i>strand.length-4&&!casting?'#b4d0bd':'#e9dfb6',1);
       if(casting){shadow(ctx,ground.x,ground.y,8,3,.22);R(ctx,target.x-2,target.y-3,4,6,'#d27a59');R(ctx,target.x-2,target.y-4,4,2,'#fff0c2');}
       else{
-        ring(target.x,target.y,11+Math.sin(now*3)*2,'#e0ead0',.65);
-        if(fight){const size=11+Math.min(12,(state.fish?.weightKg||1)*2);R(ctx,target.x-size/2,target.y-3,size,5,'#476d6c');poly(ctx,[[target.x-size/2,target.y],[target.x-size/2-7,target.y-5],[target.x-size/2-7,target.y+5]],'#547973');R(ctx,target.x+size/4,target.y-4,3,2,'#c4d5b6');for(let i=0;i<5;i++){const a=now*3+i*1.2;R(ctx,target.x+Math.cos(a)*17,target.y+Math.sin(a)*7,4,2,'#f1f1d8');}}
-        else if(state.presentation?.mode==='float'||state.rig==='float'){
+        const flow=Math.hypot(contact.flowX,contact.flowY),radius=4+Math.min(6,flow*3+contact.breaking*3);
+        if(floating)ring(target.x,target.y,radius,'#e0ead0',.35+contact.foam*.4);
+        if(floating){
           // The float marks the suspended hook; a bite dips its bright tip.
-          const floatY=target.y+(bite?2:Math.sin(now*3)*1.5);
-          R(ctx,target.x-1,floatY-9,2,5,'#e26e50');R(ctx,target.x-3,floatY-4,6,4,'#fff0cf');R(ctx,target.x-2,floatY,4,2,'#c96a47');
-        }else{const pulse=bite?4:2;R(ctx,target.x-pulse,target.y,pulse*2,1,'#a9cbb5');} // Bottom rigs show only a line-entry ripple.
-        if(bite){ring(target.x,target.y,21+(now*20)%16,'#ffe2a0',.7);R(ctx,target.x-2,target.y-35,4,13,'#fff1b7');R(ctx,target.x-2,target.y-17,4,4,'#fff1b7');}
+          const floatY=attachment.y,lean=contact.tilt*8;
+          R(ctx,target.x+lean-1,floatY-9,2,5,'#e26e50');R(ctx,target.x+lean*.4-3,floatY-4,6,4,'#fff0cf');R(ctx,target.x-2,floatY,4,2,'#c96a47');
+        }else if(!airHeight){
+          // The underwater rig/fish has no surface sprite or target ring.
+          // Small separated streaks mark only the line cutting into the sea.
+          R(ctx,target.x-4,target.y,2,1,'#a9cbb5');R(ctx,target.x+2,target.y,2,1,'#a9cbb5');
+        }
+        // A passing roller washes over the water contact, never over the tip
+        // or the dry span. Persistent foam alone does not submerge the float.
+        if(contact.breaking>.05){const wash=2+contact.breaking*5;R(ctx,target.x-wash,target.y-1,wash*2,1+contact.breaking*2,C.foam);}
+        if(floating&&airHeight>0)line(ctx,attachment.x,attachment.y,ground.x,ground.y-contact.height*3.2-airHeight*3.2,'#e9dfb6',1);
+        if(bite){const cue=floating?target:rodTip;ring(cue.x,cue.y,21+(now*20)%16,'#ffe2a0',.7);R(ctx,cue.x-2,cue.y-35,4,13,'#fff1b7');R(ctx,cue.x-2,cue.y-17,4,4,'#fff1b7');}
       }
       // The flexing rod is connected to the hands, and line starts at its tip.
-      line(ctx,p.x-12,p.y-27,p.x-22,p.y-51,'#354e50',3);line(ctx,p.x-22,p.y-51,rodTip.x,rodTip.y,'#354e50',2);line(ctx,p.x-12,p.y-28,p.x-17,p.y-39,'#caa374',3);R(ctx,p.x-14,p.y-32,6,5,'#aeb4a0');
-      return target;
+      for(let i=1;i<rod.points.length;i++)line(ctx,rod.points[i-1].x,rod.points[i-1].y,rod.points[i].x,rod.points[i].y,'#354e50',i<4?3:2);
+      line(ctx,p.x-12,p.y-28,p.x-17,p.y-39,'#caa374',3);R(ctx,p.x-14,p.y-32,6,5,'#aeb4a0');
+      // Keep navigation/debug castTarget on the simulated horizontal point;
+      // only tackle artwork receives the surface-height projection.
+      return casting?target:ground;
     }
     line(ctx,p.x+11,p.y-19,p.x+21,p.y-65,'#3e5656',2);R(ctx,p.x+10,p.y-20,3,10,'#c1a071');R(ctx,p.x+8,p.y-23,6,5,'#aab3a0');return null;
   }
 
-  function draw(state={},time=0){
-    lastState=state;now=Number.isFinite(state.elapsed)?state.elapsed:time;const raw=Number.isFinite(time)?time:now,dt=lastTime===null?.016:clamp(raw-lastTime,0,.1);lastTime=raw;
-    const target=cameraTarget(state),fitImmediately=state.phase==='casting'||Boolean(state.inspection),ease=initialized&&!fitImmediately?1-Math.exp(-dt*6):1;camera.x+=(target.x-camera.x)*ease;camera.y+=(target.y-camera.y)*ease;camera.scale+=(target.scale-camera.scale)*ease;offset.y=target.screenY;initialized=true;
+  function draw(state={},time=0,options={}){
+    const {reducedMotion=false}=options;drawOptions=options;
+    lastState=state;now=reducedMotion?0:Number.isFinite(state.elapsed)?state.elapsed:time;const raw=Number.isFinite(time)?time:now,dt=lastTime===null?.016:clamp(raw-lastTime,0,.1);lastTime=raw;
+    const target=cameraTarget(state,options);if(initialized)camera.y+=(target.screenY-offset.y)/camera.scale;Object.assign(camera,advanceShoreActionCamera(camera,target,dt,{initialized,reducedMotion}));offset.y=target.screenY;initialized=true;
     ctx.setTransform(1,0,0,1,0,0);ctx.imageSmoothingEnabled=false;R(ctx,0,0,canvas.width,canvas.height,C.deep);
     const origin=project(0,0);ctx.setTransform(camera.scale,0,0,camera.scale,origin.x,origin.y);
     drawTerrain();waves();pier();
+    const castPreview=shoreCastPreviewVisual(state);drawShoreCastPreview(castPreview,(...args)=>line(ctx,...args));
     const v=bounds(80);
     for(let i=Math.floor(v.left/430);i<Math.ceil(v.right/430);i++){const x=i*430+Math.sin(now*.07+i)*68,y=scene.shoreY(x)-160+Math.sin(now*.11+i*2)*43;if(visible(x,y))gull(x,y,true,i);}
     for(let x=Math.floor(v.left/575)*575;x<v.right;x+=575){const y=scene.shoreY(x)+87;if(visible(x,y)){gull(x+13,y);if(noise(x,71)>.5)gull(x+34,y+10);}}
@@ -435,8 +453,9 @@ export function createPacificaWorld(canvas,{sceneId='pacifica'}={}){
     person(scene.shop.x+147,scene.shop.door.y-2,{staff:true,small:true,facing:'down'});
     regularAngler(state);
     const warden=state.warden;if(warden&&visible(warden.x,warden.y))person(warden.x,warden.y,{warden:true,walking:true,facing:warden.facing??-1});
+    const fishVisual=shoreFishVisual(scene,state,{time:now,reducedMotion,cameraScale:camera.scale});
     person(p.x,p.y,{walking:state.player?.walking,facing:state.player?.facing,fishing:!!state.cast&&!['walk','landed'].includes(state.phase)});
-    const castTarget=fishing(state);
+    const castTarget=fishing(state);drawShoreFish(ctx,fishVisual,{line:(...args)=>line(ctx,...args),ring,foam:C.foam});
     if(state.inspection){
       const inspection=state.inspection,ix=inspection.x??inspection.position?.x??p.x+15,iy=inspection.y??inspection.position?.y??p.y+28;
       person(ix,iy,{warden:true,facing:'down'});R(ctx,ix-13,iy-57,29,12,'#e6d7ae');text(ctx,'CHECK',ix+1,iy-55,1,'#4b6357');
@@ -448,7 +467,7 @@ export function createPacificaWorld(canvas,{sceneId='pacifica'}={}){
       if(smelt)R(ctx,p.x+23,p.y-23,20,1,'#e7ecd4');if(croaker)R(ctx,p.x+27,p.y-23,2,2,'#6a756b');R(ctx,p.x+22,p.y-25,2,2,'#34595d');
     }}
     ctx.setTransform(1,0,0,1,0,0);
-    return{player:worldToScreen(p),shop:worldToScreen(scene.shop.door),pier:scene.pier?worldToScreen(scene.pier.gate):null,castTarget:castTarget?worldToScreen(castTarget):null,camera:{...camera}};
+    return{player:worldToScreen(p),shop:worldToScreen(scene.shop.door),pier:scene.pier?worldToScreen(scene.pier.gate):null,castTarget:castTarget?worldToScreen(castTarget):null,camera:{...camera},tackle:lastTackle,actionCamera:{mode:target.mode,focus:target.focus,desiredScale:target.scale,safeBounds:target.safeBounds},fishVisual,castPreview};
   }
-  return{resize,draw,screenToWorld,worldToScreen,focus(x,y){manualFocus=typeof x==='object'&&x?{x:x.x,y:x.y}:{x,y};if(x==null)manualFocus=null;initialized=false;},setInsets(value={}){insets={...insets,...value};initialized=false;},get camera(){return{...camera};},get state(){return lastState;}};
+  return{resize,draw,screenToWorld,worldToScreen,focus(x,y){manualFocus=typeof x==='object'&&x?{x:x.x,y:x.y}:{x,y};if(x==null)manualFocus=null;initialized=false;},setInsets(value={}){insets={...insets,...value};},get camera(){return{...camera};},get state(){return lastState;}};
 }

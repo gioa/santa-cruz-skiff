@@ -1,0 +1,53 @@
+{
+  "checks": [
+    {
+      "scene": "pacifica",
+      "checks": [
+        "Continuous world through cast/retrieve/strike/fight",
+        "Keyboard speed/drag/rod controls",
+        "Shortcuts work from range controls",
+        "Opaque readable control panel and hook/weight label",
+        "Pointer rod lift and sweep",
+        "Held retrieve moves lure",
+        "Twitch moves presentation",
+        "Gradual reel-home starts and stops",
+        "Controls fit phone/landscape/desktop",
+        "Blur freezes simulation"
+      ],
+      "initialDepth": 0
+    },
+    {
+      "scene": "half-moon-bay",
+      "checks": [
+        "Continuous world through cast/retrieve/strike/fight",
+        "Keyboard speed/drag/rod controls",
+        "Shortcuts work from range controls",
+        "Opaque readable control panel and hook/weight label",
+        "Pointer rod lift and sweep",
+        "Held retrieve moves lure",
+        "Twitch moves presentation",
+        "Gradual reel-home starts and stops",
+        "Controls fit phone/landscape/desktop",
+        "Blur freezes simulation"
+      ],
+      "initialDepth": 0
+    },
+    {
+      "scene": "benicia",
+      "checks": [
+        "Continuous world through cast/retrieve/strike/fight",
+        "Keyboard speed/drag/rod controls",
+        "Shortcuts work from range controls",
+        "Opaque readable control panel and hook/weight label",
+        "Pointer rod lift and sweep",
+        "Held retrieve moves lure",
+        "Twitch moves presentation",
+        "Gradual reel-home starts and stops",
+        "Controls fit phone/landscape/desktop",
+        "Blur freezes simulation"
+      ],
+      "initialDepth": 0
+    }
+  ],
+  "errors": []
+}

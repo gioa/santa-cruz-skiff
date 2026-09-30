@@ -1,3 +1,4 @@
+import {BENICIA_SCENE,beniciaSample} from './benicia-data.js';
 import {gameSeconds} from './game-clock.js';
 import {WAVE_CLIMATE,SURF_DOMAIN_M,SURF_INLAND_M,beachShape,bedDepth,waveNumber,surfColumn,sampleSurfColumn,stockdonRunup} from './shore-surf.js';
 // Authored coastal cross-sections informed by NOAA/NWS surf-zone science.
@@ -49,6 +50,7 @@ function scene(def){
   return Object.freeze({...def,shop,spawn,shoreY,world:Object.freeze({width:def.width,height:1080,minY:-1000,shoreY})});
 }
 export const SHORE_SCENES=Object.freeze({
+  benicia:BENICIA_SCENE,
   pacifica:scene({id:'pacifica',name:'Pacifica Beach',shortName:'Sharp Park',subtitle:'Sharp Park · 黑沙与栈桥',caption:'SHARP PARK, CA',coordinates:'37°38′ N · 122°30′ W',saveKey:'pacifica-surf-save-v1',width:6400,pier,
     palette:Object.freeze({sand:'#767671',dry:'#8d8c81',wet:'#494f50',grain:'#a29c88',grainDark:'#565d5b',sea:'#4d858d',deep:'#315d70',shallow:'#709b96',foam:'#e0e6d5',grass:'#7d8768'}),
     channels:RIPS.pacifica,
@@ -152,6 +154,7 @@ export function shoreSurfCrests(sceneId,x,elapsed=0,seaState={},maxOffshore=SURF
 }
 
 export function sampleShore(sceneId,x,y,elapsed=0,seaState={},options={}){
+  if(getShoreScene(sceneId).id==='benicia')return beniciaSample(x,y,elapsed,seaState||{});
   const s=getShoreScene(sceneId);x=safeX(x,s.spawn.x);y=finite(y,s.shoreY(x));elapsed=safeTime(elapsed);
   const p=shoreProfile(s,x,elapsed,seaState),offshore=clamp((s.shoreY(x)-y)/PIXELS_PER_METRE,0,10000),shape=p.shape;
   const bar=bell(offshore-p.barDistance,p.barDistance*.16),trough=bell(offshore-p.troughDistance,p.troughDistance*.38);
@@ -195,7 +198,7 @@ export function sampleShore(sceneId,x,y,elapsed=0,seaState={},options={}){
   const crestHeight=surf?.crestHeight||0;
   const waveLoad=clamp((waveVelocity*waveVelocity+.5*crestHeight*whitewater)/4,0,1);
   const turbidity=clamp(.03+.58*(1-Math.exp(-orbitalVelocity*orbitalVelocity*.45))+.32*meanWhitewater+.1*channel*clamp(p.waveHeight,0,1),0,1);
-  const surfaceElevation=crestHeight*.5*Math.cos(wavePhase);
+  const surfaceElevation=(surf?.surfaceHeight??crestHeight)*.5*Math.cos(wavePhase);
   // Runup: Stockdon (2006) statistics on the beach face; each arriving bore
   // runs up in proportion to its own height over ~0.35 T, then backwashes.
   const run=stockdonRunup(Math.max(.01,p.waveHeight),p.wavePeriod,shape.faceSlope);
@@ -225,6 +228,7 @@ export function sampleShore(sceneId,x,y,elapsed=0,seaState={},options={}){
 /** One column of surf for renderers: the profile and wave column are built
  * once, then crests, foam and swash are sampled cheaply along it. */
 export function shoreSurfField(sceneId,x,elapsed=0,seaState={}){
+  if(getShoreScene(sceneId).id==='benicia')return {profile:beniciaSample(x,BENICIA_SCENE.shoreY(x),elapsed,seaState||{}),crests:[],foamAt:()=>0,swashMeters:0,waterlineMeters:0,surfZoneWidth:0,foamReach:0};
   const s=getShoreScene(sceneId);x=safeX(x,s.spawn.x);elapsed=safeTime(elapsed);
   const p=shoreProfile(s,x,elapsed,seaState);
   if(!(p.waveHeight>0))return{profile:p,crests:[],foamAt:()=>0,swashMeters:0,waterlineMeters:0,surfZoneWidth:0,foamReach:0};

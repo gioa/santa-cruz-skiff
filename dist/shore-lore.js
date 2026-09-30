@@ -1,4 +1,5 @@
 // Independent, saved random stream: conversations never change fishing or patrol rolls.
+import {BENICIA_ANGLERS} from './benicia-crowd.js';
 import {shoreZone} from './shore-data.js';
 import {REGULAR,regularNotes} from './shore-regular.js';
 export const ANGLERS=Object.freeze([
@@ -11,7 +12,7 @@ export const ANGLERS=Object.freeze([
 const RANDOM_ANGLERS=3;
 const pick=(a,r)=>a[Math.min(a.length-1,Math.floor(r()*a.length))];
 function random(lore){let x=lore.rngState>>>0;x^=x<<13;x^=x>>>17;x^=x<<5;lore.rngState=x>>>0;return lore.rngState/4294967296;}
-export function shoreClues(scene){return scene.zones.flatMap(z=>[
+export function shoreClues(scene){if(scene.id==='benicia')return scene.zones.flatMap(z=>BENICIA_ANGLERS.map((a,i)=>({id:`${z.id}:local:${i}`,zoneId:z.id,topic:'local',title:`${a.name} 的经验`,text:a.line,sourceName:a.name})));return scene.zones.flatMap(z=>[
  {id:z.id+':terrain',zoneId:z.id,topic:'terrain',title:'地形印象',text:`${z.name}那边，${z.description}你可以自己去看看浪线。`},
  {id:z.id+':bait',zoneId:z.id,topic:'bait',title:'用饵经验',text:`在${z.name}附近，我通常${['north','dunes','venice','trough'].includes(z.id)?'先用沙蟹配较小的钩找浪脚里的海鲫，短抛也值得试':'用鳀鱼块试条纹鲈，先找能让饵停留的水；比目鱼还得碰上合适的深浅和呈现'}。没有万能饵，等一阵没有口也正常。`},
  {id:z.id+':drift',zoneId:z.id,topic:'drift',title:'看水经验',text:`到${z.name}先看几组浪和泡沫去向；白浪断开的地方，饵可能被带向外侧。钓组不停滚动就检查铅重和落点；重铅能帮助稳底，也未必更容易中鱼。`},
@@ -22,7 +23,7 @@ export function createShoreLore(scene,saved,elapsed=0,seed){
  const catalog=[...shoreClues(scene),...regularNotes(scene)];
  if(valid){
   lore.serial=Math.max(0,Math.floor(Number(saved.serial)||0));
-  const seen=new Set();for(const note of Array.isArray(saved.notes)?saved.notes:[]){const clue=catalog.find(c=>c.id===note.id);if(!clue||seen.has(clue.id))continue;seen.add(clue.id);lore.notes.push({...clue,angler:clue.topic==='regular'?ANGLERS.length-1:Math.max(0,Math.min(RANDOM_ANGLERS-1,Math.floor(Number(note.angler)||0))),learnedAt:Math.max(0,Number(note.learnedAt)||0)});}
+  const seen=new Set();for(const note of Array.isArray(saved.notes)?saved.notes:[]){const clue=catalog.find(c=>c.id===note.id);if(!clue||seen.has(clue.id))continue;seen.add(clue.id);lore.notes.push({...clue,angler:clue.topic==='regular'?ANGLERS.length-1:Math.max(0,Math.min(RANDOM_ANGLERS-1,Math.floor(Number(note.angler)||0))),learnedAt:Math.max(0,Number(note.learnedAt)||0),...(scene.id==='benicia'&&typeof note.sourceName==='string'?{sourceName:note.sourceName.slice(0,60),title:`${note.sourceName.slice(0,60)} 的经验`}:{})});}
   const e=saved.encounter;
   if(e&&Number.isFinite(e.x)&&Number.isFinite(e.y)&&e.x>=20&&e.x<=scene.width-20&&e.y>=scene.shoreY(e.x)+20&&e.y<=scene.world.height-25&&Number.isFinite(e.expiresAt)&&e.expiresAt>elapsed){
    lore.encounter={id:Math.max(1,Math.floor(Number(e.id)||1)),x:e.x,y:e.y,expiresAt:e.expiresAt,angler:Math.max(0,Math.min(2,Math.floor(Number(e.angler)||0))),clueId:catalog.some(c=>c.id===e.clueId)?e.clueId:null,talked:e.talked===true};
@@ -32,6 +33,7 @@ export function createShoreLore(scene,saved,elapsed=0,seed){
  return lore;
 }
 export function stepShoreLore(sim){
+ if(sim.scene.id==='benicia')return; // This waterfront's regulars are the actual crowd.
  const s=sim.state,l=s.shoreLore,r=()=>random(l);
  if(l.encounter&&s.elapsed>=l.encounter.expiresAt)l.encounter=null;
  if(l.encounter||s.elapsed<l.nextAt)return;

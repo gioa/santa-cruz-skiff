@@ -13,6 +13,11 @@ export function shoreFishPosition(sceneId,state={}){
   const target=cast?.target||{x:player.x,y:scene.shoreY(player.x)-32};
   const baseline=Math.max(1,finite(cast?.fightDistance,finite(cast?.distance,1)));
   const fraction=clamp(finite(state.lineDistance,baseline)/baseline,.025,1.5);
-  const x=origin.x+(target.x-origin.x)*fraction;
-  return{x,y:Math.min(scene.shoreY(x)-3.2,origin.y+(target.y-origin.y)*fraction)};
+  const dx=target.x-origin.x,dy=target.y-origin.y,norm=Math.hypot(dx,dy)||1,radius=norm*fraction;
+  // Integrated lateral swimming is measured in metres by the fight model.
+  // Moving sideways takes up radial reach rather than inventing extra line.
+  const lateral=state.phase==='fighting'?clamp(finite(state.fishMotion?.lateral,0)*3.2,-radius*.7,radius*.7):0;
+  const radial=lateral?Math.sqrt(Math.max(0,radius*radius-lateral*lateral)):radius;
+  const x=origin.x+dx/norm*radial-dy/norm*lateral,y=origin.y+dy/norm*radial+dx/norm*lateral;
+  return{x,y:Math.min(scene.shoreY(x)-3.2,y)};
 }

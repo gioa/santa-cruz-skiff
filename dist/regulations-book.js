@@ -107,7 +107,7 @@ export const BOOK_SPECIES=Object.freeze([
  {id:'prohibited_rockfish',group:'禁捕',name:'黄眼岩鱼、刺背岩鱼、牛岩鱼、铜斑岩鱼',en:'Yelloweye, Quillback, Cowcod, Bronzespotted',latin:'Sebastes ruberrimus / maliger / levis / gilli',
   look:'黄眼岩鱼：橙红色、亮黄色眼睛；刺背岩鱼：褐色、背鳍棘很高且前半身色浅；牛岩鱼、铜斑岩鱼多为深水鱼。',
   season:()=>'全年禁止捕捞和持有。',size:()=>'—',bag:()=>'0 条：误钓须立即放流，深水鱼使用降鱼器。',gear:()=>'—',law:'T14 CCR §28.55(b)(1)'},
- {id:'chinook_salmon',group:'船钓 · 鲑鱼',name:'帝王鲑',en:'Chinook (king) salmon',latin:'Oncorhynchus tshawytscha',
+ {id:'chinook_salmon',group:'船钓 · 鲑鱼',name:'帝王鲑',en:'Chinook salmon (king salmon)',latin:'Oncorhynchus tshawytscha',
   look:'银色，背部和尾鳍上下两叶都有黑色小斑点；牙龈（下颌齿根）为黑色。银鲑（coho）牙龈为白色，尾鳍只有上半部有斑点。',
   season:salmonSeason,size:()=>'最小 20 in 全长（50.8 cm），特别时段见季节说明。',bag:()=>'每日 2 条。禁止保留银鲑（coho）。',
   gear:()=>'Point Conception 以北：只许 1 根竿、最多 2 枚单尖无倒刺钩；非拖钓的饵钓须用无倒刺圆钩（两钩间距 ≤5 in）。',law:'T14 CCR §27.80、§1.73'},

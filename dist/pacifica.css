@@ -34,54 +34,53 @@
 
 .shore-destinations{grid-template-columns:1fr}.shore-destinations .gear-card p{font-size:13px;line-height:1.75}.shore-destinations .gear-card small{font-size:11px}
 
-/* Shore fights share the first-person HUD, with compact controls below the hands. */
-#app[data-shore-scene].is-fishing-focus #world{pointer-events:none}
-#app[data-shore-scene].is-fishing-focus .location-hud-link{display:none!important}
-#app[data-shore-scene].is-fishing-focus #boat-console,
-#app[data-shore-scene].is-fishing-focus #boat-console.fishing-open{
- position:absolute;inset:0;display:block;width:100%!important;height:100%;max-height:none;
- max-width:none;transform:none;pointer-events:none
-}
-#app[data-shore-scene].is-fishing-focus #boat-console #boat-fishing{
- position:static;display:block;width:auto;height:auto;flex:none
-}
-#app[data-shore-scene].is-fishing-focus #boat-fishing .fish-status{
- top:calc(12px + var(--safe-top));left:max(12px,calc(env(safe-area-inset-left,0px) + 8px));
- width:max-content;max-width:calc(100% - 80px);padding:8px 10px;gap:4px
-}
-#app[data-shore-scene].is-fishing-focus #boat-fishing .fish-status-head{flex-wrap:wrap;gap:6px}
-#app[data-shore-scene].is-fishing-focus #boat-fishing #fish-distance{display:inline;margin-left:4px;color:#e3dac1}
-#app[data-shore-scene].is-fishing-focus #boat-fishing #fish-detail{margin:0;color:#e3dac1;font-size:10px}
-#app[data-shore-scene].is-fishing-focus #boat-fishing .fishing-toolbar{
- position:absolute;inset:0;display:block;width:auto;height:auto;min-width:0;margin:0;padding:0;pointer-events:none
-}
-#app[data-shore-scene].is-fishing-focus #boat-fishing .shore-tension{
- position:absolute;left:max(12px,calc(env(safe-area-inset-left,0px) + 8px));
- bottom:calc(12px + var(--safe-bottom));width:min(220px,calc(100% - 152px - env(safe-area-inset-left,0px) - env(safe-area-inset-right,0px)));
- padding:7px 9px;background:#163e46d9;color:#fff1d5;border:1px solid #d8e7d77d;pointer-events:none
-}
-#app[data-shore-scene].is-fishing-focus .shore-tension .meter-caption{margin:0 0 5px;font-size:10px}
-#app[data-shore-scene].is-fishing-focus .shore-tension small{display:block;margin-top:4px;color:#e3dac1;font-size:10px}
-#app[data-shore-scene].is-fishing-focus #boat-fishing .reel-actions{
- position:absolute;left:auto;top:auto;right:max(12px,calc(env(safe-area-inset-right,0px) + 8px));
- bottom:calc(12px + var(--safe-bottom));display:flex;gap:0;width:112px;height:56px;pointer-events:none
-}
-#app[data-shore-scene].is-fishing-focus #boat-fishing .reel-actions button{
- flex:1;width:100%;min-width:44px;height:56px;min-height:56px;margin:0;padding:6px;
- border:1px solid #d8e7d77d;box-shadow:0 2px 0 #102e3940;font:700 13px ui-monospace,monospace;pointer-events:auto
-}
-#app[data-shore-scene].is-fishing-focus #boat-fishing #beach-reel,
-#app[data-shore-scene].is-fishing-focus #boat-fishing #beach-cast{background:#fff0cf;color:#173f43}
-#app[data-shore-scene].is-fishing-focus #boat-fishing #beach-reel.active{background:#dfac76;color:#173f43}
-#app[data-shore-scene].is-fishing-focus #toast{bottom:calc(88px + var(--safe-bottom));max-width:min(380px,calc(100% - 32px));font-size:11px}
+/* One continuous shore scene: the controls stay in place through casts,
+   retrieves, bites and fights. The world camera supplies action zoom. */
+#app[data-shore-scene] #world{visibility:visible;touch-action:none}
+#app[data-shore-scene]:not(.is-intro) #boat-console.fishing-open:has(#boat-fishing){width:min(410px,calc(100% - 20px));padding:7px;background:#183e45;border:1px solid #bfd0b39c;box-shadow:0 3px 0 #17383d55;bottom:calc(8px + var(--safe-bottom));color:#f8edcf}
+#app[data-shore-scene] #boat-console #boat-fishing{display:grid;grid-template-columns:minmax(0,1fr);gap:4px}
+#app[data-shore-scene] #boat-console #boat-fishing .rod-identity{grid-column:1;grid-row:1;min-height:34px;padding:3px 45px 3px 6px;background:#e9ddbddf;border:0;gap:2px 7px;font-size:10px}
+#app[data-shore-scene] #active-rod-name{display:none}
+#app[data-shore-scene] #rod-config-btn{width:38px;min-width:38px;height:34px;min-height:34px;top:0;right:0;transform:none;padding:5px}
+#app[data-shore-scene] #boat-console #boat-fishing .fish-status{grid-column:1;grid-row:2;padding:1px 3px;background:transparent;border:0;box-shadow:none;color:#f8edcf;min-width:0}
+#app[data-shore-scene] .fish-status-head{font-size:11px;line-height:16px}
+#app[data-shore-scene] #boat-fishing #fish-distance{display:block;color:#e4d4ae}
+#app[data-shore-scene] #fish-detail{display:none}
+#app[data-shore-scene] #boat-console #boat-fishing.no-instruments .fishing-toolbar{grid-column:1;grid-row:3!important;display:grid;grid-template-columns:minmax(0,1fr);gap:5px;min-width:0;width:100%}
+#app[data-shore-scene] #boat-fishing .shore-tension{padding:2px 4px;background:transparent;border:0;color:#f8edcf}
+#app[data-shore-scene] .shore-tension .meter-caption{display:flex;justify-content:space-between;margin:0 0 2px;font-size:9px;line-height:12px}
+#app[data-shore-scene] .shore-tension .meter{height:4px;margin:0;background:#0a282c}
+#app[data-shore-scene] .shore-tension small{display:none}
+#app[data-shore-scene] .shore-manipulation{display:grid;grid-template-columns:90px minmax(0,1fr);gap:10px;min-width:0}
+#app[data-shore-scene] .shore-rod-pad{position:relative;min-height:76px;touch-action:none;user-select:none;border:1px solid #b9cdbd80;background:linear-gradient(90deg,transparent 49.5%,#b9cdbd30 50%,transparent 50.5%),linear-gradient(0deg,transparent 49.5%,#b9cdbd30 50%,transparent 50.5%),#31585a;cursor:crosshair;overflow:hidden}
+#app[data-shore-scene] .shore-rod-pad>span{position:absolute;top:3px;left:5px;font-size:10px;color:#ecdfbd}
+#app[data-shore-scene] .shore-rod-pad small{position:absolute;bottom:3px;left:0;right:0;text-align:center;font-size:8px;color:#d1ddc8;pointer-events:none}
+#app[data-shore-scene] .shore-rod-pad i{position:absolute;left:clamp(12px,var(--rod-x,50%),calc(100% - 12px));top:clamp(15px,var(--rod-y,65%),calc(100% - 15px));width:16px;height:16px;transform:translate(-50%,-50%);border:2px solid #f4e7c4;border-radius:50%;background:#d69c65;box-shadow:0 1px 2px #102e39}
+#app[data-shore-scene] .shore-rod-pad.active{border-color:#f2c083}
+#app[data-shore-scene] .shore-rod-pad:focus-visible{outline:2px solid #ffd993;outline-offset:2px}
+#app[data-shore-scene] .shore-adjustments{display:grid;gap:2px;min-width:0}
+#app[data-shore-scene] .shore-adjustments label{display:block;min-width:0;font-size:10px;color:#f4e8c9}
+#app[data-shore-scene] .shore-adjustments label>span{display:flex;justify-content:space-between;gap:8px;line-height:13px}
+#app[data-shore-scene] .shore-adjustments input{display:block;appearance:none;width:100%;height:25px;margin:0;background:transparent;accent-color:#e8c68b;touch-action:none}
+#app[data-shore-scene] .shore-adjustments input::-webkit-slider-runnable-track{height:4px;background:#8ea594;border-radius:2px}
+#app[data-shore-scene] .shore-adjustments input::-webkit-slider-thumb{appearance:none;width:21px;height:21px;margin-top:-8px;border:2px solid #eed6a3;background:#406864;border-radius:50%}
+#app[data-shore-scene] .shore-adjustments input:focus-visible{outline:2px solid #ffd993;outline-offset:1px}
+#app[data-shore-scene] #boat-fishing .fishing-toolbar .reel-actions{display:flex;gap:5px;min-height:44px;height:44px;width:100%;order:0}
+#app[data-shore-scene] #boat-fishing .fishing-toolbar .reel-actions button{flex:1 1 0;min-width:0;width:auto;height:44px;min-height:44px;padding:3px;border:1px solid #bfceb2;box-shadow:0 2px 0 #16353a;line-height:1.25;font-size:12px;touch-action:none}
+#app[data-shore-scene] #boat-fishing #beach-twitch{background:#b7c8ac;color:#173d42}
+#app[data-shore-scene] #boat-fishing #beach-retrieve[aria-pressed=true]{background:#d8ac73}
+#app[data-shore-scene] #boat-fishing #cast-charge{order:0}
+#app[data-shore-scene].shore-fighting #boat-console{border-color:#e5c88c}
 @media(max-height:500px) and (orientation:landscape){
- #app[data-shore-scene].is-fishing-focus .hud,
- #app[data-shore-scene].is-fishing-focus #boat-fishing .fish-status{top:calc(8px + var(--safe-top))}
- #app[data-shore-scene].is-fishing-focus #boat-fishing .fish-status{padding:6px 9px;gap:2px}
- #app[data-shore-scene].is-fishing-focus #boat-fishing .shore-tension,
- #app[data-shore-scene].is-fishing-focus #boat-fishing .reel-actions{bottom:calc(8px + var(--safe-bottom))}
- #app[data-shore-scene].is-fishing-focus #boat-fishing .shore-tension{width:min(200px,calc(100% - 152px - env(safe-area-inset-left,0px) - env(safe-area-inset-right,0px)));padding:5px 8px}
- #app[data-shore-scene].is-fishing-focus #boat-fishing .reel-actions,
- #app[data-shore-scene].is-fishing-focus #boat-fishing .reel-actions button{height:48px;min-height:48px}
- #app[data-shore-scene].is-fishing-focus #toast{bottom:calc(76px + var(--safe-bottom));max-width:min(320px,calc(100% - 32px));font-size:10px}
+ #app[data-shore-scene]:not(.is-intro) #boat-console.fishing-open:has(#boat-fishing){width:min(590px,calc(100% - 24px))!important;padding:5px}
+ #app[data-shore-scene] #boat-console #boat-fishing{grid-template-columns:1fr 1fr;gap:3px 8px}
+ #app[data-shore-scene] #boat-console #boat-fishing .rod-identity{grid-column:1;grid-row:1;font-size:9px;min-height:30px}
+ #app[data-shore-scene] #boat-console #boat-fishing .fish-status{grid-column:2;grid-row:1;align-self:center}
+ #app[data-shore-scene] #boat-console #boat-fishing.no-instruments .fishing-toolbar{grid-column:1/-1;grid-row:2!important;grid-template-columns:1.15fr 1fr;gap:3px 10px}
+ #app[data-shore-scene] #boat-fishing .shore-tension{grid-column:1/-1}
+ #app[data-shore-scene] .shore-manipulation{grid-column:1;grid-template-columns:78px minmax(0,1fr);gap:8px}
+ #app[data-shore-scene] .shore-rod-pad{min-height:72px}
+ #app[data-shore-scene] #boat-fishing .fishing-toolbar .reel-actions{grid-column:2;align-self:end;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));height:auto}
+ #app[data-shore-scene] #boat-fishing .fishing-toolbar .reel-actions button{width:100%;height:36px;min-height:36px;font-size:11px}
+ #app[data-shore-scene] #boat-fishing #cast-charge{grid-column:1/-1}
 }

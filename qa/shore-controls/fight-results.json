@@ -1,0 +1,85 @@
+{
+  "checks": [
+    {
+      "scene": "pacifica",
+      "initialDepth": 0.7629822616326821,
+      "initialDistance": 25.224331168904303,
+      "jumpAt": 8.675000000000056,
+      "capturedAirHeight": 0.12972384643152035,
+      "maxAirHeight": 0.18242990863416478,
+      "landedAt": 32.19999999999924,
+      "energyAtLanding": 0.17703239024342202,
+      "events": [
+        {
+          "kind": "launch",
+          "time": 8.600000000000055,
+          "previousDepth": 0.029082215771124
+        },
+        {
+          "kind": "splash",
+          "time": 8.97500000000006,
+          "splash": 1
+        },
+        {
+          "kind": "launch",
+          "time": 18.949999999999992,
+          "previousDepth": 0.030564482032685192
+        },
+        {
+          "kind": "splash",
+          "time": 19.299999999999972,
+          "splash": 1
+        }
+      ],
+      "continuousView": true,
+      "floatVisible": false,
+      "lineAttached": true
+    },
+    {
+      "scene": "half-moon-bay",
+      "initialDepth": 0.787301190007468,
+      "initialDistance": 25.24826476340053,
+      "jumpAt": 8.350000000000051,
+      "capturedAirHeight": 0.14424246246283998,
+      "maxAirHeight": 0.18525856590834633,
+      "landedAt": 32.24999999999924,
+      "energyAtLanding": 0.17582254871897002,
+      "events": [
+        {
+          "kind": "launch",
+          "time": 8.25000000000005,
+          "previousDepth": 0.03516081016335457
+        },
+        {
+          "kind": "splash",
+          "time": 8.650000000000055,
+          "splash": 0.9821428571428571
+        },
+        {
+          "kind": "launch",
+          "time": 16.950000000000106,
+          "previousDepth": 0.027704313681311966
+        },
+        {
+          "kind": "splash",
+          "time": 17.300000000000086,
+          "splash": 1
+        }
+      ],
+      "continuousView": true,
+      "floatVisible": false,
+      "lineAttached": true
+    },
+    {
+      "scene": "benicia",
+      "species": "chinook_salmon",
+      "initialDepth": 3.773913521181181,
+      "waterDepthAtLanding": 7.056217027438942,
+      "fishDepthAtLanding": 0.3110936352391433,
+      "landedAt": 143.47500000001548,
+      "energyAtLanding": 0.04831892421505782,
+      "continuousView": true
+    }
+  ],
+  "errors": []
+}

@@ -12,7 +12,7 @@ const historyIds = sim => sim.state.catchHistory.map(fish => fish.catchId);
 
 test('shore encounter IDs keep their tuning while names, scientific identities and art match the shared catalog', () => {
   // Ecology keys stay local; barred surfperch is the modelled perch, redtail is legacy-only for old saves.
-  assert.deepEqual(SPECIES.map(f => f.id), ['surfperch', 'striped_bass', 'halibut', 'white_croaker', 'jacksmelt', 'redtail_surfperch', 'calico_surfperch', 'silver_surfperch', 'walleye_surfperch', 'shiner_perch', 'pile_perch', 'striped_seaperch']);
+  assert.deepEqual(SPECIES.map(f => f.id), ['surfperch', 'striped_bass', 'halibut', 'white_croaker', 'jacksmelt', 'redtail_surfperch', 'calico_surfperch', 'silver_surfperch', 'walleye_surfperch', 'shiner_perch', 'pile_perch', 'striped_seaperch', 'chinook_salmon']);
   for (const fish of SPECIES) {
     const canonical = fishSpecies(fish);
     assert.equal(fish.speciesId, canonical.id);

@@ -6,8 +6,8 @@ import {shoreFightPose,createShoreFightView} from '../dist/shore-fight-view.js';
 import {getShoreScene} from '../dist/shore-data.js';
 
 function canvas(){
-  const calls=[],attrs={};
-  const ctx=new Proxy({fillStyle:'',fillRect(...args){calls.push(['fillRect',this.fillStyle,...args]);},drawImage(...args){calls.push(['drawImage',...args]);}},{get:(value,key)=>key in value?value[key]:()=>{}});
+  const calls=[],attrs={};let path=[];
+  const ctx=new Proxy({fillStyle:'',beginPath(){path=[];},moveTo(x,y){path.push([x,y]);},lineTo(x,y){path.push([x,y]);},fill(){calls.push(['fill',this.fillStyle,path.slice()]);},fillRect(...args){calls.push(['fillRect',this.fillStyle,...args]);},drawImage(...args){calls.push(['drawImage',...args]);}},{get:(value,key)=>key in value?value[key]:()=>{}});
   return{width:900,height:600,parentElement:{clientWidth:280},style:{},dataset:{},calls,attrs,getContext:()=>ctx,
     setAttribute:(key,value)=>attrs[key]=value,getBoundingClientRect:()=>({left:0,top:0,width:900,height:600})};
 }
@@ -25,7 +25,7 @@ test('float fight view keeps the hook in its simulated upper-water layer and dra
   assert.equal(surface.z,(pose.fishWorld.y-s.cast.origin.y)/3.2);
   const art=canvas(),view=createShoreFightView(art);view.draw(s,0,{active:true});
   assert.equal(view.snapshot().floatVisible,true);
-  assert.ok(art.calls.some(call=>call[1]==='#e26e50'),'visible float tip is rendered');
+  assert.ok(art.calls.some(call=>call[0]==='fill'&&call[1]==='#e26e50'&&call[2].length===4),'the tilted float tip is rendered as a filled polygon');
   assert.equal(JSON.stringify(s),before);
   const landed={...s,phase:'landed'};art.calls.length=0;view.draw(landed,0,{active:true});
   assert.equal(view.snapshot().floatVisible,false);

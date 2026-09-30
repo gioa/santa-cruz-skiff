@@ -268,7 +268,12 @@ export function sampleSurfColumn(col,offshore){
   const T=TAU/Math.max(1e-6,col.omega??1),dt=last.age+FOAM_WAVES*T;
   foam+=.45*foamWindow(mean,i,col.n,dt+2*T)*Math.exp(-dt/FOAM_LIFE)/(1-Math.exp(-T/FOAM_LIFE));
  }
- return{foam:clamp(foam,0,1),active:clamp(active,0,1),crestHeight,crestState,crestType,crestAge:age,
+ // Adjacent waves have different heights. Blend their envelopes between
+ // crests so the water surface (and a floating rig) never jumps at a new wave.
+ const cycle=clamp(last.age*col.omega/TAU,0,1),blend=cycle*cycle*(3-2*cycle);
+ const nextHeight=col.wave(last.index+1)?.H[i]??crestHeight;
+ const surfaceHeight=crestHeight+(nextHeight-crestHeight)*blend;
+ return{foam:clamp(foam,0,1),active:clamp(active,0,1),crestHeight,surfaceHeight,crestState,crestType,crestAge:age,
   significantHeight:col.sig?col.sig.H[i]:0,saturated:col.sig?col.sig.state[i]===1||col.sig.state[i]===2:false,dry:false};
 }
 /** Stockdon et al. (2006) runup statistics for a beach-face slope. */

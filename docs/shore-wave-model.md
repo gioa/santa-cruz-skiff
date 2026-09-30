@@ -1,6 +1,6 @@
 # Shore waves, surf and whitewater
 
-Pacifica (Sharp Park) and Half Moon Bay share one surf model, `dist/shore-surf.js`, read through `dist/shore-data.js`. The same field drives the overhead coast, the first-person fight view, tackle forcing and fish habitat. It is a deterministic game model built from buoy climate statistics and standard surf-zone formulas, not a forecast, a survey or a spectral wave solver.
+Pacifica (Sharp Park) and Half Moon Bay share one surf model, `dist/shore-surf.js`, read through `dist/shore-data.js`. The same field drives the continuous shore scene, tackle forcing and fish habitat. It is a deterministic game model built from buoy climate statistics and standard surf-zone formulas, not a forecast, a survey or a spectral wave solver.
 
 ## Sea state: buoy climate
 
@@ -85,6 +85,16 @@ The foam lifetime, drift speed and spreading are game choices within the observe
 
 Coefficients that turn these into drag, turbidity or tackle load are game calibration. Heavy surf (for example 2.8 m / 16 s) moves rigs and turns fish off. The calibration shows trough fishing at Sharp Park nearly stopping in it.
 
+## Visible tackle response
+
+Most shore rigs have no bobber. Carolina and fish-finder rigs show wave effects through the rod, line, water-entry ripple and simulated underwater drift/holding. Their sinker and bait remain submerged. The mounted rig controls float artwork; stale presentation state cannot add a bobber to a bottom rig.
+
+Both shore cameras use `shore-tackle-visual.js` to read the water at the visible contact point. The float rises and falls with `surfaceElevation`, leans with local flow, and has its base covered by passing breaker foam. Adjacent wave-height envelopes blend smoothly between crests so a new wave never produces a height jump. First-person height uses the same perspective scale as the drawn crests.
+
+The waiting rod now bends with the simulation's tension. The line stays attached to the rod and water contact; tension takes up its sag and local flow bows it near the water. The simulation already moves the tackle horizontally, so rendering adds no second orbital drift. Bite dipping remains separate from wave motion.
+
+These are read-only visual responses to the existing simplified physics, not a flexible-line or buoyancy solver. Calm water adds no artificial float bobbing. Pausing holds the same frame; reduced motion samples both surf artwork and water contact at the same fixed time, while gameplay positions and tension remain responsive.
+
 ## API
 
 ```js
@@ -109,3 +119,7 @@ World coordinates use 3.2 px per metre. `sampleShore(..., {surf:false})` skips i
 - whitewater reaching the real waterline at every tide, with none on dry sand.
 
 `tests/shore-sim.test.js` and `tests/shore-technique.test.js` check that winter swell and heavy surf change tackle and fishing outcomes. `qa/shore-surf/preview.html?scene=&hs=&tp=&x=&t=&focus=&tide=&animate` renders any sea state for visual review.
+
+`tests/shore-tackle-visual.test.js` and `tests/shore-fight-view.test.js` cover crest continuity, calm-water stillness, local water contact, attached line endpoints, tension/flow response, foam layering and reduced motion. Browser scenarios and screenshots for both beaches are in `qa/shore-wave-tackle/`.
+
+Shore gameplay now keeps casting, retrieval and fighting on the same world canvas. Action zoom follows the physical rod, line entry and fish rather than switching to the legacy first-person renderer. See [shore controls](shore-controls.md) and [species fight behaviour](shore-fight-behavior.md).

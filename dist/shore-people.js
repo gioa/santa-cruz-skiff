@@ -1,6 +1,12 @@
 /** Pixel silhouettes share a foot/hand anchor, not a wardrobe. Clothing is
  * tied to identity, so an NPC keeps the same outfit while walking or fishing. */
 export const SHORE_PERSON_STYLES=Object.freeze({
+ benicia_denim:{coat:'#466883',light:'#789cb2',trousers:'#354654',hat:'#ddd1ab',skin:'#c3916d',hair:'#d2d0bc',cut:'pockets',head:'bucket'},
+ benicia_violet:{coat:'#735b7a',light:'#ac87a8',trousers:'#42444c',hat:'#493d64',skin:'#e0b792',hair:'#4a3542',cut:'satchel',head:'beanie'},
+ benicia_orange:{coat:'#b2793f',light:'#efb363',trousers:'#3b5150',hat:'#b2793f',skin:'#c3a086',hair:'#263b3b',cut:'slicker',head:'hood'},
+ benicia_red:{coat:'#904f48',light:'#cd8274',trousers:'#3c4e69',hat:'#3e5374',skin:'#a87d5e',hair:'#3c3431',cut:'pockets',head:'baseball'},
+ benicia_teal:{coat:'#376f6b',light:'#72aaa0',trousers:'#465645',hat:'#a29871',skin:'#a77963',hair:'#d3cdb9',cut:'utility',head:'sunhat'},
+ benicia_cream:{coat:'#b3aa8d',light:'#e5dbc1',trousers:'#60534e',hat:'#884b49',skin:'#d3a077',hair:'#383336',cut:'satchel',head:'workcap'},
  player:{coat:'#b76e50',light:'#d38f61',trousers:'#405a58',hat:'#476767',skin:'#d6aa81',hair:'#644f45',cut:'vest',head:'sunhat'},
  staff:{coat:'#cfaa64',light:'#ead091',trousers:'#354f51',hat:'#264c5c',skin:'#c6946e',hair:'#d4d4c3',cut:'apron',head:'workcap'},
  warden:{coat:'#526553',light:'#7f8768',trousers:'#384c43',hat:'#455b47',skin:'#d0a078',hair:'#443d36',cut:'uniform',head:'campaign'},

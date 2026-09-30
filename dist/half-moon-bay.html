@@ -14,7 +14,6 @@
 <body>
 <main id="app" class="is-intro" data-location="half-moon-bay" data-shore-scene>
 <canvas id="world" aria-label="Half Moon Bay 沙滩钓场，Francis、Venice 与 Dunes 的浅色沙滩，轻点沙地行走，轻点海面瞄准" tabindex="0"></canvas>
-<canvas id="fight-view" role="img" aria-label="Half Moon Bay 面朝海面的第一人称搏鱼视角" hidden></canvas>
 <header class="hud"><div class="brand"><span>≈</span><div>潮汐之间<small>HALF MOON BAY · PIXEL FISHING</small></div></div><div class="day-card"><span id="weather-icon" aria-label="天气">☁</span><time id="clock">06:00</time><span id="weather">晨雾</span></div><div class="hud-tools"><button id="credits-btn" class="coin-button" aria-label="查看鱼获与潮汐点"><i>✦</i><span id="credits">100</span></button><button id="audio-btn" class="square" aria-label="开关声音">♪</button><button id="settings-btn" class="square" aria-label="设置与帮助">☰</button></div></header>
 <section id="intro" class="intro"><div class="stamp"><span></span>A LITTLE ROD. A WHOLE OCEAN.</div><h1>潮汐之间<small>像素里的海风，<br>属于你的慢时光。</small></h1><p>一片沙滩，一根鱼竿。<br>从 Half Moon Bay 的清晨出发。</p><button id="start-btn" class="primary intro-start">去沙滩 <span>→</span></button><button id="resume-btn" class="text-button" hidden>继续上次航程 ↗</button><div class="intro-foot"><span id="intro-clock">06:00 AM</span><i></i><span>HALF MOON BAY, CA</span></div></section>
 <div id="intro-location" class="intro-location"><span>37°28′ N · 122°27′ W</span><strong>THE BEACH</strong><small>今天，也去浪边待一会儿。</small></div>
@@ -29,7 +28,14 @@
   <div class="rod-identity"><span id="active-rod-name">岸钓竿</span><span id="tackle-name">Carolina · 沙蟹</span><button id="rod-config-btn" type="button" aria-label="配置当前鱼竿" title="配置当前鱼竿"><svg viewBox="0 0 24 24" width="23" height="23" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="15" cy="4" r="2"/><path d="M15 6v10a5 5 0 0 1-10 0v-4l4 3" stroke-linejoin="round"/></svg></button></div>
   <div class="fishing-toolbar">
    <div id="beach-tension" class="shore-tension" hidden><div class="meter-caption"><span>鱼线张力</span><strong id="tension-value">0%</strong></div><div class="meter tension"><i id="tension-fill"></i><span></span></div><small id="fight-advice">平稳收线，红区时松手让线。</small></div>
-   <div class="reel-actions"><button id="beach-cast">按住抛竿</button><button id="beach-reel" hidden>按住收线</button><button id="beach-retrieve" hidden>收回钓组</button></div>
+   <div id="shore-manipulation" class="shore-manipulation" aria-label="钓组操控">
+    <div id="shore-rod-pad" class="shore-rod-pad" role="slider" tabindex="0" aria-label="竿姿：上下提放，左右扫竿；方向键微调" aria-valuemin="0" aria-valuemax="100" aria-valuenow="35"><span>竿姿</span><i id="shore-rod-thumb" aria-hidden="true"></i><small>提放 · 左右扫竿</small></div>
+    <div class="shore-adjustments">
+     <label for="shore-reel-speed"><span>收线速度 <output id="shore-speed-value">60%</output></span><input id="shore-reel-speed" type="range" min="20" max="100" step="5" value="60" aria-label="收线速度"></label>
+     <label for="shore-drag"><span>泄力 <output id="shore-drag-value">50%</output></span><input id="shore-drag" type="range" min="10" max="100" step="5" value="50" aria-label="泄力松紧"></label>
+    </div>
+   </div>
+   <div class="reel-actions"><button id="beach-cast">按住抛竿</button><button id="beach-reel" hidden>按住收线</button><button id="beach-twitch" hidden>轻抽</button><button id="beach-retrieve" hidden>收回</button></div>
    <div id="cast-charge" class="meter power" hidden><i id="charge-fill"></i><span id="charge-label">蓄力 0%</span></div>
   </div>
  </section>

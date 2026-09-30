@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#163e47">
+  <meta name="description" content="潮汐之间的海岸旅程：Benicia。从 First Street 岸边抛投亮片，寻找随潮迁徙的帝王鲑。">
+  <title>Benicia · 潮汐之间</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath fill='%23163e47' d='M0 0h32v32H0z'/%3E%3Cpath fill='%23f8d393' d='M14 3h4v3h4v16h-4v6h-4v-6h-4V6h4z'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="./pixel.css">
+  <link rel="stylesheet" href="./pacifica.css">
+  <link rel="stylesheet" href="./pixel-locations.css">
+</head>
+<body>
+<main id="app" class="is-intro" data-location="benicia" data-shore-scene>
+<canvas id="world" aria-label="Benicia 岸钓场，First Street 岬尖、公共码头与石岸，轻点岸边行走，轻点海面瞄准" tabindex="0"></canvas>
+<header class="hud"><div class="brand"><span>≈</span><div>潮汐之间<small>BENICIA · PIXEL FISHING</small></div></div><div class="day-card"><span id="weather-icon" aria-label="天气">☁</span><time id="clock">06:00</time><span id="weather">晨雾</span></div><div class="hud-tools"><button id="credits-btn" class="coin-button" aria-label="查看鱼获与潮汐点"><i>✦</i><span id="credits">100</span></button><button id="audio-btn" class="square" aria-label="开关声音">♪</button><button id="settings-btn" class="square" aria-label="设置与帮助">☰</button></div></header>
+<section id="intro" class="intro"><div class="stamp"><span></span>FIRST STREET. A PASSING SALMON.</div><h1>潮汐之间<small>像素里的海风，<br>属于你的慢时光。</small></h1><p>一条街的尽头，等一阵过路的鲑鱼。<br>从 Benicia 的清晨出发。</p><button id="start-btn" class="primary intro-start">去岸边 <span>→</span></button><button id="resume-btn" class="text-button" hidden>继续上次航程 ↗</button><div class="intro-foot"><span id="intro-clock">06:00 AM</span><i></i><span>BENICIA, CA</span></div></section>
+<div id="intro-location" class="intro-location"><span>38°02′ N · 122°10′ W</span><strong>FIRST STREET</strong><small>找个空位，听水流过。</small></div>
+<nav id="trip-tools" class="trip-tools" hidden aria-label="航程工具"><button id="gear-btn" aria-label="背包与装备"><canvas data-icon="backpack" width="16" height="16"></canvas><span>背包</span><kbd>I</kbd></button><button id="map-btn" aria-label="沿岸手记" hidden><canvas data-icon="map" width="16" height="16"></canvas><span>手记</span><kbd>M</kbd></button><button id="journal-btn" aria-label="鱼获与航程"><canvas data-icon="fish" width="16" height="16"></canvas><span>鱼获</span><kbd>J</kbd></button></nav>
+<button id="rules-btn" class="rules-book-btn" type="button" hidden aria-label="打开加州休闲捕鱼规定" title="加州休闲捕鱼规定"><canvas data-item-art="ca_fishing_regulations" width="32" height="32" aria-hidden="true"></canvas><span>规定</span></button>
+<section id="trip-info" class="trip-info" hidden><span id="place">Benicia</span><div><span id="speed">沙滩</span><span id="shore-rig-summary"></span></div><small id="navigation"></small></section>
+<div id="toast" role="status" aria-live="polite"></div>
+<div id="controls" class="controls" hidden>
+<section id="boat-console" class="actions-only" aria-label="岸钓操作台">
+ <section id="boat-fishing" class="no-instruments" hidden aria-label="鱼竿与鱼轮控制台">
+  <section id="fish-status" class="fish-status" hidden aria-live="polite"><div class="fish-status-head"><i></i><b id="fish-title">等待鱼讯</b><span id="fish-distance"></span></div><small id="fish-detail"></small></section>
+  <div class="rod-identity"><span id="active-rod-name">岸钓竿</span><span id="tackle-name">鲑鱼亮片 · 1/0</span><button id="rod-config-btn" type="button" aria-label="配置当前鱼竿" title="配置当前鱼竿"><svg viewBox="0 0 24 24" width="23" height="23" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="15" cy="4" r="2"/><path d="M15 6v10a5 5 0 0 1-10 0v-4l4 3" stroke-linejoin="round"/></svg></button></div>
+  <div class="fishing-toolbar">
+   <div id="beach-tension" class="shore-tension" hidden><div class="meter-caption"><span>鱼线张力</span><strong id="tension-value">0%</strong></div><div class="meter tension"><i id="tension-fill"></i><span></span></div><small id="fight-advice">平稳收线，红区时松手让线。</small></div>
+   <div id="shore-manipulation" class="shore-manipulation" aria-label="钓组操控">
+    <div id="shore-rod-pad" class="shore-rod-pad" role="slider" tabindex="0" aria-label="竿姿：上下提放，左右扫竿；方向键微调" aria-valuemin="0" aria-valuemax="100" aria-valuenow="35"><span>竿姿</span><i id="shore-rod-thumb" aria-hidden="true"></i><small>提放 · 左右扫竿</small></div>
+    <div class="shore-adjustments">
+     <label for="shore-reel-speed"><span>收线速度 <output id="shore-speed-value">60%</output></span><input id="shore-reel-speed" type="range" min="20" max="100" step="5" value="60" aria-label="收线速度"></label>
+     <label for="shore-drag"><span>泄力 <output id="shore-drag-value">50%</output></span><input id="shore-drag" type="range" min="10" max="100" step="5" value="50" aria-label="泄力松紧"></label>
+    </div>
+   </div>
+   <div class="reel-actions"><button id="beach-cast">按住抛竿</button><button id="beach-reel" hidden>按住收线</button><button id="beach-twitch" hidden>轻抽</button><button id="beach-retrieve" hidden>收回</button></div>
+   <div id="cast-charge" class="meter power" hidden><i id="charge-fill"></i><span id="charge-label">蓄力 0%</span></div>
+  </div>
+ </section>
+</section>
+</div>
+<div id="modal-layer" hidden><section id="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title"><button id="close-modal" class="square close" aria-label="关闭窗口">×</button><div id="modal-content"></div></section></div>
+<output id="beach-state" hidden></output>
+</main>
+<script type="module" src="./pacifica-game.js"></script>
+<script type="module" src="./pixel-locations.js"></script>
+</body></html>

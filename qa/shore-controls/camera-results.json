@@ -1,0 +1,1211 @@
+{
+  "checks": [
+    {
+      "scene": "pacifica",
+      "viewport": "small-phone",
+      "direction": -1,
+      "phase": "waiting",
+      "scale": 0.5725419664268585,
+      "points": {
+        "angler": {
+          "x": 220.44444444444446,
+          "y": 288,
+          "clientX": 220.44444444444446,
+          "clientY": 288,
+          "visible": true
+        },
+        "waterEntry": {
+          "x": 37.333333333333336,
+          "y": 171.55555555555554,
+          "clientX": 37.333333333333336,
+          "clientY": 171.55555555555554,
+          "visible": true
+        },
+        "rodTip": {
+          "x": 211.55555555555554,
+          "y": 256,
+          "clientX": 211.55555555555554,
+          "clientY": 256,
+          "visible": true
+        }
+      }
+    },
+    {
+      "scene": "pacifica",
+      "viewport": "small-phone",
+      "direction": -1,
+      "phase": "fighting",
+      "scale": 0.5725419664268585,
+      "points": {
+        "angler": {
+          "x": 220.44444444444446,
+          "y": 288.8888888888889,
+          "clientX": 220.44444444444446,
+          "clientY": 288.8888888888889,
+          "visible": true
+        },
+        "waterEntry": {
+          "x": 37.333333333333336,
+          "y": 171.55555555555554,
+          "clientX": 37.333333333333336,
+          "clientY": 171.55555555555554,
+          "visible": true
+        },
+        "rodTip": {
+          "x": 211.55555555555554,
+          "y": 256,
+          "clientX": 211.55555555555554,
+          "clientY": 256,
+          "visible": true
+        },
+        "fish": {
+          "x": 37.333333333333336,
+          "y": 170.66666666666666,
+          "clientX": 37.333333333333336,
+          "clientY": 170.66666666666666,
+          "visible": true
+        }
+      }
+    },
+    {
+      "scene": "pacifica",
+      "viewport": "small-phone",
+      "direction": 1,
+      "phase": "waiting",
+      "scale": 0.5725419664268585,
+      "points": {
+        "angler": {
+          "x": 40.888888888888886,
+          "y": 288,
+          "clientX": 40.888888888888886,
+          "clientY": 288,
+          "visible": true
+        },
+        "waterEntry": {
+          "x": 224,
+          "y": 171.55555555555554,
+          "clientX": 224,
+          "clientY": 171.55555555555554,
+          "visible": true
+        },
+        "rodTip": {
+          "x": 32,
+          "y": 256,
+          "clientX": 32,
+          "clientY": 256,
+          "visible": true
+        }
+      }
+    },
+    {
+      "scene": "pacifica",
+      "viewport": "small-phone",
+      "direction": 1,
+      "phase": "fighting",
+      "scale": 0.5725419664268585,
+      "points": {
+        "angler": {
+          "x": 40.888888888888886,
+          "y": 288.8888888888889,
+          "clientX": 40.888888888888886,
+          "clientY": 288.8888888888889,
+          "visible": true
+        },
+        "waterEntry": {
+          "x": 224,
+          "y": 171.55555555555554,
+          "clientX": 224,
+          "clientY": 171.55555555555554,
+          "visible": true
+        },
+        "rodTip": {
+          "x": 32,
+          "y": 256,
+          "clientX": 32,
+          "clientY": 256,
+          "visible": true
+        },
+        "fish": {
+          "x": 224,
+          "y": 170.66666666666666,
+          "clientX": 224,
+          "clientY": 170.66666666666666,
+          "visible": true
+        }
+      }
+    },
+    {
+      "scene": "pacifica",
+      "viewport": "notched-phone",
+      "direction": -1,
+      "phase": "waiting",
+      "scale": 0.6006398672531169,
+      "points": {
+        "angler": {
+          "x": 280.5833333333333,
+          "y": 447.46084724005135,
+          "clientX": 280.5833333333333,
+          "clientY": 447.46084724005135,
+          "visible": true
+        },
+        "waterEntry": {
+          "x": 46.583333333333336,
+          "y": 297.9460847240051,
+          "clientX": 46.583333333333336,
+          "clientY": 297.9460847240051,
+          "visible": true
+        },
+        "rodTip": {
+          "x": 269.75,
+          "y": 406.29011553273426,
+          "clientX": 269.75,
+          "clientY": 406.29011553273426,
+          "visible": true
+        }
+      }
+    },
+    {
+      "scene": "pacifica",
+      "viewport": "notched-phone",
+      "direction": -1,
+      "phase": "fighting",
+      "scale": 0.6006398672531169,
+      "points": {
+        "angler": {
+          "x": 280.5833333333333,
+          "y": 448.54428754813864,
+          "clientX": 280.5833333333333,
+          "clientY": 448.54428754813864,
+          "visible": true
+        },
+        "waterEntry": {
+          "x": 46.583333333333336,
+          "y": 299.0295250320924,
+          "clientX": 46.583333333333336,
+          "clientY": 299.0295250320924,
+          "visible": true
+        },
+        "rodTip": {
+          "x": 269.75,
+          "y": 407.37355584082155,
+          "clientX": 269.75,
+          "clientY": 407.37355584082155,
+          "visible": true
+        },
+        "fish": {
+          "x": 46.583333333333336,
+          "y": 297.9460847240051,
+          "clientX": 46.583333333333336,
+          "clientY": 297.9460847240051,
+          "visible": true
+        }
+      }
+    },
+    {
+      "scene": "pacifica",
+      "viewport": "notched-phone",
+      "direction": 1,
+      "phase": "waiting",
+      "scale": 0.6006398672531169,
+      "points": {
+        "angler": {
+          "x": 50.916666666666664,
+          "y": 447.46084724005135,
+          "clientX": 50.916666666666664,
+          "clientY": 447.46084724005135,
+          "visible": true
+        },
+        "waterEntry": {
+          "x": 284.9166666666667,
+          "y": 297.9460847240051,
+          "clientX": 284.9166666666667,
+          "clientY": 297.9460847240051,
+          "visible": true
+        },
+        "rodTip": {
+          "x": 40.083333333333336,
+          "y": 406.29011553273426,
+          "clientX": 40.083333333333336,
+          "clientY": 406.29011553273426,
+          "visible": true
+        }
+      }
+    },
+    {
+      "scene": "pacifica",
+      "viewport": "notched-phone",
+      "direction": 1,
+      "phase": "fighting",
+      "scale": 0.6006398672531169,
+      "points": {
+        "angler": {
+          "x": 50.916666666666664,
+          "y": 448.54428754813864,
+          "clientX": 50.916666666666664,
+          "clientY": 448.54428754813864,
+          "visible": true
+        },
+        "waterEntry": {
+          "x": 284.9166666666667,
+          "y": 299.0295250320924,
+          "clientX": 284.9166666666667,
+          "clientY": 299.0295250320924,
+          "visible": true
+        },
+        "rodTip": {
+          "x": 40.083333333333336,
+          "y": 407.37355584082155,
+          "clientX": 40.083333333333336,
+          "clientY": 407.37355584082155,
+          "visible": true
+        },
+        "fish": {
+          "x": 284.9166666666667,
+          "y": 297.9460847240051,
+          "clientX": 284.9166666666667,
+          "clientY": 297.9460847240051,
+          "visible": true
+        }
+      }
+    },
+    {
+      "scene": "pacifica",
+      "viewport": "landscape",
+      "direction": -1,
+      "phase": "waiting",
+      "scale": 0.21226107226107221,
+      "points": {
+        "angler": {
+          "x": 450.03231597845604,
+          "y": 209.41634241245137,
+          "clientX": 450.03231597845604,
+          "clientY": 209.41634241245137,
+          "visible": true
+        },
+        "waterEntry": {
+          "x": 333.3572710951526,
+          "y": 135.05836575875486,
+          "clientX": 333.3572710951526,
+          "clientY": 135.05836575875486,
+          "visible": true
+        },
+        "rodTip": {
+          "x": 443.97127468581687,
+          "y": 188.17120622568095,
+          "clientX": 443.97127468581687,
+          "clientY": 188.17120622568095,
+          "visible": true
+        }
+      }
+    },
+    {
+      "scene": "pacifica",
+      "viewport": "landscape",
+      "direction": -1,
+      "phase": "fighting",
+      "scale": 0.21176822983527377,
+      "points": {
+        "angler": {
+          "x": 448.51705565529625,
+          "y": 209.41634241245137,
+          "clientX": 448.51705565529625,
+          "clientY": 209.41634241245137,
+          "visible": true
+        },
+        "waterEntry": {
+          "x": 333.3572710951526,
+          "y": 135.05836575875486,
+          "clientX": 333.3572710951526,
+          "clientY": 135.05836575875486,
+          "visible": true
+        },
+        "rodTip": {
+          "x": 443.97127468581687,
+          "y": 189.6887159533074,
+          "clientX": 443.97127468581687,
+          "clientY": 189.6887159533074,
+          "visible": true
+        },
+        "fish": {
+          "x": 333.3572710951526,
+          "y": 135.05836575875486,
+          "clientX": 333.3572710951526,
+          "clientY": 135.05836575875486,
+          "visible": true
+        }
+      }
+    },
+    {
+      "scene": "pacifica",
+      "viewport": "landscape",
+      "direction": 1,
+      "phase": "waiting",
+      "scale": 0.21226107226107221,
+      "points": {
+        "angler": {
+          "x": 336.3877917414722,
+          "y": 209.41634241245137,
+          "clientX": 336.3877917414722,
+          "clientY": 209.41634241245137,
+          "visible": true
+        },
+        "waterEntry": {
+          "x": 451.5475763016158,
+          "y": 135.05836575875486,
+          "clientX": 451.5475763016158,
+          "clientY": 135.05836575875486,
+          "visible": true
+        },
+        "rodTip": {
+          "x": 330.326750448833,
+          "y": 188.17120622568095,
+          "clientX": 330.326750448833,
+          "clientY": 188.17120622568095,
+          "visible": true
+        }
+      }
+    },
+    {
+      "scene": "pacifica",
+      "viewport": "landscape",
+      "direction": 1,
+      "phase": "fighting",
+      "scale": 0.21176822983527377,
+      "points": {
+        "angler": {
+          "x": 336.3877917414722,
+          "y": 209.41634241245137,
+          "clientX": 336.3877917414722,
+          "clientY": 209.41634241245137,
+          "visible": true
+        },
+        "waterEntry": {
+          "x": 451.5475763016158,
+          "y": 135.05836575875486,
+          "clientX": 451.5475763016158,
+          "clientY": 135.05836575875486,
+          "visible": true
+        },
+        "rodTip": {
+          "x": 330.326750448833,
+          "y": 189.6887159533074,
+          "clientX": 330.326750448833,
+          "clientY": 189.6887159533074,
+          "visible": true
+        },
+        "fish": {
+          "x": 451.5475763016158,
+          "y": 135.05836575875486,
+          "clientX": 451.5475763016158,
+          "clientY": 135.05836575875486,
+          "visible": true
+        }
+      }
+    },
+    {
+      "scene": "half-moon-bay",
+      "viewport": "small-phone",
+      "direction": -1,
+      "phase": "waiting",
+      "scale": 0.5725419664268585,
+      "points": {
+        "angler": {
+          "x": 220.44444444444446,
+          "y": 288,
+          "clientX": 220.44444444444446,
+          "clientY": 288,
+          "visible": true
+        },
+        "waterEntry": {
+          "x": 37.333333333333336,
+          "y": 171.55555555555554,
+          "clientX": 37.333333333333336,
+          "clientY": 171.55555555555554,
+          "visible": true
+        },
+        "rodTip": {
+          "x": 211.55555555555554,
+          "y": 256,
+          "clientX": 211.55555555555554,
+          "clientY": 256,
+          "visible": true
+        }
+      }
+    },
+    {
+      "scene": "half-moon-bay",
+      "viewport": "small-phone",
+      "direction": -1,
+      "phase": "fighting",
+      "scale": 0.5725419664268585,
+      "points": {
+        "angler": {
+          "x": 220.44444444444446,
+          "y": 288.8888888888889,
+          "clientX": 220.44444444444446,
+          "clientY": 288.8888888888889,
+          "visible": true
+        },
+        "waterEntry": {
+          "x": 37.333333333333336,
+          "y": 171.55555555555554,
+          "clientX": 37.333333333333336,
+          "clientY": 171.55555555555554,
+          "visible": true
+        },
+        "rodTip": {
+          "x": 211.55555555555554,
+          "y": 256,
+          "clientX": 211.55555555555554,
+          "clientY": 256,
+          "visible": true
+        },
+        "fish": {
+          "x": 37.333333333333336,
+          "y": 170.66666666666666,
+          "clientX": 37.333333333333336,
+          "clientY": 170.66666666666666,
+          "visible": true
+        }
+      }
+    },
+    {
+      "scene": "half-moon-bay",
+      "viewport": "small-phone",
+      "direction": 1,
+      "phase": "waiting",
+      "scale": 0.5725419664268585,
+      "points": {
+        "angler": {
+          "x": 40.888888888888886,
+          "y": 288,
+          "clientX": 40.888888888888886,
+          "clientY": 288,
+          "visible": true
+        },
+        "waterEntry": {
+          "x": 224,
+          "y": 171.55555555555554,
+          "clientX": 224,
+          "clientY": 171.55555555555554,
+          "visible": true
+        },
+        "rodTip": {
+          "x": 32,
+          "y": 256,
+          "clientX": 32,
+          "clientY": 256,
+          "visible": true
+        }
+      }
+    },
+    {
+      "scene": "half-moon-bay",
+      "viewport": "small-phone",
+      "direction": 1,
+      "phase": "fighting",
+      "scale": 0.5725419664268585,
+      "points": {
+        "angler": {
+          "x": 40.888888888888886,
+          "y": 288.8888888888889,
+          "clientX": 40.888888888888886,
+          "clientY": 288.8888888888889,
+          "visible": true
+        },
+        "waterEntry": {
+          "x": 224,
+          "y": 171.55555555555554,
+          "clientX": 224,
+          "clientY": 171.55555555555554,
+          "visible": true
+        },
+        "rodTip": {
+          "x": 32,
+          "y": 256,
+          "clientX": 32,
+          "clientY": 256,
+          "visible": true
+        },
+        "fish": {
+          "x": 224,
+          "y": 170.66666666666666,
+          "clientX": 224,
+          "clientY": 170.66666666666666,
+          "visible": true
+        }
+      }
+    },
+    {
+      "scene": "half-moon-bay",
+      "viewport": "notched-phone",
+      "direction": -1,
+      "phase": "waiting",
+      "scale": 0.6006398672531169,
+      "points": {
+        "angler": {
+          "x": 280.5833333333333,
+          "y": 447.46084724005135,
+          "clientX": 280.5833333333333,
+          "clientY": 447.46084724005135,
+          "visible": true
+        },
+        "waterEntry": {
+          "x": 46.583333333333336,
+          "y": 297.9460847240051,
+          "clientX": 46.583333333333336,
+          "clientY": 297.9460847240051,
+          "visible": true
+        },
+        "rodTip": {
+          "x": 269.75,
+          "y": 406.29011553273426,
+          "clientX": 269.75,
+          "clientY": 406.29011553273426,
+          "visible": true
+        }
+      }
+    },
+    {
+      "scene": "half-moon-bay",
+      "viewport": "notched-phone",
+      "direction": -1,
+      "phase": "fighting",
+      "scale": 0.6006398672531169,
+      "points": {
+        "angler": {
+          "x": 280.5833333333333,
+          "y": 448.54428754813864,
+          "clientX": 280.5833333333333,
+          "clientY": 448.54428754813864,
+          "visible": true
+        },
+        "waterEntry": {
+          "x": 46.583333333333336,
+          "y": 299.0295250320924,
+          "clientX": 46.583333333333336,
+          "clientY": 299.0295250320924,
+          "visible": true
+        },
+        "rodTip": {
+          "x": 269.75,
+          "y": 407.37355584082155,
+          "clientX": 269.75,
+          "clientY": 407.37355584082155,
+          "visible": true
+        },
+        "fish": {
+          "x": 46.583333333333336,
+          "y": 297.9460847240051,
+          "clientX": 46.583333333333336,
+          "clientY": 297.9460847240051,
+          "visible": true
+        }
+      }
+    },
+    {
+      "scene": "half-moon-bay",
+      "viewport": "notched-phone",
+      "direction": 1,
+      "phase": "waiting",
+      "scale": 0.6006398672531169,
+      "points": {
+        "angler": {
+          "x": 50.916666666666664,
+          "y": 447.46084724005135,
+          "clientX": 50.916666666666664,
+          "clientY": 447.46084724005135,
+          "visible": true
+        },
+        "waterEntry": {
+          "x": 284.9166666666667,
+          "y": 297.9460847240051,
+          "clientX": 284.9166666666667,
+          "clientY": 297.9460847240051,
+          "visible": true
+        },
+        "rodTip": {
+          "x": 40.083333333333336,
+          "y": 406.29011553273426,
+          "clientX": 40.083333333333336,
+          "clientY": 406.29011553273426,
+          "visible": true
+        }
+      }
+    },
+    {
+      "scene": "half-moon-bay",
+      "viewport": "notched-phone",
+      "direction": 1,
+      "phase": "fighting",
+      "scale": 0.6006398672531169,
+      "points": {
+        "angler": {
+          "x": 50.916666666666664,
+          "y": 448.54428754813864,
+          "clientX": 50.916666666666664,
+          "clientY": 448.54428754813864,
+          "visible": true
+        },
+        "waterEntry": {
+          "x": 284.9166666666667,
+          "y": 299.0295250320924,
+          "clientX": 284.9166666666667,
+          "clientY": 299.0295250320924,
+          "visible": true
+        },
+        "rodTip": {
+          "x": 40.083333333333336,
+          "y": 407.37355584082155,
+          "clientX": 40.083333333333336,
+          "clientY": 407.37355584082155,
+          "visible": true
+        },
+        "fish": {
+          "x": 284.9166666666667,
+          "y": 297.9460847240051,
+          "clientX": 284.9166666666667,
+          "clientY": 297.9460847240051,
+          "visible": true
+        }
+      }
+    },
+    {
+      "scene": "half-moon-bay",
+      "viewport": "landscape",
+      "direction": -1,
+      "phase": "waiting",
+      "scale": 0.21226107226107221,
+      "points": {
+        "angler": {
+          "x": 450.03231597845604,
+          "y": 209.41634241245137,
+          "clientX": 450.03231597845604,
+          "clientY": 209.41634241245137,
+          "visible": true
+        },
+        "waterEntry": {
+          "x": 333.3572710951526,
+          "y": 135.05836575875486,
+          "clientX": 333.3572710951526,
+          "clientY": 135.05836575875486,
+          "visible": true
+        },
+        "rodTip": {
+          "x": 443.97127468581687,
+          "y": 188.17120622568095,
+          "clientX": 443.97127468581687,
+          "clientY": 188.17120622568095,
+          "visible": true
+        }
+      }
+    },
+    {
+      "scene": "half-moon-bay",
+      "viewport": "landscape",
+      "direction": -1,
+      "phase": "fighting",
+      "scale": 0.21176822983527377,
+      "points": {
+        "angler": {
+          "x": 448.51705565529625,
+          "y": 209.41634241245137,
+          "clientX": 448.51705565529625,
+          "clientY": 209.41634241245137,
+          "visible": true
+        },
+        "waterEntry": {
+          "x": 333.3572710951526,
+          "y": 135.05836575875486,
+          "clientX": 333.3572710951526,
+          "clientY": 135.05836575875486,
+          "visible": true
+        },
+        "rodTip": {
+          "x": 443.97127468581687,
+          "y": 189.6887159533074,
+          "clientX": 443.97127468581687,
+          "clientY": 189.6887159533074,
+          "visible": true
+        },
+        "fish": {
+          "x": 333.3572710951526,
+          "y": 135.05836575875486,
+          "clientX": 333.3572710951526,
+          "clientY": 135.05836575875486,
+          "visible": true
+        }
+      }
+    },
+    {
+      "scene": "half-moon-bay",
+      "viewport": "landscape",
+      "direction": 1,
+      "phase": "waiting",
+      "scale": 0.21226107226107221,
+      "points": {
+        "angler": {
+          "x": 336.3877917414722,
+          "y": 209.41634241245137,
+          "clientX": 336.3877917414722,
+          "clientY": 209.41634241245137,
+          "visible": true
+        },
+        "waterEntry": {
+          "x": 451.5475763016158,
+          "y": 135.05836575875486,
+          "clientX": 451.5475763016158,
+          "clientY": 135.05836575875486,
+          "visible": true
+        },
+        "rodTip": {
+          "x": 330.326750448833,
+          "y": 188.17120622568095,
+          "clientX": 330.326750448833,
+          "clientY": 188.17120622568095,
+          "visible": true
+        }
+      }
+    },
+    {
+      "scene": "half-moon-bay",
+      "viewport": "landscape",
+      "direction": 1,
+      "phase": "fighting",
+      "scale": 0.21176822983527377,
+      "points": {
+        "angler": {
+          "x": 336.3877917414722,
+          "y": 209.41634241245137,
+          "clientX": 336.3877917414722,
+          "clientY": 209.41634241245137,
+          "visible": true
+        },
+        "waterEntry": {
+          "x": 451.5475763016158,
+          "y": 135.05836575875486,
+          "clientX": 451.5475763016158,
+          "clientY": 135.05836575875486,
+          "visible": true
+        },
+        "rodTip": {
+          "x": 330.326750448833,
+          "y": 189.6887159533074,
+          "clientX": 330.326750448833,
+          "clientY": 189.6887159533074,
+          "visible": true
+        },
+        "fish": {
+          "x": 451.5475763016158,
+          "y": 135.05836575875486,
+          "clientX": 451.5475763016158,
+          "clientY": 135.05836575875486,
+          "visible": true
+        }
+      }
+    },
+    {
+      "scene": "benicia",
+      "viewport": "small-phone",
+      "direction": -1,
+      "phase": "waiting",
+      "scale": 0.505515587529976,
+      "points": {
+        "angler": {
+          "x": 220.22350119904067,
+          "y": 281.3980815347722,
+          "clientX": 220.22350119904067,
+          "clientY": 281.3980815347722,
+          "visible": true
+        },
+        "waterEntry": {
+          "x": 38.237889688249325,
+          "y": 165.1294964028777,
+          "clientX": 38.237889688249325,
+          "clientY": 165.1294964028777,
+          "visible": true
+        },
+        "rodTip": {
+          "x": 211.42752997601912,
+          "y": 249.30795203836934,
+          "clientX": 211.42752997601912,
+          "clientY": 249.30795203836934,
+          "visible": true
+        }
+      }
+    },
+    {
+      "scene": "benicia",
+      "viewport": "small-phone",
+      "direction": -1,
+      "phase": "fighting",
+      "scale": 0.505515587529976,
+      "points": {
+        "angler": {
+          "x": 220.22350119904067,
+          "y": 289.5969720061058,
+          "clientX": 220.22350119904067,
+          "clientY": 289.5969720061058,
+          "visible": true
+        },
+        "waterEntry": {
+          "x": 38.237889688249325,
+          "y": 157.25413590756324,
+          "clientX": 38.237889688249325,
+          "clientY": 157.25413590756324,
+          "visible": true
+        },
+        "rodTip": {
+          "x": 211.42752997601912,
+          "y": 257.5068425097029,
+          "clientX": 211.42752997601912,
+          "clientY": 257.5068425097029,
+          "visible": true
+        },
+        "fish": {
+          "x": 38.237889688249325,
+          "y": 156.93060593154405,
+          "clientX": 38.237889688249325,
+          "clientY": 156.93060593154405,
+          "visible": true
+        }
+      }
+    },
+    {
+      "scene": "benicia",
+      "viewport": "small-phone",
+      "direction": 1,
+      "phase": "waiting",
+      "scale": 0.505515587529976,
+      "points": {
+        "angler": {
+          "x": 41.77649880095916,
+          "y": 281.3980815347722,
+          "clientX": 41.77649880095916,
+          "clientY": 281.3980815347722,
+          "visible": true
+        },
+        "waterEntry": {
+          "x": 223.76211031175052,
+          "y": 165.1294964028777,
+          "clientX": 223.76211031175052,
+          "clientY": 165.1294964028777,
+          "visible": true
+        },
+        "rodTip": {
+          "x": 32.980527577937536,
+          "y": 249.30795203836934,
+          "clientX": 32.980527577937536,
+          "clientY": 249.30795203836934,
+          "visible": true
+        }
+      }
+    },
+    {
+      "scene": "benicia",
+      "viewport": "small-phone",
+      "direction": 1,
+      "phase": "fighting",
+      "scale": 0.505515587529976,
+      "points": {
+        "angler": {
+          "x": 41.77649880095916,
+          "y": 281.55984652278175,
+          "clientX": 41.77649880095916,
+          "clientY": 281.55984652278175,
+          "visible": true
+        },
+        "waterEntry": {
+          "x": 223.76211031175052,
+          "y": 165.29126139088729,
+          "clientX": 223.76211031175052,
+          "clientY": 165.29126139088729,
+          "visible": true
+        },
+        "rodTip": {
+          "x": 32.980527577937536,
+          "y": 249.46971702637887,
+          "clientX": 32.980527577937536,
+          "clientY": 249.46971702637887,
+          "visible": true
+        },
+        "fish": {
+          "x": 223.76211031175052,
+          "y": 164.9677314148681,
+          "clientX": 223.76211031175052,
+          "clientY": 164.9677314148681,
+          "visible": true
+        }
+      }
+    },
+    {
+      "scene": "benicia",
+      "viewport": "notched-phone",
+      "direction": -1,
+      "phase": "waiting",
+      "scale": 0.6618705035971223,
+      "points": {
+        "angler": {
+          "x": 282.82014388489216,
+          "y": 442.76978417266184,
+          "clientX": 282.82014388489216,
+          "clientY": 442.76978417266184,
+          "visible": true
+        },
+        "waterEntry": {
+          "x": 44.54676258992811,
+          "y": 290.53956834532374,
+          "clientX": 44.54676258992811,
+          "clientY": 290.53956834532374,
+          "visible": true
+        },
+        "rodTip": {
+          "x": 271.30359712230216,
+          "y": 400.7542446043165,
+          "clientX": 271.30359712230216,
+          "clientY": 400.7542446043165,
+          "visible": true
+        }
+      }
+    },
+    {
+      "scene": "benicia",
+      "viewport": "notched-phone",
+      "direction": -1,
+      "phase": "fighting",
+      "scale": 0.6618705035971223,
+      "points": {
+        "angler": {
+          "x": 282.82014388489216,
+          "y": 453.50457435334533,
+          "clientX": 282.82014388489216,
+          "clientY": 453.50457435334533,
+          "visible": true
+        },
+        "waterEntry": {
+          "x": 44.54676258992811,
+          "y": 280.2283752869424,
+          "clientX": 44.54676258992811,
+          "clientY": 280.2283752869424,
+          "visible": true
+        },
+        "rodTip": {
+          "x": 271.30359712230216,
+          "y": 411.489034785,
+          "clientX": 271.30359712230216,
+          "clientY": 411.489034785,
+          "visible": true
+        },
+        "fish": {
+          "x": 44.54676258992811,
+          "y": 279.80477816464025,
+          "clientX": 44.54676258992811,
+          "clientY": 279.80477816464025,
+          "visible": true
+        }
+      }
+    },
+    {
+      "scene": "benicia",
+      "viewport": "notched-phone",
+      "direction": 1,
+      "phase": "waiting",
+      "scale": 0.6618705035971223,
+      "points": {
+        "angler": {
+          "x": 49.17985611510798,
+          "y": 442.76978417266184,
+          "clientX": 49.17985611510798,
+          "clientY": 442.76978417266184,
+          "visible": true
+        },
+        "waterEntry": {
+          "x": 287.453237410072,
+          "y": 290.53956834532374,
+          "clientX": 287.453237410072,
+          "clientY": 290.53956834532374,
+          "visible": true
+        },
+        "rodTip": {
+          "x": 37.663309352517985,
+          "y": 400.7542446043165,
+          "clientX": 37.663309352517985,
+          "clientY": 400.7542446043165,
+          "visible": true
+        }
+      }
+    },
+    {
+      "scene": "benicia",
+      "viewport": "notched-phone",
+      "direction": 1,
+      "phase": "fighting",
+      "scale": 0.6618705035971223,
+      "points": {
+        "angler": {
+          "x": 49.17985611510798,
+          "y": 442.98158273381296,
+          "clientX": 49.17985611510798,
+          "clientY": 442.98158273381296,
+          "visible": true
+        },
+        "waterEntry": {
+          "x": 287.453237410072,
+          "y": 290.7513669064748,
+          "clientX": 287.453237410072,
+          "clientY": 290.7513669064748,
+          "visible": true
+        },
+        "rodTip": {
+          "x": 37.663309352517985,
+          "y": 400.9660431654676,
+          "clientX": 37.663309352517985,
+          "clientY": 400.9660431654676,
+          "visible": true
+        },
+        "fish": {
+          "x": 287.453237410072,
+          "y": 290.3277697841727,
+          "clientX": 287.453237410072,
+          "clientY": 290.3277697841727,
+          "visible": true
+        }
+      }
+    },
+    {
+      "scene": "benicia",
+      "viewport": "landscape",
+      "direction": -1,
+      "phase": "waiting",
+      "scale": 0.3672727272727272,
+      "points": {
+        "angler": {
+          "x": 457.3236363636364,
+          "y": 214.65454545454543,
+          "clientX": 457.3236363636364,
+          "clientY": 214.65454545454543,
+          "visible": true
+        },
+        "waterEntry": {
+          "x": 325.10545454545456,
+          "y": 130.1818181818182,
+          "clientX": 325.10545454545456,
+          "clientY": 130.1818181818182,
+          "visible": true
+        },
+        "rodTip": {
+          "x": 450.9330909090909,
+          "y": 191.34007272727268,
+          "clientX": 450.9330909090909,
+          "clientY": 191.34007272727268,
+          "visible": true
+        }
+      }
+    },
+    {
+      "scene": "benicia",
+      "viewport": "landscape",
+      "direction": -1,
+      "phase": "fighting",
+      "scale": 0.3285218056288185,
+      "points": {
+        "angler": {
+          "x": 450.4840986934865,
+          "y": 215.42956388742363,
+          "clientX": 450.4840986934865,
+          "clientY": 215.42956388742363,
+          "visible": true
+        },
+        "waterEntry": {
+          "x": 332.2162486671118,
+          "y": 129.4232990963229,
+          "clientX": 332.2162486671118,
+          "clientY": 129.4232990963229,
+          "visible": true
+        },
+        "rodTip": {
+          "x": 444.767819275545,
+          "y": 194.57499966610618,
+          "clientX": 444.767819275545,
+          "clientY": 194.57499966610618,
+          "visible": true
+        },
+        "fish": {
+          "x": 332.2162486671118,
+          "y": 129.21304514072045,
+          "clientX": 332.2162486671118,
+          "clientY": 129.21304514072045,
+          "visible": true
+        }
+      }
+    },
+    {
+      "scene": "benicia",
+      "viewport": "landscape",
+      "direction": 1,
+      "phase": "waiting",
+      "scale": 0.3672727272727272,
+      "points": {
+        "angler": {
+          "x": 327.6763636363637,
+          "y": 214.65454545454543,
+          "clientX": 327.6763636363637,
+          "clientY": 214.65454545454543,
+          "visible": true
+        },
+        "waterEntry": {
+          "x": 459.8945454545455,
+          "y": 130.1818181818182,
+          "clientX": 459.8945454545455,
+          "clientY": 130.1818181818182,
+          "visible": true
+        },
+        "rodTip": {
+          "x": 321.2858181818182,
+          "y": 191.34007272727268,
+          "clientX": 321.2858181818182,
+          "clientY": 191.34007272727268,
+          "visible": true
+        }
+      }
+    },
+    {
+      "scene": "benicia",
+      "viewport": "landscape",
+      "direction": 1,
+      "phase": "fighting",
+      "scale": 0.36641996807429983,
+      "points": {
+        "angler": {
+          "x": 327.82687563488605,
+          "y": 214.671600638514,
+          "clientX": 327.82687563488605,
+          "clientY": 214.671600638514,
+          "visible": true
+        },
+        "waterEntry": {
+          "x": 459.738064141634,
+          "y": 130.39500798142504,
+          "clientX": 459.738064141634,
+          "clientY": 130.39500798142504,
+          "visible": true
+        },
+        "rodTip": {
+          "x": 321.4511681903932,
+          "y": 191.41126106515745,
+          "clientX": 321.4511681903932,
+          "clientY": 191.41126106515745,
+          "visible": true
+        },
+        "fish": {
+          "x": 459.738064141634,
+          "y": 130.1604992018575,
+          "clientX": 459.738064141634,
+          "clientY": 130.1604992018575,
+          "visible": true
+        }
+      }
+    }
+  ],
+  "errors": []
+}

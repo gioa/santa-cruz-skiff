@@ -23,3 +23,11 @@
 .location-art--half-moon-bay .location-art-shop{bottom:18px;right:16px;width:28px;height:18px;background:#8e9b76;clip-path:polygon(50% 0,100% 100%,0 100%)}
 @media(max-width:760px){.location-picker-grid{grid-template-columns:1fr}.location-card{display:grid;grid-template-columns:112px minmax(0,1fr)}.location-art{height:100%;min-height:142px}.location-intro-link small{font-size:8px}}
 @media(max-height:500px) and (orientation:landscape){.location-picker-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.location-card{display:flex}.location-art{height:90px;min-height:90px}}
+/* Benicia's narrow spit and tidal water; four destinations still fit phones. */
+.location-picker-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+.location-art--benicia{background:#c9d5bb}.location-art--benicia .location-art-ocean{background:#69968e}.location-art--benicia .location-art-headland{background:#969975;top:48px;height:36px}
+.location-art--benicia .location-art-beach{inset:112px 0 -8px;background:#beb59a;transform:none;border-top:5px solid #7a8e81;box-shadow:none}
+.location-art--benicia .location-art-pier{left:48%;top:90px;width:18px;height:66px;background:#c7c6af;border:2px solid #526e68}
+.location-art--benicia .location-art-shop{left:12%;bottom:18px;width:42px;height:23px;background:#e0d4b0;border-top:7px solid #8e684c}
+.location-art--benicia .location-art-rod{right:22%;bottom:31px;width:3px;height:30px;background:#3f6260;box-shadow:-24px 2px #496279,24px 4px #9b6453}
+@media(max-width:760px){.location-picker-grid{grid-template-columns:1fr}}

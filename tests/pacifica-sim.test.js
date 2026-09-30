@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {PacificaSimulation, WORLD, SHOP, SAVE_KEY, SHOP_ITEMS} from '../dist/pacifica-sim.js';
 import {shoreProfile} from '../dist/shore-data.js';
-import {castToOffshore, finishShoreFlight} from './helpers/shore-cast.js';
+import {castToOffshore, finishShoreFlight, finishShoreRetrieve} from './helpers/shore-cast.js';
 import {schoolAtBait, awaitBite} from './helpers/shore-fish.js';
 
 const advance = (sim, seconds, input = {}) => {
@@ -127,13 +127,13 @@ test('casting is charged and aimed, while a fitted surf rod extends physical rea
   assert.ok(shortDistance>0 && shortDistance<10,'a tap gives a short toss');
   assert.ok(short.x < sim.state.player.x);
   assert.ok(short.y < WORLD.shoreY(short.x));
-  assert.ok(sim.retrieve().ok);
+  assert.ok(sim.retrieve().ok);finishShoreRetrieve(sim);
   assert.ok(sim.cast({power: 1, aim: 1}).ok);
   const starterDistance=sim.state.cast.distance;
   assert.ok(starterDistance>shortDistance*3);
   assert.ok(starterDistance<50,'the starter outfit cannot throw old 72 m casts');
   assert.ok(sim.state.cast.target.x > sim.state.player.x);
-  sim.retrieve(); shop(sim); sim.buy('surf_rod');
+  sim.retrieve();finishShoreRetrieve(sim); shop(sim); sim.buy('surf_rod');
   assert.equal(sim.state.activeRod,'starter_rod');
   sim.configureEquipment('carolina_rig','surf_rod');sim.configureEquipment('sandcrab','surf_rod');sim.configureEquipment('surf_rod');toSurf(sim);
   assert.ok(sim.cast({power: 1, aim: 1}).ok);
@@ -153,21 +153,24 @@ test('bite window, early strike and retrieval are real-time and recover safely',
   awaitBite(sim);
   assert.ok(sim.state.biteRemaining > 3);
   advance(sim, 3.3);
-  assert.equal(sim.state.phase, 'walk');
+  assert.equal(sim.state.phase, 'waiting');
   assert.equal(sim.state.stats.missed, 1);
+  finishShoreRetrieve(sim);
   assert.equal(sim.strike().ok, false);
   sim.cast({power: .2});
   assert.ok(sim.retrieve().ok);
+  assert.equal(sim.state.phase, 'casting');
+  finishShoreRetrieve(sim);
   assert.equal(sim.state.phase, 'walk');
   assert.equal(sim.state.inventory.sandcrab, 12);
   assert.equal(sim.retrieve().ok, false);
 });
 
-test('holding reel continuously breaks the line, while prolonged slack loses the fish', () => {
+test('locked drag and hard reeling can break the line, while prolonged slack loses the fish', () => {
   for (const reel of [true, false]) {
     const sim = new PacificaSimulation({rng: () => .1});
     toSurf(sim); hook(sim);
-    until(sim, () => sim.state.phase === 'walk', 30, {reel});
+    until(sim, () => sim.state.phase === 'walk', 30, {reel,drag:1,reelSpeed:1,rodLift:1});
     assert.equal(sim.state.rodSupplies[sim.state.activeRod]===null,reel,'only a snapped line loses the whole rig');
     assert.equal(sim.state.stats.caught, 0);
     assert.equal(sim.state.catches.length, 0);

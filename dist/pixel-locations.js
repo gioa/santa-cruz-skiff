@@ -28,6 +28,7 @@ export const LOCATIONS = Object.freeze([
     href: './half-moon-bay.html',
     art: 'half-moon-bay',
   }),
+  Object.freeze({id:'benicia',name:'Benicia · First Street',subtitle:'Carquinez Strait · 岸边追鲑',detail:'找一个空位，抛收亮片，等待过路的帝王鲑。',tag:'岸钓鲑鱼',href:'./benicia.html',art:'benicia'}),
 ]);
 
 let picker;
@@ -54,7 +55,7 @@ function makeArt(location) {
   for (const part of ['sun', 'headland', 'ocean', 'beach', 'foam', 'pier', 'boat', 'shop', 'rod']) {
     art.append(element('i', `location-art-${part}`));
   }
-  art.append(element('span', 'location-art-caption', location.art === 'pacifica' ? 'SHARP PARK' : location.art==='half-moon-bay'?'HALF MOON BAY':'MONTEREY BAY'));
+  art.append(element('span', 'location-art-caption', location.art === 'benicia' ? 'BENICIA' : location.art === 'pacifica' ? 'SHARP PARK' : location.art==='half-moon-bay'?'HALF MOON BAY':'MONTEREY BAY'));
   return art;
 }
 
@@ -150,7 +151,7 @@ export function mountLocationPicker() {
     trigger.type = 'button';
     trigger.dataset.scenePicker = '';
     const text = element('span');
-    text.append(element('strong', '', '选择钓场'), element('small', '', 'Santa Cruz · Pacifica · Half Moon Bay'));
+    text.append(element('strong', '', '选择钓场'), element('small', '', 'Santa Cruz · Pacifica · Half Moon Bay · Benicia'));
     trigger.append(text, element('span', 'location-intro-arrow', '↗'));
     intro.insertBefore(trigger, intro.querySelector('.intro-foot'));
   }

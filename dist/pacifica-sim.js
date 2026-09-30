@@ -1,11 +1,12 @@
-import {BAITS,SHOP_ITEMS,restoreShoreEquipment,shoreReady,shoreSupply,wearShoreSupplies,configureShoreEquipment,shoreSlots,moveShoreSlot} from './shore-equipment.js';
+import {fishMassKg} from './pixel-fish-mass.js';
+import {BAITS,SHOP_ITEMS,restoreShoreEquipment,shoreReady,shoreSupply,wearShoreSupplies,configureShoreEquipment,shoreSlots,moveShoreSlot,isShoreLure} from './shore-equipment.js';
 import {createShoreLore,stepShoreLore,talkShoreAngler} from './shore-lore.js';
 import {createShoreRegular,serializeRegular,stepShoreRegular,regularStimuli,regularBite,talkRegular} from './shore-regular.js';
 import {fishSpecies,normalizeFishIdentity} from './fish-species.js';
 // Shared shore-fishing simulation. Geometry and habitats are scene specific;
 // prices, bite rates, inspection odds and fines are authored game tuning.
 import {getShoreScene, sampleShore, onPier} from './shore-data.js';
-import {shoreEncounterRates,shoreSuitability,shoreFeeding,shoreBaitAppeal,shoreBaitFlash,SHORE_BAIT_SCENT,SHORE_POPULATION_SPECIES} from './shore-fish-ecology.js';
+import {shoreEncounterRates,shoreSuitability,shoreFeeding,shoreBaitAppeal,shoreBaitFlash,shoreLureAppeal,SHORE_BAIT_SCENT,SHORE_POPULATION_SPECIES} from './shore-fish-ecology.js';
 import {createPopulation,restorePopulation,serializePopulation,stepPopulation,resolveBite,disturb} from './fish-population.js';
 import {assessShoreCatch,shoreFindingDetail} from './shore-regulations.js';
 import {shorePresentation,stepShorePresentation} from './shore-presentation.js';
@@ -15,6 +16,7 @@ import {gameCalendar,gameSeconds} from './game-clock.js';
 import {climateSeaState} from './shore-surf.js';
 import {formatLength,formatWeight} from './units.js';
 import {SHORE_RIG_PHYSICS} from './shore-presentation.js';
+import {createShoreFightMotion,stepShoreFightMotion} from './shore-fish-fight.js';
 export const SAVE_KEY = 'pacifica-surf-save-v1';
 export const WORLD = getShoreScene('pacifica').world;
 export const SHOP = getShoreScene('pacifica').shop;
@@ -47,16 +49,15 @@ export const SPECIES = Object.freeze([
   species({id: 'shiner_perch', speciesId: 'shiner_perch', lengthCm: [7, 18], lw: [.018, 3], baseValue: 2, valuePerKg: 10, strength: .2, color: '#d9d5b0'}),
   species({id: 'pile_perch', speciesId: 'pile_perch', lengthCm: [20, 44], lw: [.03, 3], baseValue: 14, valuePerKg: 12, strength: .85, color: '#9aa39a'}),
   species({id: 'striped_seaperch', speciesId: 'striped_seaperch', lengthCm: [18, 39], lw: [.027, 3], baseValue: 14, valuePerKg: 12, strength: .75, color: '#c28a5c'}),
+  species({id:'chinook_salmon',speciesId:'chinook_salmon',lengthCm:[45,108],lw:[.0069,3.08],baseValue:38,valuePerKg:13,strength:1.5,color:'#91a6a0'}),
 ]);
-export const fishWeightKg = (sp, lengthCm, condition = 1) => sp.lw[0] * lengthCm ** sp.lw[1] * condition / 1000;
+export const fishWeightKg = (sp, lengthCm, condition = 1) => sp.id==='chinook_salmon'?fishMassKg(sp,lengthCm)*condition:sp.lw[0] * lengthCm ** sp.lw[1] * condition / 1000;
 
 const clamp = (value, low, high) => Math.max(low, Math.min(high, value));
 const finite = (value, fallback = 0) => typeof value === 'number' && Number.isFinite(value) ? value : fallback;
 const integer = (value, low, high, fallback = 0) => Math.floor(clamp(finite(value, fallback), low, high));
 const baitIds = BAITS.map(item => item.id);
 const upgradeIds = SHOP_ITEMS.filter(item => ['rod','reel','rig','book'].includes(item.kind)).map(item => item.id);
-// Small fish can be swung in without first tiring them out.
-const SMALL_FISH = new Set(['white_croaker', 'jacksmelt', 'silver_surfperch', 'walleye_surfperch', 'shiner_perch', 'calico_surfperch']);
 const statKeys = ['caught', 'kept', 'released', 'sold', 'casts', 'missed'];
 const saveVersions = [1, 2, 3, 4];
 const catchStatuses = new Set(['kept', 'released', 'sold', 'confiscated']);
@@ -138,6 +139,7 @@ export class PacificaSimulation {
       inventory: {sandcrab: 12, squid: 0, anchovy: 0, sandworm: 0, mussel: 0}, bait: 'sandcrab', rig: 'carolina', upgrades: [],
       catches: [], catchHistory: [], lastCatch: null, stats: Object.fromEntries(statKeys.map(key => [key, 0])),
       cast: null, lineDistance: 0, tension: 0, fish: null,
+      fishingControls:{reelSpeed:.6,rodLift:.35,rodSweep:0,drag:.5},autoRetrieve:false,retrieveSpeed:0,fishMotion:null,landingControl:0,
       biteRemaining: 0, fightElapsed: 0, lineStress: 0, slackTime: 0,
       encounter: null, biteSpeciesId: null, biteLengthCm: null, presentation: null, castId: 0, soakSeconds: 0,
       keptLog: [], warden: null, wardenNextAt: null, pierVisit: null,
@@ -200,6 +202,15 @@ export class PacificaSimulation {
     return !s.inspection && s.phase === 'walk' && (s.onPier || offset >= 19.9 && offset <= 130) && shoreReady(s);
   }
 
+  get canReel(){return !this.state.inspection&&['waiting','bite','fighting'].includes(this.state.phase);}
+  get lureDeployed(){return isShoreLure(shoreSupply(this.state)?.id)&&['waiting','bite'].includes(this.state.phase);}
+
+  setFishingControls(input={}){
+    const c=this.state.fishingControls;
+    for(const [key,min,max] of [['reelSpeed',.2,1],['rodLift',0,1],['rodSweep',-1,1],['drag',.1,1]])if(Number.isFinite(input[key]))c[key]=clamp(input[key],min,max);
+    return {...c};
+  }
+
   get nearPier() {
     const pier = this.scene.pier, s = this.state;
     return Boolean(pier && !s.onPier && !s.inspection && s.phase === 'walk' && Math.hypot(s.player.x - pier.gate.x, s.player.y - pier.gate.y) <= 72);
@@ -211,7 +222,7 @@ export class PacificaSimulation {
   // near the water stays open.
   behindPierFence(x, y) {
     const pier = this.scene.pier;
-    if (!pier) return false;
+    if (!pier||pier.open) return false;
     return Math.abs(x - pier.x) <= pier.width / 2 && y >= pier.entry.y - 5 && y <= pier.gate.y - 6;
   }
 
@@ -251,10 +262,10 @@ export class PacificaSimulation {
     const s = this.state;
     s.onPier = true; s.player.x = this.scene.pier.entry.x; s.player.y = this.scene.pier.entry.y;
     s.walkTarget = null; s.walkRoute = []; s.player.walking = false; s.pierPush = 0;
-    const caught = this.random() < PIER_RULES.catchChance;
+    const caught = !this.scene.pier.open && this.random() < PIER_RULES.catchChance;
     s.pierVisit = {time: 0, patrolAt: caught ? PIER_RULES.earliestSeconds + this.random() * (PIER_RULES.latestSeconds - PIER_RULES.earliestSeconds) : null};
     this.refreshSample();
-    return this.result(true, '你从围栏的缝隙挤上了旧栈桥。');
+    return this.result(true, this.scene.pier.open?'':'你从围栏的缝隙挤上了旧栈桥。');
   }
 
   pierSegmentClear(a, b) {
@@ -307,7 +318,7 @@ export class PacificaSimulation {
 
   checkPier(dt) {
     const s = this.state;
-    if (!s.onPier || s.inspection || s.phase === 'landed') return false;
+    if (!s.onPier || this.scene.pier?.open || s.inspection || s.phase === 'landed') return false;
     s.pierVisit ??= {time: 0, patrolAt: null};
     s.pierVisit.time += dt;
     if (s.pierVisit.patrolAt === null || s.pierVisit.time < s.pierVisit.patrolAt) return false;
@@ -340,7 +351,7 @@ export class PacificaSimulation {
     s.stats.casts++;
     s.phase = 'casting'; s.walkTarget = null; s.walkRoute = []; s.player.walking = false; s.player.facing = -1;
     s.cast = planned;
-    s.lineDistance = planned.distance; s.tension = 0; s.fish = null; s.lastCatch = null;
+    s.lineDistance = planned.distance; s.tension = 0; s.fish = null; s.lastCatch = null;s.autoRetrieve=false;s.fishMotion=null;s.retrieveSpeed=0;
     const sample = this.refreshSample();
     s.presentation = shorePresentation(sample, shoreSupply(s).id, 0);
     // Each cast is a new bait in the water with a fresh, short scent plume.
@@ -359,9 +370,12 @@ export class PacificaSimulation {
     // The fish that bit belongs to a real school; its size comes from that cohort.
     const lengthCm = clamp(finite(s.biteLengthCm, (species.lengthCm[0] + species.lengthCm[1]) / 2), species.lengthCm[0], species.lengthCm[1]);
     const weightKg = Math.round(fishWeightKg(species, lengthCm, .92 + this.random() * .16) * 100) / 100;
-    resolveBite(this.population, 'hooked', SHORE_POPULATION_SPECIES);
+    resolveBite(this.population, 'hooked', this.fishWorld().species);
     s.fish = {...safeFish({id: species.id, speciesId: species.speciesId, weightKg, length: lengthCm, lengthType: 'total', catchId: s.nextCatchId++, caughtDate: this.calendarDate()}), stamina: 1, run: 0, runOffset: this.random() * Math.PI * 2};
     s.cast.fightDistance = Math.max(1,s.lineDistance);
+    s.fishMotion=createShoreFightMotion(s.fish,{depth:s.presentation?.depth||1,seed:s.castId*7919+s.fish.catchId,energy:1});
+    if(s.presentation)s.presentation.twitch=0;
+    s.autoRetrieve=false;s.landingControl=0;
     s.phase = 'fighting'; s.tension = .33; s.biteRemaining = 0; s.fightElapsed = 0; s.lineStress = 0; s.slackTime = 0;
     return this.result(true, '中鱼！按住收线；张力过高就松开，让鱼冲一阵。');
   }
@@ -372,7 +386,7 @@ export class PacificaSimulation {
     const s=this.state,supply=shoreSupply(s);
     const calendar=gameCalendar(s.fishingDate,s.elapsed);
     return shoreEncounterRates({sample,bait:supply?.bait?.kind,rig:supply?.id,
-      baitCondition:supply?.bait?.condition||0,month:calendar.getUTCMonth()+1,
+      baitCondition:isShoreLure(supply?.id)?supply.condition:supply?.bait?.condition||0,month:calendar.getUTCMonth()+1,
       hour:calendar.getUTCHours()+calendar.getUTCMinutes()/60,
       presentation:s.presentation||{bottomContact:0,stability:0}});
   }
@@ -408,6 +422,12 @@ export class PacificaSimulation {
         soakSeconds: s.soakSeconds, currentX: sample.currentX, currentY: -sample.currentY,
         appeal: def => shoreBaitAppeal(def.id, {bait, rig: supply.id, baitCondition: condition, presentation: s.presentation})};
     }
+    if(target&&['waiting','bite'].includes(s.phase)&&isShoreLure(supply?.id)&&supply.condition>.08){
+      const sample=s.shoreSample||this.refreshSample(),p=s.presentation||{depth:0},motion=finite(p.motion);
+      stimulus={id:s.castId,...this.toPlane(target.x,target.y),depth:finite(p.depth),scent:0,flash:motion>.12?.85:.12,motion,
+        soakSeconds:s.soakSeconds,currentX:sample.currentX,currentY:-sample.currentY,
+        appeal:def=>shoreLureAppeal(def.id,{rig:supply.id,presentation:p,waterDepth:sample.depth,condition:supply.condition})};
+    }
     const daylight = clamp(Math.sin((hour - 5.3) * Math.PI / 13.9) * 1.4, .1, 1);
     return {species: SHORE_POPULATION_SPECIES, center, radius: 110, cellSize: 4, stimulus, stimuli: regularStimuli(this),
       env: (x, y) => this.fishEnv(x, y),
@@ -424,28 +444,31 @@ export class PacificaSimulation {
       if (event.stimulus != null) { if (event.type === 'bite') regularBite(this, event); continue; }
       if (event.type === 'nibble' && s.phase === 'waiting') s.nibbleAt = s.elapsed;
       if (event.type !== 'bite') continue;
-      if (s.phase !== 'waiting') { resolveBite(this.population, 'refused', SHORE_POPULATION_SPECIES); continue; }
+      if (s.phase !== 'waiting') { resolveBite(this.population, 'refused', this.fishWorld().species); continue; }
       s.biteSpeciesId = event.species; s.biteLengthCm = event.lengthCm;
       s.phase = 'bite'; wearShoreSupplies(s, 'bite'); s.biteRemaining = 3.2;
       s.message = '咬钩了！现在扬竿！';
     }
   }
 
-  drift(dt) {
+  drift(dt,input={}) {
     const s = this.state;
     if (!s.cast) return;
     const sample = this.refreshSample(), supply=shoreSupply(s);
-    s.presentation=stepShorePresentation(s.presentation,sample,supply?.id,dt);
+    const c=s.fishingControls,dx=s.cast.origin.x-s.cast.target.x,dy=s.cast.origin.y-s.cast.target.y,d=Math.hypot(dx,dy)||1;
+    const reeling=s.autoRetrieve||(input.reel===undefined?this.reeling:Boolean(input.reel));
+    s.presentation=stepShorePresentation(s.presentation,sample,supply?.id,dt,{...c,directionX:dx/d,directionY:dy/d,retrieveSpeed:reeling?(s.activeReel==='sealed_reel'?2.15:1.8)*c.reelSpeed:0,twitch:Boolean(input.twitch)});
+    s.retrieveSpeed=s.presentation.relativeSpeed;s.retrieveInput=reeling;
     // Mean current and wave orbital motion act on the same terminal tackle.
     s.cast.target.x = clamp(s.cast.target.x + s.presentation.driftX * dt * 3.2, 24, this.world.width - 24);
     s.cast.target.y = Math.max(this.world.minY + 20,s.cast.target.y + s.presentation.driftY * dt * 3.2);
-    if(s.cast.target.y>=this.world.shoreY(s.cast.target.x)){
-      this.clearLine();s.message='钓组随浪搁上浅滩，已收回；重新选择落点。';return;
+    if(s.cast.target.y>=this.world.shoreY(s.cast.target.x)||Math.hypot(s.cast.target.x-s.cast.origin.x,s.cast.target.y-s.cast.origin.y)<PIXELS_PER_METRE*1.5){
+      this.clearLine();s.message=reeling?'钓组已收近岸边，可以再次抛投。':'钓组随浪搁上浅滩，已收回；重新选择落点。';return;
     }
     s.cast.drift = {x: s.presentation.driftX, y: s.presentation.driftY};
     if (s.phase !== 'fighting') {
       s.lineDistance=Math.hypot(s.cast.target.x-s.cast.origin.x,s.cast.target.y-s.cast.origin.y)/3.2;
-      s.tension = clamp(.04 + Math.hypot(sample.currentX, sample.currentY) * .1 + finite(sample.waveLoad) * .12, 0, .35);
+      s.tension = clamp(.04 + Math.hypot(sample.currentX, sample.currentY) * .1 + finite(sample.waveLoad) * .12+s.presentation.relativeSpeed*.08+s.presentation.twitch*.06, 0, .65);
       // Natural bait slowly washes out. Retrieving preserves actual condition.
       if(supply?.bait) supply.bait.condition=Math.max(0,supply.bait.condition-dt*(1/2400+finite(sample.whitewater)/1800));
     }
@@ -454,13 +477,13 @@ export class PacificaSimulation {
 
   retrieve() {
     if (!['casting', 'waiting', 'bite'].includes(this.state.phase)) return this.result(false, '现在没有可以收回的空钓组。');
-    this.clearLine();
-    return this.result(true, '');
+    this.state.autoRetrieve=!this.state.autoRetrieve;
+    return this.result(true, this.state.autoRetrieve?'开始逐步收回钓组；收近岸边后可再次抛投。':'暂停收回，钓组继续随水流与重力运动。');
   }
 
   clearLine() {
-    if (this.state.phase === 'bite') resolveBite(this.population, 'missed', SHORE_POPULATION_SPECIES);
-    Object.assign(this.state, {phase: 'walk', cast: null, fish: null, lineDistance: 0, tension: 0, biteRemaining: 0, lineStress: 0, slackTime: 0, presentation:null,encounter:null,biteSpeciesId:null,biteLengthCm:null,soakSeconds:0});
+    if (this.state.phase === 'bite') resolveBite(this.population, 'missed', this.fishWorld().species);
+    Object.assign(this.state, {phase: 'walk', cast: null, fish: null, lineDistance: 0, tension: 0, biteRemaining: 0, lineStress: 0, slackTime: 0, presentation:null,encounter:null,biteSpeciesId:null,biteLengthCm:null,soakSeconds:0,autoRetrieve:false,retrieveSpeed:0,retrieveInput:false,fishMotion:null,landingControl:0});
     this.reeling = false;
   }
 
@@ -542,7 +565,7 @@ export class PacificaSimulation {
   }
 
   wardenInspect() {
-    const s = this.state, assessment = assessShoreCatch(s.catches, s.keptLog);
+    const s = this.state, assessment = assessShoreCatch(s.catches, s.keptLog,this.scene.id);
     if (!assessment.findings.length) {
       s.message = s.catches.length ? `鱼警检查了鱼篓里的 ${s.catches.length} 尾鱼：尺寸和数量都合规。` : '鱼警打了个招呼，看了看空鱼篓。';
       return this.result(true, s.message, {clear: true});
@@ -562,9 +585,11 @@ export class PacificaSimulation {
   update(dt, input = {}) {
     // Background tabs must not skip a bite window or simulate hours at once.
     dt = clamp(finite(dt), 0, .25);
+    input=input||{};this.setFishingControls(input);
     if (dt === 0) return;
+    const twitch=Boolean(input.twitch)&&!this.twitchHeld;this.twitchHeld=Boolean(input.twitch);
     const count = Math.ceil(dt / .025), tick = dt / count;
-    for (let index = 0; index < count; index++) this.tick(tick, input || {});
+    for (let index = 0; index < count; index++) this.tick(tick, {...input,twitch:twitch&&index===0});
   }
 
   tick(dt, input) {
@@ -580,7 +605,7 @@ export class PacificaSimulation {
     if (s.inspection) return;
     if (s.phase === 'walk') {this.move(dt, input); this.refreshSample(); return;}
     s.player.walking = false;
-    if (['waiting', 'bite'].includes(s.phase)) this.drift(dt);
+    if (['waiting', 'bite'].includes(s.phase)) this.drift(dt,input);
     if (s.phase === 'casting') {
       s.cast.flight += dt;
       if (s.cast.flight >= s.cast.flightDuration) {
@@ -592,15 +617,15 @@ export class PacificaSimulation {
         s.cast.flight = s.cast.flightDuration; s.phase = 'waiting';
         // The sinker's splash briefly spooks wary fish right where it lands.
         const splash = this.toPlane(s.cast.target.x, s.cast.target.y), grams = SHORE_RIG_PHYSICS[shoreSupply(s)?.id]?.sinkerGrams || 28;
-        disturb(this.population, {...splash, radius: 1.5 + grams / 25, strength: .7}, SHORE_POPULATION_SPECIES);
+        disturb(this.population, {...splash, radius: 1.5 + grams / 25, strength: .7}, this.fishWorld().species);
         s.message = '';
       }
     } else if (s.phase === 'waiting') {
       s.soakSeconds += dt;
     } else if (s.phase === 'bite') {
       s.biteRemaining -= dt;
-      if (s.biteRemaining <= 0) {s.stats.missed++; this.clearLine(); s.message = '这次咬口错过了，收回后检查余饵。';}
-    } else if (s.phase === 'fighting') this.fight(dt, input.reel === undefined ? this.reeling : Boolean(input.reel));
+      if (s.biteRemaining <= 0) {s.stats.missed++;resolveBite(this.population,'missed',this.fishWorld().species);s.phase='waiting';s.biteSpeciesId=null;s.biteLengthCm=null;s.biteRemaining=0;s.message='这次咬口错过了；可继续呈现，或逐步收回检查余饵。';}
+    } else if (s.phase === 'fighting') this.fight(dt, input.reel === undefined ? this.reeling : Boolean(input.reel),input);
   }
 
   move(dt, input) {
@@ -641,30 +666,43 @@ export class PacificaSimulation {
     } else player.walking = false;
   }
 
-  fight(dt, reel) {
-    const s = this.state, fish = s.fish;
-    s.fightElapsed += dt;
-    const wave = Math.max(0, Math.sin(s.fightElapsed * .64 + fish.runOffset));
-    fish.run = wave * fish.strength * (.3 + .7 * fish.stamina);
-    const upgraded = s.activeReel==='sealed_reel';
-    // The returning fish crosses the breaking bar; sample its current position.
-    const position=shoreFishPosition(this.scene,s);
-    const sample=sampleShore(this.scene,position.x,position.y,s.elapsed,s.seaState||{});
+  fight(dt, reel, input={}) {
+    const s=this.state,fish=s.fish,c=s.fishingControls;
+    if(!fish||!s.cast)return;
+    s.fightElapsed+=dt;
+    const p=s.presentation||={twitch:0};
+    p.twitch=input.twitch?1:clamp(finite(p.twitch)*Math.exp(-dt/.38),0,1);
+    // The short lift is the same +0.18 movement the held rod displays. It
+    // loads the line and raises the fish through the motion model; the spool
+    // still retrieves line only when the angler actually winds it.
+    const rodLift=clamp(c.rodLift+p.twitch*.18,0,1),liftPulse=rodLift-c.rodLift;
+    const position=shoreFishPosition(this.scene,s),sample=sampleShore(this.scene,position.x,position.y,s.elapsed,s.seaState||{});
     s.shoreSample=sample;
     const surfLoad=finite(sample.waveLoad)*.09+Math.hypot(sample.currentX,sample.currentY)*.027;
-    s.tension = clamp(s.tension + ((reel ? .14 - (upgraded ? .025 : 0) : -.235) + fish.run * .155 + surfLoad) * dt, 0, 1);
-    const retrieveSpeed = (upgraded ? 3.4 : 2.8) * (1 - Math.min(.6, fish.run * .47));
-    s.lineDistance = Math.max(2.5, s.lineDistance + (fish.run * 1.45 - (reel ? retrieveSpeed : 0)) * dt);
-    fish.stamina = Math.max(0, fish.stamina - (.009 + (reel ? .013 : 0)) * dt);
-    s.lineStress = s.tension > .93 ? s.lineStress + dt : Math.max(0, s.lineStress - dt * 2);
-    s.slackTime = s.tension < .045 ? s.slackTime + dt : 0;
-    if (s.lineStress > 1.35 || s.lineDistance > 155) {
-      wearShoreSupplies(s,'break'); this.clearLine(); s.message = '鱼线绷断，钓组已丢失。下一次张力进入红区时，及时松开收线。';
-    } else if (s.slackTime > 3) {
-      wearShoreSupplies(s,'escape'); this.clearLine(); s.message = '鱼线松弛太久，鱼脱钩了。适时收线，让钓线保持张力。';
-    } else if (s.lineDistance <= 3 && (fish.stamina <= .32 || SMALL_FISH.has(fish.id)&&fish.weightKg<=.4)) {
-      wearShoreSupplies(s,'catch'); s.phase = 'landed'; s.stats.caught++; s.tension = 0; fish.run = 0; this.reeling = false;
-      s.message = `${fish.name}上岸了！${formatLength(fish.length)} · ${formatWeight(fish.weightKg)}。留在鱼袋里，或放回海里。`;
+    s.fishMotion=stepShoreFightMotion(s.fishMotion,fish,{dt,time:s.fightElapsed,waterDepth:sample.depth,lineDistance:s.lineDistance,tension:s.tension,rodLift,reelSpeed:reel?c.reelSpeed:0,drag:c.drag,surfLoad});
+    const m=s.fishMotion;
+    // Sweep steers the loaded fish sideways without moving either cast anchor.
+    m.lateral=clamp(m.lateral+c.rodSweep*dt*.32*Math.max(.1,s.tension),-Math.min(6,s.lineDistance*.25),Math.min(6,s.lineDistance*.25));
+    fish.run=m.run;fish.stamina=m.energy;
+    const loading=(reel?.12*c.reelSpeed+.09*rodLift:-.18-.08*(1-rodLift))+m.pull*.24+surfLoad+liftPulse*.5;
+    const dragLimit=.15+.78*c.drag+m.headShake*.06;
+    s.tension=clamp(s.tension+loading*dt,0,Math.min(1,dragLimit));
+    const retrieve=(s.activeReel==='sealed_reel'?2:1.65)*c.reelSpeed*(1-m.pull*.55);
+    const outward=m.run*(.32+(1-c.drag)*.85);
+    s.lineDistance=Math.max(2.5,s.lineDistance+(outward-(reel?retrieve:0))*dt);
+    s.retrieveSpeed=reel?retrieve:0;
+    s.lineStress=s.tension>.93?s.lineStress+dt:Math.max(0,s.lineStress-dt*2);
+    s.slackTime=s.tension<.045?s.slackTime+dt:0;
+    // A lively fish can be landed under control; proximity alone is insufficient.
+    const controlled=s.lineDistance<=3&&!m.jumpActive&&m.run<.5&&m.depth<.8&&s.tension>.08&&s.tension<.85;
+    s.landingControl=controlled?s.landingControl+dt:Math.max(0,s.landingControl-dt*2);
+    if(s.lineStress>1.35||s.lineDistance>155){
+      wearShoreSupplies(s,'break');this.clearLine();s.message='鱼线绷断，钓组已丢失。放松泄力，降低竿尖并在冲刺时暂停收线。';
+    }else if(s.slackTime>3){
+      wearShoreSupplies(s,'escape');this.clearLine();s.message='鱼线松弛太久，鱼脱钩了。适时收线，让钓线保持张力。';
+    }else if(s.landingControl>=1){
+      wearShoreSupplies(s,'catch');s.phase='landed';s.stats.caught++;s.tension=0;fish.run=0;this.reeling=false;
+      s.message=`${fish.name}上岸了！${formatLength(fish.length)} · ${formatWeight(fish.weightKg)}。留在鱼袋里，或放回海里。`;
     }
   }
 
@@ -674,7 +712,7 @@ export class PacificaSimulation {
       scene: this.scene.id, version: 4, elapsed: s.elapsed, credits: s.credits,
       fishingDate:s.fishingDate, population: serializePopulation(this.population), keptLog: s.keptLog,
       wardenNextAt: s.wardenNextAt, pierVisit: s.onPier ? s.pierVisit : null,
-      activeRod:s.activeRod,activeReel:s.activeReel,rodSupplies:s.rodSupplies,rigStock:s.rigStock,inventorySlots:s.inventorySlots,
+      fishingControls:s.fishingControls,activeRod:s.activeRod,activeReel:s.activeReel,rodSupplies:s.rodSupplies,rigStock:s.rigStock,inventorySlots:s.inventorySlots,
       inventory: s.inventory, bait: s.bait, upgrades: s.upgrades, catches: s.catches, catchHistory: s.catchHistory,
       stats: s.stats, nextCatchId: s.nextCatchId, player: {x: s.player.x, y: s.player.y},
       pendingCatch: s.phase === 'landed' ? s.fish : null,
@@ -686,6 +724,7 @@ export class PacificaSimulation {
   restore(saved) {
     const s = this.state;
     s.elapsed = clamp(finite(saved.elapsed), 0, 1e9);
+    this.setFishingControls(saved.fishingControls||{});
     if(typeof saved.fishingDate==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(saved.fishingDate)&&Number.isFinite(Date.parse(saved.fishingDate)))s.fishingDate=saved.fishingDate;
     s.keptLog = (Array.isArray(saved.keptLog) ? saved.keptLog : []).filter(k => k && Number.isFinite(k.catchId) && typeof k.species === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(k.date)).slice(-300).map(k => ({catchId: k.catchId, species: k.species, date: k.date}));
     if (Number.isFinite(saved.wardenNextAt)) s.wardenNextAt = clamp(saved.wardenNextAt, s.elapsed, s.elapsed + 3600);

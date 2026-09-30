@@ -51,7 +51,7 @@ export function playStrategy(sceneId,strategy,seed){
   sim.update(STEP);time+=STEP;sinceCast+=STEP;
   if(sim.state.phase==='bite')return{time,species:sim.state.biteSpeciesId,lengthCm:sim.state.biteLengthCm};
   if(sim.state.phase==='walk'){refresh();cast(sim,distance);sinceCast=0;}
-  if(strategy.recast&&sinceCast>=strategy.recast&&sim.state.phase==='waiting'){sim.retrieve();refresh();cast(sim,distance);sinceCast=0;}
+  if(strategy.recast&&sinceCast>=strategy.recast&&sim.state.phase==='waiting'&&!sim.state.autoRetrieve)sim.retrieve();
  }
  return{time:null};
 }

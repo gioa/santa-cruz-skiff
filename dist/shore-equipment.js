@@ -13,6 +13,9 @@ export const STARTER_ITEMS=Object.freeze([
 ]);
 export const SHOP_ITEMS=Object.freeze([
  ...BAITS,
+ {id:'salmon_spoon',name:'银色鲑鱼亮片',kind:'rig',price:22,hook:'1/0',artificial:true,description:'1 oz 亮片，1/0 单枚无倒刺钩。落水后停顿下沉，按住收线让亮片摆动；松开会继续沉降。挂底或断线会丢失。'},
+ {id:'salmon_spinner',name:'铜色鲑鱼旋转亮片',kind:'rig',price:28,hook:'1/0',artificial:true,description:'3/4 oz 旋转亮片，1/0 单枚无倒刺钩。需要相对水流速度带动叶片；逆流收线阻力更大。停收太久会沉底。'},
+ {id:'grub_jig',name:'卷尾软饵铅头钩',kind:'rig',price:16,hook:'2',artificial:true,description:'1/2 oz 铅头钩配卷尾软饵，#2 单钩。慢收贴近沙底，抬竿或轻抽会跳起，停顿后下落；可寻找海鲫、条纹鲈与比目鱼。'},
  {id:'ca_fishing_regulations',name:'加州休闲捕鱼规定',kind:'book',price:12,kg:.15,description:'按鱼种和海域自行查阅捕捞规则的纸质手册；购买后可从左下角打开，不提供自动识鱼功能。'},
  {id:'surf_rod',name:'长节沙滩竿',kind:'rod',price:85,description:'10 ft（3.05 m）沙滩竿，适配 28–113 g 抛投总重，包含钓组和鱼饵。搭配合适的重量并充分挥竿，才能发挥远投能力。购入后配置并拿起。'},
  {id:'sealed_reel',name:'密封纺车轮',kind:'reel',price:110,description:'收线更快，张力积累稍慢。购入后手动启用。'},
@@ -21,7 +24,8 @@ export const SHOP_ITEMS=Object.freeze([
  {id:'float_rig',name:'小钩浮钓组',kind:'rig',price:24,hook:'6',description:'#6 单钩，12 g 配铅＋2 g 浮漂，连接件另计。挂小鱿鱼条或小鳀鱼块，在水面下约 1 m 随流漂钓 jacksmelt；浅水时钩深缩至水深的四分之三。强浪会扰乱呈现。断线会损失整套钓组。'},
 ]);
 export const SHORE_ITEMS=[...STARTER_ITEMS,...SHOP_ITEMS];
-const rigIds=['carolina_rig','fishfinder_rig','float_rig'];
+const rigIds=['carolina_rig','fishfinder_rig','float_rig','salmon_spoon','salmon_spinner','grub_jig'];
+export const isShoreLure=id=>id==='salmon_spoon'||id==='salmon_spinner'||id==='grub_jig';
 const bounded=v=>Number.isFinite(v)?Math.max(0,Math.min(1,v)):0;
 const cleanRig=r=>r&&rigIds.includes(r.id)&&bounded(r.condition)>USABLE_CONDITION?{id:r.id,condition:bounded(r.condition),bait:r.bait&&BAITS.some(b=>b.id===r.bait.kind)?{kind:r.bait.kind,condition:bounded(r.bait.condition)}:null}:null;
 const fresh=id=>({id,condition:1,bait:null});
@@ -43,9 +47,9 @@ export function restoreShoreEquipment(s,saved){
  s.inventorySlots=modern?saved.inventorySlots:undefined;
  syncShoreEquipment(s);shoreSlots(s);
 }
-export function syncShoreEquipment(s){const r=s.rodSupplies[s.activeRod];s.rig=r?.id==='fishfinder_rig'?'fishfinder':r?.id==='float_rig'?'float':'carolina';s.bait=r?.bait?.kind||s.bait||'sandcrab';}
+export function syncShoreEquipment(s){const r=s.rodSupplies[s.activeRod];s.rig=isShoreLure(r?.id)?'lure':r?.id==='fishfinder_rig'?'fishfinder':r?.id==='float_rig'?'float':'carolina';s.bait=r?.bait?.kind||s.bait||'sandcrab';}
 export function shoreSupply(s){return s.rodSupplies[s.activeRod];}
-export function shoreReady(s){const r=shoreSupply(s);return Boolean(r&&r.condition>USABLE_CONDITION&&r.bait?.condition>USABLE_CONDITION);}
+export function shoreReady(s){const r=shoreSupply(s);return Boolean(r&&r.condition>USABLE_CONDITION&&(isShoreLure(r.id)||r.bait?.condition>USABLE_CONDITION));}
 export function shoreOwnedItems(s){return SHORE_ITEMS.filter(i=>i.kind==='rod'?ownedRods(s).includes(i.id):i.kind==='reel'?i.id==='starter_reel'||s.upgrades.includes(i.id):i.kind==='book'?s.upgrades.includes(i.id):i.kind==='bait'?s.inventory[i.id]>0:i.kind==='rig'&&(s.rigStock[i.id]?.length||Object.values(s.rodSupplies).some(r=>r?.id===i.id)));}
 export function shoreSlots(s){return personalInventorySlots(s,shoreOwnedItems(s).map(i=>i.id)).pack;}
 export function moveShoreSlot(s,from,to){return swapInventorySlots(shoreSlots(s),from,to);}
@@ -67,6 +71,7 @@ export function configureShoreEquipment(sim,id,rodId=sim.state.activeRod){
   if(id!=='starter_reel'&&!s.upgrades.includes(id))return sim.result(false,'还没有这个鱼轮。');
   s.activeReel=id;
  }else if(item.kind==='bait'){
+  if(isShoreLure(rod?.id))return sim.result(false,'这套亮片保持原本泳姿，不另挂天然饵。');
   if(!rod||rod.condition<=USABLE_CONDITION)return sim.result(false,'先给这根鱼竿装上一套可用钓组。');
   if(!(s.inventory[id]>0))return sim.result(false,'这种鱼饵没有库存。');
   s.inventory[id]--;rod.bait={kind:id,condition:1};

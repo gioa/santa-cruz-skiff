@@ -81,7 +81,7 @@ test('each game page has a hidden lower-left handbook button that the controller
   assert.match(html,/<button id="rules-btn" class="rules-book-btn" type="button" hidden/,file);
  }
  const shore=readFileSync(new URL('../dist/pacifica-game.js',import.meta.url),'utf8'),pixel=readFileSync(new URL('../dist/pixel-game.js',import.meta.url),'utf8');
- assert.match(shore,/show\('rules-btn',started&&!focusActive&&ownsRules\(\)\)/);
+ assert.match(shore,/show\('rules-btn',started&&ownsRules\(\)\)/,'the continuous shore scene keeps the purchased handbook accessible');
  assert.match(pixel,/show\('rules-btn',!focusActive&&!s\.dayTransition&&!s\.capsize&&ownsRules\(\)\)/);
  const css=readFileSync(new URL('../dist/pixel.css',import.meta.url),'utf8');
  assert.match(css,/\.rules-book-btn\{position:absolute;left:/);assert.match(css,/bottom:calc\([^;]*var\(--rules-lift/);

@@ -196,3 +196,95 @@ test('fight sampling and rendered surf honor the same explicit sea-state scenari
  const calm=render('pacifica',s).canvas.digest(),rough=render('pacifica',{...s,seaState:{...seaState,waveHeightM:2}}).canvas.digest();
  assert.notEqual(calm,rough);
 });
+
+function floatState(sceneId='pacifica',overrides={}){
+ return state(sceneId,{rig:'float',presentation:{mode:'float',depth:1},
+  seaState:{waveHeightM:2.8,wavePeriodS:10,waveDirectionDeg:28,tideM:1.2},...overrides});
+}
+function surfaceExtremes(sceneId,s){
+ const point=shoreFightPose(sceneId,s).entryWorld;
+ let crest=null,trough=null,breaker=null;
+ for(let elapsed=0;elapsed<=30;elapsed+=.25){
+  const sample=sampleShore(sceneId,point.x,point.y,elapsed,s.seaState),item={elapsed,sample};
+  if(!crest||sample.surfaceElevation>crest.sample.surfaceElevation)crest=item;
+  if(!trough||sample.surfaceElevation<trough.sample.surfaceElevation)trough=item;
+  if(!breaker||sample.activeBreaking>breaker.sample.activeBreaking)breaker=item;
+ }
+ return{crest,trough,breaker};
+}
+
+test('first-person line contact samples the water intersection independently of fish depth',()=>{
+ for(const sceneId of ['pacifica','half-moon-bay']){
+  const s=state(sceneId),pose=shoreFightPose(sceneId,s),{shot}=render(sceneId,s,{reducedMotion:false});
+  assert.deepEqual(shot.entryWorld,pose.entryWorld);
+  assert.deepEqual(shot.waterContact.sample,sampleShore(sceneId,pose.entryWorld.x,pose.entryWorld.y,s.elapsed,s.seaState));
+  assert.notDeepEqual(shot.waterContact.sample,pose.sample,'bottom-rig contact is nearer shore than the fish');
+  assert.deepEqual(shot.linePoints.map(p=>({x:Math.round(p.x),y:Math.round(p.y)})).at(0),shot.rodTip);
+  assert.deepEqual(shot.linePoints.map(p=>({x:Math.round(p.x),y:Math.round(p.y)})).at(-1),shot.lineEntry);
+ }
+});
+
+test('float and line contact rise on local crests and fall into troughs at the coast projection scale',()=>{
+ for(const sceneId of ['pacifica','half-moon-bay']){
+  const s=floatState(sceneId),{crest,trough}=surfaceExtremes(sceneId,s),shots=[];
+  assert.ok(crest.sample.surfaceElevation>.05);assert.ok(trough.sample.surfaceElevation<-.05);
+  for(const frame of [crest,trough]){
+   const frameState={...s,elapsed:frame.elapsed},{canvas,shot}=render(sceneId,frameState,{reducedMotion:false});shots.push(shot);
+   const base=shoreSurfaceProjection(canvas.width,canvas.height,sceneId,frameState,shot.entryWorld);
+   const offshore=Math.max(.5,(getShoreScene(sceneId).shoreY(shot.entryWorld.x)-shot.entryWorld.y)/3.2);
+   close(shot.surfacePixelsPerMetre,12*18/(18+offshore)*shot.height/canvas.height);
+   close(shot.waterContact.height,frame.sample.surfaceElevation);
+   close(shot.linePoints.at(-1).y,base.y*shot.height/canvas.height-shot.waterContact.height*shot.surfacePixelsPerMetre);
+   close(shot.linePoints.at(-1).x,base.x*shot.width/canvas.width);
+   assert.equal(shot.floatVisible,true);
+  }
+  assert.ok(shots[0].lineEntry.y<shots[0].waterBase.y,'crest lifts the float above its mean-water position');
+  assert.ok(shots[1].lineEntry.y>shots[1].waterBase.y,'trough lowers the float below its mean-water position');
+ }
+});
+
+test('a zero-wave sea has no procedural float bob, lean or breaker cover',()=>{
+ for(const sceneId of ['pacifica','half-moon-bay']){
+  const s=floatState(sceneId,{seaState:{waveHeightM:0,wavePeriodS:10,waveDirectionDeg:28,tideM:1.2}});
+  const first=render(sceneId,{...s,elapsed:0},{reducedMotion:false}),later=render(sceneId,{...s,elapsed:31},{reducedMotion:false});
+  assert.equal(first.canvas.digest(),later.canvas.digest());assert.deepEqual(first.shot.linePoints,later.shot.linePoints);
+  assert.equal(first.shot.waterContact.height,0);assert.equal(first.shot.waterContact.tilt,0);assert.equal(first.shot.foamOcclusion,0);
+  assert.deepEqual(first.shot.lineEntry,first.shot.waterBase);
+ }
+});
+
+test('surf flow bows the free line in its actual direction and full tension straightens it',()=>{
+ const deflection=shot=>{const points=shot.linePoints,i=12,t=i/(points.length-1);return points[i].x-(points[0].x+(points.at(-1).x-points[0].x)*t);};
+ for(const direction of [-40,40]){
+  const s=floatState('pacifica',{tension:0,seaState:{waveHeightM:3,wavePeriodS:10,waveDirectionDeg:direction,tideM:1.2}});
+  const {crest}=surfaceExtremes('pacifica',s),frame={...s,elapsed:crest.elapsed};
+  const slack=render('pacifica',frame,{reducedMotion:false}).shot,taut=render('pacifica',{...frame,tension:1},{reducedMotion:false}).shot;
+  assert.ok(Math.abs(slack.waterContact.flowX)>.05);
+  assert.equal(Math.sign(deflection(slack)),Math.sign(slack.waterContact.flowX));
+  assert.equal(Math.sign(slack.waterContact.flowX),Math.sign(direction));
+  close(deflection(taut),0,'full tension removes lateral bow while contact stays attached');
+  assert.ok(Math.abs(deflection(slack))>.1);
+ }
+});
+
+test('active breaking foam covers the float base after its colored body is drawn',()=>{
+ const s=floatState(),{breaker}=surfaceExtremes('pacifica',s),{canvas,shot}=render('pacifica',{...s,elapsed:breaker.elapsed},{reducedMotion:false});
+ assert.ok(breaker.sample.activeBreaking>.05);assert.ok(shot.foamOcclusion>0);
+ close(shot.waterContact.breaking,breaker.sample.activeBreaking);
+ const floatBase=canvas.calls.findIndex(call=>call[0]==='fill'&&call[1]==='#c96a47');
+ assert.ok(floatBase>=0);
+ assert.ok(canvas.calls.slice(floatBase+1).some(call=>call[0]==='fillRect'&&call[1]===getShoreScene('pacifica').palette.foam));
+});
+
+test('float contact, foam and line shape are deterministic, paused and reduced-motion safe',()=>{
+ for(const sceneId of ['pacifica','half-moon-bay']){
+  const s=floatState(sceneId),canvas=recordingCanvas(),view=createShoreFightView(canvas,{sceneId});
+  view.draw(s,0,{active:true,reducedMotion:false});const before=view.snapshot(),digest=canvas.digest();
+  canvas.reset();view.draw(s,.1,{active:true,paused:true,reeling:true,reducedMotion:false});
+  assert.equal(canvas.digest(),digest);assert.deepEqual(view.snapshot(),before);
+  const frozen=render(sceneId,s),later=render(sceneId,{...s,elapsed:s.elapsed+37});
+  assert.equal(frozen.canvas.digest(),later.canvas.digest());assert.deepEqual(frozen.shot.waterContact,later.shot.waterContact);
+  assert.deepEqual(frozen.shot.linePoints,later.shot.linePoints);
+  assert.deepEqual(frozen.shot.waterContact.sample,sampleShore(sceneId,frozen.shot.entryWorld.x,frozen.shot.entryWorld.y,0,s.seaState));
+ }
+});

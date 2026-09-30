@@ -1,0 +1,41 @@
+{
+  "kind": "accelerated deterministic simulation, no forced fish",
+  "results": [
+    {
+      "seed": 123,
+      "activeSeconds": 600,
+      "casts": 14,
+      "bites": 0,
+      "catches": [],
+      "lost": 0,
+      "finite": true,
+      "finalPhase": "waiting",
+      "remainingRig": true,
+      "elapsed": 599.9999999997282
+    },
+    {
+      "seed": 911,
+      "activeSeconds": 600,
+      "casts": 14,
+      "bites": 0,
+      "catches": [],
+      "lost": 0,
+      "finite": true,
+      "finalPhase": "waiting",
+      "remainingRig": true,
+      "elapsed": 599.9999999997282
+    },
+    {
+      "seed": 2048,
+      "activeSeconds": 600,
+      "casts": 14,
+      "bites": 0,
+      "catches": [],
+      "lost": 0,
+      "finite": true,
+      "finalPhase": "waiting",
+      "remainingRig": true,
+      "elapsed": 599.9999999997282
+    }
+  ]
+}

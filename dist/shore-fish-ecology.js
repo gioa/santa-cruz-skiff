@@ -6,6 +6,20 @@ const clamp=(value,min=0,max=1)=>Math.max(min,Math.min(max,value));
 const finite=(value,fallback=0)=>Number.isFinite(value)?value:fallback;
 const bell=(value,centre,width)=>Math.exp(-.5*((value-centre)/width)**2);
 const freeze=value=>Object.freeze(value);
+const artificial=id=>['salmon_spoon','salmon_spinner','grub_jig'].includes(id);
+
+// Authored swimming-action affinities. A moving artificial is a visual/motion
+// stimulus, not an unbaited natural-bait rig and not a guaranteed bite.
+export function shoreLureAppeal(id,{rig,presentation={},waterDepth=1,condition=1}={}){
+ if(!artificial(rig)||finite(condition)<=.08||finite(presentation.depth)<.08)return 0;
+ const grub=rig==='grub_jig',speed=Math.max(0,finite(presentation.motion));
+ const preference=grub?({surfperch:.65,redtail_surfperch:.65,calico_surfperch:.65,silver_surfperch:.4,walleye_surfperch:.3,striped_bass:.85,halibut:1,white_croaker:.18,jacksmelt:.08,pile_perch:.2,striped_seaperch:.2}[id]||.05):({striped_bass:1,halibut:.6,jacksmelt:.02}[id]||.025);
+ const optimum=grub?.42:rig==='salmon_spinner'?.85:.7;
+ const swimming=bell(speed,optimum,grub?.48:.65)*(speed>.12?1:grub?.28:.035);
+ const aboveBed=Math.max(0,waterDepth-finite(presentation.depth));
+ const layer=id==='halibut'?bell(aboveBed,.35,1.1):/perch|croaker/.test(id)?bell(aboveBed,.45,1.5):1;
+ return preference*swimming*layer*clamp(condition);
+}
 
 export const SHORE_ECOLOGY=freeze([
  freeze({id:'surfperch',name:'银双齿海鲫',nameEn:'Barred surfperch',baseRatePerSecond:.0038,
@@ -190,6 +204,15 @@ export function shoreEncounterRates({sample={},bait,rig,baitCondition=1,month=9,
  sample=sample||{};presentation=presentation||{};
  const baitId=typeof bait==='string'?bait:bait?.kind||bait?.id;
  const rawRig=typeof rig==='string'?rig:rig?.id;
+ if(artificial(rawRig)){
+  const e=environment(sample,presentation),monthIndex=clamp(Math.floor(finite(month,9)),1,12)-1;
+  const perSpecies=SHORE_ECOLOGY.map(species=>{
+   const space=spaceAffinity(species.id,e),factors={water:e.offshore>0&&e.depth>.08?1:0,distance:space.distance,depth:depthAffinity(e.depth,species.depth),habitat:space.habitat,season:species.monthly[monthIndex],light:lightAffinity(species.id,hour),waves:waveAffinity(species.id,e),lure:shoreLureAppeal(species.id,{rig:rawRig,presentation,waterDepth:e.depth,condition:baitCondition})};
+   return{id:species.id,factors,ratePerSecond:species.baseRatePerSecond*Object.values(factors).reduce((a,b)=>a*b,1)};
+  });
+  const totalRatePerSecond=perSpecies.reduce((a,b)=>a+b.ratePerSecond,0),dominant=perSpecies.reduce((a,b)=>a.ratePerSecond>b.ratePerSecond?a:b);
+  return{perSpecies,totalRatePerSecond,dominantSpeciesId:totalRatePerSecond?dominant.id:null,medianWaitSeconds:totalRatePerSecond?Math.LN2/totalRatePerSecond:Infinity,status:presentation.status||'收线、停顿或轻抽，改变拟饵的速度与钓层。'};
+ }
  const rigId=rawRig==='carolina_rig'?'carolina':rawRig==='fishfinder_rig'?'fishfinder':rawRig==='float_rig'?'float':rawRig;
  const validBait=['sandcrab','squid','anchovy','sandworm','mussel'].includes(baitId)?baitId:null;
  const validRig=['carolina','fishfinder','float'].includes(rigId)?rigId:null;

@@ -1,0 +1,37 @@
+{
+  "checks": [
+    {
+      "scene": "pacifica",
+      "crestTime": 69.87011726374973,
+      "overheadRise": 1.1372729390859604,
+      "fightRisePixels": 7,
+      "checks": [
+        "Carolina and fish-finder stay submerged without bobbers or terminal markers",
+        "Both cameras share bottom-line water entry",
+        "Crest/trough float and line attachment",
+        "Tension bends waiting rod",
+        "Calm no bob",
+        "Reduced motion freezes contact",
+        "Bottom and float rigs across 4 viewport sizes",
+        "Rendering preserves gameplay state"
+      ]
+    },
+    {
+      "scene": "half-moon-bay",
+      "crestTime": 68.84005067697636,
+      "overheadRise": 0.7134976014494894,
+      "fightRisePixels": 5,
+      "checks": [
+        "Carolina and fish-finder stay submerged without bobbers or terminal markers",
+        "Both cameras share bottom-line water entry",
+        "Crest/trough float and line attachment",
+        "Tension bends waiting rod",
+        "Calm no bob",
+        "Reduced motion freezes contact",
+        "Bottom and float rigs across 4 viewport sizes",
+        "Rendering preserves gameplay state"
+      ]
+    }
+  ],
+  "errors": []
+}

@@ -1,3 +1,4 @@
+import {finishShoreRetrieve} from './helpers/shore-cast.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {PacificaSimulation, PIER_RULES, SHOP, WORLD} from '../dist/pacifica-sim.js';
@@ -138,7 +139,7 @@ test('closed pier requires an explicit gate entry and L-deck paths never cut ove
   assert.equal(sim.walkTo(pier.tip.x + 300, pier.tip.y).ok, false);
   assert.ok(sim.cast({power: 1}).ok);
   assert.ok(sim.state.cast.target.y < sim.state.cast.origin.y);
-  assert.ok(sim.retrieve().ok);
+  assert.ok(sim.retrieve().ok);finishShoreRetrieve(sim);
   assert.ok(sim.leavePier().ok);
   until(sim, () => !sim.onPier);
   assert.deepEqual({x: sim.state.player.x, y: sim.state.player.y}, pier.gate);

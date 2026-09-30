@@ -31,3 +31,10 @@ export function finishShoreFlight(sim) {
   for (let time = 0; sim.state.phase === 'casting' && time < duration + .1; time += .025) sim.update(.025);
   assert.equal(sim.state.phase, 'waiting', 'fixture lands in water before exposure starts');
 }
+
+// Retrieval advances the actual terminal tackle; it cannot teleport the rig home.
+export function finishShoreRetrieve(sim,seconds=180){
+  if(!sim.state.autoRetrieve)assert.ok(sim.retrieve().ok);
+  for(let t=0;t<seconds&&sim.state.phase!=='walk';t+=.05)sim.update(.05);
+  assert.equal(sim.state.phase,'walk','retrieved rig reaches shore before reconfiguration or recasting');
+}
