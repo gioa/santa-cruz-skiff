@@ -43,6 +43,12 @@ Every destination decides bites with the same agent-based model, `dist/fish-popu
 
 The visible bait schools at Santa Cruz (anchovy, sardine, mackerel) remain explicit schools on the map. A lure inside one meets those baitfish at the school's density, and sabiki rigs use them as before.
 
+**Several baits.** Besides the player's bait (`stimulus`), the engine accepts other anglers' baits (`stimuli`), such as Sharp Park's regular.
+- A roaming school can find any of them; a tracking school follows the bait it found.
+- Bites on another bait wait in `sideBites` until that angler resolves them with `resolveBite(pop, outcome, defs, baitId)`. The player's bite stays in `pendingBite`.
+- With a single bait the engine consumes random numbers exactly as before.
+- The calibration strategies run with the regular switched off (`regular:false`), so they compare technique without another angler competing for fish.
+
 The population is saved with each trip (`population` in the save) and uses its own random stream. Reloading therefore cannot reroll the fish around a bait. The random seed is fixed for tests and fixtures, and random for real Santa Cruz trips (daily weather) and new beach games.
 
 ## Calibration

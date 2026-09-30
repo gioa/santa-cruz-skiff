@@ -23,7 +23,7 @@ const MAINTAIN_EVERY=4,STEER_EVERY=2,CACHE_BUCKET=20,SAMPLE_POINTS=36;
 
 export function createPopulation(seed=1){
  return{version:1,rng:(Math.floor(finite(seed,1))>>>0)||1,groups:[],nextId:1,clock:0,accumulator:0,
-  maintainAt:0,center:null,pendingBite:null,stimulusId:0,lastStimulus:null};
+  maintainAt:0,center:null,pendingBite:null,sideBites:{},stimulusId:0,lastStimulus:null};
 }
 function random(pop){let x=pop.rng>>>0;x^=x<<13;x^=x>>>17;x^=x<<5;pop.rng=x>>>0||1;return pop.rng/4294967296;}
 function gaussian(pop){const u=Math.max(1e-9,random(pop)),v=random(pop);return Math.sqrt(-2*Math.log(u))*Math.cos(TAU*v);}
@@ -172,6 +172,9 @@ function moveGroup(pop,world,def,g,dt,stimulus){
  *  feeding(def): 0..1 current appetite level (time of day, season, sea state)
  *  light: 0..1 ambient light for sight; turbidity(x,y): 0..1; mixing: 0..1
  *  stimulus: null or the bait {id,x,y,depth,scent,flash,motion,soakSeconds,currentX,currentY,appeal(def,group)}
+ *  stimuli: optional other anglers' baits, same shape plus `side:true`; their
+ *    bites come back as events with `stimulus: id` and wait in `sideBites`
+ *    until `resolveBite(pop, outcome, defs, id)`.
  * Returns events: {type:'bite'|'nibble'|'arrive'|'leave', group, species, lengthCm}. */
 export function stepPopulation(pop,dt,world){
  const events=[];pop.accumulator+=Math.max(0,finite(dt));
@@ -186,17 +189,32 @@ function tick(pop,dt,world,events){
  if(jumped){pop.groups=pop.groups.filter(g=>Math.hypot(g.x-c.x,g.y-c.y)<=r*1.3&&defs[g.species]);pop.center={x:c.x,y:c.y};maintain(pop,world,true);pop.maintainAt=pop.clock+MAINTAIN_EVERY;}
  else if(pop.clock>=pop.maintainAt){pop.maintainAt=pop.clock+MAINTAIN_EVERY;pop.center={x:c.x,y:c.y};maintain(pop,world,false);}
  let stimulus=world.stimulus&&Number.isFinite(world.stimulus.x)?world.stimulus:null;
+ // Other anglers' baits in the same water (a beach regular, for instance).
+ // Their bites are held in `sideBites` by bait id; the player's stays `pendingBite`.
+ const others=(Array.isArray(world.stimuli)?world.stimuli:[]).filter(o=>o&&o.id!=null&&Number.isFinite(o.x)&&o.id!==stimulus?.id);
+ const live=new Map([...(stimulus?[[stimulus.id,stimulus]]:[]),...others.map(o=>[o.id,o])]);
+ pop.sideBites??={};
+ for(const id of Object.keys(pop.sideBites))if(!others.some(o=>String(o.id)===id))delete pop.sideBites[id];
  if((stimulus?.id??null)!==pop.lastStimulus){
   // A new cast or retrieved bait: fish following the old bait go back to roaming.
-  for(const g of pop.groups)if(g.mode==='track'||g.mode==='inspect'){g.mode='roam';g.interest=0;}
+  for(const g of pop.groups)if((g.mode==='track'||g.mode==='inspect')&&!others.some(o=>o.id===g.target)){g.mode='roam';g.interest=0;g.target=null;}
   pop.lastStimulus=stimulus?.id??null;pop.pendingBite=null;
  }
+ const open=o=>o===stimulus?!pop.pendingBite:!pop.sideBites[o.id];
  for(const g of pop.groups){
   const def=defs[g.species];if(!def)continue;
   g.hunger=clamp(g.hunger+(finite(world.feeding?.(def),.7)-g.hunger)*dt/900,0,1);
   g.alarm=Math.max(0,g.alarm-dt/(def.calmSeconds||40));
-  if(stimulus&&!pop.pendingBite)senseAndDecide(pop,world,def,g,dt,stimulus,events);
-  moveGroup(pop,world,def,g,dt,stimulus);
+  let target=null;
+  if(g.mode==='track'||g.mode==='inspect'){
+   // Old saves and single-bait callers carry no target: they follow the player's bait.
+   target=live.get(g.target??stimulus?.id)||null;
+   if(!target){g.mode='roam';g.interest=0;g.target=null;}
+   else if(open(target))senseAndDecide(pop,world,def,g,dt,target,events);
+  }else if(g.mode==='roam'){
+   for(const o of live.values()){if(!open(o))continue;senseAndDecide(pop,world,def,g,dt,o,events);if(g.mode!=='roam'){g.target=o.id;target=o;break;}}
+  }else if(stimulus&&open(stimulus))senseAndDecide(pop,world,def,g,dt,stimulus,events);
+  moveGroup(pop,world,def,g,dt,g.mode==='track'||g.mode==='inspect'?target:null);
  }
  const before=pop.groups.length;
  pop.groups=pop.groups.filter(g=>g.count>0&&Math.hypot(g.x-c.x,g.y-c.y)<=r*1.4);
@@ -230,18 +248,23 @@ function senseAndDecide(pop,world,def,g,dt,stimulus,events){
  const rate=def.biteRate*appeal*appeal*Math.pow(g.hunger,1.2)*(1-g.alarm)*competition;
  if(random(pop)<1-Math.exp(-rate*dt)){
   const lengthCm=clamp(g.lengthCm*(1+(def.cohortSd??.07)*gaussian(pop)),def.lengthCm[0]*.9,def.lengthCm[1]*1.05);
-  pop.pendingBite={group:g.id,species:g.species,lengthCm};
-  events.push({type:'bite',group:g.id,species:g.species,lengthCm});return;
+  const bite={group:g.id,species:g.species,lengthCm};
+  if(stimulus.side){pop.sideBites??={};pop.sideBites[stimulus.id]=bite;events.push({type:'bite',...bite,stimulus:stimulus.id});return;}
+  pop.pendingBite=bite;
+  events.push({type:'bite',...bite});return;
  }
- if(appeal>.05&&random(pop)<.08*dt)events.push({type:'nibble',group:g.id,species:g.species});
+ if(appeal>.05&&random(pop)<.08*dt)events.push({type:'nibble',group:g.id,species:g.species,...(stimulus.side?{stimulus:stimulus.id}:{})});
  g.interest-=dt/(def.patience||20)*(1+2*(1-Math.min(1,appeal)));
  if(g.interest<=0){g.mode='roam';g.ignoreUntil=pop.clock+90+random(pop)*150;}
 }
 
 /** Outcome of the most recent bite. `hooked` removes that fish from its school;
  * `missed` means the fish felt the hook and left; `refused` frees the bite. */
-export function resolveBite(pop,outcome,defs=[]){
- const bite=pop.pendingBite;pop.pendingBite=null;if(!bite)return null;
+export function resolveBite(pop,outcome,defs=[],stimulusId=null){
+ let bite;
+ if(stimulusId!=null){bite=pop.sideBites?.[stimulusId]||null;if(pop.sideBites)delete pop.sideBites[stimulusId];}
+ else{bite=pop.pendingBite;pop.pendingBite=null;}
+ if(!bite)return null;
  const g=pop.groups.find(x=>x.id===bite.group);if(!g)return bite;
  const def=defs.find(d=>d.id===g.species)||{};
  if(outcome==='hooked'){

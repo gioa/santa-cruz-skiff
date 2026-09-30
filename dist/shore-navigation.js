@@ -13,10 +13,18 @@ export function createShoreNavigation({scene,sim,openDialog,closeDialog,feedback
  }
  function openConversation(id){const result=sim.talkAngler(id);if(!result.ok){feedback(result);return;}openDialog('conversation',`<div class="eyebrow">A WORD ON THE BEACH</div><h2 id="modal-title">${esc(result.name)}</h2><div class="staff-banner"><p>「${esc(result.text)}」</p></div>${result.fresh?'<p class="credits-note">这一条，记进沿岸手记了。</p>':result.known?'<p class="credits-note">这段经验已经记过了。</p>':''}<div class="button-row"><button id="angler-goodbye" class="primary">谢谢，祝你上鱼</button></div>`);$('angler-goodbye').onclick=closeDialog;}
 
+ function openRegular(more=false){
+  const result=sim.talkRegular({more});if(!result.ok){feedback(result);return;}
+  const gifts=result.gifts.map(g=>`<p>「${esc(g.line)}」</p><p class="credits-note">收到：${esc(g.item)}</p>`).join('');
+  openDialog('conversation',`<div class="eyebrow">SHARP PARK REGULAR</div><h2 id="modal-title">${esc(result.name)}</h2><div class="staff-banner"><div>${result.line?`<p>「${esc(result.line)}」</p>`:''}${result.tip?`<p><b>${esc(result.tip.title)}</b>　「${esc(result.tip.text)}」</p>`:''}${gifts}</div></div>${result.fresh?'<p class="credits-note">这一条，记进沿岸手记了。</p>':''}<div class="button-row">${result.more?'<button id="regular-more" class="secondary">再请教一条</button>':''}<button id="angler-goodbye" class="primary">谢谢，祝你上鱼</button></div>`);
+  if(result.more)$('regular-more').onclick=()=>openRegular(true);
+  $('angler-goodbye').onclick=closeDialog;
+  if(result.gifts.length)feedback({ok:true,message:''});
+ }
  function openInspection(){
   const i=sim.state.inspection;if(!i)return;
   openDialog('inspection',`<div class="eyebrow">${i.kind==='beach'?'BEACH PATROL':'PIER PATROL'}</div><h2 id="modal-title">${i.kind==='beach'?'海滩鱼警检查':'栈桥巡查'}</h2>${inspectionReportMarkup({...i,debt:sim.state.fineDebt})}<div class="button-row"><button id="inspection-ok" class="primary">回到沙滩</button></div>`);
   $('inspection-ok').onclick=closeDialog;
  }
- return{openMap,openInspection,openConversation};
+ return{openMap,openInspection,openConversation,openRegular};
 }

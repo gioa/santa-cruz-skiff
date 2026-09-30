@@ -53,7 +53,9 @@ const walkGround=async point=>{
 };
 const walkUntilModal=async(key,selector)=>{
  await page.locator('#world').focus();await page.keyboard.down(key);
- try{await page.locator(selector).first().waitFor({state:'visible',timeout:5000});}finally{await page.keyboard.up(key);}
+ try{await page.locator(selector).first().waitFor({state:'visible',timeout:5000});}
+ catch(e){const s=await state();throw new Error(`${selector} did not open: ${JSON.stringify({player:s.player,phase:s.phase,walkTarget:s.walkTarget,modal:await page.locator('#modal-title').textContent().catch(()=>null),regular:s.regular&&{mode:s.regular.mode,x:Math.round(s.regular.x),y:Math.round(s.regular.y)}})}`);}
+ finally{await page.keyboard.up(key);}
 };
 try{
  for(const scene of ['pacifica','half-moon-bay']){

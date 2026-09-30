@@ -32,7 +32,8 @@ function power(sim,distance){
 function cast(sim,distance){const r=sim.cast({power:power(sim,distance)});if(!r.ok)throw new Error(r.message);while(sim.state.phase==='casting')sim.update(STEP);}
 
 export function playStrategy(sceneId,strategy,seed){
- const sim=new PacificaSimulation({sceneId,date:fishingDate,seaState:strategy.seaState,rng:mulberry(seed),loreSeed:seed});
+ // Technique comparisons are controlled: no other angler competing on the beach.
+ const sim=new PacificaSimulation({sceneId,date:fishingDate,seaState:strategy.seaState,rng:mulberry(seed),loreSeed:seed,regular:false});
  sim.buy('surf_rod');sim.state.credits=0;sim.configureEquipment('surf_rod');
  const x=strategy.position==='channel'?(sceneId==='pacifica'?3240:2670):1100;
  Object.assign(sim.state.player,{x,y:sim.world.shoreY(x)+25});

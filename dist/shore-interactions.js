@@ -10,6 +10,9 @@ function places(scene,state){
  // The closed gate is scenery: walking up to it opens nothing. (E beside it, or
  // tapping the deck from there, is how curious players find their way on.)
  if(scene.pier)result.push({id:'pier',kind:'pier',silent:true,point:scene.pier.gate,radius:42,release:68,distance:distance(player,scene.pier.gate)});
+ const regular=state.regular;
+ // The Sharp Park regular, wherever he is standing or walking.
+ if(regular&&regular.mode!=='away')result.push({id:'regular',kind:'regular',point:{x:regular.x,y:regular.y},radius:55,release:80,distance:distance(player,regular)});
  const angler=state.shoreLore?.encounter;
  if(angler&&angler.expiresAt>state.elapsed)result.push({id:`angler:${angler.id}`,kind:'angler',anglerId:angler.id,point:{x:angler.x,y:angler.y},
   radius:55,release:80,distance:distance(player,angler)});

@@ -1,5 +1,6 @@
 import {BAITS,SHOP_ITEMS,restoreShoreEquipment,shoreReady,shoreSupply,wearShoreSupplies,configureShoreEquipment,shoreSlots,moveShoreSlot} from './shore-equipment.js';
 import {createShoreLore,stepShoreLore,talkShoreAngler} from './shore-lore.js';
+import {createShoreRegular,serializeRegular,stepShoreRegular,regularStimuli,regularBite,talkRegular} from './shore-regular.js';
 import {fishSpecies,normalizeFishIdentity} from './fish-species.js';
 // Shared shore-fishing simulation. Geometry and habitats are scene specific;
 // prices, bite rates, inspection odds and fines are authored game tuning.
@@ -123,7 +124,7 @@ function safeFish(raw) {
 }
 
 export class PacificaSimulation {
-  constructor({sceneId = 'pacifica', saved, rng = Math.random, loreSeed, seaState = null, date = new Date().toISOString().slice(0,10)} = {}) {
+  constructor({sceneId = 'pacifica', saved, rng = Math.random, loreSeed, seaState = null, date = new Date().toISOString().slice(0,10), regular = true} = {}) {
     this.scene = getShoreScene(sceneId);
     this.world = this.scene.world;
     this.shop = this.scene.shop;
@@ -143,7 +144,7 @@ export class PacificaSimulation {
       fishingDate: /^\d{4}-\d{2}-\d{2}$/.test(date)&&Number.isFinite(Date.parse(date))?date:new Date().toISOString().slice(0,10),
       seaState: seaState && typeof seaState==='object' ? {...seaState} : null,
       walkTarget: null, walkRoute: [],
-      message: `欢迎来到 ${this.scene.name}。沿沙滩寻找浪沟，按住抛投蓄力。`,
+      message: '',
       nextCatchId: 1,
       onPier: false, leavingPier: false, inspectionCount: 0, inspection: null, fineDebt: 0,
       shoreSample: null,
@@ -151,6 +152,8 @@ export class PacificaSimulation {
     if (saved?.scene === this.scene.id && saveVersions.includes(saved.version)) this.restore(saved);
     restoreShoreEquipment(this.state,saved?.scene===this.scene.id&&saveVersions.includes(saved.version)?saved:null);
     this.state.shoreLore=createShoreLore(this.scene,saved?.scene===this.scene.id?saved.shoreLore:null,this.state.elapsed,loreSeed);
+    // Sharp Park's regular angler keeps his own random stream too.
+    this.state.regular=regular?createShoreRegular(this.scene,saved?.scene===this.scene.id?saved.regular:null,(this.state.shoreLore.rngState^0x2545f491)>>>0):null;
     // Fish live in their own saved random stream, so reloading cannot reroll them.
     const savedPopulation = saved?.scene === this.scene.id && saved.population?.version === 1 ? saved.population : null;
     this.population = savedPopulation ? restorePopulation(savedPopulation, 1, SHORE_POPULATION_SPECIES.map(d => d.id))
@@ -170,6 +173,7 @@ export class PacificaSimulation {
   }
 
   talkAngler(id){return talkShoreAngler(this,id);}
+  talkRegular(options){return talkRegular(this,options);}
 
   random() { return clamp(finite(this.rng(), .5), 0, .999999); }
 
@@ -239,7 +243,7 @@ export class PacificaSimulation {
     const target = point(x, y), route = routeAroundShop(this.building, s.player, target);
     if (!route.length) return this.result(false, '这里暂时无法到达。');
     s.walkTarget = target; s.walkRoute = route;
-    return this.result(true, y - this.world.shoreY(x) <= 130 ? '走向浪线，准备抛投。' : '沿沙滩行走中。');
+    return this.result(true, '');
   }
 
   enterPier() {
@@ -284,7 +288,7 @@ export class PacificaSimulation {
     const route = [];
     for (let n = 1; n > 0; n = previous[n]) route.unshift({...nodes[n]});
     s.walkTarget = target; s.walkRoute = route; s.leavingPier = exiting;
-    return this.result(true, exiting ? '沿栈桥返回岸边入口。' : '沿桥面移动。');
+    return this.result(true, '');
   }
 
   leavePier() {
@@ -343,7 +347,7 @@ export class PacificaSimulation {
     s.castId++; s.soakSeconds = 0;
     s.encounter = this.encounterRates(sample); s.biteSpeciesId = null; s.biteLengthCm = null;
     s.biteRemaining = 0; this.reeling = false;
-    return this.result(true, planned.loadRatio>1?'钓组超出竿的抛重范围，挥竿距离受限；可换轻组或长竿。':`抛出约 ${Math.round(planned.distance*3.28084)} ft${planned.landing==='water'?'，留意落水处。':'，这一竿可能够不到水面。'}`);
+    return this.result(true, planned.loadRatio>1?'钓组超出竿的抛重范围，挥竿距离受限；可换轻组或长竿。':`抛出约 ${Math.round(planned.distance*3.28084)} ft${planned.landing==='water'?'。':'，这一竿可能够不到水面。'}`);
   }
 
   strike() {
@@ -405,7 +409,7 @@ export class PacificaSimulation {
         appeal: def => shoreBaitAppeal(def.id, {bait, rig: supply.id, baitCondition: condition, presentation: s.presentation})};
     }
     const daylight = clamp(Math.sin((hour - 5.3) * Math.PI / 13.9) * 1.4, .1, 1);
-    return {species: SHORE_POPULATION_SPECIES, center, radius: 110, cellSize: 4, stimulus,
+    return {species: SHORE_POPULATION_SPECIES, center, radius: 110, cellSize: 4, stimulus, stimuli: regularStimuli(this),
       env: (x, y) => this.fishEnv(x, y),
       suitability: (def, x, y) => { const e = this.fishEnv(x, y); return e.water ? shoreSuitability(def.id, e.sample, {month}) : 0; },
       feeding: def => .35 + .65 * shoreFeeding(def.id, hour), light: daylight,
@@ -416,6 +420,8 @@ export class PacificaSimulation {
   stepFish(dt) {
     const s = this.state, events = stepPopulation(this.population, dt, this.fishWorld());
     for (const event of events) {
+      // Bites and nibbles on someone else's bait (the regular's) are his.
+      if (event.stimulus != null) { if (event.type === 'bite') regularBite(this, event); continue; }
       if (event.type === 'nibble' && s.phase === 'waiting') s.nibbleAt = s.elapsed;
       if (event.type !== 'bite') continue;
       if (s.phase !== 'waiting') { resolveBite(this.population, 'refused', SHORE_POPULATION_SPECIES); continue; }
@@ -449,7 +455,7 @@ export class PacificaSimulation {
   retrieve() {
     if (!['casting', 'waiting', 'bite'].includes(this.state.phase)) return this.result(false, '现在没有可以收回的空钓组。');
     this.clearLine();
-    return this.result(true, '已收回钓组，钩上余饵保留。');
+    return this.result(true, '');
   }
 
   clearLine() {
@@ -569,6 +575,7 @@ export class PacificaSimulation {
     stepShoreLore(this);
     if (this.checkPier(dt)) return;
     this.stepFish(dt);
+    stepShoreRegular(this, dt);
     this.stepWarden(dt);
     if (s.inspection) return;
     if (s.phase === 'walk') {this.move(dt, input); this.refreshSample(); return;}
@@ -586,7 +593,7 @@ export class PacificaSimulation {
         // The sinker's splash briefly spooks wary fish right where it lands.
         const splash = this.toPlane(s.cast.target.x, s.cast.target.y), grams = SHORE_RIG_PHYSICS[shoreSupply(s)?.id]?.sinkerGrams || 28;
         disturb(this.population, {...splash, radius: 1.5 + grams / 25, strength: .7}, SHORE_POPULATION_SPECIES);
-        s.message = s.rig==='float'?'浮漂落水。等待小钩下沉，留意持续下沉或横移的鱼讯。':'钓组落水。等待竿尖点动，出现咬口后及时扬竿。';
+        s.message = '';
       }
     } else if (s.phase === 'waiting') {
       s.soakSeconds += dt;
@@ -605,8 +612,8 @@ export class PacificaSimulation {
       const next = s.walkRoute[0], dx = next.x - player.x, dy = next.y - player.y;
       if (Math.hypot(dx, dy) < 2) {
         s.walkRoute.shift();
-        if (!s.walkRoute.length && s.leavingPier) {this.ejectFromPier(); s.message = '已离开栈桥，回到沙滩。'; return;}
-        if (!s.walkRoute.length) {s.walkTarget = null; s.message = this.nearShop ? 'Bait & Tackle：补充鱼饵、升级装备、出售渔获。' : this.canCast ? '这里可以抛投。调整方向，按住抛投蓄力。' : s.message;}
+        if (!s.walkRoute.length && s.leavingPier) {this.ejectFromPier(); return;}
+        if (!s.walkRoute.length) s.walkTarget = null;
       } else {mx = dx; my = dy;}
     }
     // Undocumented: leaning on the closed gate long enough finds the gap in it.
@@ -672,7 +679,7 @@ export class PacificaSimulation {
       stats: s.stats, nextCatchId: s.nextCatchId, player: {x: s.player.x, y: s.player.y},
       pendingCatch: s.phase === 'landed' ? s.fish : null,
       onPier: s.onPier, inspectionCount: s.inspectionCount,
-      inspection: s.inspection, fineDebt: s.fineDebt, shoreLore:s.shoreLore,
+      inspection: s.inspection, fineDebt: s.fineDebt, shoreLore:s.shoreLore, regular: serializeRegular(s.regular),
     }));
   }
 
@@ -742,7 +749,7 @@ export class PacificaSimulation {
     else if (pending && !s.catchHistory.some(record => record.catchId === pending.catchId)) {
       s.fish = pending; s.phase = 'landed'; s.nextCatchId = Math.max(s.nextCatchId, pending.catchId + 1);
       s.message = '这条鱼还在等你决定：留下，还是放流？';
-    } else s.message = `欢迎回到 ${this.scene.name}。装备和渔获已恢复，沿浪线继续沙滩钓吧。`;
+    } else s.message = '';
   }
 }
 

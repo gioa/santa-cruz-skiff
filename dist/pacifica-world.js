@@ -361,6 +361,36 @@ export function createPacificaWorld(canvas,{sceneId='pacifica'}={}){
     if(fishing){line(ctx,-10,-23,-13,-28,'#dcad81',4);line(ctx,9,-23,4,-27,'#e8bb8d',4);R(ctx,-14,-29,6,4,'#edc99b');}else{R(ctx,-13,-24,4,12+leg,'#dfb289');R(ctx,10,-24,4,12-leg,'#e7bb8d');}
     if(warden){R(ctx,3,-23,4,5,'#e3c276');R(ctx,-11,-12,23,3,'#394f46');R(ctx,10,-24,12,14,'#e6d9b2');R(ctx,12,-22,7,2,'#778073');R(ctx,12,-18,5,1,'#778073');}if(staff){R(ctx,-5,-19,11,9,'#4b6b64');R(ctx,-2,-24,4,4,'#e6d2a2');}ctx.restore();
   }
+  // 空军大队长: his gear, the rod in a sand spike, and a line out to his real bait.
+  function regularAngler(state){
+    const r=state.regular;if(!r||r.mode==='away')return;
+    const walking=['arriving','moving','leaving'].includes(r.mode),holding=['casting','bite','fighting','landed'].includes(r.mode);
+    const far=r.bait||r.fight?.from;if(!visible(r.x,r.y)&&!(far&&visible(far.x,far.y)))return;
+    if(!walking){
+      // Cooler with a ruler on the lid, bait bucket and sand spike.
+      shadow(ctx,r.x+27,r.y+1,24,6,.16);R(ctx,r.x+17,r.y-13,20,13,'#dcd6bd');R(ctx,r.x+17,r.y-15,20,4,'#3f6a8c');R(ctx,r.x+19,r.y-14,16,1,'#e8c77c');
+      bucket(ctx,r.x-27,r.y+4,'#b87150');line(ctx,r.x+12,r.y+3,r.x+12,r.y-14,'#8a8f86',2);
+    }
+    person(r.x,r.y,{veteran:ANGLERS[3],walking,fishing:holding,facing:walking?(r.route?.[0]?.x>r.x?1:3):-1});
+    if(walking){line(ctx,r.x+9,r.y-34,r.x+14,r.y-84,'#3b4f55',2);return;}
+    let tip;
+    if(holding){const bend=r.mode==='fighting'?Math.sin(now*6)*2:0,butt={x:r.x-10,y:r.y-23};tip=r.mode==='fighting'?{x:r.x-24+bend,y:r.y-50}:{x:r.x-21,y:r.y-64};
+      line(ctx,butt.x,butt.y,(butt.x+tip.x)/2-(r.mode==='fighting'?4:0),(butt.y+tip.y)/2,'#3b4f55',2);line(ctx,(butt.x+tip.x)/2-(r.mode==='fighting'?4:0),(butt.y+tip.y)/2,tip.x,tip.y,'#3b4f55',2);}
+    else{tip={x:r.x+3,y:r.y-64};line(ctx,r.x+12,r.y-10,tip.x,tip.y,'#3b4f55',2);if(r.mode==='soaking')R(ctx,tip.x-1,tip.y-1,3,3,'#e2c56e');}
+    let end=null;
+    if(r.mode==='casting'&&r.bait){const k=clamp(1-r.timer/1.8,0,1);end={x:tip.x+(r.bait.x-tip.x)*k,y:tip.y+(r.bait.y-tip.y)*k-Math.sin(k*Math.PI)*60};}
+    else if(['soaking','bite'].includes(r.mode)&&r.bait)end={x:r.bait.x,y:r.bait.y};
+    else if(r.mode==='fighting'&&r.fight){const k=clamp(r.fight.elapsed/r.fight.duration,0,1),shore=scene.shoreY(r.x)+4;
+      end={x:r.fight.from.x+(r.x-r.fight.from.x)*k+Math.sin(now*1.7)*14*(1-k),y:r.fight.from.y+(shore-r.fight.from.y)*k};
+      ctx.globalAlpha=.7;R(ctx,end.x-4,end.y-1,9,2,'#f3f4e7');ctx.globalAlpha=1;}
+    if(end){if(r.mode==='bite'){tip.x+=Math.sin(now*28)*1.5;}ctx.globalAlpha=.5;line(ctx,tip.x,tip.y,end.x,end.y,'#e6eadb',1);ctx.globalAlpha=1;}
+    if(r.mode==='landed'&&r.landed){
+      // The fish in his hands: a silver striper with dark lines, or a perch.
+      const bass=r.landed.species==='striped_bass',len=bass?30:18,x=r.x+8,y=r.y-30;
+      R(ctx,x,y,len,bass?7:8,bass?'#c8d0c8':'#d8c89a');poly(ctx,[[x+len,y+3],[x+len+6,y-2],[x+len+6,y+9]],bass?'#8e9a96':'#b59c68');
+      if(bass)for(let i=0;i<4;i++)R(ctx,x+3,y+1+i*1.6,len-6,1,'#4d5a5c');R(ctx,x+2,y+2,2,2,'#2f4546');
+    }
+  }
   function ring(x,y,r,color,alpha=1){ctx.globalAlpha=alpha;const points=[];for(let i=0;i<20;i++){const a=i/20*TAU;points.push([x+Math.cos(a)*r,y+Math.sin(a)*r*.42]);}for(let i=0;i<points.length;i++){const p=points[i],q=points[(i+1)%points.length];line(ctx,p[0],p[1],q[0],q[1],color,2);}ctx.globalAlpha=1;}
   function fishing(state){
     const p=state.player||{x:1100,y:865},cast=state.cast,active=cast&&!['walk','landed'].includes(state.phase);
@@ -408,6 +438,7 @@ export function createPacificaWorld(canvas,{sceneId='pacifica'}={}){
     const encounter=state.shoreLore?.encounter;if(encounter&&visible(encounter.x,encounter.y)){person(encounter.x,encounter.y,{veteran:ANGLERS[encounter.angler],fishing:true});line(ctx,encounter.x-11,encounter.y-25,encounter.x-21,encounter.y-61,'#496463',2);bucket(ctx,encounter.x+22,encounter.y+4);}
 
     person(scene.shop.x+147,scene.shop.door.y-2,{staff:true,small:true,facing:'down'});
+    regularAngler(state);
     const warden=state.warden;if(warden&&visible(warden.x,warden.y))person(warden.x,warden.y,{warden:true,walking:true,facing:warden.facing??-1});
     person(p.x,p.y,{walking:state.player?.walking,facing:state.player?.facing,fishing:!!state.cast&&!['walk','landed'].includes(state.phase)});
     const castTarget=fishing(state);
