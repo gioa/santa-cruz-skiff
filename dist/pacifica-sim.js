@@ -495,7 +495,7 @@ export class PacificaSimulation {
     if(crankDriven)s.autoRetrieve=false;
     const reeling=crankDriven?crankRate>0:s.autoRetrieve||(input.reel===undefined?this.reeling:Boolean(input.reel));
     const windingSpeed=crankDriven?crankRate*SHORE_CRANK_TURN_METRES:(s.activeReel==='sealed_reel'?2.15:1.8)*c.reelSpeed;
-    s.presentation=stepShorePresentation(s.presentation,sample,supply?.id,dt,{...c,directionX:dx/d,directionY:dy/d,retrieveSpeed:reeling?windingSpeed:0,twitch:Boolean(input.twitch)});
+    s.presentation=stepShorePresentation(s.presentation,sample,supply?.id,dt,{...c,directionX:dx/d,directionY:dy/d,retrieveSpeed:reeling?windingSpeed:0,twitch:Boolean(input.twitch),rodRaise:finite(input.rodRaise)});
     s.retrieveInput=reeling;
     s.tension = clamp(.04 + Math.hypot(sample.currentX, sample.currentY) * .1 + finite(sample.waveLoad) * .12+s.presentation.relativeSpeed*.08+s.presentation.twitch*.06, 0, .65);
     // Mean current and wave orbital motion act on the same terminal tackle.
@@ -644,7 +644,7 @@ export class PacificaSimulation {
     if (dt === 0) return;
     const twitch=Boolean(input.twitch)&&!this.twitchHeld;this.twitchHeld=Boolean(input.twitch);
     const count = Math.ceil(dt / .025), tick = dt / count;
-    for (let index = 0; index < count; index++) this.tick(tick, {...input,twitch:twitch&&index===0});
+    for (let index = 0; index < count; index++) this.tick(tick, {...input,twitch:twitch&&index===0,rodRaise:index===0?finite(input.rodRaise):0});
   }
 
   tick(dt, input) {
@@ -742,7 +742,7 @@ export class PacificaSimulation {
     // The short lift is the same +0.18 movement the held rod displays. It
     // loads the line and raises the fish through the motion model; the spool
     // still retrieves line only when the angler actually winds it.
-    const rodLift=clamp(c.rodLift+p.twitch*.18,0,1),liftPulse=rodLift-c.rodLift;
+    const rodLift=clamp(c.rodLift+Math.max(p.twitch*.18,finite(input.rodRaise)),0,1),liftPulse=rodLift-c.rodLift;
     const position=shoreFishPosition(this.scene,s),sample=sampleShore(this.scene,position.x,position.y,s.elapsed,s.seaState||{});
     s.shoreSample=sample;
     const surfLoad=finite(sample.waveLoad)*.09+Math.hypot(sample.currentX,sample.currentY)*.027;

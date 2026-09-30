@@ -7,7 +7,7 @@ import {createPacificaWorld} from './pacifica-world.js';
 import {createPacificaMenus} from './pacifica-menus.js';
 import {createPixelSprites} from './pixel-sprites.js';
 import {shoreControlWords,stepShoreReelVisual} from './shore-reel-feedback.js';
-import {createShoreReelInput,tapShoreReelInput,stepShoreReelInput} from './shore-reel-input.js';
+import {createShoreReelHold,setShoreReelHeld,stepShoreReelHold,SHORE_REEL_HOLD_DELAY_SECONDS,SHORE_ROD_REST_LIFT,SHORE_ROD_HELD_LIFT} from './shore-reel-input.js';
 import {SHORE_MOVEMENT} from './shore-movement.js';
 import {shoreWorldMetres,shorePersonFoot} from './shore-scale.js';
 
@@ -25,7 +25,7 @@ const scene=getShoreScene($('app').dataset.location),WORLD=scene.world,SHOP=scen
 let saved;try{saved=JSON.parse(localStorage.getItem(SAVE_KEY)||'null');}catch{}
 const benicia=scene.id==='benicia';
 const sim=benicia?new BeniciaSimulation({saved}):new PacificaSimulation({saved,sceneId:scene.id}),world=benicia?createBeniciaWorld($('world')):createPacificaWorld($('world'),{sceneId:scene.id});
-sim.setFishingControls({rodLift:.35,rodSweep:0});
+sim.setFishingControls({rodLift:SHORE_ROD_REST_LIFT,rodSweep:0});
 const interactions=createShoreInteractions(scene);interactions.reset(sim.state);
 const reducedMotion=matchMedia('(prefers-reduced-motion: reduce)');
 const keys=new Set(),dialog=$('modal'),modalLayer=$('modal-layer');
@@ -33,17 +33,24 @@ const sprites=createPixelSprites();
 for(const el of document.querySelectorAll('[data-icon]')){const asset=sprites.icons[el.dataset.icon];if(asset){el.width=asset.width;el.height=asset.height;el.getContext('2d').drawImage(asset,0,0);}}
 let lastFocus=null,lastWorldFrame=null;
 let started=false,focused=true,last=performance.now(),lastSave=0,lastPhase=sim.state.phase,lastMessage='',chargeStart=0,reeling=false,scenePickerOpen=false,inspectionId=null,toastTimer,modalType='',sound=null,soundEnabled=false;
-let aim=0,afterPierWalk=null,twitchQueued=false,castPreview=null,reelInput=createShoreReelInput();
+let aim=0,afterPierWalk=null,castPreview=null,reelInput=createShoreReelHold();
+const reelPointers=new Set();
 let castCharge=0,reelVisual={},nextDragClick=0;
-const controlDefaults={reelSpeed:.6,rodLift:.35,rodSweep:0,drag:.5};
+const controlDefaults={reelSpeed:.6,rodLift:SHORE_ROD_REST_LIFT,rodSweep:0,drag:.5};
 const fishingControls=()=>({...controlDefaults,...sim.state.fishingControls});
 function persist(){try{localStorage.setItem(SAVE_KEY,JSON.stringify(sim.snapshot()));}catch{}}
 function feedback(result){if(result?.message)toast(result.message);persist();updateUI();return result;}
 function toast(message){$('toast').textContent=String(message).replaceAll('贝币','潮汐点');$('toast').classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').classList.remove('show'),3300);}
-function resetInput(){keys.clear();chargeStart=0;castCharge=0;castPreview=null;reeling=false;reelInput=createShoreReelInput();twitchQueued=false;$('beach-reel').classList.remove('active');show('cast-charge',false);}
+function stopReeling(){
+  reelInput=createShoreReelHold();reeling=false;$('beach-reel').classList.remove('active');
+  applyGestureRod();
+  const pointers=[...reelPointers];reelPointers.clear();
+  for(const id of pointers)if($('beach-reel').hasPointerCapture(id))$('beach-reel').releasePointerCapture(id);
+}
+function resetInput(){keys.clear();chargeStart=0;castCharge=0;castPreview=null;stopReeling();show('cast-charge',false);}
 function paused(){return !started||Boolean(modalType)||scenePickerOpen||document.hidden||!focused;}
 function syncFishingScene(){
-  if(!sim.canReel){reeling=false;reelInput=createShoreReelInput();$('beach-reel').classList.remove('active');}
+  if(!sim.canReel)stopReeling();
   $('app').classList.toggle('shore-fighting',sim.state.phase==='fighting');
   $('app').classList.toggle('shore-line-out',Boolean(sim.state.cast));
 }
@@ -95,9 +102,35 @@ $('beach-cast').addEventListener('keydown',e=>{if(![' ','Enter'].includes(e.key)
 $('beach-cast').addEventListener('keyup',e=>{if(![' ','Enter'].includes(e.key))return;e.preventDefault();finishCharge();});
 $('beach-cast').addEventListener('blur',()=>finishCharge(true));
 $('beach-cast').addEventListener('click',e=>{if(e.detail!==0||paused())return;if(sim.state.phase==='walk'){if(sim.canCast)feedback(sim.cast({power:0,aim}));else toast(!sim.tackleReady?'先打开鱼竿配置，装好钓组和鱼饵。':'走到岸边，再准备抛竿。');}else primaryAction();});
-function pulseReel(){if(!paused()&&sim.canReel)reelInput=tapShoreReelInput(reelInput);}
-$('beach-reel').addEventListener('click',pulseReel);
-$('beach-reel').addEventListener('keydown',e=>{if([' ','Enter'].includes(e.key)){e.preventDefault();if(!e.repeat)pulseReel();}});
+function applyGestureRod(){
+  sim.setFishingControls({rodLift:reelInput.sources.length?SHORE_ROD_HELD_LIFT:SHORE_ROD_REST_LIFT,rodSweep:0});
+  // The combined gesture supplies its own actual rod movement. No lingering
+  // legacy twitch may keep the displayed/physical rod raised after release.
+  if(sim.state.presentation){sim.state.presentation.twitch=0;sim.state.presentation.hopRemaining=0;}
+}
+function holdReel(source,held){
+  if(held&&!paused()&&sim.state.phase==='bite'){const result=sim.strike();feedback(result);if(!result.ok)return;}
+  reelInput=setShoreReelHeld(reelInput,source,held,{enabled:!paused()&&sim.canReel});
+  applyGestureRod();reeling=reelInput.sources.length>0&&reelInput.heldSeconds>=SHORE_REEL_HOLD_DELAY_SECONDS;
+  $('beach-reel').classList.toggle('active',reelInput.sources.length>0);
+}
+$('beach-reel').addEventListener('pointerdown',e=>{
+  if(e.button>0||paused()||!sim.canReel)return;e.preventDefault();
+  $('beach-reel').focus({preventScroll:true});$('beach-reel').setPointerCapture(e.pointerId);
+  reelPointers.add(e.pointerId);holdReel('pointer:'+e.pointerId,true);
+});
+function releaseReelPointer(e){
+  if(!reelPointers.delete(e.pointerId))return;
+  holdReel('pointer:'+e.pointerId,false);
+  if(e.type!=='pointerup'&&!reelInput.sources.length)reelInput=createShoreReelHold();
+  if($('beach-reel').hasPointerCapture(e.pointerId))$('beach-reel').releasePointerCapture(e.pointerId);
+}
+for(const event of ['pointerup','pointercancel','lostpointercapture'])$('beach-reel').addEventListener(event,releaseReelPointer);
+$('beach-reel').addEventListener('keydown',e=>{if([' ','Enter'].includes(e.key)){e.preventDefault();if(!e.repeat)holdReel('key:'+e.key,true);}});
+$('beach-reel').addEventListener('keyup',e=>{if([' ','Enter'].includes(e.key)){e.preventDefault();holdReel('key:'+e.key,false);}});
+// A second thumb may focus the drag slider while the first still holds the
+// captured reel pointer. Only the button's focus-bound keyboard holds end.
+$('beach-reel').addEventListener('blur',()=>{holdReel('key: ',false);holdReel('key:Enter',false);if(!reelInput.sources.length)reelInput=createShoreReelHold();});
 function setControls(partial){if(paused())return;sim.setFishingControls(partial);syncControlUI();}
 function syncControlUI(){
   const c=fishingControls(),words=shoreControlWords(c);
@@ -116,8 +149,6 @@ function updateReelFeedback(dt,now){
 }
 $('shore-drag').addEventListener('input',()=>setControls({drag:Number($('shore-drag').value)/100}));
 $('shore-drag').addEventListener('change',persist);
-function twitch(){if(paused()||!sim.canReel)return;twitchQueued=true;}
-$('beach-twitch').onclick=twitch;
 
 function walkTo(x,y){if(sim.onPier&&!onPier(scene,x,y)){afterPierWalk={x,y};feedback(sim.leavePier());return;}afterPierWalk=null;feedback(sim.walkTo(x,y));}
 const coastMenus=createShoreNavigation({scene,sim,openDialog,closeDialog,feedback});
@@ -170,14 +201,13 @@ function updateUI(){
   $('shore-rig-summary').textContent='';show('shore-rig-summary',false);
   const states={walk:'',casting:'钓组飞出',waiting:presentationHint(s),bite:'鱼咬钩了 · 扬竿',fighting:s.reelFeedback?.dragSlip?'泄力出线':s.tension<.06?'鱼线松弛':'中鱼',landed:'鱼已上岸'};
   $('fish-title').textContent=states[s.phase];
-  const hints={walk:!sim.tackleReady?'打开鱼竿配置，检查钓组和余饵。':'轻点水面瞄准 · 拉竿后松手抛出',casting:'',waiting:isShoreLure(supply?.id)?'连点摇轮收饵 · 停点沉饵':'观察竿尖 · 连点摇轮收回',bite:'现在扬竿 / 空格',fighting:s.fishMotion?.jumpActive?'鱼跃出水面 · 保持连线':s.reelFeedback?.dragSlip?'让鱼出线，保持竿弯':s.tension>.8?'竿身压弯 · 放松泄力':s.tension<.06?'轻点摇轮收紧鱼线':'点按摇轮 · 鱼冲时让线',landed:'留下或放流'};
+  const hints={walk:!sim.tackleReady?'打开鱼竿配置，检查钓组和余饵。':'轻点水面瞄准 · 拉竿后松手抛出',casting:'',waiting:'轻按抬竿 · 长按收线 · 松开放竿',bite:'轻按抬竿挂钩',fighting:s.fishMotion?.jumpActive?'鱼跃出水面 · 保持连线':s.reelFeedback?.dragSlip?'让鱼出线，保持竿弯':s.tension>.8?'竿身压弯 · 放松泄力':'轻按抬竿 · 长按收线 · 松开放竿',landed:'留下或放流'};
   $('navigation').textContent=hints[s.phase];$('fish-detail').textContent=hints[s.phase];
   show('boat-fishing',fishing);show('fish-status',s.phase!=='walk');
   $('boat-console').classList.toggle('actions-only',!fishing);$('boat-console').classList.toggle('fishing-open',fishing);$('boat-fishing').classList.toggle('has-status',s.phase!=='walk');
-  show('beach-cast',['walk','casting','bite','landed'].includes(s.phase));$('beach-cast').disabled=s.phase==='casting';$('beach-cast').textContent=s.phase==='bite'?'扬竿':s.phase==='landed'?'查看鱼获':s.phase==='casting'?'抛投中':'按住抛竿';
-  show('beach-reel',Boolean(sim.canReel));$('beach-reel-label').textContent='点击摇轮';
-  show('beach-twitch',['waiting','bite','fighting'].includes(s.phase));$('beach-twitch').textContent=s.phase==='fighting'?'轻提':'轻抽';
-  show('shore-drag-control',s.phase!=='landed');$('boat-console').classList.toggle('is-bite',s.phase==='bite');
+  show('beach-cast',['walk','casting','landed'].includes(s.phase));$('beach-cast').disabled=s.phase==='casting';$('beach-cast').textContent=s.phase==='landed'?'查看鱼获':s.phase==='casting'?'抛投中':'按住抛竿';
+  show('beach-reel',Boolean(sim.canReel));$('beach-reel-label').textContent='抬竿 / 收线';
+  show('shore-drag-control',Boolean(s.cast)&&['casting','waiting','bite','fighting'].includes(s.phase));$('boat-console').classList.toggle('is-bite',s.phase==='bite');
   $('beach-state').textContent=JSON.stringify({scene:scene.id,started,paused:paused(),...s,canCast:sim.canCast,canReel:sim.canReel,nearShop:sim.nearShop,view:'shore',focusView:{active:false},actionCamera:lastWorldFrame?.actionCamera,fishVisual:lastWorldFrame?.fishVisual,reelVisual});
   show('rules-btn',started&&ownsRules());placeRegulationsButton($('rules-btn'),[$('boat-console')]);
   syncInsets();
@@ -188,13 +218,13 @@ window.addEventListener('keydown',e=>{
   if(paused())return;
   const input=e.target.closest('input,select,textarea'),k=e.key.toLowerCase();
   if(input&&(!input.matches('input[type="range"]')||['arrowup','arrowdown','arrowleft','arrowright','home','end','pageup','pagedown'].includes(k)))return;
-  if(e.target.closest('button,a')&&[' ','enter'].includes(k))return;if(['w','a','s','d','arrowup','arrowdown','arrowleft','arrowright',' ','f','t'].includes(k))e.preventDefault();if(e.repeat)return;keys.add(k);if(k===' ')beginCharge();if(k==='f')pulseReel();if(k==='t')twitch();if(k==='i')openBag();if(k==='j')openJournal();if(k==='m')openMap();if(k==='e')interactNearby();
+  if(e.target.closest('button,a')&&[' ','enter'].includes(k))return;if(['w','a','s','d','arrowup','arrowdown','arrowleft','arrowright',' ','f'].includes(k))e.preventDefault();if(e.repeat)return;keys.add(k);if(k===' ')beginCharge();if(k==='f')holdReel('key:f',true);if(k==='i')openBag();if(k==='j')openJournal();if(k==='m')openMap();if(k==='e')interactNearby();
 });
-window.addEventListener('keyup',e=>{keys.delete(e.key.toLowerCase());if(e.key===' ')finishCharge();});
+window.addEventListener('keyup',e=>{const k=e.key.toLowerCase();keys.delete(k);if(k==='f'||e.key===' '||e.key==='Enter')holdReel('key:'+(k==='f'?k:e.key),false);if(e.key===' ')finishCharge();});
 window.addEventListener('blur',()=>{focused=false;resetInput();persist();});
 window.addEventListener('focus',()=>{focused=true;last=performance.now();});
 document.addEventListener('visibilitychange',()=>{resetInput();persist();last=performance.now();});
-window.addEventListener('pagehide',persist);
+window.addEventListener('pagehide',()=>{resetInput();persist();});
 window.addEventListener('location-picker',e=>{scenePickerOpen=Boolean(e.detail?.open);resetInput();persist();last=performance.now();});
 let lastInsetLayout='';
 function syncInsets(){
@@ -217,8 +247,8 @@ window.addEventListener('resize',resize);resize();
 function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;if(!paused()){
   const x=Number(keys.has('d')||keys.has('arrowright'))-Number(keys.has('a')||keys.has('arrowleft')),y=Number(keys.has('s')||keys.has('arrowdown'))-Number(keys.has('w')||keys.has('arrowup'));
   if(x||y)afterPierWalk=null;
-  const stroke=stepShoreReelInput(reelInput,dt,{enabled:sim.canReel});reelInput=stroke.state;reeling=stroke.input.reel;$('beach-reel').classList.toggle('active',reeling);
-  sim.update(dt,{x,y,drag:fishingControls().drag,rodLift:.35,rodSweep:0,...stroke.input,twitch:twitchQueued});twitchQueued=false;
+  const stroke=stepShoreReelHold(reelInput,dt,{enabled:sim.canReel});reelInput=stroke.state;reeling=stroke.input.reel;$('beach-reel').classList.toggle('active',reelInput.sources.length>0);
+  sim.update(dt,{x,y,drag:fishingControls().drag,rodSweep:0,...stroke.input});
   if(afterPierWalk&&!sim.onPier&&!sim.state.walkTarget&&!sim.state.inspection){const p=afterPierWalk;afterPierWalk=null;feedback(sim.walkTo(p.x,p.y));}
   if(sim.state.inspection&&sim.state.inspection.id!==inspectionId)openInspection();
   const place=interactions.step(sim.state,{paused:paused()});if(place)activatePlace(place);

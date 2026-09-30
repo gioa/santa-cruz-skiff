@@ -11,7 +11,7 @@ const hash=(x,y=0)=>{let h=Math.imul(x|0,374761393)+Math.imul(y|0,668265263);h=M
 // South-facing view: eastward flood moves left. Wrap both signs offshore.
 export const beniciaRippleX=(start,time,speed)=>((start-time*speed*3.2)%2600+2600)%2600-150;
 export function createBeniciaWorld(canvas){
- const g=canvas.getContext('2d',{alpha:false});let w=900,h=700,now=0,insets={top:120,bottom:180},lastState=null,focus=null,lastTime=null,offsetY=350,lastTackle=null,drawOptions={};
+ const g=canvas.getContext('2d',{alpha:false});let w=900,h=700,cssWidth=900,cssHeight=700,now=0,insets={top:120,bottom:180},lastState=null,focus=null,lastTime=null,offsetY=350,lastTackle=null,drawOptions={};
  const cam={x:scene.spawn.x,y:scene.spawn.y-50,scale:.9,width:w,height:h};let first=true;
  const rect=(x,y,ww,hh,c)=>{g.fillStyle=c;g.fillRect(Math.round(x),Math.round(y),Math.round(ww),Math.round(hh));};
  const line=(x,y,xx,yy,c,width=1)=>{g.strokeStyle=c;g.lineWidth=width;g.beginPath();g.moveTo(Math.round(x),Math.round(y));g.lineTo(Math.round(xx),Math.round(yy));g.stroke();};
@@ -152,11 +152,19 @@ export function createBeniciaWorld(canvas){
   return casting?target:ground;
  }
  function worldToScreen(p,y){p=typeof p==='object'?p:{x:p,y};const x=(p.x-cam.x)*cam.scale+w/2,yy=(p.y-cam.y)*cam.scale+offsetY,r=canvas.getBoundingClientRect();return{x:x*r.width/w,y:yy*r.height/h,clientX:r.left+x*r.width/w,clientY:r.top+yy*r.height/h,visible:x>=0&&x<=w&&yy>=0&&yy<=h};}
- function resize(width,height){w=width;h=height;canvas.width=Math.round(w);canvas.height=Math.round(h);cam.width=w;cam.height=h;cam.scale=w<600?.88:1.05;first=true;}
+ function resize(width,height){
+  // Match the other shore scenes' backing resolution and CSS camera scale.
+  cssWidth=Math.max(1,width);cssHeight=Math.max(1,height);
+  w=Math.min(1000,Math.max(360,Math.round(width*.66)));h=Math.round(w*height/width);
+  canvas.width=w;canvas.height=h;cam.width=w;cam.height=h;g.imageSmoothingEnabled=false;first=true;
+ }
  function draw(s={},time=0,options={}){
   const {reducedMotion=false}=options;drawOptions=options;lastState=s;now=reducedMotion?0:s.elapsed||0;const p=s.player||scene.spawn;
   const raw=Number.isFinite(time)?time:now,dt=lastTime===null?.016:clamp(raw-lastTime,0,.1);lastTime=raw;
-  const targetCamera=shoreActionCameraTarget(scene,s,{width:w,height:h,top:insets.top,bottom:insets.bottom,left:insets.left||0,right:insets.right||0,baseScale:w<600?.88:1.05,manualFocus:focus,actionFocus:options.actionFocus,rodLift:options.rodLift,rodSweep:options.rodSweep});
+  const ratio=h/cssHeight,v={top:insets.top*ratio,bottom:insets.bottom*ratio,left:(insets.left||0)*ratio,right:(insets.right||0)*ratio};
+  const compact=cssWidth<720||cssHeight<520,available=Math.max(100,h-v.top-v.bottom);
+  const baseScale=Math.max(.25,compact?Math.min(.86,w/510,available/365):Math.min(.76,w/1150,available/680));
+  const targetCamera=shoreActionCameraTarget(scene,s,{width:w,height:h,...v,baseScale,manualFocus:focus,actionFocus:options.actionFocus,rodLift:options.rodLift,rodSweep:options.rodSweep});
   if(!first)cam.y+=(targetCamera.screenY-offsetY)/cam.scale;
   Object.assign(cam,advanceShoreActionCamera(cam,targetCamera,dt,{initialized:!first,reducedMotion}));offsetY=targetCamera.screenY;first=false;
   g.setTransform(1,0,0,1,0,0);g.imageSmoothingEnabled=false;rect(0,0,w,h,scene.palette.sea);

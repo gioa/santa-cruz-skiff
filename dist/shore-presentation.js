@@ -64,7 +64,7 @@ export function stepShorePresentation(previous,sample,rigId,dt,controls={}){
   const leverage=before.mode==='bottom'?(rigId==='fishfinder_rig'?.36:.7):1;
   const speed=retrieve*(before.mode==='bottom'?(rigId==='fishfinder_rig'?.7:.88):1);
   const twitch=controls.twitch?1:Math.max(0,finite(previous?.twitch)*Math.exp(-dt/.38));
-  const raise=Math.max(0,lift-finite(previous?.rodLift,lift));
+  const raise=Math.max(0,lift-finite(previous?.rodLift,lift),clamp(finite(controls.rodRaise),0,1));
   // Spread one short rod stroke over time; applying its entire displacement
   // in a render frame made velocity/load depend on the device frame rate.
   const remaining=controls.twitch?(.18+.3*lift):Math.max(0,finite(previous?.hopRemaining));
