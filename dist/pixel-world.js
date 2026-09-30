@@ -176,9 +176,9 @@ export function createPixelWorld(canvas,{sprites={},conditions={}}={}){
   function boat(state,pose=boatRenderPose(state,HARBOR)){
     const g=skiffGeometry(pose),x=pose.x,z=pose.z,p=point(x,z),heading=pose.heading,scale=g.scale,bob=g.screenY-p.y;
     const occupied=state.mode==='boat'&&pose.afloat,fishActive=!['idle','landed'].includes(state.fishState||'idle');
-    const bodyX=state.standing?(state.deckX||0)*15:0,bodyY=state.standing?(state.deckZ??.8)*14-10:0;
+    const bodyX=state.standing?(state.deckX||0)*15:0,bodyY=state.standing?(state.deckZ??.8)*14-10:state.captain?.hired?-9:0;
     const mounted=['port','starboard'].includes(state.rodMount),equippedRod=state.profile?.loadout?.rod,readied=occupied&&!state.moored&&state.controlPanel!=='helm'&&!state.standing&&state.fishState!=='landed'&&equippedRod&&(!Array.isArray(state.packed)||state.packed.includes(equippedRod)),holding=(fishActive||readied)&&!mounted;
-    const occupantPose=holding?'fishing':state.controlPanel==='helm'?'driving':'seated';
+    const occupantPose=holding?'fishing':!state.captain?.hired&&state.controlPanel==='helm'?'driving':'seated';
     const rod=occupied&&(fishActive||mounted||readied)?getRodCurve(state,{origin:{x:g.screenX,y:g.screenY},scale,heading,bodyX,bodyY}):null;
     // A stored boat has only its dry deck shadow. A raised hull's shadow stays
     // on the surface below, while the hull follows the crane's actual pose.
@@ -214,6 +214,11 @@ export function createPixelWorld(canvas,{sprites={},conditions={}}={}){
         ctx.save();ctx.scale(scale,scale);ctx.translate(0,12);ctx.fillStyle='#243f4c';ctx.fillRect(-6,4,5,10);ctx.fillRect(3,4,5,10);ctx.fillStyle='#de8b4d';ctx.fillRect(-8,-10,16,17);ctx.fillStyle='#ffd17c';ctx.fillRect(-6,-8,4,12);ctx.fillRect(3,-8,3,12);ctx.fillStyle='#dfb48b';ctx.fillRect(-5,-20,11,10);ctx.fillStyle='#31535a';ctx.fillRect(-6,-23,12,5);ctx.fillStyle='#ebc777';ctx.fillRect(-8,-19,16,3);
         if(occupantPose==='driving'){pixelLine(6,-3,9,9,'#e1b58e',4);pixelLine(9,9,3,23,'#343f43',3);ctx.fillStyle='#d6aa86';ctx.fillRect(7,7,4,4);}else if(occupantPose!=='fishing'){ctx.fillStyle='#d9ae83';ctx.fillRect(-10,-3,3,8);ctx.fillRect(8,-3,3,8);}ctx.restore();
       }
+    }
+    if(occupied&&state.captain?.hired&&sprites.captainYork){
+      ctx.save();ctx.scale(scale,scale);ctx.drawImage(sprites.captainYork,-8,10);
+      const grip=outboardPose(state.tiller||0).grip;
+      pixelLine(-3,28,grip.x,grip.y,'#d8b18a',2);ctx.fillStyle='#f2c796';ctx.fillRect(Math.round(grip.x)-1,Math.round(grip.y)-1,3,2);ctx.restore();
     }
     if(occupied&&(state.stability?.waterLitres||0)>.3){ctx.save();ctx.scale(scale,scale);ctx.beginPath();ctx.moveTo(0,-30);ctx.lineTo(14,-12);ctx.lineTo(14,31);ctx.lineTo(-14,31);ctx.lineTo(-14,-12);ctx.closePath();ctx.clip();const amount=Math.min(1,state.stability.waterLitres/130);ctx.fillStyle=`rgba(84,164,170,${.22+amount*.52})`;ctx.fillRect(-18,-28,36,62);ctx.strokeStyle='#c7e2d3';ctx.lineWidth=1;for(let y=-18;y<32;y+=11){ctx.beginPath();ctx.moveTo(-12,y+Math.sin(clock*2+y)*2);ctx.lineTo(12,y+Math.sin(clock*2+y+1)*2);ctx.stroke();}if(state.bailing){ctx.fillStyle='#ead4a0';ctx.fillRect(8,4+Math.sin(clock*5)*5,8,9);ctx.fillStyle='#b8e3df';ctx.fillRect(16,Math.sin(clock*5)*12,9,3);}ctx.restore();}
     if(occupied&&Math.abs(state.roll||0)>Math.PI/2){ctx.save();ctx.scale(scale,scale);ctx.beginPath();ctx.moveTo(0,-42);ctx.lineTo(14,-26);ctx.lineTo(20,12);ctx.lineTo(17,35);ctx.lineTo(-17,35);ctx.lineTo(-20,12);ctx.lineTo(-14,-26);ctx.closePath();ctx.fillStyle='#ad8452';ctx.fill();ctx.strokeStyle='#e4c58d';ctx.lineWidth=3;ctx.stroke();ctx.fillStyle='#6b5942';ctx.fillRect(-2,-32,4,62);ctx.restore();}

@@ -126,6 +126,14 @@ function personSprite({worker=false,back=false,step=0,fish=false,hold=false,driv
 
 // The counter keeper has their own silhouette, face and work clothes rather
 // than the angler sprite with another vest colour. Keep the same foot anchor.
+function captainYorkSprite(){return raster(16,26,({rect:r,line:l})=>{
+ r(3,23,5,2,'ink');r(9,23,5,2,'ink');r(4,17,4,7,'navy');r(9,17,4,7,'navy');
+ r(2,10,12,11,'navy');r(3,11,3,8,'denim');r(10,11,3,8,'denim');
+ r(6,10,4,3,'ivory');r(6,13,2,7,'gold');r(10,16,3,3,'steel');
+ r(2,12,3,6,'navy');r(2,17,4,3,'skin');r(11,12,3,6,'navy');r(11,17,3,3,'skin');
+ r(4,4,9,7,'skin');r(4,8,9,3,'steel');r(6,7,5,2,'skin');
+ r(3,2,11,3,'ivory');r(5,0,7,3,'cream');r(2,5,13,2,'navy');r(7,2,3,2,'gold');
+});}
 function dockWorkerSprite(){return raster(16,26,({rect:r,px,poly:p,line:l})=>{
   r(2,24,13,1,'#20364266');
   // Wider planted stance and tall waterproof boots.
@@ -484,7 +492,7 @@ export function createPixelSprites(){
   const hut=hutSprite();
   return {
     boat:boatSprite(),boatHull:boatSprite({outboard:false}),outboard:outboardSprite(),angler,anglerBack,anglerWalk1:personSprite({step:1}),anglerWalk2:personSprite({step:2}),
-    anglerFish:personSprite({fish:true}),anglerHold:personSprite({hold:true}),anglerDrive:personSprite({back:true,drive:true}),
+    captainYork:captainYorkSprite(),anglerFish:personSprite({fish:true}),anglerHold:personSprite({hold:true}),anglerDrive:personSprite({back:true,drive:true}),
     anglerLeft:personSprite({side:-1}),anglerRight:personSprite({side:1}),
     dockWorker:dockWorkerSprite(),warden:wardenSprite(),hut,tackleShop:hut,
     crate:crateSprite(),cooler:coolerSprite(),buoy:buoySprite(),kelp:kelpSprite(),rock:rockSprite(),

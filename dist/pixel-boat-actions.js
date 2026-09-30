@@ -4,19 +4,20 @@ import {hasElectricReel} from './equipment.js';
 export function boatActions(s,{panel='tackle',hasRod=true,hasChart=false,canLower=false,nearDock=false}={}){
  const fish=s.fishState||'idle',idle=fish==='idle',waiting=['sinking','waiting'].includes(fish),water=waiting||['bite','fight'].includes(fish),mounted=['port','starboard'].includes(s.rodMount);
  const ready=s.mode==='boat'&&s.rentalPaid&&s.launchStage==='afloat'&&!s.paused&&(!s.fishLanding||fish==='landed')&&!s.dayTransition&&!s.capsize&&!s.bailing&&!s.docking&&s.inspection?.phase!=='checking',aboard=ready;
- const boatFree=aboard&&!s.snagged&&(idle||mounted&&waiting),helm=boatFree&&panel==='helm',tackle=aboard&&!helm&&(hasRod||fish==='landed');
+ const guided=Boolean(s.captain?.hired),departing=guided&&['boarding','travel','returning','docking'].includes(s.captain.phase);
+ const boatFree=aboard&&!s.snagged&&(idle||mounted&&waiting),helm=boatFree&&!guided&&panel==='helm',tackle=aboard&&!helm&&(hasRod||fish==='landed');
  const pickUp=tackle&&mounted&&['idle','sinking','waiting','bite','fight'].includes(fish)&&Math.abs(s.throttle||0)<=.01&&Math.abs(s.speed||0)<=1.2;
  return{
   console:ready,helm,tackle,mounted,
   unmoor:false,dock:aboard&&idle&&nearDock&&Math.abs(s.speed||0)<.85,
   engine:false,anchor:false,
-  switchPanel:boatFree,switchLabel:helm?'钓鱼':'操船',
+  switchPanel:boatFree&&!guided,switchLabel:helm?'钓鱼':'操船',
   monitor:helm&&mounted,
   adjustPose:tackle&&!['casting','flight','landed'].includes(fish)&&(Math.abs(s.throttle||0)<=.01||mounted),
   reelInstrument:tackle&&(water||fish==='flight'),reel:tackle&&water,spool:tackle&&water&&fish!=='fight',drag:tackle&&(fish==='fight'||Boolean(s.snagged)),
-  lower:tackle&&idle&&canLower,cast:tackle&&idle&&canLower&&!mounted,
+  lower:tackle&&idle&&canLower&&!departing,cast:tackle&&idle&&canLower&&!departing&&!mounted,
   hook:tackle&&fish==='bite'&&!mounted,catch:tackle&&fish==='landed',retrieve:tackle&&waiting&&hasElectricReel(s.profile,s.packed),
   mount:tackle&&hasRod&&!mounted&&(idle||waiting),take:pickUp,
-  assemble:ready&&idle,return:boatFree&&hasChart
+  assemble:ready&&idle,return:boatFree&&hasChart&&!guided
  };
 }

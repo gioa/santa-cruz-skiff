@@ -1,0 +1,34 @@
+{
+  "feature": "Captain York — Santa Cruz skiff",
+  "date": "2026-09-30",
+  "validation": {
+    "unit_and_simulation": "1185 tests passed, including 10 York-specific tests",
+    "build": "npm run check; npm test; npm run build",
+    "browser": [
+      "390 × 844: hire at hut, 25 credit charge plus 15 rental, board, York drives away using real boat motion",
+      "In-trip pause, reload/resume preserves 60 credits and clock; captain waits for continue",
+      "Change to halibut shows actual squid-bait mismatch explanation without charging again",
+      "1440 × 900: distinct passenger and captain, connected tiller hand; no console errors"
+    ]
+  },
+  "evidence": [
+    "hire-mobile.png",
+    "aboard-dialog-mobile.png",
+    "gear-advice-mobile.png",
+    "underway-desktop.png"
+  ],
+  "behavior": {
+    "fee": 25,
+    "contract": "One outing, ends at docking/rescue/new day",
+    "navigation": "Uses mapped habitat/depth, water routing and the existing outboard physics",
+    "catching": "Existing fish ecology, gear wear, bait consumption and catch laws remain active. No fish spawning or guaranteed bites.",
+    "trolling": "Requires suitable rig, bait/soft plastic, weight, designated holder side, depth and closed spool; stops for bite/fight/snag/inspection",
+    "weather": "Requests return in high wind/waves or after 16:30 game time; waits for player to stow line"
+  },
+  "research": [
+    "https://wildlife.ca.gov/Conservation/Marine/Life-History-Fish",
+    "https://nrm.dfg.ca.gov/FileHandler.ashx?DocumentID=33920",
+    "https://www.fisheries.noaa.gov/marine-mammal-protection/ca-or-wa-salmon-troll-fishery-mmpa-list-fisheries",
+    "https://montereybay.noaa.gov/media/research/techreports/frey_etal_2012.pdf"
+  ]
+}
