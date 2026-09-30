@@ -15,9 +15,9 @@ export const beniciaRippleX=(start,time,speed)=>((start-time*speed*3.2)%2600+260
 export function createBeniciaWorld(canvas){
  const g=canvas.getContext('2d',{alpha:false});let w=900,h=700,now=0,insets={top:120,bottom:180},lastState=null,focus=null,lastTime=null,offsetY=350,lastTackle=null,drawOptions={};
  const cam={x:scene.spawn.x,y:scene.spawn.y-50,scale:.9,width:w,height:h};let first=true;
- const rect=(x,y,ww,hh,c)=>{g.fillStyle=c;g.fillRect(Math.round(x),Math.round(y),Math.round(ww),Math.round(hh));};
+ const rect=(x,y,ww,hh,c)=>{g.fillStyle=c;g.fillRect(x,y,ww,hh);};
  const line=(x,y,xx,yy,c,width=1)=>{g.strokeStyle=c;g.lineWidth=width;g.beginPath();g.moveTo(x,y);g.lineTo(xx,yy);g.stroke();};
- const poly=(pts,c)=>{g.fillStyle=c;g.beginPath();pts.forEach(([x,y],i)=>i?g.lineTo(Math.round(x),Math.round(y)):g.moveTo(Math.round(x),Math.round(y)));g.closePath();g.fill();};
+ const poly=(pts,c)=>{g.fillStyle=c;g.beginPath();pts.forEach(([x,y],i)=>i?g.lineTo(x,y):g.moveTo(x,y));g.closePath();g.fill();};
  const label=(t,x,y,size=12,c='#3d5552')=>{g.font=`bold ${size}px monospace`;g.textAlign='center';g.fillStyle=c;g.fillText(t,x,y);};
  const view=()=>({left:cam.x-w/2/cam.scale,right:cam.x+w/2/cam.scale,top:cam.y-offsetY/cam.scale,bottom:cam.y+(h-offsetY)/cam.scale});
  const visible=(x,y,r=100)=>{const v=view();return x>v.left-r&&x<v.right+r&&y>v.top-r&&y<v.bottom+r;};
@@ -45,28 +45,78 @@ export function createBeniciaWorld(canvas){
   for(let i=0;i<5;i++){line(x+25+i*11,y+90,x+22+i*11,y+63,'#dbbd7f',2);rect(x+20+i*11,y+75,4,6,i%2?'#bd8b47':'#b8c9bd');}
   rect(x+163,y+95,30,24,'#778b82');rect(x+160,y+93,36,5,'#e6dec0');
  }
- function land(){
-  const v=view(),lo=Math.floor(v.left/2)*2,hi=v.right+12,shore=[];
-  for(let x=lo;x<hi;x+=2)shore.push([x,beniciaShoreY(x)]);
-  poly([...shore,[hi,1300],[lo,1300]],'#c3bca1');
-  // Wet tidal pocket and armour rocks follow the outline, never a surf beach.
-  for(let x=lo;x<hi;x+=12){const y=beniciaShoreY(x);
-   if(x<800){const exposed=(1.7-beniciaTide(now).height)*20;rect(x,y-exposed,13,exposed+12,'#909583');if(hash(x,2)>.45)rect(x,y-exposed+4,8,1,'#bdbaa0');}
-   else if(visible(x,y))for(let dx=0;dx<12;dx+=2.2){const ry=beniciaShoreY(x+dx);withShoreProp(g,x+dx,ry+1.2,.11,()=>rock(x+dx,ry+1.2,12+hash(x+dx,4)*9));}
-   rect(x,y+22,13,4,'#d4c9a6');
+ // Stable sub-metre marks survive a close camera: the physical dimensions
+ // stay fixed while the density is culled at a wider view.
+ function groundGrain(v,shoreOnly=false){
+  const step=cam.scale<1?3.2:1.2;
+  for(let x=Math.floor(v.left/step)*step;x<v.right;x+=step)for(let y=Math.floor(v.top/step)*step;y<v.bottom;y+=step){
+   const sy=beniciaShoreY(x),inland=y-sy;if(inland<.5||inland>m(42)||onPier(scene,x,y))continue;
+   if(shoreOnly&&inland>m(6))continue;
+   const n=hash(Math.round(x*10),Math.round(y*10));if(n<.42)continue;
+   const xx=x+hash(x*11,y*7)*step,yy=y+hash(x*13,y*3)*step;
+   rect(xx,yy,.055+n*.16,.035+n*.065,n>.76?'#d4cbb0':n>.53?'#aea78f':'#b4af95');
+   if(n>.95)line(xx,yy,xx+.23,yy-.025,'#e0d7b9',.025);
   }
+ }
+ function shoreGround(){
+  const v=view(),step=Math.max(.35,2/cam.scale),lo=Math.floor(v.left/step)*step,hi=v.right+step;
+  const shore=[];for(let x=lo;x<=hi;x+=step)shore.push([x,beniciaShoreY(x)]);
+  poly([...shore,[hi,1300],[lo,1300]],'#c3bca1');
+  // A weathered waterside walking strip sits behind the armoured edge. Its
+  // narrow joints and gritty shoulders give scale without a giant blank band.
+  const near=shore.map(([x,y])=>[x,y+m(1.4)]),far=shore.map(([x,y])=>[x,y+m(4.8)]);
+  poly([...near,...far.reverse()],'#b5b39f');
+  const curb=shore.map(([x,y])=>[x,y+m(1.4)]);
+  for(let i=1;i<curb.length;i++)line(...curb[i-1],...curb[i],'#d6cdb0',m(.06));
+  for(let x=Math.floor(lo/m(2))*m(2);x<hi;x+=m(2)){
+   const sy=beniciaShoreY(x),yy=sy+m(1.5);line(x,yy,x+.25,sy+m(4.75),'#a6a797',m(.012));
+   if(hash(x,62)>.8)line(x,yy+m(1),x+m(.3),yy+m(1.25),'#969e90',m(.016));
+  }
+  const tide=beniciaTide(now);
+  // Two irregular rows of small riprap have shadowed gaps and wet edges.
+  // This avoids turning dozens of identical boulders into a single sawtooth.
+  const rockStep=m(.52),firstRock=Math.floor(lo/rockStep)*rockStep;
+  for(let x=firstRock;x<hi+rockStep;x+=rockStep){
+   const sy=beniciaShoreY(x);
+   if(x<800){const exposed=Math.max(0,1.7-tide.height)*m(2),yy=sy-exposed;rect(x,yy,rockStep+.05,exposed+m(.3),'#929b88');
+    if(hash(x,7)>.52)line(x,yy+.15,x+.5,yy+.12,'#b7b6a0',.045);
+   }else for(let row=0;row<2;row++){
+    const n=hash(Math.round(x*10),row+4),rx=x+(row?.46:0)+(n-.5)*.55,ry=beniciaShoreY(rx)+row*m(.27)+n*m(.08);
+    const r=m(.17+n*.2);poly([[rx-r,ry],[rx-r*.8,ry-r*.65],[rx-r*.1,ry-r],[rx+r*.8,ry-r*.63],[rx+r,ry],[rx+.1,ry+.14]],n>.5?'#78877b':'#65796f');
+    poly([[rx-r*.8,ry-r*.65],[rx-r*.1,ry-r],[rx+r*.8,ry-r*.63],[rx+r*.36,ry-r*.35]],n>.5?'#b7bba6':'#a4afa0');
+    line(rx-r*.65,ry-.03,rx+r*.65,ry+.025,'#4e7269',.07);
+   }
+  }
+ }
+ function bankFurniture(){
+  const v=view(),spacing=m(14),lo=Math.floor(v.left/spacing)*spacing;
+  for(let x=lo;x<v.right+spacing;x+=spacing){
+   if(x>865&&x<1315)continue;
+   const sy=beniciaShoreY(x);if(visible(x,sy+m(5),m(5))){
+    bench(x,sy+m(5));
+    if((Math.round(x/spacing)&1)===0)lamp(x+m(2.1),sy+m(5.2));
+    // Low salt grass at the back of the promenade, with clear walking space.
+    for(let i=0;i<7;i++){const gx=x-m(2)+i*.4,gy=sy+m(6)+hash(i,x)*.6;line(gx,gy,gx-.12,gy-.32,'#859777',.035);line(gx+.07,gy,gx+.21,gy-.45,'#718871',.035);}
+   }
+  }
+ }
+ function land(){
+  const v=view();shoreGround();
   // The promenade opens onto First Street's rounded turnaround.
   rect(850,570,475,570,'#969c92');rect(898,560,380,590,'#777f7a');
   poly([[900,585],[864,510],[896,439],[948,409],[1230,409],[1282,439],[1312,510],[1278,585]],'#858d83');
   for(let y=650;y<1130;y+=70)rect(1086,y,4,28,'#dfd0a5');
-  rect(914,470,350,7,'#c2c3ab');for(let x=930;x<1270;x+=50)rect(x,463,3,20,'#556f68');
+  // A low promenade barrier keeps its geographic span, with human-scale
+  // rails and posts instead of the old metre-thick road decoration.
+  const barrierFoot=477,barrierTop=barrierFoot-m(.8);
+  line(914,barrierTop,1264,barrierTop,'#c2c3ab',m(.07));
+  line(914,barrierFoot-m(.35),1264,barrierFoot-m(.35),'#879488',m(.04));
+  for(let x=914;x<=1264;x+=m(2.4))line(x,barrierFoot,x,barrierTop,'#556f68',m(.075));
   label('FIRST STREET',1090,951,20,'#c9ceb5');
   // Waterfront lawns, worn walking paths and historic pilings east of the spit.
   rect(80,735,720,420,'#96a581');rect(1340,760,850,380,'#96a581');
   rect(80,792,720,29,'#cfc6a6');rect(1340,790,850,29,'#cfc6a6');
-  for(let x=100;x<800;x+=73)if(visible(x,beniciaShoreY(x)+93)){
-   const yy=beniciaShoreY(x)+94;bench(x,yy);if(x%3)lamp(x+28,yy-4);
-  }
+
   for(let i=0;i<11;i++){const x=510+i*23,y=beniciaShoreY(x)-25-(i%3)*13;if(visible(x,y)){withShoreProp(g,x,y+11,.09,()=>{rect(x+4,y+6,9,10,'#456f69');rect(x,y-16,9,27,'#6c6350');rect(x-1,y-18,11,3,'#b9a27b');},.22);}}
   for(const x of[815,1340,1480,650])if(visible(x,850))palm(x,850);
   // Parked cars stay behind the active bank and leave pedestrian space.
@@ -74,16 +124,27 @@ export function createBeniciaWorld(canvas){
    withShoreProp(g,x,y,m(1.8)/42,()=>{rect(x+6,y+7,42,74,'#637a70');rect(x,y,42,72,c);rect(x+5,y+14,32,20,'#455d60');rect(x+5,y+40,32,13,'#516d6d');rect(x-3,y+12,5,13,'#354646');rect(x+40,y+12,5,13,'#354646');rect(x+3,y+3,9,3,'#eae2c1');rect(x+31,y+3,8,3,'#eae2c1');},m(4.5)/72);
   }
   for(const [x,y]of[[860,595],[1310,595],[1450,692],[1710,680],[900,389],[1270,389]])if(visible(x,y))lamp(x,y);
-  for(const x of[1480,1680,1880])if(visible(x,700))bench(x,700);
+
   // Old brick storefronts at the inland edge; silhouettes, no invented brands.
   for(let i=0;i<6;i++){const x=200+i*280,y=1040;if(visible(x,y)){withShoreProp(g,x+80,y+105,.2,()=>{rect(x,y,160,105,i%2?'#a68c75':'#b59b7d');rect(x-4,y-8,168,12,'#56716a');for(let j=0;j<4;j++){rect(x+14+j*37,y+17,23,30,'#e3d1a7');rect(x+17+j*37,y+20,17,23,'#5a8180');}rect(x+66,y+63,29,42,'#44696a');});}}
+  groundGrain(v);bankFurniture();
   if(visible(1130,730,220))shop();
  }
  function pier(){const p=scene.pier;
-  rect(p.x-25,p.top+15,74,p.bottom-p.top,'#3e6765');g.save();g.translate(0,-m(3.5));rect(p.x-32,p.top,64,p.bottom-p.top,'#b9bba5');
+  // The elevated deck casts a translucent shadow onto both water and land;
+  // the shoreline and ground texture must remain visible underneath it.
+  g.save();g.globalAlpha=.12;rect(p.x-25,p.top+15,74,p.bottom-p.top,'#3e6765');g.restore();
+  g.save();g.translate(0,-m(3.5));rect(p.x-32,p.top,64,p.bottom-p.top,'#b9bba5');
   // Joints and railings are metric props too, not metre-thick strokes left
   // over from the old enlarged-person artwork.
-  for(let y=p.top+5;y<p.bottom;y+=16)rect(p.x-32,y,64,m(.015),'#8a9589');
+  const v=view();
+  for(let y=p.top+5;y<p.bottom;y+=m(2.4))line(p.x-32,y,p.x+32,y,'#939e90',m(.016));
+  for(let x=p.x-24;x<p.x+32;x+=m(2.4))line(x,p.top,x,p.bottom,'#a5ac99',m(.012));
+  const grainStep=cam.scale<1?3.2:1.25;
+  for(let x=Math.max(p.x-31,Math.floor(v.left/grainStep)*grainStep);x<Math.min(p.x+31,v.right);x+=grainStep)for(let y=Math.max(p.top,Math.floor(v.top/grainStep)*grainStep);y<Math.min(p.bottom,v.bottom+m(3.5));y+=grainStep){const n=hash(Math.round(x*10),Math.round(y*10));if(n>.58)rect(x+n*.7,y+n*.3,.09+n*.06,.035+n*.045,n>.86?'#d7d8bd':'#a1ab96');}
+  for(const x of[p.x-29,p.x+29])for(let y=p.top+8;y<p.bottom;y+=m(5)){
+   rect(x-.27,y-.14,.54,.28,'#6e837b');for(let k=0;k<3;k++)line(x-.2+k*.17,y-.11,x-.2+k*.17,y+.1,'#364f50',.022);
+  }
   function rail(x0,y0,x1,y1){
    const height=m(1.1),count=Math.ceil(Math.hypot(x1-x0,y1-y0)/m(2.4));
    line(x0,y0-height,x1,y1-height,'#e0d4b2',m(.05));
@@ -97,14 +158,33 @@ export function createBeniciaWorld(canvas){
  }
  function water(){
   const v=view(),tide=beniciaTide(now);rect(v.left,v.top,v.right-v.left,v.bottom-v.top,'#608c86');
-  // Authored estuarine depth tones and turbid shallow pocket.
-  for(let x=Math.floor(v.left/16)*16;x<v.right+16;x+=16){const sy=beniciaShoreY(x);
-   for(let y=Math.floor(v.top/16)*16;y<Math.min(v.bottom,sy);y+=16){const d=(sy-y)/3.2;rect(x,y,17,17,d<12?'#8aaba0':d<32?'#769c91':d<70?'#638f87':'#557f7e');}
+  // Continuous colour through the turbid shallows. Rendering resolution is
+  // screen-sized, while shoreline/depth coordinates remain in world metres.
+  const step=Math.max(.25,2/cam.scale),lo=Math.floor(v.left/step)*step;
+  for(let x=lo;x<v.right+step;x+=step){
+   const sy=beniciaShoreY(x+step*.5),tip=Math.exp(-(((x-1090)/245)**2)),reach=m(60+tip*50);
+   const gradient=g.createLinearGradient(x,sy,x,sy-reach);
+   if(gradient?.addColorStop){gradient.addColorStop(0,'#86a89a');gradient.addColorStop(.10,'#7ba396');gradient.addColorStop(.32,'#6c998f');gradient.addColorStop(.67,'#5a8783');gradient.addColorStop(1,'#4d777a');g.fillStyle=gradient;}
+   else g.fillStyle='#729b90';
+   g.fillRect(x,v.top,step+1/cam.scale,Math.max(0,Math.min(v.bottom,sy)-v.top));
   }
-  // Ripples advect east/west with the tidal stream. No ocean breaker bands.
-  for(let i=0;i<470;i++){const x=beniciaRippleX(hash(i,4)*2600,now,tide.speed),y=hash(i,6)*1500-760;
-   if(y>beniciaShoreY(x)-3||!visible(x,y,10))continue;rect(x,y,5+hash(i,9)*17,1,hash(i,10)>.5?'#92afa0':'#486f70');
+  // Deterministic small surface facets are seeded by world cells, not by the
+  // viewport. They drift with the tide but never jump when the camera moves.
+  const grid=cam.scale<1?m(1.6):m(.5),drift=now*tide.speed*3.2;
+  const start=Math.floor((v.left+drift)/grid)-1,end=Math.ceil((v.right+drift)/grid)+1;
+  for(let i=start;i<=end;i++)for(let j=Math.floor(v.top/grid)-1;j<=Math.ceil(v.bottom/grid);j++){
+   const n=hash(i,j);if(n<.56)continue;
+   const x=(i+hash(i+831,j))*grid-drift,y=(j+hash(i,j+613))*grid,sy=beniciaShoreY(x);
+   if(y>sy-.25||y<v.top||y>v.bottom||x<v.left-2||x>v.right+2)continue;
+   const wave=Math.sin(now*1.85+i*.31+j*.77),length=m(.09+n*.19),alpha=.16+Math.abs(wave)*.18;
+   g.globalAlpha=alpha;rect(x,y,length,.025+n*.026,n>.8?'#d1dfc6':'#365f66');
+   if(n>.85){rect(x+.1,y-.07,length*.55,.024,'#cedec8');}
   }
+  g.globalAlpha=1;
+  // Shore reflection threads stay broken and narrow: estuary water has no
+  // beach-like white surf, only small highlights beside the riprap.
+  for(let x=Math.floor(v.left/.8)*.8;x<v.right;x+=.8){const n=hash(Math.round(x*10),91);if(n>.58){const sy=beniciaShoreY(x),yy=sy-.2-Math.abs(Math.sin(now*1.85+x*.055))*.22;g.globalAlpha=.22;rect(x,yy,.18+n*.32,.035,'#d1dbc0');}}
+  g.globalAlpha=1;
   for(let i=0;i<3;i++){const x=280+i*180,y=-180+i*36;if(visible(x,y)){for(let j=0;j<8;j++)rock(x+j*13,y+Math.sin(j)*5,11);}}
   // Distant working ship travels through the strait, with its own fading wake.
   const shipX=(now*1.7+350)%3000-350,shipY=-330;
@@ -117,12 +197,12 @@ export function createBeniciaWorld(canvas){
  }
  function person(n,player=false){
   if(!visible(n.x,n.y))return;const style=player?'player':n.style,foot=shorePersonFoot({player:n,onPier:onPier(scene,n.x,n.y)});
-  g.save();g.translate(foot.x,foot.y);g.fillStyle='#7c8b79';g.fillRect(-m(.3),0,m(.6),m(.12));drawShorePerson(g,{style,scale:shorePersonScale(style),walking:n.walking,fishing:true,facing:player?n.facing:-1,time:now});g.restore();
+  g.save();g.translate(foot.x,foot.y);g.fillStyle='#7c8b79';g.fillRect(-m(.3),0,m(.6),m(.12));drawShorePerson(g,{style,scale:shorePersonScale(style),walking:n.walking,fishing:player||['casting','retrieving'].includes(n.mode),facing:player?n.facing:-1,time:now});g.restore();
  }
  function locals(state){
   for(const n of state.crowd||[]){person(n);if(!visible(n.x,n.y))continue;
-   g.fillStyle='#d2d7be';g.fillRect(n.x+m(.6),n.y-m(.3),m(.6),m(.3));
-   const rod=shoreRodPose({player:n,onPier:onPier(scene,n.x,n.y)},{style:n.style});drawMetricRod(g,rod);
+   if(!n.walking){const x=n.x+m(.6),y=n.y;rect(x,y-m(.3),m(.6),m(.3),'#d2d7be');rect(x-.04,y-m(.3),m(.625),m(.045),n.offset>.5?'#4c777e':'#a77751');rect(x+m(.22),y-m(.23),m(.16),m(.045),'#8d9a8b');}
+   const casting=n.mode==='casting',rod=shoreRodPose({player:n,onPier:onPier(scene,n.x,n.y),fishingControls:{rodLift:casting?.35+Math.sin(clamp(n.phase/2,0,1)*Math.PI)*.45:n.mode==='retrieving'?.4:.8,rodSweep:0}},{style:n.style});drawMetricRod(g,rod);
    if(n.mode==='retrieving'||n.mode==='casting'){const progress=n.mode==='casting'?n.phase/2:1-(n.phase-2)/38,tx=n.x-25+n.offset*50,ty=n.y-55-progress*110;shoreFineLine(g,rod.tip,{x:tx,y:ty},'#c2c4a5',.025);}
   }
  }

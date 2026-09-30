@@ -1,0 +1,2339 @@
+{
+  "sourceHashes": {
+    "pacifica-world.js": "dc9ea264da77140c563877a98674eb67cbb119c5ab0d4ad5df8c0aeff9d581f6",
+    "benicia-world.js": "0125d7818aafec0208a59b51b9c00bb65fc52a2ca7f3b21929c638848f73d3f7",
+    "shore-action-view.js": "6467fcc5ce3f13a14271cc089a79c1f152e4bd0e1db9aa3efecb0d46d5042be9",
+    "shore-metric-art.js": "c94943800652dee982cedda5a7ff2ce811fe47aba98c0583874a061f384fd05e",
+    "pacifica-game.js": "82e9dfb5a2c40278c9d2f0059d1b8621e30a9be355bcc9d74f781152a82310ad",
+    "shore-movement.js": "3a26ca0df0955829f88f9f3f032085fa5c4bd9f84ceeed7e886e75bde59db8a0",
+    "shore-data.js": "e1291535ff390bfc70eb85245ed503b60ba1bfbbec617d451c357535654266a7",
+    "pacifica-sim.js": "3f104f347d193d6fd9e27f210be52cc3f56294b162abfc428c73c0578a4f2f82"
+  },
+  "sea": {
+    "waveHeightM": 0.8,
+    "wavePeriodS": 11,
+    "waveDirectionDeg": 10,
+    "tideM": 0.8
+  },
+  "fixtures": "Arrival uses fresh constructor position; casts/fights use shoreline fixture. Actual casts and recorded fights; NPCs retained; finite tap strokes; no invented fish pose",
+  "artifacts": [
+    "visual-repair-pacifica-phone-arrival.png",
+    "visual-repair-pacifica-phone-casts.png",
+    "visual-repair-pacifica-phone-near-fish.png",
+    "visual-repair-pacifica-desktop-arrival.png",
+    "visual-repair-pacifica-desktop-casts.png",
+    "visual-repair-pacifica-desktop-near-fish.png",
+    "visual-repair-half-moon-bay-phone-arrival.png",
+    "visual-repair-half-moon-bay-phone-casts.png",
+    "visual-repair-half-moon-bay-phone-near-fish.png",
+    "visual-repair-half-moon-bay-desktop-arrival.png",
+    "visual-repair-half-moon-bay-desktop-casts.png",
+    "visual-repair-half-moon-bay-desktop-near-fish.png",
+    "visual-repair-benicia-phone-arrival.png",
+    "visual-repair-benicia-phone-casts.png",
+    "visual-repair-benicia-phone-near-fish.png",
+    "visual-repair-benicia-desktop-arrival.png",
+    "visual-repair-benicia-desktop-casts.png",
+    "visual-repair-benicia-desktop-near-fish.png"
+  ],
+  "frames": [
+    {
+      "scene": "pacifica",
+      "phase": "walk",
+      "elapsed": 47.025,
+      "sea": {
+        "waveHeightM": 0.8,
+        "wavePeriodS": 11,
+        "waveDirectionDeg": 10,
+        "tideM": 0.8
+      },
+      "player": {
+        "x": 1133.2,
+        "y": 487.4208971892726,
+        "facing": -1,
+        "walking": false
+      },
+      "cast": null,
+      "lineDistance": 0,
+      "fishMotion": null,
+      "fish": null,
+      "crowdCount": 0,
+      "regularMode": "arriving",
+      "camera": {
+        "x": 1139.3555275930255,
+        "y": 448.9262611226007,
+        "scale": 4.348382372301211,
+        "width": 360,
+        "height": 779
+      },
+      "cameraCSSScale": 4.710747569992979,
+      "playerHeightCSS": 26.38018639196068,
+      "points": {
+        "angler": {
+          "x": 165.75,
+          "y": 622.9781771501926,
+          "clientX": 165.75,
+          "clientY": 622.9781771501926,
+          "visible": true
+        }
+      },
+      "fishVisible": false,
+      "floatVisible": false,
+      "safeBounds": {
+        "left": 28,
+        "right": 278.4668246445498,
+        "top": 121.83530805687204,
+        "bottom": 693.1611374407582
+      },
+      "safeBoundsCSS": {
+        "left": 30.333333333333332,
+        "right": 301.6723933649289,
+        "top": 131.98825039494469,
+        "bottom": 750.9245655608214
+      },
+      "frameMeanMs": 2.255555556880103,
+      "frameMaxMs": 3.3000000715255737,
+      "viewport": "phone",
+      "condition": "arrival"
+    },
+    {
+      "scene": "pacifica",
+      "phase": "waiting",
+      "elapsed": 48.92879226840207,
+      "sea": {
+        "waveHeightM": 0.8,
+        "wavePeriodS": 11,
+        "waveDirectionDeg": 10,
+        "tideM": 0.8
+      },
+      "player": {
+        "x": 2440,
+        "y": 433.7354136121566,
+        "facing": -1,
+        "walking": false
+      },
+      "cast": {
+        "origin": {
+          "x": 2438.360975609756,
+          "y": 428.3643323155729
+        },
+        "target": {
+          "x": 2438.7464963803573,
+          "y": 410.73683706159613
+        },
+        "distance": 5.561125378231004,
+        "paidLength": 6.098237392957397,
+        "aim": 0
+      },
+      "lineDistance": 5.509909531584334,
+      "fishMotion": null,
+      "fish": null,
+      "crowdCount": 0,
+      "regularMode": "arriving",
+      "camera": {
+        "x": 2445.5287757832043,
+        "y": 421.51612533687637,
+        "scale": 4.348382372301211,
+        "width": 360,
+        "height": 779
+      },
+      "cameraCSSScale": 4.710747569992979,
+      "playerHeightCSS": 26.38018639196068,
+      "points": {
+        "angler": {
+          "x": 169,
+          "y": 445.29396662387677,
+          "clientX": 169,
+          "clientY": 445.29396662387677,
+          "visible": true
+        },
+        "rod": {
+          "x": 161.41666666666666,
+          "y": 382.4544287548139,
+          "clientX": 161.41666666666666,
+          "clientY": 382.4544287548139,
+          "visible": true
+        },
+        "waterEntry": {
+          "x": 162.5,
+          "y": 338.0333761232349,
+          "clientX": 162.5,
+          "clientY": 338.0333761232349,
+          "visible": true
+        }
+      },
+      "fishVisible": false,
+      "floatVisible": false,
+      "safeBounds": {
+        "left": 28,
+        "right": 278.4668246445498,
+        "top": 121.83530805687204,
+        "bottom": 594.4016587677725
+      },
+      "safeBoundsCSS": {
+        "left": 30.333333333333332,
+        "right": 301.6723933649289,
+        "top": 131.98825039494469,
+        "bottom": 643.9351303317535
+      },
+      "frameMeanMs": 1.9499999947018094,
+      "frameMaxMs": 2.399999976158142,
+      "viewport": "phone",
+      "condition": "short-cast"
+    },
+    {
+      "scene": "pacifica",
+      "phase": "waiting",
+      "elapsed": 50.79490060234697,
+      "sea": {
+        "waveHeightM": 0.8,
+        "wavePeriodS": 11,
+        "waveDirectionDeg": 10,
+        "tideM": 0.8
+      },
+      "player": {
+        "x": 2440,
+        "y": 433.7354136121566,
+        "facing": -1,
+        "walking": false
+      },
+      "cast": {
+        "origin": {
+          "x": 2438.360975609756,
+          "y": 428.3643323155729
+        },
+        "target": {
+          "x": 2438.395164585019,
+          "y": 282.0482836502947
+        },
+        "distance": 45.78224572177623,
+        "paidLength": 45.849584538641366,
+        "aim": 0
+      },
+      "lineDistance": 45.72376645614555,
+      "fishMotion": null,
+      "fish": null,
+      "crowdCount": 0,
+      "regularMode": "arriving",
+      "camera": {
+        "x": 2447.925217402222,
+        "y": 357.17184863122566,
+        "scale": 3.0668774921556734,
+        "width": 360,
+        "height": 779
+      },
+      "cameraCSSScale": 3.322450616501979,
+      "playerHeightCSS": 18.605723452411087,
+      "points": {
+        "angler": {
+          "x": 169,
+          "y": 642.4801026957638,
+          "clientX": 169,
+          "clientY": 642.4801026957638,
+          "visible": true
+        },
+        "rod": {
+          "x": 163.58333333333334,
+          "y": 598.0590500641848,
+          "clientX": 163.58333333333334,
+          "clientY": 598.0590500641848,
+          "visible": true
+        },
+        "waterEntry": {
+          "x": 163.58333333333334,
+          "y": 178.76765083440307,
+          "clientX": 163.58333333333334,
+          "clientY": 178.76765083440307,
+          "visible": true
+        }
+      },
+      "fishVisible": false,
+      "floatVisible": false,
+      "safeBounds": {
+        "left": 28,
+        "right": 278.4668246445498,
+        "top": 121.83530805687204,
+        "bottom": 594.4016587677725
+      },
+      "safeBoundsCSS": {
+        "left": 30.333333333333332,
+        "right": 301.6723933649289,
+        "top": 131.98825039494469,
+        "bottom": 643.9351303317535
+      },
+      "frameMeanMs": 2.75,
+      "frameMaxMs": 3,
+      "viewport": "phone",
+      "condition": "full-cast"
+    },
+    {
+      "scene": "pacifica",
+      "phase": "fighting",
+      "elapsed": 53.08150337112268,
+      "sea": {
+        "waveHeightM": 0.8,
+        "wavePeriodS": 11,
+        "waveDirectionDeg": 10,
+        "tideM": 0.8
+      },
+      "player": {
+        "x": 2440,
+        "y": 433.7354136121566,
+        "facing": -1,
+        "walking": false
+      },
+      "cast": {
+        "origin": {
+          "x": 2438.360975609756,
+          "y": 428.3643323155729
+        },
+        "target": {
+          "x": 2438.5505106174064,
+          "y": 393.2572993459326
+        },
+        "distance": 11.087529074306648,
+        "paidLength": 11.365871866861765,
+        "aim": 0
+      },
+      "lineDistance": 7.962756218731644,
+      "fishMotion": {
+        "speciesId": "jacksmelt",
+        "seed": 23971822,
+        "variation": 0.4443153371103108,
+        "elapsed": 3.8000000000000203,
+        "depth": 0.18141810293296673,
+        "airHeight": 0,
+        "jumpActive": false,
+        "jumpVelocity": 0,
+        "jumpCooldown": 0.5161244158632783,
+        "jumpCount": 0,
+        "splash": 0,
+        "run": 0,
+        "headShake": 0,
+        "lateral": -0.7501816286463466,
+        "lateralVelocity": 0.2657533629665768,
+        "diveVelocity": -0.054693333445317294,
+        "energy": 0.913827883237082,
+        "phase": "glide",
+        "pull": 0.05741027197797385,
+        "verticalPickup": 0,
+        "surfaceStartleUsed": false,
+        "surfaceBurstSeconds": 0
+      },
+      "fish": {
+        "id": "jacksmelt",
+        "speciesId": "jacksmelt",
+        "color": "#b5cfce",
+        "catchId": 1,
+        "weightKg": 0.23,
+        "kg": 0.23,
+        "length": 33,
+        "lengthType": "total",
+        "caughtDate": "2026-09-30",
+        "value": 7,
+        "strength": 0.3,
+        "stamina": 0.913827883237082,
+        "run": 0,
+        "name": "加州似银汉鱼",
+        "commonName": "Jacksmelt",
+        "nameEn": "Jacksmelt",
+        "latin": "Atherinopsis californiensis",
+        "runOffset": 3.141592653589793
+      },
+      "crowdCount": 0,
+      "regularMode": "arriving",
+      "camera": {
+        "x": 2444.204217976082,
+        "y": 417.63983433944486,
+        "scale": 4.348382372301211,
+        "width": 360,
+        "height": 779
+      },
+      "cameraCSSScale": 4.710747569992979,
+      "playerHeightCSS": 26.38018639196068,
+      "points": {
+        "angler": {
+          "x": 175.5,
+          "y": 463.7124518613607,
+          "clientX": 175.5,
+          "clientY": 463.7124518613607,
+          "visible": true
+        },
+        "rod": {
+          "x": 167.91666666666666,
+          "y": 401.9563543003851,
+          "clientX": 167.91666666666666,
+          "clientY": 401.9563543003851,
+          "visible": true
+        },
+        "waterEntry": {
+          "x": 157.08333333333334,
+          "y": 332.61617458279846,
+          "clientX": 157.08333333333334,
+          "clientY": 332.61617458279846,
+          "visible": true
+        }
+      },
+      "fishVisible": false,
+      "floatVisible": false,
+      "safeBounds": {
+        "left": 28,
+        "right": 278.4668246445498,
+        "top": 121.83530805687204,
+        "bottom": 594.4016587677725
+      },
+      "safeBoundsCSS": {
+        "left": 30.333333333333332,
+        "right": 301.6723933649289,
+        "top": 131.98825039494469,
+        "bottom": 643.9351303317535
+      },
+      "frameMeanMs": 1.7222222222222223,
+      "frameMaxMs": 2,
+      "viewport": "phone",
+      "condition": "near-fish"
+    },
+    {
+      "scene": "pacifica",
+      "phase": "walk",
+      "elapsed": 47.025,
+      "sea": {
+        "waveHeightM": 0.8,
+        "wavePeriodS": 11,
+        "waveDirectionDeg": 10,
+        "tideM": 0.8
+      },
+      "player": {
+        "x": 1133.2,
+        "y": 487.4208971892726,
+        "facing": -1,
+        "walking": false
+      },
+      "cast": null,
+      "lineDistance": 0,
+      "fishMotion": null,
+      "fish": null,
+      "crowdCount": 0,
+      "regularMode": "arriving",
+      "camera": {
+        "x": 1133.2,
+        "y": 448.9262611226007,
+        "scale": 3.6284722222222223,
+        "width": 950,
+        "height": 594
+      },
+      "cameraCSSScale": 5.5,
+      "playerHeightCSS": 30.800000000000004,
+      "points": {
+        "angler": {
+          "x": 720,
+          "y": 695.4545454545455,
+          "clientX": 720,
+          "clientY": 695.4545454545455,
+          "visible": true
+        }
+      },
+      "fishVisible": false,
+      "floatVisible": false,
+      "safeBounds": {
+        "left": 28,
+        "right": 922,
+        "top": 109.02000000000001,
+        "bottom": 529.2
+      },
+      "safeBoundsCSS": {
+        "left": 42.4421052631579,
+        "right": 1397.5578947368422,
+        "top": 165.25136842105266,
+        "bottom": 802.1557894736843
+      },
+      "frameMeanMs": 4.716666665342119,
+      "frameMaxMs": 6.799999952316284,
+      "viewport": "desktop",
+      "condition": "arrival"
+    },
+    {
+      "scene": "pacifica",
+      "phase": "waiting",
+      "elapsed": 48.92879226840207,
+      "sea": {
+        "waveHeightM": 0.8,
+        "wavePeriodS": 11,
+        "waveDirectionDeg": 10,
+        "tideM": 0.8
+      },
+      "player": {
+        "x": 2440,
+        "y": 433.7354136121566,
+        "facing": -1,
+        "walking": false
+      },
+      "cast": {
+        "origin": {
+          "x": 2438.360975609756,
+          "y": 428.3643323155729
+        },
+        "target": {
+          "x": 2438.7464963803573,
+          "y": 410.73683706159613
+        },
+        "distance": 5.561125378231004,
+        "paidLength": 6.098237392957397,
+        "aim": 0
+      },
+      "lineDistance": 5.509909531584334,
+      "fishMotion": null,
+      "fish": null,
+      "crowdCount": 0,
+      "regularMode": "arriving",
+      "camera": {
+        "x": 2439.717216876352,
+        "y": 418.95180230952894,
+        "scale": 3.8159973859706424,
+        "width": 950,
+        "height": 594
+      },
+      "cameraCSSScale": 5.784248669260763,
+      "playerHeightCSS": 32.39179254786028,
+      "points": {
+        "angler": {
+          "x": 721.5157894736842,
+          "y": 515.1515151515151,
+          "clientX": 721.5157894736842,
+          "clientY": 515.1515151515151,
+          "visible": true
+        },
+        "rod": {
+          "x": 712.421052631579,
+          "y": 437.8787878787879,
+          "clientX": 712.421052631579,
+          "clientY": 437.8787878787879,
+          "visible": true
+        },
+        "waterEntry": {
+          "x": 713.9368421052632,
+          "y": 383.3333333333333,
+          "clientX": 713.9368421052632,
+          "clientY": 383.3333333333333,
+          "visible": true
+        }
+      },
+      "fishVisible": false,
+      "floatVisible": false,
+      "safeBounds": {
+        "left": 28,
+        "right": 922,
+        "top": 108.36,
+        "bottom": 458.58
+      },
+      "safeBoundsCSS": {
+        "left": 42.4421052631579,
+        "right": 1397.5578947368422,
+        "top": 164.25094736842107,
+        "bottom": 695.1107368421052
+      },
+      "frameMeanMs": 4.450000001324548,
+      "frameMaxMs": 5,
+      "viewport": "desktop",
+      "condition": "short-cast"
+    },
+    {
+      "scene": "pacifica",
+      "phase": "waiting",
+      "elapsed": 50.79490060234697,
+      "sea": {
+        "waveHeightM": 0.8,
+        "wavePeriodS": 11,
+        "waveDirectionDeg": 10,
+        "tideM": 0.8
+      },
+      "player": {
+        "x": 2440,
+        "y": 433.7354136121566,
+        "facing": -1,
+        "walking": false
+      },
+      "cast": {
+        "origin": {
+          "x": 2438.360975609756,
+          "y": 428.3643323155729
+        },
+        "target": {
+          "x": 2438.395164585019,
+          "y": 282.0482836502947
+        },
+        "distance": 45.78224572177623,
+        "paidLength": 45.849584538641366,
+        "aim": 0
+      },
+      "lineDistance": 45.72376645614555,
+      "fishMotion": null,
+      "fish": null,
+      "crowdCount": 0,
+      "regularMode": "arriving",
+      "camera": {
+        "x": 2439.1975822925097,
+        "y": 357.17184863122566,
+        "scale": 2.272869902156545,
+        "width": 950,
+        "height": 594
+      },
+      "cameraCSSScale": 3.4451922727425526,
+      "playerHeightCSS": 19.293076727358297,
+      "points": {
+        "angler": {
+          "x": 723.0315789473684,
+          "y": 692.4242424242424,
+          "clientX": 723.0315789473684,
+          "clientY": 692.4242424242424,
+          "visible": true
+        },
+        "rod": {
+          "x": 716.9684210526316,
+          "y": 646.969696969697,
+          "clientX": 716.9684210526316,
+          "clientY": 646.969696969697,
+          "visible": true
+        },
+        "waterEntry": {
+          "x": 716.9684210526316,
+          "y": 212.12121212121212,
+          "clientX": 716.9684210526316,
+          "clientY": 212.12121212121212,
+          "visible": true
+        }
+      },
+      "fishVisible": false,
+      "floatVisible": false,
+      "safeBounds": {
+        "left": 28,
+        "right": 922,
+        "top": 108.36,
+        "bottom": 458.58
+      },
+      "safeBoundsCSS": {
+        "left": 42.4421052631579,
+        "right": 1397.5578947368422,
+        "top": 164.25094736842107,
+        "bottom": 695.1107368421052
+      },
+      "frameMeanMs": 7.716666665342119,
+      "frameMaxMs": 11.399999976158142,
+      "viewport": "desktop",
+      "condition": "full-cast"
+    },
+    {
+      "scene": "pacifica",
+      "phase": "fighting",
+      "elapsed": 53.08150337112268,
+      "sea": {
+        "waveHeightM": 0.8,
+        "wavePeriodS": 11,
+        "waveDirectionDeg": 10,
+        "tideM": 0.8
+      },
+      "player": {
+        "x": 2440,
+        "y": 433.7354136121566,
+        "facing": -1,
+        "walking": false
+      },
+      "cast": {
+        "origin": {
+          "x": 2438.360975609756,
+          "y": 428.3643323155729
+        },
+        "target": {
+          "x": 2438.5505106174064,
+          "y": 393.2572993459326
+        },
+        "distance": 11.087529074306648,
+        "paidLength": 11.365871866861765,
+        "aim": 0
+      },
+      "lineDistance": 7.962756218779153,
+      "fishMotion": {
+        "speciesId": "jacksmelt",
+        "seed": 23971822,
+        "variation": 0.4443153371103108,
+        "elapsed": 3.8000000000000203,
+        "depth": 0.1814181059412033,
+        "airHeight": 0,
+        "jumpActive": false,
+        "jumpVelocity": 0,
+        "jumpCooldown": 0.5161244158632783,
+        "jumpCount": 0,
+        "splash": 0,
+        "run": 0,
+        "headShake": 0,
+        "lateral": -0.7501816095150933,
+        "lateralVelocity": 0.2657533616119351,
+        "diveVelocity": -0.05469333694015286,
+        "energy": 0.9138278842645374,
+        "phase": "glide",
+        "pull": 0.05741027200587683,
+        "verticalPickup": 0,
+        "surfaceStartleUsed": false,
+        "surfaceBurstSeconds": 0
+      },
+      "fish": {
+        "id": "jacksmelt",
+        "speciesId": "jacksmelt",
+        "color": "#b5cfce",
+        "catchId": 1,
+        "weightKg": 0.23,
+        "kg": 0.23,
+        "length": 33,
+        "lengthType": "total",
+        "caughtDate": "2026-09-30",
+        "value": 7,
+        "strength": 0.3,
+        "stamina": 0.9138278842645374,
+        "run": 0,
+        "name": "加州似银汉鱼",
+        "commonName": "Jacksmelt",
+        "nameEn": "Jacksmelt",
+        "latin": "Atherinopsis californiensis",
+        "runOffset": 3.141592653589793
+      },
+      "crowdCount": 0,
+      "regularMode": "arriving",
+      "camera": {
+        "x": 2438.048690413682,
+        "y": 417.63983433663714,
+        "scale": 4.483472222222223,
+        "width": 950,
+        "height": 594
+      },
+      "cameraCSSScale": 6.796000000000001,
+      "playerHeightCSS": 38.05760000000001,
+      "points": {
+        "angler": {
+          "x": 733.6421052631579,
+          "y": 539.3939393939394,
+          "clientX": 733.6421052631579,
+          "clientY": 539.3939393939394,
+          "visible": true
+        },
+        "rod": {
+          "x": 721.5157894736842,
+          "y": 450,
+          "clientX": 721.5157894736842,
+          "clientY": 450,
+          "visible": true
+        },
+        "waterEntry": {
+          "x": 707.8736842105263,
+          "y": 348.4848484848485,
+          "clientX": 707.8736842105263,
+          "clientY": 348.4848484848485,
+          "visible": true
+        }
+      },
+      "fishVisible": false,
+      "floatVisible": false,
+      "safeBounds": {
+        "left": 28,
+        "right": 922,
+        "top": 108.36,
+        "bottom": 458.58
+      },
+      "safeBoundsCSS": {
+        "left": 42.4421052631579,
+        "right": 1397.5578947368422,
+        "top": 164.25094736842107,
+        "bottom": 695.1107368421052
+      },
+      "frameMeanMs": 3.5500000052981906,
+      "frameMaxMs": 4.099999904632568,
+      "viewport": "desktop",
+      "condition": "near-fish"
+    },
+    {
+      "scene": "half-moon-bay",
+      "phase": "walk",
+      "elapsed": 47.025,
+      "sea": {
+        "waveHeightM": 0.8,
+        "wavePeriodS": 11,
+        "waveDirectionDeg": 10,
+        "tideM": 0.8
+      },
+      "player": {
+        "x": 1133.2,
+        "y": 534.7134390467802,
+        "facing": -1,
+        "walking": false
+      },
+      "cast": null,
+      "lineDistance": 0,
+      "fishMotion": null,
+      "fish": null,
+      "crowdCount": 0,
+      "regularMode": null,
+      "camera": {
+        "x": 1139.3555275930255,
+        "y": 495.79394085507494,
+        "scale": 4.348382372301211,
+        "width": 360,
+        "height": 779
+      },
+      "cameraCSSScale": 4.710747569992979,
+      "playerHeightCSS": 26.38018639196068,
+      "points": {
+        "angler": {
+          "x": 165.75,
+          "y": 625.1450577663671,
+          "clientX": 165.75,
+          "clientY": 625.1450577663671,
+          "visible": true
+        }
+      },
+      "fishVisible": false,
+      "floatVisible": false,
+      "safeBounds": {
+        "left": 28,
+        "right": 278.4668246445498,
+        "top": 121.83530805687204,
+        "bottom": 693.1611374407582
+      },
+      "safeBoundsCSS": {
+        "left": 30.333333333333332,
+        "right": 301.6723933649289,
+        "top": 131.98825039494469,
+        "bottom": 750.9245655608214
+      },
+      "frameMeanMs": 2.311111112435659,
+      "frameMaxMs": 2.8000000715255737,
+      "viewport": "phone",
+      "condition": "arrival"
+    },
+    {
+      "scene": "half-moon-bay",
+      "phase": "waiting",
+      "elapsed": 48.92879226840207,
+      "sea": {
+        "waveHeightM": 0.8,
+        "wavePeriodS": 11,
+        "waveDirectionDeg": 10,
+        "tideM": 0.8
+      },
+      "player": {
+        "x": 2440,
+        "y": 501.44458515718213,
+        "facing": -1,
+        "walking": false
+      },
+      "cast": {
+        "origin": {
+          "x": 2438.360975609756,
+          "y": 496.0735038605984
+        },
+        "target": {
+          "x": 2438.5409272869397,
+          "y": 478.4784810650678
+        },
+        "distance": 5.561125378231004,
+        "paidLength": 6.098237392957397,
+        "aim": 0
+      },
+      "lineDistance": 5.498732185032403,
+      "fishMotion": null,
+      "fish": null,
+      "crowdCount": 0,
+      "regularMode": null,
+      "camera": {
+        "x": 2445.4259912364955,
+        "y": 489.24153311112497,
+        "scale": 4.348382372301211,
+        "width": 360,
+        "height": 779
+      },
+      "cameraCSSScale": 4.710747569992979,
+      "playerHeightCSS": 26.38018639196068,
+      "points": {
+        "angler": {
+          "x": 169,
+          "y": 445.29396662387677,
+          "clientX": 169,
+          "clientY": 445.29396662387677,
+          "visible": true
+        },
+        "rod": {
+          "x": 161.41666666666666,
+          "y": 382.4544287548139,
+          "clientX": 161.41666666666666,
+          "clientY": 382.4544287548139,
+          "visible": true
+        },
+        "waterEntry": {
+          "x": 162.5,
+          "y": 342.3671373555841,
+          "clientX": 162.5,
+          "clientY": 342.3671373555841,
+          "visible": true
+        }
+      },
+      "fishVisible": false,
+      "floatVisible": false,
+      "safeBounds": {
+        "left": 28,
+        "right": 278.4668246445498,
+        "top": 121.83530805687204,
+        "bottom": 594.4016587677725
+      },
+      "safeBoundsCSS": {
+        "left": 30.333333333333332,
+        "right": 301.6723933649289,
+        "top": 131.98825039494469,
+        "bottom": 643.9351303317535
+      },
+      "frameMeanMs": 1.7888888915379841,
+      "frameMaxMs": 2.100000023841858,
+      "viewport": "phone",
+      "condition": "short-cast"
+    },
+    {
+      "scene": "half-moon-bay",
+      "phase": "waiting",
+      "elapsed": 50.79490060234697,
+      "sea": {
+        "waveHeightM": 0.8,
+        "wavePeriodS": 11,
+        "waveDirectionDeg": 10,
+        "tideM": 0.8
+      },
+      "player": {
+        "x": 2440,
+        "y": 501.44458515718213,
+        "facing": -1,
+        "walking": false
+      },
+      "cast": {
+        "origin": {
+          "x": 2438.360975609756,
+          "y": 496.0735038605984
+        },
+        "target": {
+          "x": 2438.3627640117093,
+          "y": 349.58503838298907
+        },
+        "distance": 45.78224572177625,
+        "paidLength": 45.84958453864139,
+        "aim": 0
+      },
+      "lineDistance": 45.777645465164426,
+      "fishMotion": null,
+      "fish": null,
+      "crowdCount": 0,
+      "regularMode": null,
+      "camera": {
+        "x": 2447.9187829605485,
+        "y": 424.79481177008563,
+        "scale": 3.063449624953511,
+        "width": 360,
+        "height": 779
+      },
+      "cameraCSSScale": 3.3187370936996365,
+      "playerHeightCSS": 18.584927724717968,
+      "points": {
+        "angler": {
+          "x": 169,
+          "y": 642.4801026957638,
+          "clientX": 169,
+          "clientY": 642.4801026957638,
+          "visible": true
+        },
+        "rod": {
+          "x": 163.58333333333334,
+          "y": 598.0590500641848,
+          "clientX": 163.58333333333334,
+          "clientY": 598.0590500641848,
+          "visible": true
+        },
+        "waterEntry": {
+          "x": 163.58333333333334,
+          "y": 185.26829268292684,
+          "clientX": 163.58333333333334,
+          "clientY": 185.26829268292684,
+          "visible": true
+        }
+      },
+      "fishVisible": false,
+      "floatVisible": false,
+      "safeBounds": {
+        "left": 28,
+        "right": 278.4668246445498,
+        "top": 121.83530805687204,
+        "bottom": 594.4016587677725
+      },
+      "safeBoundsCSS": {
+        "left": 30.333333333333332,
+        "right": 301.6723933649289,
+        "top": 131.98825039494469,
+        "bottom": 643.9351303317535
+      },
+      "frameMeanMs": 2.2611111071374683,
+      "frameMaxMs": 2.6999999284744263,
+      "viewport": "phone",
+      "condition": "full-cast"
+    },
+    {
+      "scene": "half-moon-bay",
+      "phase": "fighting",
+      "elapsed": 53.10650337112268,
+      "sea": {
+        "waveHeightM": 0.8,
+        "wavePeriodS": 11,
+        "waveDirectionDeg": 10,
+        "tideM": 0.8
+      },
+      "player": {
+        "x": 2440,
+        "y": 501.44458515718213,
+        "facing": -1,
+        "walking": false
+      },
+      "cast": {
+        "origin": {
+          "x": 2438.360975609756,
+          "y": 496.0735038605984
+        },
+        "target": {
+          "x": 2438.4604218379995,
+          "y": 460.78661162251717
+        },
+        "distance": 11.087529074306648,
+        "paidLength": 11.365871866861765,
+        "aim": 0
+      },
+      "lineDistance": 7.977091935547003,
+      "fishMotion": {
+        "speciesId": "jacksmelt",
+        "seed": 23971822,
+        "variation": 0.4443153371103108,
+        "elapsed": 3.8250000000000206,
+        "depth": 0.10934865923288166,
+        "airHeight": 0,
+        "jumpActive": false,
+        "jumpVelocity": 0,
+        "jumpCooldown": 0.4911244158632783,
+        "jumpCount": 0,
+        "splash": 0,
+        "run": 0,
+        "headShake": 0,
+        "lateral": -0.742929938466059,
+        "lateralVelocity": 0.26864918594133586,
+        "diveVelocity": -0.04025042951389239,
+        "energy": 0.9145418160636761,
+        "phase": "glide",
+        "pull": 0.05742965620226374,
+        "verticalPickup": 0,
+        "surfaceStartleUsed": false,
+        "surfaceBurstSeconds": 0
+      },
+      "fish": {
+        "id": "jacksmelt",
+        "speciesId": "jacksmelt",
+        "color": "#b5cfce",
+        "catchId": 1,
+        "weightKg": 0.23,
+        "kg": 0.23,
+        "length": 33,
+        "lengthType": "total",
+        "caughtDate": "2026-09-30",
+        "value": 7,
+        "strength": 0.3,
+        "stamina": 0.9145418160636761,
+        "run": 0,
+        "name": "加州似银汉鱼",
+        "commonName": "Jacksmelt",
+        "nameEn": "Jacksmelt",
+        "latin": "Atherinopsis californiensis",
+        "runOffset": 3.141592653589793
+      },
+      "crowdCount": 0,
+      "regularMode": null,
+      "camera": {
+        "x": 2444.183145659012,
+        "y": 485.32787145206896,
+        "scale": 4.348382372301211,
+        "width": 360,
+        "height": 779
+      },
+      "cameraCSSScale": 4.710747569992979,
+      "playerHeightCSS": 26.38018639196068,
+      "points": {
+        "angler": {
+          "x": 175.5,
+          "y": 463.7124518613607,
+          "clientX": 175.5,
+          "clientY": 463.7124518613607,
+          "visible": true
+        },
+        "rod": {
+          "x": 167.91666666666666,
+          "y": 401.9563543003851,
+          "clientX": 167.91666666666666,
+          "clientY": 401.9563543003851,
+          "visible": true
+        },
+        "waterEntry": {
+          "x": 157.08333333333334,
+          "y": 326.1155327342747,
+          "clientX": 157.08333333333334,
+          "clientY": 326.1155327342747,
+          "visible": true
+        },
+        "fish": {
+          "x": 157.08333333333334,
+          "y": 321.78177150192556,
+          "clientX": 157.08333333333334,
+          "clientY": 321.78177150192556,
+          "visible": true
+        }
+      },
+      "fishVisible": true,
+      "floatVisible": false,
+      "safeBounds": {
+        "left": 28,
+        "right": 278.4668246445498,
+        "top": 121.83530805687204,
+        "bottom": 594.4016587677725
+      },
+      "safeBoundsCSS": {
+        "left": 30.333333333333332,
+        "right": 301.6723933649289,
+        "top": 131.98825039494469,
+        "bottom": 643.9351303317535
+      },
+      "frameMeanMs": 2.1166666679912143,
+      "frameMaxMs": 3,
+      "viewport": "phone",
+      "condition": "near-fish"
+    },
+    {
+      "scene": "half-moon-bay",
+      "phase": "walk",
+      "elapsed": 47.025,
+      "sea": {
+        "waveHeightM": 0.8,
+        "wavePeriodS": 11,
+        "waveDirectionDeg": 10,
+        "tideM": 0.8
+      },
+      "player": {
+        "x": 1133.2,
+        "y": 534.7134390467802,
+        "facing": -1,
+        "walking": false
+      },
+      "cast": null,
+      "lineDistance": 0,
+      "fishMotion": null,
+      "fish": null,
+      "crowdCount": 0,
+      "regularMode": null,
+      "camera": {
+        "x": 1133.2,
+        "y": 495.79394085507494,
+        "scale": 3.6284722222222223,
+        "width": 950,
+        "height": 594
+      },
+      "cameraCSSScale": 5.5,
+      "playerHeightCSS": 30.800000000000004,
+      "points": {
+        "angler": {
+          "x": 720,
+          "y": 696.969696969697,
+          "clientX": 720,
+          "clientY": 696.969696969697,
+          "visible": true
+        }
+      },
+      "fishVisible": false,
+      "floatVisible": false,
+      "safeBounds": {
+        "left": 28,
+        "right": 922,
+        "top": 109.02000000000001,
+        "bottom": 529.2
+      },
+      "safeBoundsCSS": {
+        "left": 42.4421052631579,
+        "right": 1397.5578947368422,
+        "top": 165.25136842105266,
+        "bottom": 802.1557894736843
+      },
+      "frameMeanMs": 4.966666671964857,
+      "frameMaxMs": 8.600000023841858,
+      "viewport": "desktop",
+      "condition": "arrival"
+    },
+    {
+      "scene": "half-moon-bay",
+      "phase": "waiting",
+      "elapsed": 48.92879226840207,
+      "sea": {
+        "waveHeightM": 0.8,
+        "wavePeriodS": 11,
+        "waveDirectionDeg": 10,
+        "tideM": 0.8
+      },
+      "player": {
+        "x": 2440,
+        "y": 501.44458515718213,
+        "facing": -1,
+        "walking": false
+      },
+      "cast": {
+        "origin": {
+          "x": 2438.360975609756,
+          "y": 496.0735038605984
+        },
+        "target": {
+          "x": 2438.5409272869397,
+          "y": 478.4784810650678
+        },
+        "distance": 5.561125378231004,
+        "paidLength": 6.098237392957397,
+        "aim": 0
+      },
+      "lineDistance": 5.498732185032403,
+      "fishMotion": null,
+      "fish": null,
+      "crowdCount": 0,
+      "regularMode": null,
+      "camera": {
+        "x": 2439.27046364347,
+        "y": 489.24153311112497,
+        "scale": 4.044097222222222,
+        "width": 950,
+        "height": 594
+      },
+      "cameraCSSScale": 6.13,
+      "playerHeightCSS": 34.328,
+      "points": {
+        "angler": {
+          "x": 724.5473684210526,
+          "y": 504.54545454545456,
+          "clientX": 724.5473684210526,
+          "clientY": 504.54545454545456,
+          "visible": true
+        },
+        "rod": {
+          "x": 713.9368421052632,
+          "y": 422.72727272727275,
+          "clientX": 713.9368421052632,
+          "clientY": 422.72727272727275,
+          "visible": true
+        },
+        "waterEntry": {
+          "x": 715.4526315789474,
+          "y": 369.6969696969697,
+          "clientX": 715.4526315789474,
+          "clientY": 369.6969696969697,
+          "visible": true
+        }
+      },
+      "fishVisible": false,
+      "floatVisible": false,
+      "safeBounds": {
+        "left": 28,
+        "right": 922,
+        "top": 108.36,
+        "bottom": 458.58
+      },
+      "safeBoundsCSS": {
+        "left": 42.4421052631579,
+        "right": 1397.5578947368422,
+        "top": 164.25094736842107,
+        "bottom": 695.1107368421052
+      },
+      "frameMeanMs": 4.5999999973509045,
+      "frameMaxMs": 5.199999928474426,
+      "viewport": "desktop",
+      "condition": "short-cast"
+    },
+    {
+      "scene": "half-moon-bay",
+      "phase": "waiting",
+      "elapsed": 50.79490060234697,
+      "sea": {
+        "waveHeightM": 0.8,
+        "wavePeriodS": 11,
+        "waveDirectionDeg": 10,
+        "tideM": 0.8
+      },
+      "player": {
+        "x": 2440,
+        "y": 501.44458515718213,
+        "facing": -1,
+        "walking": false
+      },
+      "cast": {
+        "origin": {
+          "x": 2438.360975609756,
+          "y": 496.0735038605984
+        },
+        "target": {
+          "x": 2438.3627640117093,
+          "y": 349.58503838298907
+        },
+        "distance": 45.78224572177625,
+        "paidLength": 45.84958453864139,
+        "aim": 0
+      },
+      "lineDistance": 45.777645465164426,
+      "fishMotion": null,
+      "fish": null,
+      "crowdCount": 0,
+      "regularMode": null,
+      "camera": {
+        "x": 2439.1813820058546,
+        "y": 424.7948117700856,
+        "scale": 2.270329501957218,
+        "width": 950,
+        "height": 594
+      },
+      "cameraCSSScale": 3.441341560861467,
+      "playerHeightCSS": 19.271512740824218,
+      "points": {
+        "angler": {
+          "x": 723.0315789473684,
+          "y": 692.4242424242424,
+          "clientX": 723.0315789473684,
+          "clientY": 692.4242424242424,
+          "visible": true
+        },
+        "rod": {
+          "x": 716.9684210526316,
+          "y": 646.969696969697,
+          "clientX": 716.9684210526316,
+          "clientY": 646.969696969697,
+          "visible": true
+        },
+        "waterEntry": {
+          "x": 716.9684210526316,
+          "y": 218.1818181818182,
+          "clientX": 716.9684210526316,
+          "clientY": 218.1818181818182,
+          "visible": true
+        }
+      },
+      "fishVisible": false,
+      "floatVisible": false,
+      "safeBounds": {
+        "left": 28,
+        "right": 922,
+        "top": 108.36,
+        "bottom": 458.58
+      },
+      "safeBoundsCSS": {
+        "left": 42.4421052631579,
+        "right": 1397.5578947368422,
+        "top": 164.25094736842107,
+        "bottom": 695.1107368421052
+      },
+      "frameMeanMs": 6.333333333333333,
+      "frameMaxMs": 9.899999976158142,
+      "viewport": "desktop",
+      "condition": "full-cast"
+    },
+    {
+      "scene": "half-moon-bay",
+      "phase": "fighting",
+      "elapsed": 53.10650337112268,
+      "sea": {
+        "waveHeightM": 0.8,
+        "wavePeriodS": 11,
+        "waveDirectionDeg": 10,
+        "tideM": 0.8
+      },
+      "player": {
+        "x": 2440,
+        "y": 501.44458515718213,
+        "facing": -1,
+        "walking": false
+      },
+      "cast": {
+        "origin": {
+          "x": 2438.360975609756,
+          "y": 496.0735038605984
+        },
+        "target": {
+          "x": 2438.4604218379995,
+          "y": 460.78661162251717
+        },
+        "distance": 11.087529074306648,
+        "paidLength": 11.365871866861765,
+        "aim": 0
+      },
+      "lineDistance": 7.977091935547003,
+      "fishMotion": {
+        "speciesId": "jacksmelt",
+        "seed": 23971822,
+        "variation": 0.4443153371103108,
+        "elapsed": 3.8250000000000206,
+        "depth": 0.10934865923288166,
+        "airHeight": 0,
+        "jumpActive": false,
+        "jumpVelocity": 0,
+        "jumpCooldown": 0.4911244158632783,
+        "jumpCount": 0,
+        "splash": 0,
+        "run": 0,
+        "headShake": 0,
+        "lateral": -0.742929938466059,
+        "lateralVelocity": 0.26864918594133586,
+        "diveVelocity": -0.04025042951389239,
+        "energy": 0.9145418160636761,
+        "phase": "glide",
+        "pull": 0.05742965620226374,
+        "verticalPickup": 0,
+        "surfaceStartleUsed": false,
+        "surfaceBurstSeconds": 0
+      },
+      "fish": {
+        "id": "jacksmelt",
+        "speciesId": "jacksmelt",
+        "color": "#b5cfce",
+        "catchId": 1,
+        "weightKg": 0.23,
+        "kg": 0.23,
+        "length": 33,
+        "lengthType": "total",
+        "caughtDate": "2026-09-30",
+        "value": 7,
+        "strength": 0.3,
+        "stamina": 0.9145418160636761,
+        "run": 0,
+        "name": "加州似银汉鱼",
+        "commonName": "Jacksmelt",
+        "nameEn": "Jacksmelt",
+        "latin": "Atherinopsis californiensis",
+        "runOffset": 3.141592653589793
+      },
+      "crowdCount": 0,
+      "regularMode": null,
+      "camera": {
+        "x": 2438.0276180659866,
+        "y": 485.32787145206896,
+        "scale": 4.483472222222223,
+        "width": 950,
+        "height": 594
+      },
+      "cameraCSSScale": 6.796000000000001,
+      "playerHeightCSS": 38.05760000000001,
+      "points": {
+        "angler": {
+          "x": 733.6421052631579,
+          "y": 539.3939393939394,
+          "clientX": 733.6421052631579,
+          "clientY": 539.3939393939394,
+          "visible": true
+        },
+        "rod": {
+          "x": 721.5157894736842,
+          "y": 450,
+          "clientX": 721.5157894736842,
+          "clientY": 450,
+          "visible": true
+        },
+        "waterEntry": {
+          "x": 707.8736842105263,
+          "y": 340.90909090909093,
+          "clientX": 707.8736842105263,
+          "clientY": 340.90909090909093,
+          "visible": true
+        },
+        "fish": {
+          "x": 706.3578947368421,
+          "y": 333.3333333333333,
+          "clientX": 706.3578947368421,
+          "clientY": 333.3333333333333,
+          "visible": true
+        }
+      },
+      "fishVisible": true,
+      "floatVisible": false,
+      "safeBounds": {
+        "left": 28,
+        "right": 922,
+        "top": 108.36,
+        "bottom": 458.58
+      },
+      "safeBoundsCSS": {
+        "left": 42.4421052631579,
+        "right": 1397.5578947368422,
+        "top": 164.25094736842107,
+        "bottom": 695.1107368421052
+      },
+      "frameMeanMs": 4.200000001324548,
+      "frameMaxMs": 4.700000047683716,
+      "viewport": "desktop",
+      "condition": "near-fish"
+    },
+    {
+      "scene": "benicia",
+      "phase": "walk",
+      "elapsed": 47.025,
+      "sea": {
+        "waveHeightM": 0.8,
+        "wavePeriodS": 11,
+        "waveDirectionDeg": 10,
+        "tideM": 0.8
+      },
+      "player": {
+        "x": 1090,
+        "y": 404.8,
+        "facing": -1,
+        "walking": false
+      },
+      "cast": null,
+      "lineDistance": 0,
+      "fishMotion": null,
+      "fish": null,
+      "crowdCount": 19,
+      "regularMode": null,
+      "camera": {
+        "x": 1100.0869565217392,
+        "y": 354.64,
+        "scale": 2.875,
+        "width": 390,
+        "height": 844
+      },
+      "cameraCSSScale": 2.875,
+      "playerHeightCSS": 16.1,
+      "points": {
+        "angler": {
+          "x": 165.9999999999997,
+          "y": 585.71,
+          "clientX": 165.9999999999997,
+          "clientY": 585.71,
+          "visible": true
+        }
+      },
+      "fishVisible": false,
+      "floatVisible": false,
+      "safeBounds": {
+        "left": 28,
+        "right": 304,
+        "top": 131,
+        "bottom": 752
+      },
+      "safeBoundsCSS": {
+        "left": 28,
+        "right": 304,
+        "top": 131,
+        "bottom": 752
+      },
+      "frameMeanMs": 2.2277777791023254,
+      "frameMaxMs": 4.600000023841858,
+      "viewport": "phone",
+      "condition": "arrival"
+    },
+    {
+      "scene": "benicia",
+      "phase": "waiting",
+      "elapsed": 48.92879226840207,
+      "sea": {
+        "waveHeightM": 0.8,
+        "wavePeriodS": 11,
+        "waveDirectionDeg": 10,
+        "tideM": 0.8
+      },
+      "player": {
+        "x": 1438,
+        "y": 561.0863371814021,
+        "facing": -1,
+        "walking": false
+      },
+      "cast": {
+        "origin": {
+          "x": 1436.360975609756,
+          "y": 555.7152558848184
+        },
+        "target": {
+          "x": 1436.1265891805567,
+          "y": 538.1532567089142
+        },
+        "distance": 5.561125378231004,
+        "paidLength": 6.098237392957786,
+        "aim": 0
+      },
+      "lineDistance": 5.48861349797393,
+      "fishMotion": null,
+      "fish": null,
+      "crowdCount": 19,
+      "regularMode": null,
+      "camera": {
+        "x": 1443.115468503322,
+        "y": 548.8997969451582,
+        "scale": 4.791666666666667,
+        "width": 390,
+        "height": 844
+      },
+      "cameraCSSScale": 4.791666666666667,
+      "playerHeightCSS": 26.83333333333334,
+      "points": {
+        "angler": {
+          "x": 170.48838008824845,
+          "y": 446.39383863200203,
+          "clientX": 170.48838008824845,
+          "clientY": 446.39383863200203,
+          "visible": true
+        },
+        "rod": {
+          "x": 162.6347215516626,
+          "y": 382.3684190336503,
+          "clientX": 162.6347215516626,
+          "clientY": 382.3684190336503,
+          "visible": true
+        },
+        "waterEntry": {
+          "x": 161.61355172513254,
+          "y": 341.8719630215103,
+          "clientX": 161.61355172513254,
+          "clientY": 341.8719630215103,
+          "visible": true
+        }
+      },
+      "fishVisible": false,
+      "floatVisible": false,
+      "safeBounds": {
+        "left": 28,
+        "right": 304,
+        "top": 131,
+        "bottom": 645
+      },
+      "safeBoundsCSS": {
+        "left": 28,
+        "right": 304,
+        "top": 131,
+        "bottom": 645
+      },
+      "frameMeanMs": 1.1222222248713176,
+      "frameMaxMs": 3.899999976158142,
+      "viewport": "phone",
+      "condition": "short-cast"
+    },
+    {
+      "scene": "benicia",
+      "phase": "waiting",
+      "elapsed": 50.79490060234697,
+      "sea": {
+        "waveHeightM": 0.8,
+        "wavePeriodS": 11,
+        "waveDirectionDeg": 10,
+        "tideM": 0.8
+      },
+      "player": {
+        "x": 1438,
+        "y": 561.0863371814021,
+        "facing": -1,
+        "walking": false
+      },
+      "cast": {
+        "origin": {
+          "x": 1436.360975609756,
+          "y": 555.7152558848184
+        },
+        "target": {
+          "x": 1435.3546245172006,
+          "y": 409.2919488991922
+        },
+        "distance": 45.78224572177625,
+        "paidLength": 45.84958453864182,
+        "aim": 0
+      },
+      "lineDistance": 45.758364129473726,
+      "fishMotion": null,
+      "fish": null,
+      "crowdCount": 19,
+      "regularMode": null,
+      "camera": {
+        "x": 1445.3769956441724,
+        "y": 484.4691430402971,
+        "scale": 3.3334546459581014,
+        "width": 390,
+        "height": 844
+      },
+      "cameraCSSScale": 3.3334546459581014,
+      "playerHeightCSS": 18.667346017365368,
+      "points": {
+        "angler": {
+          "x": 170.4091195967207,
+          "y": 643.3999417699401,
+          "clientX": 170.4091195967207,
+          "clientY": 643.3999417699401,
+          "visible": true
+        },
+        "rod": {
+          "x": 164.9455061282232,
+          "y": 598.9111939585573,
+          "clientX": 164.9455061282232,
+          "clientY": 598.9111939585573,
+          "visible": true
+        },
+        "waterEntry": {
+          "x": 161.87326946884212,
+          "y": 178.53958941530948,
+          "clientX": 161.87326946884212,
+          "clientY": 178.53958941530948,
+          "visible": true
+        }
+      },
+      "fishVisible": false,
+      "floatVisible": false,
+      "safeBounds": {
+        "left": 28,
+        "right": 304,
+        "top": 131,
+        "bottom": 645
+      },
+      "safeBoundsCSS": {
+        "left": 28,
+        "right": 304,
+        "top": 131,
+        "bottom": 645
+      },
+      "frameMeanMs": 1.783333334657881,
+      "frameMaxMs": 4.599999904632568,
+      "viewport": "phone",
+      "condition": "full-cast"
+    },
+    {
+      "scene": "benicia",
+      "phase": "fighting",
+      "elapsed": 53.131503371122676,
+      "sea": {
+        "waveHeightM": 0.8,
+        "wavePeriodS": 11,
+        "waveDirectionDeg": 10,
+        "tideM": 0.8
+      },
+      "player": {
+        "x": 1438,
+        "y": 561.0863371814021,
+        "facing": -1,
+        "walking": false
+      },
+      "cast": {
+        "origin": {
+          "x": 1436.360975609756,
+          "y": 555.7152558848184
+        },
+        "target": {
+          "x": 1435.9738177298989,
+          "y": 520.2908327771703
+        },
+        "distance": 11.08752907430663,
+        "paidLength": 11.365871866862165,
+        "aim": 0
+      },
+      "lineDistance": 7.9782899601124875,
+      "fishMotion": {
+        "speciesId": "jacksmelt",
+        "seed": 23971822,
+        "variation": 0.4443153371103108,
+        "elapsed": 3.850000000000021,
+        "depth": 0.12990135535215835,
+        "airHeight": 0,
+        "jumpActive": false,
+        "jumpVelocity": 0,
+        "jumpCooldown": 0.4661244158632783,
+        "jumpCount": 0,
+        "splash": 0,
+        "run": 0,
+        "headShake": 0,
+        "lateral": -0.7360886729607938,
+        "lateralVelocity": 0.2705755268268588,
+        "diveVelocity": -0.04296290973431412,
+        "energy": 0.9138891470349056,
+        "phase": "glide",
+        "pull": 0.05741193470082418,
+        "verticalPickup": 0,
+        "surfaceStartleUsed": false,
+        "surfaceBurstSeconds": 0
+      },
+      "fish": {
+        "id": "jacksmelt",
+        "speciesId": "jacksmelt",
+        "color": "#b5cfce",
+        "catchId": 1,
+        "weightKg": 0.23,
+        "kg": 0.23,
+        "length": 33,
+        "lengthType": "total",
+        "caughtDate": "2026-09-30",
+        "value": 7,
+        "strength": 0.3,
+        "stamina": 0.9138891470349056,
+        "run": 0,
+        "name": "加州似银汉鱼",
+        "commonName": "Jacksmelt",
+        "nameEn": "Jacksmelt",
+        "latin": "Atherinopsis californiensis",
+        "runOffset": 3.141592653589793
+      },
+      "crowdCount": 19,
+      "regularMode": null,
+      "camera": {
+        "x": 1441.9160803775158,
+        "y": 544.9836087761921,
+        "scale": 4.791666666666667,
+        "width": 390,
+        "height": 844
+      },
+      "cameraCSSScale": 4.791666666666667,
+      "playerHeightCSS": 26.83333333333334,
+      "points": {
+        "angler": {
+          "x": 176.2354481910703,
+          "y": 465.1589069416312,
+          "clientX": 176.2354481910703,
+          "clientY": 465.1589069416312,
+          "visible": true
+        },
+        "rod": {
+          "x": 168.3817896544845,
+          "y": 401.9798402601041,
+          "clientX": 168.3817896544845,
+          "clientY": 401.9798402601041,
+          "visible": true
+        },
+        "waterEntry": {
+          "x": 156.43169898157836,
+          "y": 327.12884565442096,
+          "clientX": 156.43169898157836,
+          "clientY": 327.12884565442096,
+          "visible": true
+        },
+        "fish": {
+          "x": 155.7645518089297,
+          "y": 320.69960671854756,
+          "clientX": 155.7645518089297,
+          "clientY": 320.69960671854756,
+          "visible": true
+        }
+      },
+      "fishVisible": true,
+      "floatVisible": false,
+      "safeBounds": {
+        "left": 28,
+        "right": 304,
+        "top": 131,
+        "bottom": 645
+      },
+      "safeBoundsCSS": {
+        "left": 28,
+        "right": 304,
+        "top": 131,
+        "bottom": 645
+      },
+      "frameMeanMs": 1.183333330684238,
+      "frameMaxMs": 3.700000047683716,
+      "viewport": "phone",
+      "condition": "near-fish"
+    },
+    {
+      "scene": "benicia",
+      "phase": "walk",
+      "elapsed": 47.025,
+      "sea": {
+        "waveHeightM": 0.8,
+        "wavePeriodS": 11,
+        "waveDirectionDeg": 10,
+        "tideM": 0.8
+      },
+      "player": {
+        "x": 1090,
+        "y": 404.8,
+        "facing": -1,
+        "walking": false
+      },
+      "cast": null,
+      "lineDistance": 0,
+      "fishMotion": null,
+      "fish": null,
+      "crowdCount": 19,
+      "regularMode": null,
+      "camera": {
+        "x": 1090,
+        "y": 354.64,
+        "scale": 5.5,
+        "width": 1440,
+        "height": 900
+      },
+      "cameraCSSScale": 5.5,
+      "playerHeightCSS": 30.800000000000004,
+      "points": {
+        "angler": {
+          "x": 720,
+          "y": 759.3800000000001,
+          "clientX": 720,
+          "clientY": 759.3800000000001,
+          "visible": true
+        }
+      },
+      "fishVisible": false,
+      "floatVisible": false,
+      "safeBounds": {
+        "left": 28,
+        "right": 1412,
+        "top": 159,
+        "bottom": 808
+      },
+      "safeBoundsCSS": {
+        "left": 28,
+        "right": 1412,
+        "top": 159,
+        "bottom": 808
+      },
+      "frameMeanMs": 3.433333330684238,
+      "frameMaxMs": 6.699999928474426,
+      "viewport": "desktop",
+      "condition": "arrival"
+    },
+    {
+      "scene": "benicia",
+      "phase": "waiting",
+      "elapsed": 48.92879226840207,
+      "sea": {
+        "waveHeightM": 0.8,
+        "wavePeriodS": 11,
+        "waveDirectionDeg": 10,
+        "tideM": 0.8
+      },
+      "player": {
+        "x": 1438,
+        "y": 561.0863371814021,
+        "facing": -1,
+        "walking": false
+      },
+      "cast": {
+        "origin": {
+          "x": 1436.360975609756,
+          "y": 555.7152558848184
+        },
+        "target": {
+          "x": 1436.1265891805567,
+          "y": 538.1532567089142
+        },
+        "distance": 5.561125378231004,
+        "paidLength": 6.098237392957786,
+        "aim": 0
+      },
+      "lineDistance": 5.48861349797393,
+      "fishMotion": null,
+      "fish": null,
+      "crowdCount": 19,
+      "regularMode": null,
+      "camera": {
+        "x": 1437.0632945902785,
+        "y": 548.8997969451582,
+        "scale": 6.13,
+        "width": 1440,
+        "height": 900
+      },
+      "cameraCSSScale": 6.13,
+      "playerHeightCSS": 34.328,
+      "points": {
+        "angler": {
+          "x": 725.742004161593,
+          "y": 504.2034916481751,
+          "clientX": 725.742004161593,
+          "clientY": 504.2034916481751,
+          "visible": true
+        },
+        "rod": {
+          "x": 715.6947846493972,
+          "y": 422.2954939846142,
+          "clientX": 715.6947846493972,
+          "clientY": 422.2954939846142,
+          "visible": true
+        },
+        "waterEntry": {
+          "x": 714.3883976504485,
+          "y": 370.48820173673556,
+          "clientX": 714.3883976504485,
+          "clientY": 370.48820173673556,
+          "visible": true
+        }
+      },
+      "fishVisible": false,
+      "floatVisible": false,
+      "safeBounds": {
+        "left": 28,
+        "right": 1412,
+        "top": 158,
+        "bottom": 701
+      },
+      "safeBoundsCSS": {
+        "left": 28,
+        "right": 1412,
+        "top": 158,
+        "bottom": 701
+      },
+      "frameMeanMs": 4.888888888888889,
+      "frameMaxMs": 39.09999990463257,
+      "viewport": "desktop",
+      "condition": "short-cast"
+    },
+    {
+      "scene": "benicia",
+      "phase": "waiting",
+      "elapsed": 50.79490060234697,
+      "sea": {
+        "waveHeightM": 0.8,
+        "wavePeriodS": 11,
+        "waveDirectionDeg": 10,
+        "tideM": 0.8
+      },
+      "player": {
+        "x": 1438,
+        "y": 561.0863371814021,
+        "facing": -1,
+        "walking": false
+      },
+      "cast": {
+        "origin": {
+          "x": 1436.360975609756,
+          "y": 555.7152558848184
+        },
+        "target": {
+          "x": 1435.3546245172006,
+          "y": 409.2919488991922
+        },
+        "distance": 45.78224572177625,
+        "paidLength": 45.84958453864182,
+        "aim": 0
+      },
+      "lineDistance": 45.758364129473726,
+      "fishMotion": null,
+      "fish": null,
+      "crowdCount": 19,
+      "regularMode": null,
+      "camera": {
+        "x": 1436.6773122586003,
+        "y": 484.4691430402971,
+        "scale": 3.521528935321496,
+        "width": 1440,
+        "height": 900
+      },
+      "cameraCSSScale": 3.521528935321496,
+      "playerHeightCSS": 19.720562037800377,
+      "points": {
+        "angler": {
+          "x": 724.6578831537341,
+          "y": 699.3096661110458,
+          "clientX": 724.6578831537341,
+          "clientY": 699.3096661110458,
+          "visible": true
+        },
+        "rod": {
+          "x": 718.8860113377922,
+          "y": 652.3108527616666,
+          "clientX": 718.8860113377922,
+          "clientY": 652.3108527616666,
+          "visible": true
+        },
+        "waterEntry": {
+          "x": 715.6404383688351,
+          "y": 208.22178414885806,
+          "clientX": 715.6404383688351,
+          "clientY": 208.22178414885806,
+          "visible": true
+        }
+      },
+      "fishVisible": false,
+      "floatVisible": false,
+      "safeBounds": {
+        "left": 28,
+        "right": 1412,
+        "top": 158,
+        "bottom": 701
+      },
+      "safeBoundsCSS": {
+        "left": 28,
+        "right": 1412,
+        "top": 158,
+        "bottom": 701
+      },
+      "frameMeanMs": 9.5,
+      "frameMaxMs": 49.199999928474426,
+      "viewport": "desktop",
+      "condition": "full-cast"
+    },
+    {
+      "scene": "benicia",
+      "phase": "fighting",
+      "elapsed": 53.131503371122676,
+      "sea": {
+        "waveHeightM": 0.8,
+        "wavePeriodS": 11,
+        "waveDirectionDeg": 10,
+        "tideM": 0.8
+      },
+      "player": {
+        "x": 1438,
+        "y": 561.0863371814021,
+        "facing": -1,
+        "walking": false
+      },
+      "cast": {
+        "origin": {
+          "x": 1436.360975609756,
+          "y": 555.7152558848184
+        },
+        "target": {
+          "x": 1435.9738177298989,
+          "y": 520.2908327771703
+        },
+        "distance": 11.08752907430663,
+        "paidLength": 11.365871866862165,
+        "aim": 0
+      },
+      "lineDistance": 7.9782899601124875,
+      "fishMotion": {
+        "speciesId": "jacksmelt",
+        "seed": 23971822,
+        "variation": 0.4443153371103108,
+        "elapsed": 3.850000000000021,
+        "depth": 0.12990135535215835,
+        "airHeight": 0,
+        "jumpActive": false,
+        "jumpVelocity": 0,
+        "jumpCooldown": 0.4661244158632783,
+        "jumpCount": 0,
+        "splash": 0,
+        "run": 0,
+        "headShake": 0,
+        "lateral": -0.7360886729607938,
+        "lateralVelocity": 0.2705755268268588,
+        "diveVelocity": -0.04296290973431412,
+        "energy": 0.9138891470349056,
+        "phase": "glide",
+        "pull": 0.05741193470082418,
+        "verticalPickup": 0,
+        "surfaceStartleUsed": false,
+        "surfaceBurstSeconds": 0
+      },
+      "fish": {
+        "id": "jacksmelt",
+        "speciesId": "jacksmelt",
+        "color": "#b5cfce",
+        "catchId": 1,
+        "weightKg": 0.23,
+        "kg": 0.23,
+        "length": 33,
+        "lengthType": "total",
+        "caughtDate": "2026-09-30",
+        "value": 7,
+        "strength": 0.3,
+        "stamina": 0.9138891470349056,
+        "run": 0,
+        "name": "加州似银汉鱼",
+        "commonName": "Jacksmelt",
+        "nameEn": "Jacksmelt",
+        "latin": "Atherinopsis californiensis",
+        "runOffset": 3.141592653589793
+      },
+      "crowdCount": 19,
+      "regularMode": null,
+      "camera": {
+        "x": 1435.8639064644722,
+        "y": 544.9836087761921,
+        "scale": 6.796,
+        "width": 1440,
+        "height": 900
+      },
+      "cameraCSSScale": 6.796,
+      "playerHeightCSS": 38.05760000000001,
+      "points": {
+        "angler": {
+          "x": 734.5168916674471,
+          "y": 538.934142241807,
+          "clientX": 734.5168916674471,
+          "clientY": 538.934142241807,
+          "visible": true
+        },
+        "rod": {
+          "x": 723.3780819113489,
+          "y": 449.3275466589915,
+          "clientX": 723.3780819113489,
+          "clientY": 449.3275466589915,
+          "visible": true
+        },
+        "waterEntry": {
+          "x": 706.4293202668821,
+          "y": 343.1667064488582,
+          "clientX": 706.4293202668821,
+          "clientY": 343.1667064488582,
+          "visible": true
+        },
+        "fish": {
+          "x": 705.4831083325544,
+          "y": 334.0481448193216,
+          "clientX": 705.4831083325544,
+          "clientY": 334.0481448193216,
+          "visible": true
+        }
+      },
+      "fishVisible": true,
+      "floatVisible": false,
+      "safeBounds": {
+        "left": 28,
+        "right": 1412,
+        "top": 158,
+        "bottom": 701
+      },
+      "safeBoundsCSS": {
+        "left": 28,
+        "right": 1412,
+        "top": 158,
+        "bottom": 701
+      },
+      "frameMeanMs": 2.438888887564341,
+      "frameMaxMs": 5.5,
+      "viewport": "desktop",
+      "condition": "near-fish"
+    }
+  ],
+  "errors": [],
+  "visualReview": {
+    "status": "pass_with_notes",
+    "reviewedAt": "2026-09-30T04:33:08.795Z",
+    "artifactHashes": {
+      "visual-repair-pacifica-phone-arrival.png": "8783a5994347d292362e2f7d2b9bd24ccb3e2486ebf78b0924c8a4157e391988",
+      "visual-repair-pacifica-phone-casts.png": "bff572fd2320b32186a839e1ef06d6506b8b6ffdceaf33e3c50bca8ebf1cc1a7",
+      "visual-repair-pacifica-phone-near-fish.png": "291bd0fae3edcfe67d7db96fdf02955f65307a07eaea8926929adde614caac4c",
+      "visual-repair-pacifica-desktop-arrival.png": "3e7b0c79fe111d89aa6c11f0b2ac754d1b40a5e699338e108b3de010d3afa5e7",
+      "visual-repair-pacifica-desktop-casts.png": "54e3b544f8dcfe9dde2fbc7f92e98e91b83e407bc1ef90a05cc2f6826f73e165",
+      "visual-repair-pacifica-desktop-near-fish.png": "6ff7bd69d4e3fd2bf6539a14caed3ba136e3853f5fb2c3398a6356e3e631de2b",
+      "visual-repair-half-moon-bay-phone-arrival.png": "d291fbdcb5f78ed91087f6bbefac6cd448446e61e5fac0a64d512a5f411ff6af",
+      "visual-repair-half-moon-bay-phone-casts.png": "c06d447e7c4535b08f3bcdf206a7a7702a95d87cc7f63837411dac5218005c18",
+      "visual-repair-half-moon-bay-phone-near-fish.png": "cec0c9975011ed4162c88966d6733fc3a59829759c93f779d9d599945020c233",
+      "visual-repair-half-moon-bay-desktop-arrival.png": "c7d4e401814776d2f3647b80374bebefc4fbadf7e519d736d44517376b9eb28c",
+      "visual-repair-half-moon-bay-desktop-casts.png": "bf0ed8ccb1df5736f1167e5c492302173bbc04248f8b6230135beed3c79f3b6d",
+      "visual-repair-half-moon-bay-desktop-near-fish.png": "27b179b41d5d2a242ec7098889ceebb029c0dcee4299e3a154dc8a0db6f07f22",
+      "visual-repair-benicia-phone-arrival.png": "34ff3e9cb463fd769fe92401634a3df17a56b9d18940b70827f61e6152776002",
+      "visual-repair-benicia-phone-casts.png": "96d2f23f262c7846bf346a0d7eec0ef0d57f563b1be04304e6798aa984d45c97",
+      "visual-repair-benicia-phone-near-fish.png": "745bde1c102e014574a50cea0158f244b9d7ec216ea72f2247a2325f235e68d1",
+      "visual-repair-benicia-desktop-arrival.png": "a3cd943ab121c1a9a98b544f4efec2c2dafc6b3f35ff23379190ab32cf0a56f7",
+      "visual-repair-benicia-desktop-casts.png": "b4834de30bd6b1cba25ffaebd0f49ceadea28916003ca8e0e8a64dd4f1386c9a",
+      "visual-repair-benicia-desktop-near-fish.png": "e0019d679e683e81ad7dc1da9c618c4cd217b24d70e8de306244b7a1b128b3d4"
+    },
+    "inspectedArtifacts": [
+      "visual-repair-pacifica-phone-arrival.png",
+      "visual-repair-pacifica-phone-casts.png",
+      "visual-repair-pacifica-phone-near-fish.png",
+      "visual-repair-pacifica-desktop-arrival.png",
+      "visual-repair-pacifica-desktop-casts.png",
+      "visual-repair-pacifica-desktop-near-fish.png",
+      "visual-repair-half-moon-bay-phone-arrival.png",
+      "visual-repair-half-moon-bay-phone-casts.png",
+      "visual-repair-half-moon-bay-phone-near-fish.png",
+      "visual-repair-half-moon-bay-desktop-arrival.png",
+      "visual-repair-half-moon-bay-desktop-casts.png",
+      "visual-repair-half-moon-bay-desktop-near-fish.png",
+      "visual-repair-benicia-phone-arrival.png",
+      "visual-repair-benicia-phone-casts.png",
+      "visual-repair-benicia-phone-near-fish.png",
+      "visual-repair-benicia-desktop-arrival.png",
+      "visual-repair-benicia-desktop-casts.png",
+      "visual-repair-benicia-desktop-near-fish.png"
+    ],
+    "method": "All 18 screenshots were previously inspected. After the controller-only removal of reeling-driven actionFocus, the entire gate was recaptured: 17 final PNGs are byte-identical to their inspected versions; the changed Pacifica phone cast pair was inspected again. Its short-cast camera centre settled slightly differently with identical physics state and scale. Arrival preserves the fresh constructor player position. Cast and fight states use the real simulation, mounted Carolina rigs, fixed sea state, and retained NPCs. Only transient toast notifications are hidden for screenshots.",
+    "findings": [
+      "All 24 recorded conditions passed browser-error, mounted-bottom-rig, renderer-state-mutation and safe-viewport assertions. Angler, rod tip, water entry and visible fish fit within the measured rectangle clear of the interface.",
+      "The beach views retain continuous coastal bands and fine foam/terrain detail without magnified terrain cells. Full casts widen to show the actual line span; near fights return to a closer view without enlarging the fish independently.",
+      "True Pacifica and Half Moon Bay arrivals show crisp kiosks, correctly attached shop shadows, restrained kelp size and readable shoreline context. Wave foam no longer paints over their roofs.",
+      "True Benicia arrival shows both pier sides and the nearby coast. Its shadow remains translucent with ground texture visible, and its land barrier has human-scale posts. No vertical water-coverage seam is visible in the final Benicia images.",
+      "All 19 Benicia crowd members remain in simulation state; nearby anglers, coolers, lamps, benches and riprap retain coherent proportions. Bottom rigs have no float marker. The Pacifica near-fight fish is hidden at its actual depth; actual surface fish in Half Moon Bay and Benicia remain small."
+    ],
+    "notes": [
+      {
+        "severity": "minor",
+        "scene": "benicia",
+        "observation": "The neighbouring NPC line is more visually prominent than the player line during a short cast. It remains attached to its own angler and is not an erroneous player strand."
+      },
+      {
+        "severity": "minor",
+        "scene": "benicia",
+        "observation": "The broad pier apron remains intentionally sparse and geometric. The phone arrival player is 16.1 CSS px tall to include the pier width and coastline; active short-cast/near-fight views restore about 26.8 CSS px."
+      }
+    ],
+    "performance": {
+      "method": "18 consecutive warm renderer calls per condition in headless Chrome on the development host; no mobile CPU emulation.",
+      "meanFrameMsRange": [
+        1.1222222248713176,
+        9.5
+      ],
+      "maxSingleFrameMs": 49.199999928474426,
+      "limitations": "These timings measure rendering calls, not full interactive device frame pacing."
+    },
+    "coverage": {
+      "scenes": [
+        "pacifica",
+        "half-moon-bay",
+        "benicia"
+      ],
+      "viewports": [
+        {
+          "name": "phone",
+          "width": 390,
+          "height": 844
+        },
+        {
+          "name": "desktop",
+          "width": 1440,
+          "height": 900
+        }
+      ],
+      "conditions": [
+        "true arrival",
+        "actual short cast",
+        "actual full cast",
+        "recorded near-fish fight"
+      ],
+      "artifacts": 18,
+      "conditionsCaptured": 24,
+      "sourceFilesVerified": 8
+    },
+    "limitations": [
+      "The gate samples one fixed sea state and one representative bottom rig. It does not claim an exhaustive review of every camera path, weather state, species or equipment setup."
+    ],
+    "controllerRecapture": {
+      "reason": "Remove the controller option that allowed reel clicks to boost camera focus.",
+      "sourceFilesChanged": [
+        "pacifica-game.js"
+      ],
+      "identicalArtifacts": [
+        "visual-repair-pacifica-phone-arrival.png",
+        "visual-repair-pacifica-phone-near-fish.png",
+        "visual-repair-pacifica-desktop-arrival.png",
+        "visual-repair-pacifica-desktop-casts.png",
+        "visual-repair-pacifica-desktop-near-fish.png",
+        "visual-repair-half-moon-bay-phone-arrival.png",
+        "visual-repair-half-moon-bay-phone-casts.png",
+        "visual-repair-half-moon-bay-phone-near-fish.png",
+        "visual-repair-half-moon-bay-desktop-arrival.png",
+        "visual-repair-half-moon-bay-desktop-casts.png",
+        "visual-repair-half-moon-bay-desktop-near-fish.png",
+        "visual-repair-benicia-phone-arrival.png",
+        "visual-repair-benicia-phone-casts.png",
+        "visual-repair-benicia-phone-near-fish.png",
+        "visual-repair-benicia-desktop-arrival.png",
+        "visual-repair-benicia-desktop-casts.png",
+        "visual-repair-benicia-desktop-near-fish.png"
+      ],
+      "reinspectedArtifacts": [
+        "visual-repair-pacifica-phone-casts.png"
+      ],
+      "findings": "No visual regression in the changed cast pair. All safe UI rectangle and physics-preservation assertions passed again."
+    }
+  }
+}

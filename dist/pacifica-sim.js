@@ -89,6 +89,7 @@ const baitIds = BAITS.map(item => item.id);
 const upgradeIds = SHOP_ITEMS.filter(item => ['rod','reel','rig','book'].includes(item.kind)).map(item => item.id);
 const statKeys = ['caught', 'kept', 'released', 'sold', 'casts', 'missed'];
 const saveVersions = [1, 2, 3, 4];
+const SHORE_LAYOUT_REVISION = 1;
 const catchStatuses = new Set(['kept', 'released', 'sold', 'confiscated']);
 const shopBounds = shoreShopBounds;
 const inBuilding = (building, x, y) => x > building.left && x < building.right && y > building.top && y < building.bottom;
@@ -778,7 +779,7 @@ export class PacificaSimulation {
   snapshot() {
     const s = this.state;
     return JSON.parse(JSON.stringify({
-      scene: this.scene.id, version: 4, elapsed: s.elapsed, credits: s.credits,
+      scene: this.scene.id, version: 4, shoreLayoutRevision: SHORE_LAYOUT_REVISION, elapsed: s.elapsed, credits: s.credits,
       fishingDate:s.fishingDate, population: serializePopulation(this.population), keptLog: s.keptLog,
       wardenNextAt: s.wardenNextAt, pierVisit: s.onPier ? s.pierVisit : null,
       fishingControls:s.fishingControls,activeRod:s.activeRod,activeReel:s.activeReel,rodSupplies:s.rodSupplies,rigStock:s.rigStock,inventorySlots:s.inventorySlots,
@@ -822,7 +823,12 @@ export class PacificaSimulation {
     for (const key of statKeys) s.stats[key] = integer(saved.stats?.[key], 0, 1e8);
     s.nextCatchId = s.catchHistory.reduce((next, fish) => Math.max(next, fish.catchId + 1), integer(saved.nextCatchId, 1, 1e9, 1));
     const x = finite(saved.player?.x, s.player.x), y = finite(saved.player?.y, s.player.y);
-    if (this.onSand(x, y)) {s.player.x = x; s.player.y = y;}
+    // Only the two obsolete beach arrival areas move with the fictional shop.
+    // Recording the layout revision keeps later visits to those places intact.
+    const oldArrival = ['pacifica', 'half-moon-bay'].includes(this.scene.id) && finite(saved.shoreLayoutRevision) < SHORE_LAYOUT_REVISION
+      && [{x: 1130, y: 823}, {x: 1100, y: 865}].some(p => Math.hypot(x-p.x, y-p.y) <= 5*PIXELS_PER_METRE);
+    if (oldArrival) Object.assign(s.player, shoreArrivalPosition(this.scene));
+    else if (this.onSand(x, y)) {s.player.x = x; s.player.y = y;}
     if (saved.version >= 2) {
       s.fineDebt = integer(saved.fineDebt, 0, 1e7);
       s.inspectionCount = integer(saved.inspectionCount, 0, 1e8);

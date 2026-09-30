@@ -2,13 +2,14 @@ import {drawShorePerson} from './shore-people.js';
 import {ANGLERS} from './shore-lore.js';
 // Shared pixel-art shoreline renderer. Fixed bathymetry, animated surf and
 // game collision geometry all use shore-data; the camera follows a long coast.
-import {getShoreScene, sampleShore, shoreSurfField, onPier} from './shore-data.js';
+import {getShoreScene, sampleShore, shoreProfile, shoreSurfField, onPier} from './shore-data.js';
 import {shoreCastPosition} from './shore-casting.js';
 import {shoreFishPosition} from './shore-line-geometry.js';
 import {shoreWaterContact,shoreTackleLine,shoreRigUsesFloat,shoreLineWaterEntry} from './shore-tackle-visual.js';
 import {shoreRodPose,shoreActionCameraTarget,advanceShoreActionCamera,shoreFishVisual,drawShoreFish,shoreCastPreviewVisual,drawShoreCastPreview} from './shore-action-view.js';
 import {shoreWorldMetres as m,shorePersonScale,shorePersonFoot} from './shore-scale.js';
 import {shoreFineLine,drawMetricRod,drawMetricFloat,drawMetricWeight,withShoreProp} from './shore-metric-art.js';
+import {bedDepth} from './shore-surf.js';
 const TAU=Math.PI*2;
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const noise=(x,y=0)=>{let n=Math.imul(x|0,374761393)+Math.imul(y|0,668265263);n=Math.imul(n^(n>>>13),1274126177);return((n^(n>>>16))>>>0)/4294967295;};
@@ -27,9 +28,9 @@ export function createPacificaWorld(canvas,{sceneId='pacifica'}={}){
   const ctx=canvas.getContext('2d',{alpha:false});
   const camera={x:scene.spawn.x,y:scene.spawn.y-150,scale:.65,width:900,height:600};
   let cssWidth=900,cssHeight=600,insets={top:90,bottom:200},now=0,lastTime=null,lastState=null,manualFocus=null,initialized=false,b=null,lastTackle=null,drawOptions={};
-  const chunkSize=512,chunks=new Map();let deepTile=null;
-  const R=(g,x,y,w,h,c)=>{g.fillStyle=c;g.fillRect(Math.round(x),Math.round(y),Math.round(w),Math.round(h));};
-  function poly(g,pts,c){g.fillStyle=c;g.beginPath();pts.forEach(([x,y],i)=>i?g.lineTo(Math.round(x),Math.round(y)):g.moveTo(Math.round(x),Math.round(y)));g.closePath();g.fill();}
+  const chunkSize=128,chunks=new Map();let deepTile=null;
+  const R=(g,x,y,w,h,c)=>{g.fillStyle=c;g.fillRect(x,y,w,h);};
+  function poly(g,pts,c){g.fillStyle=c;g.beginPath();pts.forEach(([x,y],i)=>i?g.lineTo(x,y):g.moveTo(x,y));g.closePath();g.fill();}
   function line(g,x0,y0,x1,y1,c,w=2){if(w<1){shoreFineLine(g,{x:x0,y:y0},{x:x1,y:y1},c,w);return;}x0=Math.round(x0);y0=Math.round(y0);x1=Math.round(x1);y1=Math.round(y1);const dx=Math.abs(x1-x0),sx=x0<x1?1:-1,dy=-Math.abs(y1-y0),sy=y0<y1?1:-1;let err=dx+dy;for(let i=0;i<4000;i++){R(g,x0,y0,w,w,c);if(x0===x1&&y0===y1)break;const e=err*2;if(e>=dy){err+=dy;x0+=sx;}if(e<=dx){err+=dx;y0+=sy;}}}
   function text(g,label,x,y,size=2,color=C.ink,align='center'){
     const chars=[...label.toUpperCase()].map(c=>FONT[c]||FONT[' ']);const width=chars.reduce((n,p)=>n+(p[0].length+1)*size,0)-size;
@@ -53,10 +54,10 @@ export function createPacificaWorld(canvas,{sceneId='pacifica'}={}){
     for(const xx of[x+12,x+w-32]){R(g,xx,y+41,21,20,'#ede1b9');R(g,xx+3,y+44,15,14,'#507f86');R(g,xx+10,y+44,2,14,'#efe4bd');R(g,xx+3,y+50,15,2,'#efe4bd');R(g,xx-2,y+61,25,3,'#688b73');}
     R(g,x+w/2-10,y+43,20,30,'#49686a');R(g,x+w/2-7,y+47,14,14,'#87b5ab');R(g,x+w/2+4,y+64,2,2,'#e8c786');R(g,x+w/2-15,y+73,30,5,'#c3ad85');
   }
-  function shop(){withShoreProp(b,scene.shop.door.x,scene.shop.door.y,.14,()=>shopArt());}
+  function shop(target){const previous=b;b=target;withShoreProp(b,scene.shop.door.x,scene.shop.door.y,.14,()=>shopArt());b=previous;}
   function shopArt(){
-    const x=1050,y=670,w=160;
-    shadow(b,x+w/2+12,790,w+44,28,.2);
+    const {x,y,width:w}=scene.shop;
+    shadow(b,x+w/2+12,y+140,w+44,28,.2);
     R(b,x-5,y+31,w+10,93,'#53655b');R(b,x,y+27,w,94,'#8ea497');R(b,x+4,y+32,w-8,85,'#a8b5a0');
     for(let yy=y+38;yy<y+120;yy+=8){R(b,x+4,yy,w-8,2,'#80968a');R(b,x+4,yy+2,w-8,1,'#c4c8ac');}
     // Hand-tiled sea-green roof, a cream fascia and warm striped canvas.
@@ -91,26 +92,26 @@ export function createPacificaWorld(canvas,{sceneId='pacifica'}={}){
     if(sub)text(g,sub,x,y+24,1,'#c7d5bd');
   }
   function creekX(creek,y){return creek.x+Math.sin((y-460)/155)*43+Math.sin(y/63)*9;}
-  function terrainChunk(cx,cy){
-    const cache=document.createElement('canvas');cache.width=chunkSize;cache.height=chunkSize;
-    b=cache.getContext('2d',{alpha:false});b.translate(-cx,-cy);
+  function terrainChunk(cx,cy,resolution){
+    const cache=document.createElement('canvas');cache.width=chunkSize*resolution;cache.height=chunkSize*resolution;
+    b=cache.getContext('2d',{alpha:false});b.scale(resolution,resolution);b.translate(-cx,-cy);
     R(b,cx,cy,chunkSize,chunkSize,C.dry);
     // Submerged bars are pale; deeper troughs and channel cuts remain dark.
     // This is sampled once per cached tile, not painted as a repeating texture.
     const waterTones=hmb?['#93b9aa','#81ada4','#70a09e','#5a8d96','#477d8c','#3c7183']:
       ['#83a59a','#709b96','#5a8b90','#487d86','#3d6d7e','#315d70'];
-    // Depth shading every 8 px, blended between neighbouring tones with a
-    // little grain so the bar, trough and rip channels shade without bands.
-    for(let x=cx;x<cx+chunkSize;x+=8){
-      const sy=scene.shoreY(x+4);
-      for(let y=cy;y<Math.min(cy+chunkSize,sy+16);y+=8){
-        const bed=sampleShore(scene,x+4,y+4,0,{},{surf:false});
-        const t=clamp(bed.depth/1.05+(noise(x>>3,(y>>3)+5)-.5)*.35,0,4.999),lo=Math.floor(t);
-        R(b,x,y,8,8,mixTone(waterTones[lo],waterTones[lo+1],smooth(t-lo)));
-        if(noise(x>>3,y>>3)>.93)R(b,x+noise(y,x)*6,y+noise(x,y+1)*6,4+noise(x+1,y)*9,1,t<2?C.shallow:C.sea);
+    // Fine depth shading is cached at the working camera's resolution. The
+    // bathymetry stays in metres; the old 8-world-unit squares were 2.5m wide.
+    const cell=2;
+    for(let x=cx;x<cx+chunkSize;x+=cell){
+      const sy=scene.shoreY(x+cell/2),profile=shoreProfile(scene,x+cell/2,0,{});
+      for(let y=cy;y<Math.min(cy+chunkSize,sy+cell);y+=cell){
+        const depth=bedDepth(profile.shape,Math.max(0,(sy-y-cell/2)/3.2),profile.tide,0);
+        const t=clamp(depth/1.05,0,4.999),lo=Math.floor(t);
+        R(b,x,y,cell,cell,mixTone(waterTones[lo],waterTones[lo+1],smooth(t-lo)));
       }
     }
-    const coast=[];for(let x=cx-8;x<=cx+chunkSize+8;x+=8)coast.push([x,Math.round(scene.shoreY(x)/2)*2]);
+    const coast=[];for(let x=cx-2;x<=cx+chunkSize+2;x+=2)coast.push([x,scene.shoreY(x)]);
     const bottom=cy+chunkSize+2;
     // Swash-wetted sand, the damp band up to the high-tide line, then sand and
     // dry sand. Each boundary wanders on its own; nothing runs parallel.
@@ -120,19 +121,18 @@ export function createPacificaWorld(canvas,{sceneId='pacifica'}={}){
       const pts=coast.map(([x,y])=>[x,edge(x,y,k)]);
       if(bottom>Math.min(...pts.map(p=>p[1])))poly(b,[...pts,[cx+chunkSize+8,bottom],[cx-8,bottom]],color);
     });
-    // Wrack line: broken strands of kelp and debris along the last high tide.
-    for(let x=Math.floor(cx/6)*6;x<cx+chunkSize+6;x+=6){
-      if(vnoise(x/90,61)<.42||noise(x,62)>.7)continue;
-      const y=edge(x,scene.shoreY(x),2)-2+noise(x,63)*5;if(y<cy-4||y>cy+chunkSize+4)continue;
-      R(b,x,y,3+noise(x,64)*6,noise(x,65)>.6?2:1,noise(x,66)>.5?(hmb?'#8c8a6d':'#3f4640'):(hmb?'#a39d7e':'#565a4f'));
+    // Wrack and grains have centimetre-scale detail, independent of zoom.
+    for(let x=Math.floor(cx)*1;x<cx+chunkSize+1;x++){
+      if(vnoise(x/18,61)<.42||noise(x,62)>.62)continue;
+      const y=edge(x,scene.shoreY(x),2)+noise(x,63)*1.5;
+      if(y<cy-1||y>cy+chunkSize+1)continue;
+      R(b,x,y,.2+noise(x,64)*.8,.05+noise(x,65)*.12,hmb?'#9d9475':'#51594e');
     }
-    // Coordinate-seeded grains continue across tile boundaries and do not swim.
-    for(let gx=Math.floor(cx/18)*18;gx<cx+chunkSize;gx+=18)for(let gy=Math.floor(cy/19)*19;gy<cy+chunkSize;gy+=19){
-      const x=gx+noise(gx,gy)*15,y=gy+noise(gy,gx)*16,shore=scene.shoreY(x),off=y-shore;
-      if(off<8||off>660)continue;
-      R(b,x,y,noise(gx+1,gy)>.83?4:2,noise(gx+2,gy)>.9?2:1,noise(gx,gy+1)>.5?C.grain:C.grainDark);
-      if(!hmb&&off<63&&noise(gx+7,gy)>.56){R(b,x,y,4,3,'#333d41');R(b,x,y,3,1,'#82857b');}
-      if(!hmb&&off>30&&off<110&&noise(Math.floor(x/95),Math.floor(y/19))>.77){R(b,x-4,y,13,2,'#4b5353');R(b,x,y+3,9,1,'#59605b');}
+    for(let gx=Math.floor(cx/2)*2;gx<cx+chunkSize;gx+=2)for(let gy=Math.floor(cy/2)*2;gy<cy+chunkSize;gy+=2){
+      const x=gx+noise(gx,gy)*1.8,y=gy+noise(gy,gx)*1.8,off=y-scene.shoreY(x);
+      if(off<1||off>660)continue;
+      R(b,x,y,.05+noise(gx+1,gy)*.16,.03+noise(gx+2,gy)*.07,noise(gx,gy+1)>.5?C.grain:C.grainDark);
+      if(!hmb&&off<35&&noise(gx+7,gy)>.83){R(b,x,y,.2,.12,'#4b5353');R(b,x,y,.12,.04,'#82857b');}
     }
     if(hmb){
       // A low vegetated dune ridge, with the two creek mouths cutting across it.
@@ -143,7 +143,7 @@ export function createPacificaWorld(canvas,{sceneId='pacifica'}={}){
       }
       for(let x=Math.floor(cx/31)*31;x<cx+chunkSize+31;x+=31){const y=954+noise(x,73)*250;if(y>cy-30&&y<cy+chunkSize+35)grass(b,x,y,.65+noise(x,31)*.65,noise(x,99)>.45?C.grass:'#747f66');}
       for(const creek of scene.creeks||[]){
-        if(Math.abs(creek.x-(cx+256))>360)continue;
+        if(Math.abs(creek.x-(cx+chunkSize/2))>360)continue;
         for(let y=Math.max(cy-16,scene.shoreY(creek.x)+3);y<cy+chunkSize+16;y+=8){
           const x=creekX(creek,y),w=19+15*Math.sin(y/213)**2+4*Math.sin(y/29);
           R(b,x-w-13,y,w*2+26,9,'#a4ac9c');R(b,x-w,y,w*2,9,'#67948e');if(noise(creek.x,y)>.77)R(b,x-w+6+noise(y,creek.x)*12,y+1,5+noise(y,17)*10,1,'#93b2a1');
@@ -176,10 +176,8 @@ export function createPacificaWorld(canvas,{sceneId='pacifica'}={}){
     for(let x=Math.floor(cx/240)*240;x<cx+chunkSize+240;x+=240){
       const sy=scene.shoreY(x),y=sy+139+noise(x,32)*135;
       if(y>cy-35&&y<cy+chunkSize+35&&noise(x,17)>.42){withShoreProp(b,x,y,m(2)/46,()=>{line(b,x,y,x+46,y+6,'#918972',6);line(b,x+2,y-1,x+43,y+4,'#b4aa8c',2);line(b,x+19,y+2,x+27,y-6,'#918972',3);});}
-      if(sy+55>cy-30&&sy+55<cy+chunkSize+30){R(b,x+45,sy+68,17,2,'#757c56');R(b,x+51,sy+65,9,2,'#7e845b');R(b,x+58,sy+68,2,8,'#727653');}
+      if(sy+55>cy-30&&sy+55<cy+chunkSize+30)withShoreProp(b,x+53,sy+68,.12,()=>{R(b,x+45,sy+68,17,2,'#757c56');R(b,x+51,sy+65,9,2,'#7e845b');R(b,x+58,sy+68,2,8,'#727653');});
     }
-    if(cx<1300&&cx+chunkSize>970&&cy<870&&cy+chunkSize>640)shop();
-    if(cx<1070&&cx+chunkSize>900&&cy<850&&cy+chunkSize>760)beachSign(b,hmb?'HALF MOON BAY':'PACIFICA',hmb?'DUNES / VENICE':'SHARP PARK',974,781);
     const labels=hmb?['DUNES','FRENCHMANS','VENICE','PILARCITOS','FRANCIS','SOUTH BEACH']:['NORTH BEACH','OLD PIER','SAND TROUGH','BAR GAP','SOUTH BEACH','MORI POINT'];
     scene.zones.forEach((zone,i)=>{if(zone.x>cx-100&&zone.x<cx+chunkSize+100&&cy<885&&cy+chunkSize>770)beachSign(b,labels[i]||'BEACH','COAST TRAIL',zone.x,805);});
     b=null;return cache;
@@ -192,15 +190,15 @@ export function createPacificaWorld(canvas,{sceneId='pacifica'}={}){
   function drawTerrain(){
     const v=bounds(12),firstX=Math.floor(v.left/chunkSize),lastX=Math.floor(v.right/chunkSize),firstY=Math.floor(v.top/chunkSize),lastY=Math.floor(v.bottom/chunkSize);
     for(let tx=firstX;tx<=lastX;tx++)for(let ty=firstY;ty<=lastY;ty++){
-      const key=tx+','+ty,farOffshore=(ty+1)*chunkSize<=-512;let tile=farOffshore?offshoreTile():chunks.get(key);
-      if(!tile){tile=terrainChunk(tx*chunkSize,ty*chunkSize);chunks.set(key,tile);}
+      const resolution=Math.min(8,Math.max(1,2**Math.ceil(Math.log2(camera.scale*2)))),key=tx+','+ty+','+resolution,farOffshore=(ty+1)*chunkSize<=-512;let tile=farOffshore?offshoreTile():chunks.get(key);
+      if(!tile){tile=terrainChunk(tx*chunkSize,ty*chunkSize,resolution);chunks.set(key,tile);}
       else if(!farOffshore){chunks.delete(key);chunks.set(key,tile);}
       // Snap shared edges in screen pixels so scaled tiles cannot show seams.
       const a=project(tx*chunkSize,ty*chunkSize),z=project((tx+1)*chunkSize,(ty+1)*chunkSize);
       ctx.save();ctx.setTransform(1,0,0,1,0,0);ctx.drawImage(tile,a.x,a.y,z.x-a.x,z.y-a.y);ctx.restore();
     }
     // Bounded LRU: a long walk does not retain a canvas for the entire coastline.
-    const visibleLandRows=Math.max(0,lastY-Math.max(firstY,-1)+1),tileBudget=Math.max(54,(lastX-firstX+1)*visibleLandRows+4);
+    const visibleLandRows=Math.max(0,lastY-Math.max(firstY,-1)+1),tileBudget=Math.max(16,(lastX-firstX+1)*visibleLandRows+4);
     while(chunks.size>tileBudget)chunks.delete(chunks.keys().next().value);
   }
   function pier(){
@@ -236,7 +234,7 @@ export function createPacificaWorld(canvas,{sceneId='pacifica'}={}){
   function cameraTarget(state,options){
     const compact=cssWidth<720||cssHeight<520,v=viewport(),available=Math.max(100,canvas.height-v.top-v.bottom);
     const baseScale=Math.max(.25,compact?Math.min(.86,canvas.width/510,available/365):Math.min(.76,canvas.width/1150,available/680));
-    return shoreActionCameraTarget(scene,state,{width:canvas.width,height:canvas.height,top:v.top,bottom:v.bottom,left:v.left,right:v.right,baseScale,manualFocus,actionFocus:options.actionFocus,rodLift:options.rodLift,rodSweep:options.rodSweep});
+    return shoreActionCameraTarget(scene,state,{width:canvas.width,height:canvas.height,top:v.top,bottom:v.bottom,left:v.left,right:v.right,baseScale,pixelRatio:canvas.width/cssWidth,manualFocus,actionFocus:options.actionFocus,rodLift:options.rodLift,rodSweep:options.rodSweep});
   }
   let offset={x:0,y:0};
   function project(x,y){return{x:Math.round((x-camera.x)*camera.scale+canvas.width/2),y:Math.round((y-camera.y)*camera.scale+offset.y)};}
@@ -263,90 +261,64 @@ export function createPacificaWorld(canvas,{sceneId='pacifica'}={}){
   function composite(name,alpha){ctx.save();ctx.setTransform(1,0,0,1,0,0);ctx.globalAlpha=alpha;ctx.drawImage(layers[name].canvas,0,0);ctx.restore();}
   const FOAM=['#adcbc2','#c9ddd4','#e1ebdf','#f5f7ec'];
   function waves(){
-    const v=bounds(30),step=8,left=Math.floor(v.left/step)*step,sea=lastState?.seaState,cell=2.5*3.2,cols=[];
-    for(let x=left;x<v.right;x+=step){
+    const v=bounds(8),step=Math.max(2,8/camera.scale),left=Math.floor(v.left/step)*step,sea=lastState?.seaState,cols=[];
+    for(let x=left;x<=v.right+step;x+=step){
       const sy=scene.shoreY(x);
-      if(sy<v.top-60||sy-1400>v.bottom){cols.push(null);continue;}
-      const f=shoreSurfField(scene,x,now,sea);
-      if(!f.crests.length&&!f.surfZoneWidth&&!f.foamReach){cols.push(null);continue;}
-      // Foam every 2.5 m from the real (tidal) waterline to beyond the outermost break.
-      const start=Math.min(0,-Math.floor(f.waterlineMeters/2.5)*2.5),reach=Math.min(420,Math.max(f.surfZoneWidth,f.foamReach)+30);
-      const foam=new Float32Array(Math.max(0,Math.ceil((reach-start)/2.5)));
-      for(let k=0;k<foam.length;k++)foam[k]=f.foamAt(start+k*2.5);
-      cols.push({x,sy,f,start,foam,col:Math.floor(x/step)});
+      cols.push({x,sy,f:shoreSurfField(scene,x,now,sea)});
     }
-    const at=(c,d)=>{if(!c)return 0;const k=Math.round((d-c.start)/2.5);return k>=0&&k<c.foam.length?c.foam[k]:0;};
-    const shade=layer('shade'),g=layer('foam'),sheet=[];
-    for(let ci=0;ci<cols.length;ci++){
-      const c=cols[ci];if(!c){sheet.push(null);continue;}
-      const {x,sy,f,col}=c,metres=x/3.2;
-      // Foam mat. Whitewater spreads sideways into the unbroken part of a crest,
-      // floating foam gathers into patches that drift shoreward, and each cell
-      // fades in and out on its own slow clock.
-      for(let k=0;k<c.foam.length;k++){
-        const d=c.start+k*2.5,y=sy-d*3.2;if(y<v.top-8||y>v.bottom+8||moriLand(x,y))continue;
-        let a=c.foam[k];
-        for(let o=1;o<=3;o++)a=Math.max(a,(.95-o*.25)*Math.max(at(cols[ci-o],d),at(cols[ci+o],d)));
-        if(a<.04)continue;
-        const patch=.5+.9*vnoise2(metres/17+now*.006,(d+.5*now)/6,3);
-        if(a<.85)a=clamp(a*patch,0,1);
-        const row=Math.round(d/2.5),h=noise(col,row),twinkle=Math.abs(2*((h*7.3+now/(8+7*noise(row,col)))%1)-1);
-        if(twinkle>a*1.5)continue;
-        if(a>.6)R(g,x,y-cell,step+1,cell+1,FOAM[Math.min(3,Math.floor(a*3.99))]);
-        // Thin foam is lace: scattered streaks of varying length, off the cell grid.
-        else R(g,x+(noise(col,row+99)-.5)*6,y-cell+(noise(row,col+7)-.5)*5,3+noise(col+3,row)*9,a>.3?3:2,FOAM[Math.min(3,Math.floor(a*3.99))]);
-      }
-      for(const w of f.crests){
-        const y=sy-w.offshore*3.2;if(y<v.top-30||y>v.bottom+30||moriLand(x,y))continue;
-        const hPx=Math.max(1,w.height*3.2),n=noise(col,w.index);
-        if(w.state==='unbroken'||w.state==='reformed'){
-          // Steepening face: a darker band on the shoreward side and a lighter crest.
-          const steep=clamp(w.steepness/.78,0,1);if(steep<.12)continue;
-          R(shade,x,y,step+1,Math.max(1,hPx*.6*steep),steep>.55?C.deep:C.sea);
-          if(steep>.8)R(g,x,y-1,step+1,2,FOAM[1+Math.floor(n*2)]);
-          continue;
-        }
-        if(w.state==='breaking'&&w.sinceBreak!==null&&w.sinceBreak<Math.max(3,w.height*4)){
-          // Fresh break: the lip over its shadowed face. Plunging lips throw spray ahead.
-          R(g,x,y-2,step+1,Math.max(2,hPx*.55),FOAM[3]);
-          R(shade,x,y+Math.max(2,hPx*.55)-2,step+1,Math.max(1,hPx*.35),C.deep);
-          if(w.type==='plunging'||w.type==='surging'){
-            const throw_=hPx*(.6+.5*n);
-            R(g,x+2,y+throw_,3,2,FOAM[3]);if(n>.4)R(g,x+5,y+throw_*.7,2,2,FOAM[2]);if(w.height>1.2&&n>.6)R(g,x+1,y-hPx*.9,2,2,FOAM[3]);
+    const shade=layer('shade'),foam=layer('foam');
+    const ribbon=(g,x,y,xx,yy,width,color)=>poly(g,[[x,y],[xx,yy],[xx,yy+width],[x,y+width]],color);
+    for(let i=0;i<cols.length-1;i++){
+      const a=cols[i],b=cols[i+1],x=a.x,xx=b.x,f=a.f;
+      // Each front follows the same physical crest across adjacent columns.
+      // Connected ribbons replace square blocks; their texture is decimetres.
+      for(const crest of f.crests){
+        const next=b.f.crests.find(c=>c.index===crest.index)||crest;
+        const y=a.sy-crest.offshore*3.2,yy=b.sy-next.offshore*3.2;
+        if(Math.max(y,yy)<v.top-12||Math.min(y,yy)>v.bottom+12||moriLand(x,y))continue;
+        const height=m(crest.height),broken=['breaking','bore'].includes(crest.state),n=noise(Math.floor(x),crest.index);
+        if(!broken){
+          const steep=clamp(crest.steepness/.78,0,1);if(steep<.12)continue;
+          ribbon(shade,x,y,xx,yy,Math.max(.12,height*.55*steep),C.deep);
+          ribbon(foam,x,y-.06,xx,yy-.06,.04+steep*.09,steep>.75?FOAM[1]:'#83aaa2');
+        }else{
+          const roller=crest.roller||.4,thickness=m(.08+crest.height*.16),front=(n-.5)*m(.12);
+          ribbon(shade,x,y+thickness,xx,yy+thickness,height*.22,C.deep);
+          ribbon(foam,x,y+front,xx,yy+front,thickness,FOAM[3]);
+          for(let q=x;q<xx;q+=.65){
+            const t=(q-x)/(xx-x),cy=y+(yy-y)*t;
+            for(let k=0;k<4;k++){
+              const h=noise(Math.floor(q*8)+k,crest.index);
+              if(h>.35+.45*roller)continue;
+              R(foam,q,cy-m(.12+k*.2)-h*.2,.25+h*.55,.05+h*.09,FOAM[k<2?2:1]);
+            }
+            if(crest.type==='plunging'&&crest.sinceBreak<3&&noise(Math.floor(q*9),crest.index)>.6)R(foam,q,cy+height*.4,.08,.12,FOAM[3]);
           }
-          continue;
-        }
-        // Broken bore: a lumpy white front with aerated, streaky water behind it.
-        const band=(1+1.8*w.height)*3.2*(.4+.6*w.roller),front=(n-.5)*3+(vnoise(metres/6,w.index)-.5)*4;
-        R(g,x,y+front-3,step+1,w.roller>.5?5:3,FOAM[w.roller>.3?3:2]);
-        for(let k=0;k<band;k+=3){
-          const m=noise(col*31+k,w.index),fade=1-k/band;
-          if(m>(.25+.6*fade)*(.5+.5*w.roller))continue;
-          R(g,x+(m>.8?2:0),y+front-3-k,step+1-(m>.8?3:0),3,FOAM[fade>.6?3:m>.5?1:2]);
         }
       }
-      // Swash: the last bore runs up the face as a sheet with a lobed, foamy
-      // front that differs from wave to wave, then drains back.
-      const wl=sy+f.waterlineMeters*3.2,lobe=.72+.56*vnoise(metres/13+f.swashWave*3.7,70);
-      const front=wl+Math.max(.6,f.swashMeters*3.2*lobe);
-      if(front>v.top-10&&wl<v.bottom+10&&!moriLand(x,wl)){
-        sheet.push({x,wl,front});
-        const rush=clamp(1-f.swashPhase/.4,0,1),bandPx=4+10*rush;
-        R(g,x,front-1,step+1,2,FOAM[rush>.2?3:1]);
-        for(let k=2;k<bandPx;k+=2){const m=noise(col*17+k,f.swashWave);if(m<rush*(1-k/bandPx)*1.3)R(g,x+(m>.5?1:0),front-1-k,step,2,FOAM[m<.3?3:2]);}
-        if(rush===0&&noise(col,f.swashWave)>.55)R(g,x+2,front+2,3,1,FOAM[1]);
-      }else sheet.push(null);
+      // Small interrupted foam streaks use the actual lingering foam field.
+      // They drift across the surface without a visible sampling-cell grid.
+      const start=Math.max(-f.waterlineMeters,(a.sy-v.bottom)/3.2),end=Math.min((a.sy-v.top)/3.2,Math.max(f.surfZoneWidth,f.foamReach)+10);
+      for(let d=Math.floor(start/.5)*.5;d<end;d+=.5){
+        const amount=f.foamAt(d);if(amount<.08)continue;
+        for(let q=x;q<xx;q+=.8){
+          const h=noise(Math.floor(q*5),Math.floor(d*2)),patch=vnoise2(q/15-now*.02,d/3+now*.03,3);
+          if(h>amount*(.25+patch*.55))continue;
+          const y=a.sy-d*3.2+h*.7;if(moriLand(q,y))continue;
+          R(foam,q+h*.4,y,.18+h*.65,.04+amount*.1,FOAM[amount>.55?2:0]);
+        }
+      }
+      const wl=a.sy+f.waterlineMeters*3.2,wl2=b.sy+b.f.waterlineMeters*3.2;
+      const front=wl+Math.max(.3,f.swashMeters*3.2*(.85+.3*vnoise(x/28+f.swashWave*3.7,70)));
+      const front2=wl2+Math.max(.3,b.f.swashMeters*3.2*(.85+.3*vnoise(xx/28+b.f.swashWave*3.7,70)));
+      if(Math.max(front,front2)>v.top&&Math.min(wl,wl2)<v.bottom&&!moriLand(x,wl)){
+        ctx.globalAlpha=.27;poly(ctx,[[x,wl-.2],[xx,wl2-.2],[xx,front2],[x,front]],C.shallow);ctx.globalAlpha=1;
+        const rush=clamp(1-f.swashPhase/.4,0,1);
+        ribbon(foam,x,front,xx,front2,.08+rush*.17,FOAM[rush>.2?3:1]);
+        for(let q=x;q<xx;q+=.7){const n=noise(Math.floor(q*7),f.swashWave);if(n>.4+rush*.4)continue;R(foam,q,front+(front2-front)*(q-x)/(xx-x)-n*m(.7),.2+n*.5,.06,FOAM[1]);}
+      }
     }
-    // One translucent water film per run of wet columns.
-    for(let i=0;i<sheet.length;){
-      if(!sheet[i]){i++;continue;}
-      let j=i;while(j+1<sheet.length&&sheet[j+1])j++;
-      const run=sheet.slice(i,j+1),last=run.at(-1);
-      ctx.globalAlpha=.36;poly(ctx,[...run.map(p=>[p.x,p.wl-2]),[last.x+step,last.wl-2],[last.x+step,last.front],...run.map(p=>[p.x,p.front]).reverse()],C.shallow);
-      i=j+1;
-    }
-    ctx.globalAlpha=1;
-    composite('shade',.4);composite('foam',.93);
+    composite('shade',.32);composite('foam',.84);
   }
   function gull(x,y,flight=false,variant=0){withShoreProp(ctx,x,y,m(flight?1.2:.5)/(flight?16:15),()=>gullArt(x,y,flight,variant));}
   function gullArt(x,y,flight=false,variant=0){
@@ -421,6 +393,11 @@ export function createPacificaWorld(canvas,{sceneId='pacifica'}={}){
     ctx.setTransform(1,0,0,1,0,0);ctx.imageSmoothingEnabled=false;R(ctx,0,0,canvas.width,canvas.height,C.deep);
     const origin=project(0,0);ctx.setTransform(camera.scale,0,0,camera.scale,origin.x,origin.y);
     drawTerrain();waves();pier();
+    // Buildings and signs stand above the swash layer, retaining their detail
+    // and occluding water behind them instead of baking roofs into the ground.
+    if(visible(scene.shop.door.x,scene.shop.door.y,180)){
+      shop(ctx);beachSign(ctx,hmb?'HALF MOON BAY':'PACIFICA',hmb?'DUNES / VENICE':'SHARP PARK',scene.shop.door.x+26,scene.shop.door.y-63);
+    }
     const castPreview=shoreCastPreviewVisual(state);drawShoreCastPreview(castPreview,(...args)=>line(ctx,...args));
     const v=bounds(80);
     for(let i=Math.floor(v.left/430);i<Math.ceil(v.right/430);i++){const x=i*430+Math.sin(now*.07+i)*68,y=scene.shoreY(x)-160+Math.sin(now*.11+i*2)*43;if(visible(x,y))gull(x,y,true,i);}

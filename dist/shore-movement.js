@@ -14,8 +14,8 @@ export function shoreWalkBoundaryY(scene,x){
 }
 export function shoreStandPosition(scene,x){return{x,y:shoreWalkBoundaryY(scene,x)+SHORE_MOVEMENT.stand-SHORE_MOVEMENT.shoreClearance};}
 export function shoreArrivalPosition(scene){
- const point=scene.pier?.open?scene.pier.gate:scene.shop.door;
- return{x:point.x,y:point.y+shoreWorldMetres(scene.pier?.open?1.5:2.5)};
+ if(scene.pier?.open)return{x:scene.pier.gate.x,y:scene.pier.gate.y+shoreWorldMetres(1.5)};
+ return{...scene.spawn};
 }
 // The doorway remains the authored location; the shop artwork and footprint
 // share its metric scale (a seven-metre shop rather than a fifty-metre one).

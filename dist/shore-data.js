@@ -10,7 +10,6 @@ const safeX=(value,fallback)=>Math.max(-1e6,Math.min(1e6,finite(value,fallback))
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const bell=(v,width)=>Math.exp(-Math.pow(v/width,2));
 const shop=Object.freeze({x:1050,y:670,width:160,height:120,door:Object.freeze({x:1130,y:815})});
-const spawn=Object.freeze({x:1100,y:865});
 // Rip channels through the bar (x px, alongshore half-width px).
 const RIPS=Object.freeze({
   pacifica:Object.freeze([{x:760,width:140},{x:1660,width:115},{x:3240,width:190},{x:4890,width:160},{x:5960,width:130}]),
@@ -47,7 +46,13 @@ const pier=Object.freeze({
 });
 function scene(def){
   const shoreY=x=>coast(def.id,x);
-  return Object.freeze({...def,shop,spawn,shoreY,world:Object.freeze({width:def.width,height:1080,minY:-1000,shoreY})});
+  // The fictional tackle shop belongs at the beach entrance. Keep the same
+  // artwork dimensions and doorway anchor while moving it into the coastal
+  // walking view; its scaled footprint remains fully on dry land.
+  const doorY=shoreY(shop.door.x)+14*PIXELS_PER_METRE;
+  const beachShop=Object.freeze({...shop,y:shop.y+doorY-shop.door.y,door:Object.freeze({...shop.door,y:doorY})});
+  const spawn=Object.freeze({x:beachShop.door.x+PIXELS_PER_METRE,y:doorY+2.2*PIXELS_PER_METRE});
+  return Object.freeze({...def,shop:beachShop,spawn,shoreY,world:Object.freeze({width:def.width,height:1080,minY:-1000,shoreY})});
 }
 export const SHORE_SCENES=Object.freeze({
   benicia:BENICIA_SCENE,

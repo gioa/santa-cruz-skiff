@@ -22,7 +22,7 @@ export function shoreActionPoint(sceneId,state={}){
 
 // The same camera stays in the scene. Its preferred zoom reacts to real tackle
 // activity, while a fit envelope always leaves the angler and action together.
-export function shoreActionCameraTarget(sceneId,state,{width,height,top=0,bottom=0,left=0,right=0,baseScale=.65,manualFocus=null,actionFocus,rodLift,rodSweep}={}){
+export function shoreActionCameraTarget(sceneId,state,{width,height,top=0,bottom=0,left=0,right=0,baseScale=.65,pixelRatio=1,manualFocus=null,actionFocus,rodLift,rodSweep}={}){
  const scene=getShoreScene(sceneId),p=state.player||scene.spawn,charging=state.phase==='walk'&&state.castCharge>0,active=Boolean(state.cast&&!['walk','landed'].includes(state.phase));
  const motion=state.fishMotion||{};
  // Individual reel clicks and twitches must not pump the zoom: enlarging the
@@ -34,14 +34,19 @@ export function shoreActionCameraTarget(sceneId,state,{width,height,top=0,bottom
  const safeWidth=Math.max(1,safe.right-safe.left),safeHeight=Math.max(1,safe.bottom-safe.top),screenY=(safe.top+safe.bottom)/2;
  const action=shoreActionPoint(scene,state),rod=shoreRodPose(state,{rodLift,rodSweep});
  const foot=shorePersonFoot({...state,player:p}),margin=shoreWorldMetres(.6);
+ const pierContext=!active&&!charging&&scene.pier?.open&&(state.onPier||Math.hypot(p.x-scene.pier.gate.x,p.y-scene.pier.gate.y)<shoreWorldMetres(15));
  const points=[{x:foot.x-shoreWorldMetres(.6),y:foot.y-shoreWorldMetres(1.85)},{x:foot.x+shoreWorldMetres(.6),y:foot.y+shoreWorldMetres(.15)},...rod.points];
  if(active)points.push({x:action.x-margin,y:action.y-margin},{x:action.x+margin,y:action.y+margin});
+ if(pierContext)points.push({x:scene.pier.x-scene.pier.width*.75,y:foot.y},{x:scene.pier.x+scene.pier.width*.75,y:Math.min(foot.y,scene.shoreY(p.x)-shoreWorldMetres(5))});
  const lo={x:Math.min(...points.map(q=>q.x)),y:Math.min(...points.map(q=>q.y))},hi={x:Math.max(...points.map(q=>q.x)),y:Math.max(...points.map(q=>q.y))};
  const fit=Math.min(safeWidth/Math.max(1,hi.x-lo.x),safeHeight/Math.max(1,hi.y-lo.y));
- // A close working view spans roughly twelve metres across. Distant casts
- // naturally pull the continuous camera back to fit their real endpoints.
- let scale=Math.min(fit,Math.min(safeWidth/shoreWorldMetres(12),safeHeight/shoreWorldMetres(8))*(1+focus*.45));
- let target=active?{x:(lo.x+hi.x)/2,y:(lo.y+hi.y)/2}:{x:foot.x,y:foot.y-shoreWorldMetres(1.8)};
+ // Keep a readable angler inside a real stretch of coast. A desktop must not
+ // magnify the same twelve metres to fill its entire window. The cap is in
+ // CSS pixels, independent of the renderer's backing resolution.
+ const workingScale=(5.5+focus*1.8)*pixelRatio;
+ let scale=Math.min(fit,workingScale,safeWidth/shoreWorldMetres(18),safeHeight/shoreWorldMetres(12));
+ const shore=scene.shoreY(p.x),nearShore=!state.onPier&&p.y-shore<shoreWorldMetres(pierContext?40:22);
+ let target=active||pierContext?{x:(lo.x+hi.x)/2,y:(lo.y+hi.y)/2}:{x:foot.x,y:nearShore?(foot.y+shore-shoreWorldMetres(8))/2:foot.y-shoreWorldMetres(1.8)};
  if(manualFocus){target={...manualFocus};scale=baseScale;}
  else target.x+=(width/2-(safe.left+safe.right)/2)/Math.max(.08,scale);
  return{...target,scale:Math.max(.08,scale),screenY,focus,mode:manualFocus?'inspect':charging?'charging':active?state.phase:'walk',safeBounds:safe,points:manualFocus?[]:points,action};

@@ -1,7 +1,13 @@
 import {shoreWorldMetres as m} from './shore-scale.js';
-export function shoreFineLine(ctx,a,b,color,width=.035){ctx.strokeStyle=color;ctx.lineWidth=width;ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();}
+// Raster coverage keeps thin rods/line visible without moving their physical
+// centreline or inflating fish, tackle bodies, or distances.
+export function shoreFineLine(ctx,a,b,color,width=.035,minPixels=.65){
+ const transform=ctx.getTransform?.(),scale=Math.hypot(transform?.a??1,transform?.b??0)||1;
+ const canvas=ctx.canvas,cssRatio=canvas?.getBoundingClientRect?.().width/canvas?.width||1;
+ ctx.strokeStyle=color;ctx.lineWidth=Math.max(width,minPixels/(scale*cssRatio));ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();
+}
 export function drawMetricRod(ctx,rod){
- for(let i=1;i<rod.points.length;i++)shoreFineLine(ctx,rod.points[i-1],rod.points[i],'#354e50',m(i<7?.018:.008));
+ for(let i=1;i<rod.points.length;i++)shoreFineLine(ctx,rod.points[i-1],rod.points[i],'#354e50',m(i<7?.018:.008),.85);
  const a=rod.points[0],b=rod.points[4];shoreFineLine(ctx,a,b,'#caa374',m(.035));
  ctx.fillStyle='#aeb4a0';ctx.fillRect(a.x-m(.025),a.y-m(.025),m(.05),m(.075));
 }

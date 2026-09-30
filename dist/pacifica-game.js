@@ -80,7 +80,7 @@ $('world').addEventListener('pointerdown',e=>{
   // Pick its visible projected surface, then walk to the actual deck point.
   const deckPoint=benicia?{x:p.x,y:p.y+shoreWorldMetres(3.5)}:p;
   if(scene.pier&&onPier(scene,deckPoint.x,deckPoint.y)){if(sim.onPier)walkTo(deckPoint.x,deckPoint.y);else if(sim.nearPier)feedback(sim.enterPier());else walkTo(scene.pier.gate.x,scene.pier.gate.y);return;}
-  if(p.x>=SHOP.x-20&&p.x<=SHOP.x+SHOP.width+20&&p.y>=SHOP.y-65&&p.y<=SHOP.door.y+30){if(nearbyShoreInteraction(scene,sim.state)?.kind==='shop')interactNearby();else walkTo(SHOP.door.x,SHOP.door.y);return;}
+  if(p.x>=SHOP.door.x+(SHOP.x-17-SHOP.door.x)*.14&&p.x<=SHOP.door.x+(SHOP.x+SHOP.width+20-SHOP.door.x)*.14&&p.y>=SHOP.door.y+(SHOP.y-20-SHOP.door.y)*.14&&p.y<=SHOP.door.y+shoreWorldMetres(1)){if(nearbyShoreInteraction(scene,sim.state)?.kind==='shop')interactNearby();else walkTo(SHOP.door.x,SHOP.door.y);return;}
   if(p.y<WORLD.shoreY(p.x)){if(sim.state.phase==='bite'){feedback(sim.strike());return;}if(sim.state.phase==='walk')aim=Math.max(-1,Math.min(1,Math.atan2(p.x-sim.state.player.x,sim.state.player.y-p.y)/(Math.PI/3)));updateUI();return;}
   walkTo(p.x,p.y);
 });
@@ -228,7 +228,7 @@ function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;if(!paused()
 }
   if(chargeStart){castCharge=shoreCastPower(now-chargeStart);castPreview=sim.previewCast({power:castCharge,aim});}
   if(sound){sound.gain.gain.setTargetAtTime(soundEnabled&&!document.hidden&&focused?(.12+.06*Math.sin(now/1400)):0,sound.ctx.currentTime,.2);}
-  updateReelFeedback(dt,now);syncFishingScene();lastWorldFrame=world.draw(castPreview?{...sim.state,castPreview,castCharge,castAim:aim}:sim.state,sim.state.elapsed,{reducedMotion:reducedMotion.matches,actionFocus:reeling});
+  updateReelFeedback(dt,now);syncFishingScene();lastWorldFrame=world.draw(castPreview?{...sim.state,castPreview,castCharge,castAim:aim}:sim.state,sim.state.elapsed,{reducedMotion:reducedMotion.matches});
   updateUI();requestAnimationFrame(frame);
 }
 updateUI();requestAnimationFrame(frame);

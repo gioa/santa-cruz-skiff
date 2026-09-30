@@ -21,7 +21,7 @@ Controls remain in place during fights. Opening a menu, changing tabs or losing 
 
 Only `float_rig` creates a visible float. Carolina and fish-finder rigs settle near the bottom; line entry, rod bend and submerged motion communicate wave/current loading. A float's hook remains below its float rather than becoming the surface object itself.
 
-- **Spoon:** wind for swimming action, pause to sink, vary speed or sweep to change motion.
+- **Spoon:** wind for swimming action, pause to sink, vary tap cadence or twitch to change motion.
 - **Spinner:** relative water speed drives its action, so retrieve direction and tidal current matter.
 - **Grub jig:** alternate slow winding, lifts/twitches and pauses for hops and drops near the bottom.
 - **Natural bait rigs:** cast and soak, or wind slowly to reposition. Surviving mounted bait and tackle stay mounted after retrieval; repeated casts do not create new supplies. Washout, snagging and line breaks still consume supplies.
@@ -39,6 +39,8 @@ Hooked fish use actual mass, species profile, energy and line loading. See [rese
 ## Consistent world scale
 
 The shore uses 3.2 world units per metre everywhere. People are 1.75 m tall, rods use their equipped 2.13 m or 3.05 m lengths, fish use recorded centimetres, and the projectile begins at the physical rod tip. Curving a rod cannot lengthen it. Zoom scales every object together: distant casts make the person smaller, then nearby retrieval and fish movement bring the continuous camera closer. Human-scale props and movement use the same conversion. Walking is 1.6 m/s; nearby conversations and shop access use metre-scale proximity.
+
+The working camera caps magnification in CSS pixels rather than enlarging the same small patch to fill larger windows. Near-shore walking includes waterline context; pier arrivals frame both edges and the coast, and long casts still fit their actual endpoints. Coastal caches retain fine terrain detail, storefronts render above the surf, and waves use continuous crest ribbons and small physical foam streaks. Thin fishing lines receive minimum raster coverage without moving their centreline or enlarging fish. The fictional beach storefronts sit 14 m inland, with narrow one-time migration for saves parked at their obsolete arrivals.
 
 See `dist/shore-scale.js`, `dist/shore-movement.js` and [casting details](shore-casting-model.md). Screen-sized touch padding is an input aid; it does not extend the physical reach of a conversation.
 

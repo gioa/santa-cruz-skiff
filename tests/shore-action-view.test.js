@@ -156,3 +156,26 @@ test('Benicia flood ripples move east on the south-facing view and wrap in eithe
   const x=beniciaRippleX(start,elapsed,speed);assert.ok(x>=-150&&x<2450);
  }
 });
+
+test('walking camera preserves coastal context and caps desktop magnification in CSS pixels',()=>{
+ const scene=getShoreScene('pacifica'),s={phase:'walk',player:{...scene.spawn}};
+ for(const [width,height] of [[390,844],[1440,900]])for(const pixelRatio of[1,.66]){
+  const target=shoreActionCameraTarget(scene,s,{width:width*pixelRatio,height:height*pixelRatio,top:140*pixelRatio,bottom:70*pixelRatio,pixelRatio});
+  const camera=advanceShoreActionCamera({width:width*pixelRatio,height:height*pixelRatio,x:0,y:0,scale:1},target,0,{initialized:false});
+  assert.ok(camera.scale/pixelRatio<=5.5+1e-8,'larger windows add scenery instead of magnifying the same tiny patch');
+  assert.ok(5.6*camera.scale/pixelRatio>=24,'the physical angler remains readable');
+  const coastlineY=(scene.shoreY(s.player.x)-camera.y)*camera.scale+target.screenY;
+  assert.ok(coastlineY>target.safeBounds.top&&coastlineY<target.safeBounds.bottom,'arrival includes the actual shoreline above the angler');
+ }
+});
+
+test('a fresh Benicia arrival shows both pier edges and the actual coastline',()=>{
+ const scene=getShoreScene('benicia'),p={x:scene.pier.gate.x,y:scene.pier.gate.y+4.8},s={phase:'walk',player:p};
+ const target=shoreActionCameraTarget(scene,s,{width:390,height:844,top:160,bottom:80});
+ const camera=advanceShoreActionCamera({width:390,height:844,x:0,y:0,scale:1},target,0,{initialized:false}),bounds=target.safeBounds;
+ for(const x of[scene.pier.x-scene.pier.width/2,scene.pier.x+scene.pier.width/2]){
+  const screenX=(x-camera.x)*camera.scale+195;assert.ok(screenX>=bounds.left&&screenX<=bounds.right,'the entrance does not fill the window with an edge-less slab');
+ }
+ const shoreY=(scene.shoreY(p.x)-camera.y)*camera.scale+target.screenY;
+ assert.ok(shoreY>bounds.top&&shoreY<bounds.bottom);assert.ok(5.6*camera.scale>=16);
+});
