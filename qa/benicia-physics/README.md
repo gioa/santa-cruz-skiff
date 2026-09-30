@@ -10,6 +10,7 @@ Reproduced before the fix: an unreeled spoon cast 21.40 m from its release point
 - Losing contact with rock clears the old snag exposure. Drift onto mud or lifting off the bottom cannot trigger a break from a previous patch of rock.
 - The Benicia deck uses the same elevation as the angler. Picking the projected deck resolves to its walkable surface. It occludes the lower line and tackle underneath.
 - Empty-rig reel clicks and twitches no longer briefly zoom the camera in, which visually enlarged the line during an inward stroke. The camera still fits actual travel and fish fights.
+- Close-view testing also exposed oversized legacy railing/joint strokes; the Benicia rails and deck joints now use metre-based dimensions consistent with the angler.
 
 ## Automated coverage
 
@@ -21,6 +22,6 @@ Existing encounter/fight/landing, inventory, keep/release, inspections, purchase
 
 ## Browser checks
 
-Uninstrumented CUA browser interaction at 390 × 844: enter/walk along the public pier, aim, short-cast on land versus in water, let a spoon sink/drift, twitch, repeatedly click the reel until retrieval, verify configuration unlocks only once retrieved, swap to Carolina tackle, attach anchovy (stock 6 → 5), and cast the bottom rig without a bobber. Reload/resume retained the clock and inventory. Screenshot evidence is stored here; rendering alone does not prove the physics invariants above.
+Uninstrumented CUA browser interaction at 390 × 844, 844 × 390 and 1280 × 800: enter/walk along the public pier, aim, short-cast on land versus in water, let a spoon sink/drift, twitch, repeatedly click the reel until retrieval, verify configuration unlocks only once retrieved, swap to Carolina tackle, attach anchovy (stock 6 → 5), and cast the bottom rig without a bobber. Reload/resume retained the clock and inventory. Screenshot evidence is stored here; rendering alone does not prove the physics invariants above.
 
 All magnitudes remain authored game approximations. This change is not a calibrated fishing-line elasticity or commercial reel model.

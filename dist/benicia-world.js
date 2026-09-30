@@ -81,8 +81,16 @@ export function createBeniciaWorld(canvas){
  }
  function pier(){const p=scene.pier;
   rect(p.x-25,p.top+15,74,p.bottom-p.top,'#3e6765');g.save();g.translate(0,-m(3.5));rect(p.x-32,p.top,64,p.bottom-p.top,'#b9bba5');
-  for(let y=p.top+5;y<p.bottom;y+=16){rect(p.x-29,y,58,1,'#8a9589');for(const x of[p.x-32,p.x+30]){rect(x,y,3,14,'#546861');rect(x-2,y+13,7,5,'#415a53');}}
-  for(const x of[p.x-32,p.x+30])rect(x,p.top,3,p.bottom-p.top,'#e0d4b2');rect(p.x-32,p.top,64,3,'#e4dab9');
+  // Joints and railings are metric props too, not metre-thick strokes left
+  // over from the old enlarged-person artwork.
+  for(let y=p.top+5;y<p.bottom;y+=16)rect(p.x-32,y,64,m(.015),'#8a9589');
+  function rail(x0,y0,x1,y1){
+   const height=m(1.1),count=Math.ceil(Math.hypot(x1-x0,y1-y0)/m(2.4));
+   line(x0,y0-height,x1,y1-height,'#e0d4b2',m(.05));
+   line(x0,y0-height*.5,x1,y1-height*.5,'#879488',m(.035));
+   for(let i=0;i<=count;i++){const f=i/count,x=x0+(x1-x0)*f,y=y0+(y1-y0)*f;line(x,y,x,y-height,'#546861',m(.065));}
+  }
+  rail(p.x-31.5,p.top,p.x-31.5,p.bottom);rail(p.x+31.5,p.top,p.x+31.5,p.bottom);rail(p.x-31.5,p.top,p.x+31.5,p.top);
   for(const y of[p.top+42,p.top+123]){lamp(p.x+29,y);bench(p.x-3,y+20);}
   g.restore();
   withShoreProp(g,p.x,p.bottom+25,.08,()=>{rect(p.x-68,p.bottom+10,136,22,'#355e5d');label('BENICIA FISHING PIER',p.x,p.bottom+25,9,'#f1dfb4');});
