@@ -24,8 +24,10 @@ export function shoreActionPoint(sceneId,state={}){
 // activity, while a fit envelope always leaves the angler and action together.
 export function shoreActionCameraTarget(sceneId,state,{width,height,top=0,bottom=0,left=0,right=0,baseScale=.65,manualFocus=null,actionFocus,rodLift,rodSweep}={}){
  const scene=getShoreScene(sceneId),p=state.player||scene.spawn,charging=state.phase==='walk'&&state.castCharge>0,active=Boolean(state.cast&&!['walk','landed'].includes(state.phase));
- const motion=state.fishMotion||{},presentation=state.presentation||{};
- let focus=charging?.55:state.phase==='fighting'?.72+clamp(finite(motion.run)/3,0,1)*.15+(motion.jumpActive?.13:0):state.phase==='bite'?.95:state.phase==='casting'?.6:active?.35+clamp(finite(presentation.retrieveSpeed),0,1)*.3+clamp(finite(presentation.twitch),0,1)*.2:0;
+ const motion=state.fishMotion||{};
+ // Individual reel clicks and twitches must not pump the zoom: enlarging the
+ // same line on every stroke made an inward pull appear to travel outward.
+ let focus=charging?.55:state.phase==='fighting'?.72+clamp(finite(motion.run)/3,0,1)*.15+(motion.jumpActive?.13:0):state.phase==='bite'?.95:state.phase==='casting'?.6:active?.35:0;
  if(actionFocus===true)focus=Math.max(focus,.75);
  else if(Number.isFinite(actionFocus))focus=clamp(actionFocus,0,1);
  const safe={left:left+Math.min(28,width*.08),right:width-right-Math.min(28,width*.08),top:top+12,bottom:height-bottom-12};

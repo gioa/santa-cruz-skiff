@@ -8,6 +8,7 @@ import {shoreSupply,isShoreLure} from '../dist/shore-equipment.js';
 import {finishShoreFlight} from './helpers/shore-cast.js';
 import {shorePresentation,stepShorePresentation} from '../dist/shore-presentation.js';
 import {shorePierOccludes,shoreVisibleLineSegments} from '../dist/shore-tackle-visual.js';
+import {shoreActionCameraTarget} from '../dist/shore-action-view.js';
 
 const rigs=['salmon_spoon','salmon_spinner','grub_jig','carolina_rig','fishfinder_rig','float_rig'];
 const sites=[{name:'mud-bank',x:440},{name:'old-pilings',x:760},{name:'rock-bank',x:1430},{name:'west-bank',x:1910},{name:'pier-tip',x:1090,pier:true}];
@@ -75,6 +76,16 @@ test('pier deck hides underwater tackle and the lower strand, but not a raised r
  const visible=shoreVisibleLineSegments('benicia',points,6,0);
  assert.ok(visible.length>0&&visible.length<24);
  assert.deepEqual(visible[0][0],points[0]);assert.notDeepEqual(visible.at(-1)[1],points.at(-1));
+});
+test('reel clicks and twitches cannot magnify a stationary rig and imply outward movement',()=>{
+ const sim=setup(sites.at(-1),'salmon_spoon'),s=sim.state,tip=shoreRodGeometry(s).tipWorld;
+ s.cast.target={x:tip.x+6.4,y:tip.y-6.4};
+ for(const [width,height]of[[390,844],[844,390],[1280,800]]){
+  const view={width,height,top:100,bottom:180};
+  const quiet=shoreActionCameraTarget('benicia',{...s,presentation:{twitch:0,retrieveSpeed:0}},view);
+  const stroke=shoreActionCameraTarget('benicia',{...s,presentation:{twitch:1,retrieveSpeed:1.75}},view);
+  assert.equal(stroke.scale,quiet.scale);assert.equal(stroke.focus,quiet.focus);
+ }
 });
 for(const site of sites)for(const power of [0,.5,1])for(const aim of [-1,0,1]){
  test(`${site.name}: ${power} power / ${aim} aim resolves its actual landing and can recover`,()=>{

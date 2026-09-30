@@ -9,10 +9,11 @@ Reproduced before the fix: an unreeled spoon cast 21.40 m from its release point
 - Retrieval checks horizontal range and actual depth. A rig several metres below a pier is not considered retrieved merely because it is horizontally close.
 - Losing contact with rock clears the old snag exposure. Drift onto mud or lifting off the bottom cannot trigger a break from a previous patch of rock.
 - The Benicia deck uses the same elevation as the angler. Picking the projected deck resolves to its walkable surface. It occludes the lower line and tackle underneath.
+- Empty-rig reel clicks and twitches no longer briefly zoom the camera in, which visually enlarged the line during an inward stroke. The camera still fits actual travel and fish fights.
 
 ## Automated coverage
 
-`tests/benicia-physics-audit.test.js` contains 112 cases: 5 positions × 6 rigs × 2 tidal directions; 5 positions × 3 cast powers × 3 aim directions; and 7 specific constraint, vertical-pickup, stale-snag, long-soak, frame-rate and occlusion cases. Each retrieval exercises the normal simulation and checks completion, finite state and supply conservation. Physics fixtures disable random encounters so a fish cannot interrupt the invariant being tested.
+`tests/benicia-physics-audit.test.js` contains 113 cases: 5 positions × 6 rigs × 2 tidal directions; 5 positions × 3 cast powers × 3 aim directions; and 8 specific constraint, vertical-pickup, stale-snag, long-soak, frame-rate, camera and occlusion cases. Each retrieval exercises the normal simulation and checks completion, finite state and supply conservation. Physics fixtures disable random encounters so a fish cannot interrupt the invariant being tested.
 
 Existing encounter/fight/landing, inventory, keep/release, inspections, purchases, navigation and save tests remain part of the full suite. The complete suite passed 1,150 cases locally. A final rod-tip-direction refinement also passed the focused 154-case set; deployment runs the complete suite again.
 
